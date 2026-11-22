@@ -25,3 +25,16 @@
     transition-property: none;
   }
 }
+
+/* The sign-in waveform (components/auth-card.tsx) breathes like a voice; still under Reduce Motion. */
+@keyframes auth-wave {
+  0%, 100% { transform: scaleY(0.55); }
+  50% { transform: scaleY(1); }
+}
+.auth-wave-bar {
+  animation: auth-wave 3.2s ease-in-out infinite;
+  transform-origin: bottom;
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-wave-bar { animation: none; transform: scaleY(0.8); }
+}
