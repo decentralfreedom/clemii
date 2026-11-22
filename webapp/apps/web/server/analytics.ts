@@ -12,6 +12,7 @@
 import { isIPv4, isIPv6 } from "node:net";
 import type { Env, Hono } from "hono";
 import type { ServerConfig } from "./config";
+import { campaignOf } from "../shared/campaign";
 import { RateLimitStore, clientKey } from "./http/rate-limiter";
 
 export type Analytics = NonNullable<ServerConfig["analytics"]>;
@@ -71,7 +72,7 @@ export function registerAnalytics<E extends Env>(app: Hono<E>, input: {
       void send(fetcher, views, {
         type: "event",
         payload: {
-          website: views.websiteId, hostname, url: context.req.path,
+          website: views.websiteId, hostname, url: `${context.req.path}${campaignOf(context.req.url)}`,
           referrer: referrerOf(headers.get("referer")), language: languageOf(headers.get("accept-language")),
           ip: coarseAddress(context.req.header("cf-connecting-ip")),
         },
@@ -93,7 +94,7 @@ export function registerAnalytics<E extends Env>(app: Hono<E>, input: {
       void send(fetcher, analytics, {
         type: "event",
         payload: {
-          website: analytics.websiteId, hostname, url: from && pagePath.test(from) ? from : "/download", name: "download",
+          website: analytics.websiteId, hostname, url: `${from && pagePath.test(from) ? from : "/download"}${campaignOf(context.req.url)}`, name: "download",
           // Set by Cloudflare in front of this server; a client cannot choose it.
           ip: coarseAddress(context.req.header("cf-connecting-ip")),
         },
