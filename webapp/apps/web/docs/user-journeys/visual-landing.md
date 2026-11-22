@@ -87,6 +87,8 @@ LANDING-ENTRY-007: the router's hydration data ($_TSR) is loaded as deferred scr
 
 LANDING-ENTRY-008: each page loads its own code on demand, and its own stylesheets are linked in its prerendered head, so the first paint is already styled (no full-screen logo before the landing's styles arrive). Its code chunks are announced with `modulepreload`. `tests/entrance.spec.ts` checks that every stylesheet a page uses was linked in its first HTML; `tests/prerender-scripts.spec.ts` checks the prerender links a page's chunk CSS.
 
+LANDING-ENTRY-009: when the landing's stylesheet arrives after its JavaScript (a slow connection), the entrance still plays: the first paint waits for the stylesheet, so the page decides whether to play the entrance only once the head's stylesheets have loaded, instead of reading the missing fallback clock as too late. `tests/entrance.spec.ts` delays only the landing's stylesheet and expects the header's entrance.
+
 Implementation follows [Vite's async chunk loading](https://vite.dev/guide/features#async-chunk-loading-optimization): retain dynamic scene imports, extracted CSS and automatic dependency preloads. No additional loading framework or global animation loop is introduced.
 
 LANDING-010: the rose opens and closes with actual wheel scrolling; reduced motion presents its open pose, and a missing local model keeps the vector fallback. Covered in tests/flower.spec.ts.
