@@ -542,7 +542,8 @@ test("CMS-014 Settings, as Ghost's: the sidebar becomes its navigation, and Inte
 
 test("CMS-015 Settings > History, as Ghost's, lists who changed what and opens the post", async ({ signedIn, draft, baseURL }, testInfo) => {
   const mobile = testInfo.project.name === "mobile";
-  const post = await draft({ title: `History journey ${crypto.randomUUID().slice(0, 8)}: a post the owner edits` });
+  const title = `History journey ${crypto.randomUUID().slice(0, 8)}: a post the owner edits`;
+  const post = await draft({ title });
   expect((await signedIn.request.patch(`/v1/posts/${post.id}`, { headers: { origin: baseURL! }, data: { imageAlt: "A Mac with the dictation settings open." } })).status()).toBe(200);
 
   await signedIn.goto("/settings/history");
@@ -551,10 +552,10 @@ test("CMS-015 Settings > History, as Ghost's, lists who changed what and opens t
   if (!mobile) await expect(signedIn.getByRole("navigation", { name: "Settings" }).getByRole("button", { name: "History" })).toBeVisible();
   await card.getByRole("button", { name: "View history" }).click();
   const modal = signedIn.getByRole("dialog", { name: "History" });
-  const entries = modal.getByTestId("history-entry").filter({ hasText: post.title });
+  const entries = modal.getByTestId("history-entry").filter({ hasText: title });
   // Newest first: the edit, then the draft being added, each by the signed-in owner, with date and time.
-  await expect(entries.first()).toContainText(`Post edited: ${post.title} by @owner`);
-  await expect(entries.nth(1)).toContainText(`Post added: ${post.title} by @owner`);
+  await expect(entries.first()).toContainText(`Post edited: ${title} by @owner`);
+  await expect(entries.nth(1)).toContainText(`Post added: ${title} by @owner`);
   await expect(entries.first()).toContainText(/\d{1,2} \w{3} \d{4} \| \d{2}:\d{2}:\d{2}/);
   // The dialog has finished opening before it is looked at.
   await signedIn.evaluate(() => Promise.all(document.getAnimations().map((animation) => animation.finished)));
@@ -563,7 +564,7 @@ test("CMS-015 Settings > History, as Ghost's, lists who changed what and opens t
   // The filter narrows the log; tokens and sign-ins hold no post entries.
   await modal.getByRole("button", { name: "Filter history" }).click();
   await signedIn.getByRole("menuitemradio", { name: "Tokens & sign-ins" }).click();
-  await expect(modal.getByTestId("history-entry").filter({ hasText: post.title })).toHaveCount(0);
+  await expect(modal.getByTestId("history-entry").filter({ hasText: title })).toHaveCount(0);
   await modal.getByRole("button", { name: "Filter history" }).click();
   await signedIn.getByRole("menuitemradio", { name: "Posts" }).click();
   await expect(entries.first()).toBeVisible();
@@ -576,7 +577,7 @@ test("CMS-015 Settings > History, as Ghost's, lists who changed what and opens t
   await signedIn.getByRole("menuitemradio", { name: "Posts" }).click();
 
   // An entry links to its post.
-  await entries.first().getByRole("link", { name: post.title }).click();
+  await entries.first().getByRole("link", { name: title }).click();
   await expect(signedIn).toHaveURL(new RegExp(`/posts/${post.id}$`));
 });
 
