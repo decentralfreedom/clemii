@@ -251,6 +251,7 @@ Docker Swarm, Kubernetes, Fly.io) works without code changes:
 | Background cleanup | Idempotent; two instances may run it during an overlap. |
 | Shared volume | Object writes are atomic (temporary file, then rename). |
 | `HUSH_READ_ONLY=1` | Proof writes return 503 with `Retry-After: 300`; pages and proof reads keep working. Used during data moves. |
+| `HUSH_UMAMI_URL`, `HUSH_UMAMI_WEBSITE_ID` | Optional, set together (PRD R10). The server then counts page views and downloads and sends them to that Umami (`/api/send`). Without them nothing is counted. The browser tracker additionally needs `HUSH_UMAMI_TRACKER=1` and stays off until the legal review (`docs/legal-review.md`, item 6). |
 
 **Migrations must stay additive.** The previous release keeps serving from the
 new schema until its replacement is healthy. Add tables, nullable columns and
@@ -265,6 +266,10 @@ running version uses it.
 4. **Advanced > Operations > Stop Grace Period**: 30 seconds (Coolify's default). The drain (10 seconds) plus in-flight requests must finish well inside it.
 5. **Container Labels**: keep **Managed by Coolify**. No retry middleware is needed: the end-to-end check below runs with Coolify's generated labels and no retry, and drops no requests. Hand-edited labels would stop following domain changes.
 6. **Environment Variables** (runtime only): `NODE_ENV=production`, `PORT=3000`, `HUSH_PUBLIC_BASE_URL=https://behu.sh`, `HUSH_DATA_DIR=/app/data`, `HUSH_SERVICE_KEY_ID`, and `DATABASE_URL` from the `hush-postgres` resource's internal connection URL.
+   - Visit counting:
+     - `HUSH_UMAMI_URL=https://umami.decentralfreedom.com`, the operator's Umami.
+     - `HUSH_UMAMI_WEBSITE_ID`, the UUID of the Umami website `hush` / `behu.sh`.
+   - Cloudflare Access protects Umami except `/script.js` and `/api/send`, so this server needs no Access credentials to send.
 7. **Persistent Storage**: one volume mounted at `/app/data`.
 8. Automatic deployment settings stay as in "Automatic website deployments" above.
 9. **Blog from the CMS**: under **Build**, set **Docker Build Stage Target** to
