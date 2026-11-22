@@ -128,4 +128,17 @@ describe.skipIf(!serverUrl)("goals", () => {
     expect((await call("GET", "/v1/goals?quarter=2026-Q4")).body.objectives).toHaveLength(1);
     expect((await database.db.select().from(auditLog)).map((entry) => entry.action)).toEqual(expect.arrayContaining(["goal.approved", "goal.checked_in", "goal.created", "goal.archived"]));
   });
+
+  test("CMS-GOALS-005 every proposal still waiting for the owner is listed, whatever its quarter, until it is approved or rejected", async () => {
+    const propose = async (quarter: string, title: string) => (await call("POST", "/v1/goals", { quarter, title, keyResults: [{ title: "Partner articles", kind: "manual", target: 2 }] })).body.id as string;
+    const later = await propose("2027-Q3", "Later proposal");
+    const now = await propose("2026-Q4", "Current proposal");
+    const titles = async () => ((await call("GET", "/v1/goals/drafts")).body.objectives as Array<{ title: string; status: string }>).map((objective) => objective.title);
+    expect(await titles()).toEqual(expect.arrayContaining(["Later proposal", "Current proposal"]));
+    expect((await call("GET", "/v1/goals/drafts")).body.objectives.every((objective: { status: string }) => objective.status === "draft")).toBe(true);
+    expect((await call("POST", `/v1/goals/${now}/approve`, undefined, owner)).status).toBe(204);
+    expect((await call("DELETE", `/v1/goals/${later}`, undefined, owner)).status).toBe(204);
+    expect(await titles()).not.toEqual(expect.arrayContaining(["Later proposal"]));
+    expect(await titles()).not.toEqual(expect.arrayContaining(["Current proposal"]));
+  });
 });

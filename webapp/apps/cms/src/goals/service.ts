@@ -141,6 +141,13 @@ export async function checkIn(db: Database, keyResultId: string, value: number, 
   });
 }
 
+/** Every objective still waiting for the owner's approval, whatever its quarter, newest first. */
+export async function listDrafts(db: Database) {
+  const quarters = await db.selectDistinct({ quarter: goalObjectives.quarter }).from(goalObjectives).where(eq(goalObjectives.status, "draft"));
+  const lists = await Promise.all(quarters.map(({ quarter }) => listObjectives(db, quarter, false)));
+  return lists.flat().filter((objective) => objective.status === "draft").sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
 /** A quarter's objectives, newest first, each key result with its progress from the data. */
 export async function listObjectives(db: Database, quarter: string, includeArchived: boolean) {
   const period = quarterRange(quarter);

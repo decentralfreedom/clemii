@@ -3,9 +3,9 @@
 //
 // Where visits come from, as Ghost's Top sources card with tabs: channels,
 // the sites and links within them, and our tagged campaigns, for the whole
-// site or one post (PRD: traffic sources and channels). A channel row filters
-// the page to that channel, as Plausible's dashboard does. Downloads here are
-// those through tagged links only; an untagged download's source is unknown.
+// site or one post (PRD: traffic sources and channels). A channel row opens
+// its sources in place. Downloads here are those through tagged links only;
+// an untagged download's source is unknown.
 import { useState } from "react";
 import { useGetTrafficSources, type GetTrafficSourcesParams, type TrafficSourceRowChannel } from "@/api/cms.generated";
 import { BarList } from "@/components/analytics/bar-list";
@@ -16,17 +16,9 @@ import { channelLabels, channelNotes } from "@/lib/traffic-labels";
 type View = "channel" | "source" | "campaign";
 const number = new Intl.NumberFormat("en");
 
-export function SourcesCard({ params, postId, channel, onChannel }: {
-  params: Pick<GetTrafficSourcesParams, "days" | "since">;
-  postId?: string;
-  /** The channel the page is filtered to, if any. */
-  channel?: TrafficSourceRowChannel;
-  /** Filters the page to a channel; without it, a channel row opens its sources here. */
-  onChannel?: (channel: TrafficSourceRowChannel) => void;
-}) {
+export function SourcesCard({ params, postId }: { params: Pick<GetTrafficSourcesParams, "days" | "since">; postId?: string }) {
   const [picked, setPicked] = useState<View>("channel");
-  const [local, setLocal] = useState<TrafficSourceRowChannel>();
-  const within = channel ?? local;
+  const [within, setWithin] = useState<TrafficSourceRowChannel>();
   const view: View = within && picked === "channel" ? "source" : picked;
   const sources = useGetTrafficSources({ ...params, groupBy: view, postId, channel: within, limit: 10 });
   const data = sources.data?.status === 200 ? sources.data.data : undefined;
@@ -38,7 +30,7 @@ export function SourcesCard({ params, postId, channel, onChannel }: {
         key: name, value: row.pageviews, detail: number.format(row.downloads),
         label: <span title={channelNotes[name]}>{channelLabels[name]}</span>,
         actionLabel: `Show ${channelLabels[name]} only`,
-        onSelect: () => (onChannel ? onChannel(name) : setLocal(name)),
+        onSelect: () => setWithin(name),
       };
     }
     if (view === "source") {
@@ -58,13 +50,13 @@ export function SourcesCard({ params, postId, channel, onChannel }: {
         <CardTitle>Sources</CardTitle>
         <CardDescription>
           Where visits came from{within ? <>, within <strong className="font-medium text-foreground">{channelLabels[within]}</strong></> : ""}. Downloads count here only through tagged links.
-          {local && !channel && <> <button type="button" className="underline" onClick={() => setLocal(undefined)}>All channels</button></>}
+          {within && <> <button type="button" className="underline" onClick={() => setWithin(undefined)}>All channels</button></>}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
-        <Tabs value={view} onValueChange={(value) => { setPicked(value as View); if (value === "channel") setLocal(undefined); }} variant="underline">
+        <Tabs value={view} onValueChange={(value) => { setPicked(value as View); if (value === "channel") setWithin(undefined); }} variant="underline">
           <TabsList aria-label="Group sources by">
-            <TabsTrigger value="channel" disabled={Boolean(channel)}>Channels</TabsTrigger>
+            <TabsTrigger value="channel">Channels</TabsTrigger>
             <TabsTrigger value="source">Sources</TabsTrigger>
             <TabsTrigger value="campaign">Campaigns</TabsTrigger>
           </TabsList>

@@ -786,6 +786,162 @@
           "position"
         ]
       },
+      "BlogAnalytics": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "The first day both Search Console and Umami have in the window; null when they share none"
+          },
+          "to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "preliminaryFrom": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "The first day Google was still counting at its last import; its numbers may still change"
+          },
+          "searchImportedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "trafficImportedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "impressions": {
+                "type": "integer"
+              },
+              "clicks": {
+                "type": "integer",
+                "description": "Clicks from Google Search"
+              },
+              "pageviews": {
+                "type": "integer",
+                "description": "From every source"
+              },
+              "downloads": {
+                "type": "integer",
+                "description": "Downloads started on the post's pages"
+              }
+            },
+            "required": [
+              "impressions",
+              "clicks",
+              "pageviews",
+              "downloads"
+            ]
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "impressions": {
+                  "type": "integer"
+                },
+                "clicks": {
+                  "type": "integer",
+                  "description": "Clicks from Google Search"
+                },
+                "pageviews": {
+                  "type": "integer",
+                  "description": "From every source"
+                },
+                "downloads": {
+                  "type": "integer",
+                  "description": "Downloads started on the post's pages"
+                }
+              },
+              "required": [
+                "date",
+                "impressions",
+                "clicks",
+                "pageviews",
+                "downloads"
+              ]
+            },
+            "description": "Only days with numbers; a day in the window without one had none"
+          },
+          "posts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "postId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "impressions": {
+                  "type": "integer"
+                },
+                "clicks": {
+                  "type": "integer",
+                  "description": "Clicks from Google Search"
+                },
+                "pageviews": {
+                  "type": "integer",
+                  "description": "From every source"
+                },
+                "downloads": {
+                  "type": "integer",
+                  "description": "Downloads started on the post's pages"
+                }
+              },
+              "required": [
+                "postId",
+                "title",
+                "status",
+                "impressions",
+                "clicks",
+                "pageviews",
+                "downloads"
+              ]
+            },
+            "description": "Every post with numbers in the window, most downloads first"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "preliminaryFrom",
+          "searchImportedAt",
+          "trafficImportedAt",
+          "totals",
+          "days",
+          "posts"
+        ]
+      },
       "Traffic": {
         "type": "object",
         "properties": {
@@ -1781,6 +1937,20 @@
           "taggedOnly"
         ],
         "description": "For a measured key result: the value and the days it covers"
+      },
+      "GoalDrafts": {
+        "type": "object",
+        "properties": {
+          "objectives": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalObjective"
+            }
+          }
+        },
+        "required": [
+          "objectives"
+        ]
       },
       "NewGoalObjective": {
         "type": "object",
@@ -3165,6 +3335,84 @@
         }
       }
     },
+    "/v1/blog": {
+      "get": {
+        "operationId": "getBlogAnalytics",
+        "tags": [
+          "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "The blog's funnel and every post's part in it: Google impressions and clicks, page views and downloads, over the last `days` days (or since a day) that both Search Console and Umami have.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3650,
+              "default": 90
+            },
+            "required": false,
+            "name": "days",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "required": false,
+            "name": "since",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The blog's analytics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogAnalytics"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The token lacks posts:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/posts/{id}/traffic": {
       "get": {
         "operationId": "getPostTraffic",
@@ -4130,6 +4378,62 @@
           },
           "422": {
             "description": "Names something the catalog does not have",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/goals/drafts": {
+      "get": {
+        "operationId": "listGoalDrafts",
+        "tags": [
+          "Goals"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "Every proposed objective still waiting for the owner's approval, whatever its quarter, newest first.",
+        "responses": {
+          "200": {
+            "description": "The drafts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalDrafts"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
             "content": {
               "application/json": {
                 "schema": {

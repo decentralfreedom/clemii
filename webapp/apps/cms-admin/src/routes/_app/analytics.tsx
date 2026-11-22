@@ -1,63 +1,58 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 //
-// The site's analytics, laid out as Ghost Admin's: tabs by the question they
-// answer (components/analytics/tabs), an Overview at a glance and the detail
-// one click further; a post opens its own analytics from any list. The tab,
-// range, channel and quarter live in the address, so a view can be shared.
-// The route file holds only the address and the frame: each tab is its own
-// component, and the router splits this route's component into its own chunk.
+// The blog's analytics on one screen, as Ghost Admin's Analytics overview and
+// a dashboard in Stephen Few's sense: the blog's funnel from Google
+// impressions to downloads as the headline, then every post with how it
+// drives downloads, each opening the post's own analytics, one level deeper.
+// No tabs: more opens by clicking. Google and Umami count the same days, the
+// days both have (GET /v1/blog), posts only. A goal an agent proposed shows
+// here only while it waits for the owner.
 import { createFileRoute } from "@tanstack/react-router";
-import type { TrafficSourceRowChannel } from "@/api/cms.generated";
-import { GoalsView } from "@/components/analytics/goals-view";
+import { useGetBlogAnalytics } from "@/api/cms.generated";
+import { BlogFunnel } from "@/components/analytics/blog-funnel";
+import { BlogPostsCard } from "@/components/analytics/blog-posts-card";
+import { DataSource } from "@/components/analytics/data-source";
+import { GoalProposalsCard } from "@/components/analytics/goal-proposals-card";
 import { RangeSelect } from "@/components/analytics/range-select";
-import { OverviewTab } from "@/components/analytics/tabs/overview-tab";
-import { SearchTab } from "@/components/analytics/tabs/search-tab";
-import { TrafficTab } from "@/components/analytics/tabs/traffic-tab";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { defaultAnalyticsRange, isAnalyticsRange, type AnalyticsRangeKey } from "@/lib/analytics-ranges";
-import { isChannel } from "@/lib/traffic-labels";
-
-const tabs = ["overview", "search", "traffic", "goals"] as const;
-type Tab = (typeof tabs)[number];
-const isTab = (value: unknown): value is Tab => typeof value === "string" && (tabs as readonly string[]).includes(value);
+import { defaultAnalyticsRange, isAnalyticsRange, rangeParams, type AnalyticsRangeKey } from "@/lib/analytics-ranges";
 
 export const Route = createFileRoute("/_app/analytics")({
-  validateSearch: (search: Record<string, unknown>): { tab?: Exclude<Tab, "overview">; quarter?: string; range?: AnalyticsRangeKey; channel?: TrafficSourceRowChannel } => ({
-    ...(isTab(search.tab) && search.tab !== "overview" ? { tab: search.tab } : {}),
-    ...(typeof search.quarter === "string" && /^\d{4}-Q[1-4]$/.test(search.quarter) ? { quarter: search.quarter } : {}),
-    ...(isAnalyticsRange(search.range) && search.range !== defaultAnalyticsRange ? { range: search.range } : {}),
-    ...(isChannel(search.channel) ? { channel: search.channel } : {}),
-  }),
+  validateSearch: (search: Record<string, unknown>): { range?: AnalyticsRangeKey } =>
+    isAnalyticsRange(search.range) && search.range !== defaultAnalyticsRange ? { range: search.range } : {},
   component: Analytics,
 });
 
 function Analytics() {
-  const { tab = "overview", quarter, range = defaultAnalyticsRange, channel } = Route.useSearch();
+  const { range = defaultAnalyticsRange } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const go = (next: Tab, nextChannel?: TrafficSourceRowChannel) =>
-    void navigate({ search: (previous) => ({ ...previous, tab: next === "overview" ? undefined : next, channel: nextChannel }) });
+  const query = useGetBlogAnalytics(rangeParams(range));
+  const blog = query.data?.status === 200 ? query.data.data : undefined;
 
   return (
     <div className="mx-auto flex w-full max-w-(--content-width) flex-col px-(--page-gutter) pb-12">
-      <header className="flex flex-col gap-4 pt-[28px] pb-6">
+      <header className="flex flex-wrap items-center justify-between gap-4 pt-[28px] pb-6">
         <h1 className="text-3xl leading-tight font-bold tracking-tight">Analytics</h1>
-        <div className="flex items-center justify-between gap-4 border-b border-border-default">
-          <Tabs value={tab} onValueChange={(value) => go(value as Tab)} variant="underline">
-            <TabsList aria-label="Analytics">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="search">Search</TabsTrigger>
-              <TabsTrigger value="traffic">Traffic</TabsTrigger>
-              <TabsTrigger value="goals">Goals</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          {tab !== "goals" && <RangeSelect value={range} onChange={(next) => void navigate({ search: (previous) => ({ ...previous, range: next === defaultAnalyticsRange ? undefined : next }) })} />}
-        </div>
+        <RangeSelect value={range} onChange={(next) => void navigate({ search: next === defaultAnalyticsRange ? {} : { range: next } })} />
       </header>
-      {tab === "overview" && <OverviewTab range={range} onTraffic={(next) => go("traffic", next)} />}
-      {tab === "search" && <SearchTab range={range} />}
-      {tab === "traffic" && <TrafficTab range={range} channel={channel} onChannel={(next) => go("traffic", next)} />}
-      {tab === "goals" && <GoalsView quarter={quarter} onQuarter={(next) => void navigate({ search: (previous) => ({ ...previous, quarter: next }) })} />}
+      <div className="flex flex-col gap-6">
+        <GoalProposalsCard />
+        {query.isPending ? (
+          <p className="py-24 text-center text-sm text-text-secondary">Loading…</p>
+        ) : !blog ? (
+          <p className="py-24 text-center text-sm text-destructive">The numbers could not be loaded.</p>
+        ) : !blog.from || !blog.to ? (
+          <p className="py-24 text-center text-sm text-text-secondary">No days that both Google Search Console and Umami have yet; the CMS reads them once a day.</p>
+        ) : (
+          <>
+            <BlogFunnel blog={{ ...blog, from: blog.from, to: blog.to }} />
+            <BlogPostsCard posts={blog.posts} range={range} />
+            <DataSource from={blog.from} to={blog.to} importedAt={blog.searchImportedAt} preliminaryFrom={blog.preliminaryFrom}>
+              Posts only: impressions and clicks from Google Search Console, page views and downloads from Umami, over the same days. Home and download pages do not count here.
+            </DataSource>
+          </>
+        )}
+      </div>
     </div>
   );
 }
