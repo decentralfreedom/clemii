@@ -286,4 +286,25 @@ describe.skipIf(!serverUrl)("hush-cms CLI", () => {
     expect((await cli(["links", "archive", id])).stdout).toContain("Archived r/macapps");
     expect((await cli(["links", "list"])).stdout).toContain("No tracked links yet");
   });
+
+  test("CMS-CLI-010 reads the goals catalog and proposes an objective, which waits as a draft for the owner", async () => {
+    const catalog = await cli(["goals", "catalog"]);
+    expect(catalog.stdout).toContain("pageviews");
+    expect(catalog.stdout).toContain("/blog/dictate-from-the-terminal");
+    const post = (await cli(["posts", "get", "dictate-from-the-terminal", "--json"])).json();
+    await writeFile(file("goal.json"), JSON.stringify({ quarter: "2026-Q4", title: "More readers from search", keyResults: [
+      { title: "Google clicks", kind: "measured", metric: "clicks", scope: { postId: post.id }, target: 40 },
+      { title: "Guest posts", kind: "manual", target: 2 },
+    ] }));
+    const proposed = await cli(["goals", "propose", file("goal.json")]);
+    expect(proposed.stdout).toContain('Proposed "More readers from search" for 2026-Q4 as a draft');
+    const list = await cli(["goals", "list", "--quarter", "2026-Q4"]);
+    expect(list.stdout).toContain("More readers from search (draft, 2026-10-01 to 2026-12-31)");
+    expect(list.stdout).toMatch(/Guest posts \(manual\)\s+-\s+2/);
+    // A scope the data does not have is refused with the CMS's reason.
+    await writeFile(file("bad-goal.json"), JSON.stringify({ quarter: "2026-Q4", title: "x", keyResults: [{ title: "y", kind: "measured", metric: "pageviews", scope: { source: "myspace" }, target: 1 }] }));
+    const refused = await cli(["goals", "propose", file("bad-goal.json")]);
+    expect(refused.exitCode).toBe(1);
+    expect(refused.stderr).toContain("does not occur in the CMS's data");
+  });
 });

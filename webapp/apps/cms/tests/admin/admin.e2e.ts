@@ -866,6 +866,47 @@ test("CMS-022 makes a tracked link from fixed choices, lists it with its numbers
   await expect(entries.nth(1)).toContainText("Tracked link made");
 });
 
+test("CMS-023 the Goals tab shows an agent's proposal with progress from the numbers, the owner approves it, checks in and sets a goal", async ({ signedIn }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop", "one shared proposal: the owner approves it once");
+  await signedIn.goto("/analytics?tab=goals&quarter=2026-Q4");
+  const proposal = signedIn.getByTestId("objective").filter({ hasText: "Become the answer for private Mac dictation" });
+  await expect(proposal).toContainText("Draft");
+  await expect(proposal).toContainText("Proposed by hush-seo");
+  const result = (title: string) => proposal.getByTestId("key-result").filter({ hasText: title });
+  // Every value comes from the imported numbers, from the day they start.
+  await expect(result("Page views of the post")).toContainText("50 of 100");
+  await expect(result("Page views of the post")).toContainText("Counted from 15 Nov 2026, when the numbers start");
+  await expect(result("Downloads from the Reddit launch")).toContainText("2 of 5");
+  await expect(result("Downloads from the Reddit launch")).toContainText("Downloads through tagged links only");
+  await expect(result("Google clicks on the post")).toContainText("36 of 60");
+  await expect(result("Partner articles published")).toContainText("Manual: entered by hand, not yet");
+  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
+  await signedIn.screenshot({ path: testInfo.outputPath("goals.png"), fullPage: true });
+
+  await proposal.getByRole("button", { name: "Approve" }).click();
+  await expect(proposal).not.toContainText("Draft");
+  await result("Partner articles published").getByLabel("Partner articles published: current value").fill("1");
+  await result("Partner articles published").getByRole("button", { name: "Check in" }).click();
+  await expect(result("Partner articles published")).toContainText("1 of 3");
+
+  // The owner's own goal, from the same catalog: active at once.
+  await signedIn.getByRole("button", { name: "New objective" }).click();
+  const dialog = signedIn.getByRole("dialog", { name: "New objective for 2026-Q4" });
+  await dialog.getByLabel("Objective").fill("Grow the whole site");
+  await dialog.getByRole("textbox", { name: "Key result 1" }).fill("Page views of the site");
+  await dialog.getByLabel("Target").fill("500");
+  await dialog.getByRole("button", { name: "Save objective" }).click();
+  const own = signedIn.getByTestId("objective").filter({ hasText: "Grow the whole site" });
+  await expect(own.getByTestId("key-result")).toContainText("200 of 500");
+  await expect(own).not.toContainText("Draft");
+
+  await signedIn.goto("/settings/history");
+  await signedIn.getByTestId("history").getByRole("button", { name: "View history" }).click();
+  const history = signedIn.getByRole("dialog", { name: "History" });
+  await expect(history.getByTestId("history-entry").filter({ hasText: "Goal approved" }).first()).toContainText("Become the answer for private Mac dictation");
+  await expect(history.getByTestId("history-entry").filter({ hasText: "Goal proposed" }).first()).toContainText("by hush-seo");
+});
+
 test("the admin runs under its Content Security Policy without violations", async ({ signedIn, draft }) => {
   const violations: string[] = [];
   signedIn.on("console", (message) => { if (/Content.Security.Policy|Refused to/i.test(message.text())) violations.push(message.text()); });
