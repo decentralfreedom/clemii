@@ -492,7 +492,8 @@ export function PostEditor({ post, onCreated, onReopen }: { post?: Post; onCreat
     setDirty(false);
     queryClient.removeQueries({ queryKey: getGetPostQueryKey(post.id) });
     await queryClient.invalidateQueries({ queryKey: getListPostsQueryKey() });
-    void navigate({ to: "/", search: {} });
+    // As Ghost, in place of the editor's history entry: Back must not lead to a post that is gone.
+    void navigate({ to: "/", search: {}, replace: true });
     return undefined;
   };
 
