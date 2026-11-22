@@ -15,7 +15,8 @@
 // image's health check and any platform's probe work for it unchanged. Once a
 // day it imports Search Console numbers (search/import.ts) when it holds the
 // key; a failing import is logged and retried hourly, never counted against
-// readiness, so Google being down cannot hold up publishing. It
+// readiness, so Google being down cannot hold up publishing; page views and
+// downloads from Umami (traffic/import.ts) follow the same rules. It
 // applies pending migrations before its first tick,
 // as the API does at start (under one advisory lock), so neither depends on
 // the other having started.
@@ -30,6 +31,8 @@ import { searchConsoleClient } from "../search/console";
 import { importSearchConsole, searchImportDue } from "../search/import";
 import { syncSite } from "../site/deploy";
 import { createObjectStore } from "../storage/object-store";
+import { importTraffic, trafficImportDue } from "../traffic/import";
+import { umamiClient } from "../traffic/umami";
 
 /** How long the scheduler counts as ready without a tick that succeeded. */
 const readyWindowMs = 5 * 60_000;
@@ -39,6 +42,7 @@ await migrateDatabase(config.databaseUrl);
 const { db, close } = connectDatabase(config.databaseUrl);
 const backups = createObjectStore(config.backups);
 const searchConsole = config.searchConsole && searchConsoleClient(config.searchConsole);
+const umami = config.umami && umamiClient(config.umami);
 // Not ready until the backup bucket answers with these credentials (config-check.ts).
 const configuration = watchConfiguration([storeCheck("backup bucket", backups)]);
 const log = (level: "info" | "error", message: string, details: Record<string, unknown> = {}) =>
@@ -107,6 +111,17 @@ async function tick() {
       }
     } catch (error) {
       log("error", "Importing Search Console numbers failed", { error: String(error) });
+    }
+  }
+  // Likewise outside the health count: Umami is a separate service.
+  if (umami) {
+    try {
+      if (await trafficImportDue(db)) {
+        const { otherPages, ...result } = await importTraffic(db, umami);
+        log("info", "Imported page views and downloads", { ...result, otherPages: otherPages.length });
+      }
+    } catch (error) {
+      log("error", "Importing page views and downloads failed", { error: String(error) });
     }
   }
   if (healthy) lastHealthyTick = Date.now();

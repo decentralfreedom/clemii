@@ -171,6 +171,31 @@ account, run Search Console's Change of address, and update
 `CMS_SEARCH_CONSOLE_SITE` if needed. Posts are matched by path, so their
 history carries over.
 
+### Page views and downloads from Umami (PRD R11)
+
+The scheduler imports every complete US Pacific day from Umami: page views
+per page and the website's `download` events, which carry the page they came
+from. It writes them per post and for the whole site, from the day the Umami
+website was created, and retries hourly on failure without affecting
+readiness. Unique visitors are not imported: summed over days, they would
+count a person once a day. Umami sits behind Cloudflare Access, so the
+scheduler needs both an Umami API key and an Access service token.
+
+1. **Umami:** **Settings > API keys**, create a key named `hush-cms` (keys
+   do not expire; revoke it there).
+2. **Cloudflare Zero Trust:** **Access controls > Service credentials >
+   Service tokens**, create `hush-cms-umami`. In the Access application
+   "Umami", add a policy with the action **Service Auth** that includes only
+   this token.
+3. **Coolify:** in hush-cms-scheduler only, add `CMS_UMAMI_URL`
+   (`https://umami.decentralfreedom.com`), `CMS_UMAMI_WEBSITE_ID` (behu.sh's
+   website id), `CMS_UMAMI_API_KEY`, `CMS_UMAMI_ACCESS_CLIENT_ID` and
+   `CMS_UMAMI_ACCESS_CLIENT_SECRET`: locked, runtime only, Literal.
+
+**Check:** the log shows "Imported page views and downloads", with `from` set
+to the website's creation day. A post's page views for one day match Umami's
+Pages report for that day in the America/Los_Angeles time zone.
+
 Check after changes: from the `hush-cms-scheduler` container a request to
 `http://172.16.0.2:8000/api/v1/applications/<website uuid>` with the deploy
 token answers "Missing required permissions: read" (the IP is allowed, the

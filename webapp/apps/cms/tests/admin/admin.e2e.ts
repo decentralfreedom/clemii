@@ -686,6 +686,13 @@ test("CMS-018 a published post's analytics page, as Ghost's: from the posts list
     await metrics.getByRole("tab", { name: /Avg. position/ }).click();
     await expect(metrics.getByRole("tab", { name: /Avg. position/ })).toHaveAttribute("aria-selected", "true");
   }
+  // The funnel keeps to the days both sources have, 15 to 20 November: the 1 November impressions and the 21 November visits are left out.
+  const funnel = signedIn.getByRole("list", { name: "Funnel" });
+  await expect(funnel.getByTestId("funnel-impressions-value")).toHaveText("300");
+  await expect(funnel.getByTestId("funnel-clicks")).toContainText("2.0% CTR");
+  await expect(funnel.getByTestId("funnel-pageviews-value")).toHaveText("40");
+  await expect(funnel.getByTestId("funnel-downloads")).toContainText("7.5% of page views");
+  await expect(signedIn.getByText(/15 Nov 2026 to 20 Nov 2026: the days both Search Console and Umami have/)).toBeVisible();
   // Each day with a position is drawn, also between days without one.
   await expect(signedIn.locator(".recharts-area-dots circle")).toHaveCount(2);
   await expect(signedIn.getByRole("table", { name: "Top searches" }).getByRole("row").nth(1)).toContainText("dictate without cloud");
@@ -740,6 +747,11 @@ test("CMS-019 the Analytics dashboard, as Ghost's: from the sidebar, Google's si
     await expect(metrics.getByRole("tab", { name: /Avg. position/ })).toHaveAttribute("title", /lower is better/);
   }
   await expect(signedIn.getByText(/more than the posts add up to/)).toBeVisible();
+  const funnel = signedIn.getByRole("list", { name: "Funnel" });
+  await expect(funnel.getByTestId("funnel-impressions-value")).toHaveText("800");
+  await expect(funnel.getByTestId("funnel-clicks")).toContainText("2.5% CTR");
+  await expect(funnel.getByTestId("funnel-pageviews-value")).toHaveText("150");
+  await expect(funnel.getByTestId("funnel-downloads-value")).toHaveText("11");
   // Google's own word on which days it is still counting, on the chart and in words.
   await expect(signedIn.locator(".recharts-reference-line")).toHaveCount(1);
   await expect(signedIn.getByText("Preliminary", { exact: true })).toBeVisible();

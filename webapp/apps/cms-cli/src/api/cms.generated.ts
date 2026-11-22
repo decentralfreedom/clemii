@@ -361,6 +361,37 @@ export interface SiteSearch {
   topPosts: SearchTopPost[];
 }
 
+export type TrafficTotals = {
+  pageviews: number;
+  downloads: number;
+};
+
+export interface TrafficDay {
+  /** A US Pacific day, as Search Console's */
+  date: string;
+  pageviews: number;
+  /** Downloads started from these pages */
+  downloads: number;
+}
+
+export interface Traffic {
+  /**
+     * The first day in the window; null until the first import
+     * @nullable
+     */
+  from: string | null;
+  /**
+     * The last complete day imported
+     * @nullable
+     */
+  to: string | null;
+  /** @nullable */
+  importedAt: string | null;
+  totals: TrafficTotals;
+  /** Only days with numbers; a day in the window without one had none */
+  days: TrafficDay[];
+}
+
 export type PostLang = typeof PostLang[keyof typeof PostLang];
 
 
@@ -690,6 +721,24 @@ export type GetSiteSearchParams = {
    * @maximum 100
    */
   limit?: number;
+};
+
+export type GetPostTrafficParams = {
+  /**
+   * @minimum 1
+   * @maximum 3650
+   */
+  days?: number;
+  since?: string;
+};
+
+export type GetSiteTrafficParams = {
+  /**
+   * @minimum 1
+   * @maximum 3650
+   */
+  days?: number;
+  since?: string;
 };
 
 export type ListPostsParams = {
@@ -1564,6 +1613,133 @@ export const getGetSiteSearchUrl = (params?: GetSiteSearchParams,) => {
 export const getSiteSearch = async (params?: GetSiteSearchParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getSiteSearchResponse> => {
 
   return cmsFetch<getSiteSearchResponse>(getGetSiteSearchUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type getPostTrafficResponse200 = {
+  data: Traffic
+  status: 200
+}
+
+export type getPostTrafficResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type getPostTrafficResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type getPostTrafficResponse404 = {
+  data: Error
+  status: 404
+}
+
+export type getPostTrafficResponse422 = {
+  data: Error
+  status: 422
+}
+
+export type getPostTrafficResponseSuccess = (getPostTrafficResponse200) & {
+  headers: Headers;
+};
+export type getPostTrafficResponseError = (getPostTrafficResponse401 | getPostTrafficResponse403 | getPostTrafficResponse404 | getPostTrafficResponse422) & {
+  headers: Headers;
+};
+
+export type getPostTrafficResponse = (getPostTrafficResponseSuccess | getPostTrafficResponseError)
+
+export const getGetPostTrafficUrl = (id: string,
+    params?: GetPostTrafficParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/posts/${id}/traffic?${stringifiedParams}` : `/v1/posts/${id}/traffic`
+}
+
+/**
+ * A post's page views and downloads from Umami, per US Pacific day, at every address the post has had.
+ */
+export const getPostTraffic = async (id: string,
+    params?: GetPostTrafficParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getPostTrafficResponse> => {
+
+  return cmsFetch<getPostTrafficResponse>(getGetPostTrafficUrl(id,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type getSiteTrafficResponse200 = {
+  data: Traffic
+  status: 200
+}
+
+export type getSiteTrafficResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type getSiteTrafficResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type getSiteTrafficResponse422 = {
+  data: Error
+  status: 422
+}
+
+export type getSiteTrafficResponseSuccess = (getSiteTrafficResponse200) & {
+  headers: Headers;
+};
+export type getSiteTrafficResponseError = (getSiteTrafficResponse401 | getSiteTrafficResponse403 | getSiteTrafficResponse422) & {
+  headers: Headers;
+};
+
+export type getSiteTrafficResponse = (getSiteTrafficResponseSuccess | getSiteTrafficResponseError)
+
+export const getGetSiteTrafficUrl = (params?: GetSiteTrafficParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/traffic?${stringifiedParams}` : `/v1/traffic`
+}
+
+/**
+ * The whole site's page views and downloads from Umami, per US Pacific day: every page, the home and release pages too.
+ */
+export const getSiteTraffic = async (params?: GetSiteTrafficParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getSiteTrafficResponse> => {
+
+  return cmsFetch<getSiteTrafficResponse>(getGetSiteTrafficUrl(params),
   {
     ...options,
     method: 'GET'

@@ -106,15 +106,19 @@ export async function searchMarkers(db: Database, postId: string, from: string, 
  * but never before the first day the CMS has numbers for. Inside it a day
  * without a row had no impressions; before it there are no numbers at all.
  */
+/** A window's first day: `span` days back from `to`, or `since`, never before the first day the CMS has numbers for nor after the last. */
+export function clampedStart(coverage: string, to: string, span: number, since?: string) {
+  const wanted = since ?? new Date(Date.parse(to) - (span - 1) * 86_400_000).toISOString().slice(0, 10);
+  const start = wanted > coverage ? wanted : coverage;
+  return start < to ? start : to;
+}
+
 export async function searchWindow(db: Database, span: number, since?: string) {
   const state = await readSearchState(db);
   const to = state?.importedThrough ?? null;
   const coverage = state?.importedFrom ?? to;
   if (!to || !coverage) return { from: null, to: null, coverage: null, preliminaryFrom: null, importedAt: state?.importedAt?.toISOString() ?? null };
-  const wanted = since ?? new Date(Date.parse(to) - (span - 1) * 86_400_000).toISOString().slice(0, 10);
-  // Never before the first day the CMS has numbers for, and never after the last.
-  const start = wanted > coverage ? wanted : coverage;
-  const from = start < to ? start : to;
+  const from = clampedStart(coverage, to, span, since);
   // Google's still-incomplete days inside the window, from its first one shown.
   const incomplete = state?.incompleteFrom;
   const preliminaryFrom = !incomplete || incomplete > to ? null : incomplete < from ? from : incomplete;

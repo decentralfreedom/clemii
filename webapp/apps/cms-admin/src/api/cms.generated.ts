@@ -380,6 +380,37 @@ export interface SiteSearch {
   topPosts: SearchTopPost[];
 }
 
+export type TrafficTotals = {
+  pageviews: number;
+  downloads: number;
+};
+
+export interface TrafficDay {
+  /** A US Pacific day, as Search Console's */
+  date: string;
+  pageviews: number;
+  /** Downloads started from these pages */
+  downloads: number;
+}
+
+export interface Traffic {
+  /**
+     * The first day in the window; null until the first import
+     * @nullable
+     */
+  from: string | null;
+  /**
+     * The last complete day imported
+     * @nullable
+     */
+  to: string | null;
+  /** @nullable */
+  importedAt: string | null;
+  totals: TrafficTotals;
+  /** Only days with numbers; a day in the window without one had none */
+  days: TrafficDay[];
+}
+
 export type PostLang = typeof PostLang[keyof typeof PostLang];
 
 
@@ -709,6 +740,24 @@ export type GetSiteSearchParams = {
    * @maximum 100
    */
   limit?: number;
+};
+
+export type GetPostTrafficParams = {
+  /**
+   * @minimum 1
+   * @maximum 3650
+   */
+  days?: number;
+  since?: string;
+};
+
+export type GetSiteTrafficParams = {
+  /**
+   * @minimum 1
+   * @maximum 3650
+   */
+  days?: number;
+  since?: string;
 };
 
 export type ListPostsParams = {
@@ -2387,6 +2436,293 @@ export function useGetSiteSearch<TData = Awaited<ReturnType<typeof getSiteSearch
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetSiteSearchQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getPostTrafficResponse200 = {
+  data: Traffic
+  status: 200
+}
+
+export type getPostTrafficResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type getPostTrafficResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type getPostTrafficResponse404 = {
+  data: Error
+  status: 404
+}
+
+export type getPostTrafficResponse422 = {
+  data: Error
+  status: 422
+}
+
+export type getPostTrafficResponseSuccess = (getPostTrafficResponse200) & {
+  headers: Headers;
+};
+export type getPostTrafficResponseError = (getPostTrafficResponse401 | getPostTrafficResponse403 | getPostTrafficResponse404 | getPostTrafficResponse422) & {
+  headers: Headers;
+};
+
+export type getPostTrafficResponse = (getPostTrafficResponseSuccess | getPostTrafficResponseError)
+
+export const getGetPostTrafficUrl = (id: string,
+    params?: GetPostTrafficParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/posts/${id}/traffic?${stringifiedParams}` : `/v1/posts/${id}/traffic`
+}
+
+/**
+ * A post's page views and downloads from Umami, per US Pacific day, at every address the post has had.
+ */
+export const getPostTraffic = async (id: string,
+    params?: GetPostTrafficParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getPostTrafficResponse> => {
+
+  return cmsFetch<getPostTrafficResponse>(getGetPostTrafficUrl(id,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPostTrafficQueryKey = (id: string,
+    params?: GetPostTrafficParams,) => {
+    return [
+    `/v1/posts/${id}/traffic`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetPostTrafficQueryOptions = <TData = Awaited<ReturnType<typeof getPostTraffic>>, TError = Error>(id: string,
+    params?: GetPostTrafficParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPostTraffic>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPostTrafficQueryKey(id,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPostTraffic>>> = ({ signal }) => getPostTraffic(id,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPostTraffic>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPostTrafficQueryResult = NonNullable<Awaited<ReturnType<typeof getPostTraffic>>>
+export type GetPostTrafficQueryError = Error
+
+
+/** A post's page views and downloads from Umami, per US Pacific day, at every address the post has had. */
+export function useGetPostTraffic<TData = Awaited<ReturnType<typeof getPostTraffic>>, TError = Error>(
+ id: string,
+    params: undefined |  GetPostTrafficParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPostTraffic>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPostTraffic>>,
+          TError,
+          Awaited<ReturnType<typeof getPostTraffic>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** A post's page views and downloads from Umami, per US Pacific day, at every address the post has had. */
+export function useGetPostTraffic<TData = Awaited<ReturnType<typeof getPostTraffic>>, TError = Error>(
+ id: string,
+    params?: GetPostTrafficParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPostTraffic>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPostTraffic>>,
+          TError,
+          Awaited<ReturnType<typeof getPostTraffic>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** A post's page views and downloads from Umami, per US Pacific day, at every address the post has had. */
+export function useGetPostTraffic<TData = Awaited<ReturnType<typeof getPostTraffic>>, TError = Error>(
+ id: string,
+    params?: GetPostTrafficParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPostTraffic>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** A post's page views and downloads from Umami, per US Pacific day, at every address the post has had. */
+export function useGetPostTraffic<TData = Awaited<ReturnType<typeof getPostTraffic>>, TError = Error>(
+ id: string,
+    params?: GetPostTrafficParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPostTraffic>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPostTrafficQueryOptions(id,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getSiteTrafficResponse200 = {
+  data: Traffic
+  status: 200
+}
+
+export type getSiteTrafficResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type getSiteTrafficResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type getSiteTrafficResponse422 = {
+  data: Error
+  status: 422
+}
+
+export type getSiteTrafficResponseSuccess = (getSiteTrafficResponse200) & {
+  headers: Headers;
+};
+export type getSiteTrafficResponseError = (getSiteTrafficResponse401 | getSiteTrafficResponse403 | getSiteTrafficResponse422) & {
+  headers: Headers;
+};
+
+export type getSiteTrafficResponse = (getSiteTrafficResponseSuccess | getSiteTrafficResponseError)
+
+export const getGetSiteTrafficUrl = (params?: GetSiteTrafficParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/traffic?${stringifiedParams}` : `/v1/traffic`
+}
+
+/**
+ * The whole site's page views and downloads from Umami, per US Pacific day: every page, the home and release pages too.
+ */
+export const getSiteTraffic = async (params?: GetSiteTrafficParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getSiteTrafficResponse> => {
+
+  return cmsFetch<getSiteTrafficResponse>(getGetSiteTrafficUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSiteTrafficQueryKey = (params?: GetSiteTrafficParams,) => {
+    return [
+    `/v1/traffic`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetSiteTrafficQueryOptions = <TData = Awaited<ReturnType<typeof getSiteTraffic>>, TError = Error>(params?: GetSiteTrafficParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSiteTraffic>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSiteTrafficQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSiteTraffic>>> = ({ signal }) => getSiteTraffic(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSiteTraffic>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetSiteTrafficQueryResult = NonNullable<Awaited<ReturnType<typeof getSiteTraffic>>>
+export type GetSiteTrafficQueryError = Error
+
+
+/** The whole site's page views and downloads from Umami, per US Pacific day: every page, the home and release pages too. */
+export function useGetSiteTraffic<TData = Awaited<ReturnType<typeof getSiteTraffic>>, TError = Error>(
+ params: undefined |  GetSiteTrafficParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSiteTraffic>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSiteTraffic>>,
+          TError,
+          Awaited<ReturnType<typeof getSiteTraffic>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** The whole site's page views and downloads from Umami, per US Pacific day: every page, the home and release pages too. */
+export function useGetSiteTraffic<TData = Awaited<ReturnType<typeof getSiteTraffic>>, TError = Error>(
+ params?: GetSiteTrafficParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSiteTraffic>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSiteTraffic>>,
+          TError,
+          Awaited<ReturnType<typeof getSiteTraffic>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** The whole site's page views and downloads from Umami, per US Pacific day: every page, the home and release pages too. */
+export function useGetSiteTraffic<TData = Awaited<ReturnType<typeof getSiteTraffic>>, TError = Error>(
+ params?: GetSiteTrafficParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSiteTraffic>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** The whole site's page views and downloads from Umami, per US Pacific day: every page, the home and release pages too. */
+export function useGetSiteTraffic<TData = Awaited<ReturnType<typeof getSiteTraffic>>, TError = Error>(
+ params?: GetSiteTrafficParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSiteTraffic>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSiteTrafficQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
