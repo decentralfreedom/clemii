@@ -19,7 +19,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 import {
-  approvePost, createDraft, getGetPostQueryKey, getListMediaQueryKey, getListPostsQueryKey, getListRevisionsQueryKey, previewPost, publishPost,
+  approvePost, createDraft, deletePost, getGetPostQueryKey, getListMediaQueryKey, getListPostsQueryKey, getListRevisionsQueryKey, previewPost, publishPost,
   schedulePost, unpublishPost, updatePost, uploadMedia, useListMedia, type Media, type Post, type Preview,
 } from "@/api/cms.generated";
 import { CmsError } from "@/api/fetcher";
@@ -156,6 +156,8 @@ export function PostEditor({ post, onCreated, onReopen }: { post?: Post; onCreat
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const dirtySince = useRef<number | null>(null);
   const autosaveRef = useRef<() => void>(() => {});
+  // Set while the draft is being deleted and after: nothing may be written to a post that is gone.
+  const deleted = useRef(false);
   const live = post?.status === "published" || post?.status === "scheduled";
 
   const refresh = useCallback(async (id: string) => {
@@ -184,6 +186,7 @@ export function PostEditor({ post, onCreated, onReopen }: { post?: Post; onCreat
 
   /** Saves what changed; returns the post id, or undefined when the CMS refused it. One save runs at a time. */
   const save = useCallback(async (kind: "auto" | "manual" = "manual"): Promise<string | undefined> => {
+    if (deleted.current) return undefined;
     if (saving.current) {
       await saving.current;
       // What was typed meanwhile still needs saving.
@@ -245,6 +248,7 @@ export function PostEditor({ post, onCreated, onReopen }: { post?: Post; onCreat
 
   /** A draft saves three seconds after its author stops, and once a minute while they keep writing. */
   const autosave = useCallback(() => {
+    if (deleted.current) return;
     const status = current.current.post?.status;
     if (status === "published" || status === "scheduled") return;
     clearTimeout(timer.current);
@@ -366,6 +370,8 @@ export function PostEditor({ post, onCreated, onReopen }: { post?: Post; onCreat
   }, [dirty]);
   const blocker = useBlocker({
     shouldBlockFn: async ({ next }) => {
+      // A deleted draft has nothing left to save.
+      if (deleted.current) return false;
       // Moving from "new" to the saved post's own address is not leaving.
       if (created.current && next.pathname === `/posts/${created.current.id}`) return false;
       const unsaved = changes.current.content !== changes.current.savedContent || changes.current.fields !== changes.current.savedFields;
@@ -464,6 +470,30 @@ export function PostEditor({ post, onCreated, onReopen }: { post?: Post; onCreat
     } finally {
       setBusy(false);
     }
+  };
+
+  /**
+   * Deletes the draft, as Ghost's delete-section.tsx: the editor stops saving
+   * first (its timer, and the save in flight is awaited), so no save reaches a
+   * post that is gone; then the posts list. Returns why the CMS refused, if it did.
+   */
+  const deleteDraft = async (): Promise<string | undefined> => {
+    if (!post) return undefined;
+    deleted.current = true;
+    clearTimeout(timer.current);
+    await saving.current?.catch(() => undefined);
+    try {
+      await deletePost(post.id);
+    } catch (error) {
+      deleted.current = false;
+      if (changes.current.content !== changes.current.savedContent || changes.current.fields !== changes.current.savedFields) autosave();
+      return describe(error).message;
+    }
+    setDirty(false);
+    queryClient.removeQueries({ queryKey: getGetPostQueryKey(post.id) });
+    await queryClient.invalidateQueries({ queryKey: getListPostsQueryKey() });
+    void navigate({ to: "/", search: {} });
+    return undefined;
   };
 
   // The preview: rendered by the CMS a moment after the last change, with the contract's problems.
@@ -636,6 +666,7 @@ export function PostEditor({ post, onCreated, onReopen }: { post?: Post; onCreat
             <PostSettingsSidebar
               frameRef={settingsFrameRef} opensInPlace={settingsMemory.restored}
               fields={fields} onChange={changedFields} post={post} heading={heading} markdownMode={!opened.article}
+              onDelete={deleteDraft}
               onRestored={async (restored) => {
                 queryClient.setQueryData(getGetPostQueryKey(restored.id), { data: restored, status: 200, headers: new Headers() });
                 await refresh(restored.id);
