@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { createApp } from "../../src/app";
 import { createSession, setSessionCookie } from "../../src/auth/sessions";
 import { systemActor } from "../../src/auth/tokens";
-import { searchConsoleState, searchDaily, searchQueries, searchSiteDaily, trafficDaily, trafficSiteDaily, trafficState } from "../../src/db/schema";
+import { searchConsoleState, searchDaily, searchQueries, searchSiteDaily, trafficDaily, trafficSiteDaily, trafficSourceDaily, trafficState } from "../../src/db/schema";
 import { Hono } from "hono";
 import { createDraft, publishPost } from "../../src/posts/service";
 import { LocalObjectStore } from "../../src/storage/object-store";
@@ -58,6 +58,21 @@ await cms.db.insert(trafficSiteDaily).values([
   { date: "2026-11-19", pageviews: 30, downloads: 2 },
   { date: "2026-11-20", pageviews: 120, downloads: 9 },
   { date: "2026-11-21", pageviews: 50, downloads: 4 },
+]);
+// Their sources (src/traffic/import.ts): every day's rows add up to its page views above, 200 in all.
+const post = { path: "/blog/dictate-without-cloud", postId: live.id, pageType: "post" };
+const none = { medium: "", campaign: "", content: "", downloads: 0 };
+await cms.db.insert(trafficSourceDaily).values([
+  { date: "2026-11-19", path: "/", postId: null, pageType: "home", channel: "direct", source: "", ...none, pageviews: 30 },
+  { date: "2026-11-20", ...post, channel: "organicSearch", source: "google.com", ...none, pageviews: 25 },
+  { date: "2026-11-20", ...post, channel: "ai", source: "chatgpt.com", ...none, pageviews: 5 },
+  { date: "2026-11-20", ...post, channel: "organicSocial", source: "reddit", medium: "social", campaign: "launch", content: "", pageviews: 10, downloads: 2 },
+  { date: "2026-11-20", path: "/", postId: null, pageType: "home", channel: "direct", source: "", ...none, pageviews: 40 },
+  { date: "2026-11-20", path: "/", postId: null, pageType: "home", channel: "email", source: "newsletter", medium: "email", campaign: "december", content: "", pageviews: 20, downloads: 1 },
+  { date: "2026-11-20", path: "/releases/0.1.0-alpha.9", postId: null, pageType: "release", channel: "direct", source: "", ...none, pageviews: 20 },
+  { date: "2026-11-21", ...post, channel: "organicSearch", source: "google.com", ...none, pageviews: 10 },
+  { date: "2026-11-21", path: "/", postId: null, pageType: "home", channel: "direct", source: "", ...none, pageviews: 30 },
+  { date: "2026-11-21", path: "/releases/0.1.0-alpha.9", postId: null, pageType: "release", channel: "direct", source: "", ...none, pageviews: 10 },
 ]);
 await cms.db.insert(searchQueries).values([
   { postId: live.id, date: "2026-11-20", query: "dictate without cloud", impressions: 200, clicks: 5, position: 5 },

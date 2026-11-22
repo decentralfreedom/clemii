@@ -11,6 +11,7 @@ import { ArrowLeft, ArrowUpRight, Pen } from "lucide-react";
 import { useGetPost, useGetPostSearch, useGetPostTraffic, type Post } from "@/api/cms.generated";
 import { DataSource } from "@/components/analytics/data-source";
 import { FunnelCard } from "@/components/analytics/funnel-card";
+import { SourcesCard } from "@/components/analytics/sources-card";
 import { RangeSelect } from "@/components/analytics/range-select";
 import { SearchChanges } from "@/components/analytics/search-changes";
 import { SearchKpis } from "@/components/analytics/search-kpis";
@@ -91,6 +92,7 @@ function PostAnalytics() {
         <div className="flex flex-col gap-6">
           <SearchKpis id="post" search={{ ...numbers, from: numbers.from, to: numbers.to }} />
           {visits && <FunnelCard search={{ from: numbers.from, to: numbers.to, days: numbers.days }} traffic={visits} />}
+          <SourcesCard params={params} postId={id} />
           <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2">
             <SearchQueriesCard postId={id} params={params} limit={5} more={{ tab: "search" }} compact />
             <SearchChanges markers={numbers.markers} />
