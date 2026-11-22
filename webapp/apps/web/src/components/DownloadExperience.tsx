@@ -16,6 +16,7 @@ import { ButtonLink, buttonClassName } from "./ButtonLink";
 import { DownloadHandoff } from "./DownloadHandoff";
 import { m } from "../paraglide/messages";
 import { useBrowserValue } from "./useBrowserValue";
+import { campaignOf } from "../../shared/campaign";
 
 type DownloadLinkProps = Omit<
   ComponentProps<typeof ButtonLink>,
@@ -29,6 +30,8 @@ export function DownloadLink({ mobileLabel = m.download_mobile(), ...props }: Do
   ), false);
   // The page the button is on, for the blog funnel (server/analytics.ts).
   const page = useRouterState({ select: (state) => state.location.pathname });
+  // The page's campaign tags travel with the download, so a newsletter's downloads count for it.
+  const campaign = useBrowserValue(() => campaignOf(window.location.href), "");
   const [handoffOpen, setHandoffOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const release = latestRelease;
@@ -62,7 +65,7 @@ export function DownloadLink({ mobileLabel = m.download_mobile(), ...props }: Do
   return (
     <ButtonLink
       {...props}
-      href={downloadPath(page)}
+      href={downloadPath(page, campaign)}
       download={release.downloadName}
       onClick={startDownload}
     />

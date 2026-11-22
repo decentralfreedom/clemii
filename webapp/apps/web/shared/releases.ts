@@ -342,8 +342,9 @@ export function findRelease(slug: string) {
 /**
  * Where download buttons point: the website counts the download (PRD R10,
  * "downloads" means a download started) and redirects to the latest release's
- * exact immutable DMG. `from` is the path of the page the button is on.
+ * exact immutable DMG. `from` is the path of the page the button is on;
+ * `campaign`, that page's campaign tags (shared/campaign.ts), if any.
  */
-export function downloadPath(from: string) {
-  return `/download?from=${encodeURIComponent(from)}`;
+export function downloadPath(from: string, campaign = "") {
+  return `/download?from=${encodeURIComponent(from)}${campaign.replace(/^\?/, "&")}`;
 }

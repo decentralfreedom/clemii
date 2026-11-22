@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { Hono } from "hono";
+import { campaignOf } from "../shared/campaign";
 import { coarseAddress, registerAnalytics } from "./analytics";
 import { loadConfig } from "./config";
 
@@ -104,15 +105,15 @@ describe("page views counted on this server", () => {
     "cf-connecting-ip": "203.0.113.7", "referer": "https://www.google.com/search?q=dictation", "accept-language": "de-DE,de;q=0.9,en;q=0.8",
   };
 
-  test("records a browser's navigation to a page with its path, origin of the referrer, language and shortened address", async () => {
+  test("records a browser's navigation to a page with its path, campaign tags, origin of the referrer, language and shortened address", async () => {
     const { app, sent } = setup();
-    const response = await app.request("/blog/dictate-on-mac?utm_source=x", { headers: navigation });
+    const response = await app.request("/blog/dictate-on-mac?utm_source=newsletter&utm_medium=email&gclid=abc123&q=secret", { headers: navigation });
     expect(await response.text()).toContain("article");
     await Bun.sleep(0);
     expect(events(sent)).toEqual([{
       type: "event",
       payload: {
-        website: analytics.websiteId, hostname: "behu.sh", url: "/blog/dictate-on-mac",
+        website: analytics.websiteId, hostname: "behu.sh", url: "/blog/dictate-on-mac?utm_source=newsletter&utm_medium=email",
         referrer: "https://www.google.com/search", language: "de-DE", ip: "203.0.113.0",
       },
     }]);
@@ -148,6 +149,24 @@ describe("page views counted on this server", () => {
     await app.request("/blog/dictate-on-mac", { headers: navigation });
     await Bun.sleep(0);
     expect(sent).toEqual([]);
+  });
+});
+
+describe("campaign tags", () => {
+  test("keeps only the five UTM tags, trimmed and cleaned, and never an ad click id", () => {
+    expect(campaignOf("/blog/a?utm_source=reddit&utm_medium=social&utm_campaign=launch&utm_content=r%2Fmacapps&utm_term=dictation")).toBe(
+      "?utm_source=reddit&utm_medium=social&utm_campaign=launch&utm_content=rmacapps&utm_term=dictation");
+    expect(campaignOf("/blog/a?gclid=x&fbclid=y&email=a%40b.c&ref=z")).toBe("");
+    expect(campaignOf("/blog/a")).toBe("");
+    expect(campaignOf(`/a?utm_source=${"x".repeat(150)}`)).toBe(`?utm_source=${"x".repeat(100)}`);
+    expect(campaignOf("/a?utm_source=%3Cscript%3E")).toBe("?utm_source=script");
+  });
+
+  test("a download keeps the campaign of the page it started on", async () => {
+    const { app, sent } = setup();
+    await app.request("/download?from=/blog/dictate-on-mac&utm_source=creator-anna&utm_medium=social&gclid=abc", { headers: { "user-agent": "Mozilla/5.0" } });
+    await Bun.sleep(0);
+    expect(events(sent)[0].payload.url).toBe("/blog/dictate-on-mac?utm_source=creator-anna&utm_medium=social");
   });
 });
 
