@@ -312,7 +312,8 @@
               "string",
               "null"
             ],
-            "format": "date"
+            "format": "date",
+            "description": "The first day counted: the requested start, or the first day the CMS has numbers for if that is later"
           },
           "to": {
             "type": [
@@ -396,6 +397,74 @@
           "date",
           "impressions",
           "clicks",
+          "position"
+        ]
+      },
+      "PostSearchQueries": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "importedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "queries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchQuery"
+            },
+            "description": "Most impressions first. Google leaves out rare queries to protect searchers' privacy, so these add up to less than the post's totals."
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "importedAt",
+          "queries"
+        ]
+      },
+      "SearchQuery": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "impressions": {
+            "type": "integer"
+          },
+          "clicks": {
+            "type": "integer"
+          },
+          "ctr": {
+            "type": "number",
+            "description": "Clicks per impression, 0 to 1"
+          },
+          "position": {
+            "type": "number",
+            "description": "Average position, weighted by impressions"
+          }
+        },
+        "required": [
+          "query",
+          "impressions",
+          "clicks",
+          "ctr",
           "position"
         ]
       },
@@ -1429,7 +1498,7 @@
             "bearer": []
           }
         ],
-        "description": "The post's Google Search Console numbers: impressions, clicks and position per day and in total, over the last `days` days Search Console has (28 by default).",
+        "description": "The post's Google Search Console numbers: impressions, clicks and position per day and in total, over the last `days` days Search Console has (28 by default), or since a day. The CMS keeps every day it imported, also after Google drops it (16 months).",
         "parameters": [
           {
             "schema": {
@@ -1444,11 +1513,22 @@
             "schema": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 486,
+              "maximum": 3650,
               "default": 28
             },
             "required": false,
             "name": "days",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Start here instead of counting `days` back, such as the first of the year"
+            },
+            "required": false,
+            "description": "Start here instead of counting `days` back, such as the first of the year",
+            "name": "since",
             "in": "query"
           }
         ],
@@ -1459,6 +1539,116 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PostSearch"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The token lacks posts:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such post",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/posts/{id}/search/queries": {
+      "get": {
+        "operationId": "getPostSearchQueries",
+        "tags": [
+          "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "The Google searches the post was found for over the last `days` days Search Console has (28 by default), most impressions first.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3650,
+              "default": 28
+            },
+            "required": false,
+            "name": "days",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Start here instead of counting `days` back, such as the first of the year"
+            },
+            "required": false,
+            "description": "Start here instead of counting `days` back, such as the first of the year",
+            "name": "since",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The post's search queries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostSearchQueries"
                 }
               }
             }

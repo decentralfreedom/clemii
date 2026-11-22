@@ -136,9 +136,17 @@ The CMS reaches Coolify's API only over a private network, never the internet:
 
 ### Google Search Console (PRD R12)
 
-The scheduler imports Search Console numbers per post once a day. If Google
-fails, it logs the error and retries hourly; this never affects readiness, so
-publishing continues.
+The scheduler imports Search Console numbers per post and its searches once a
+day. If Google fails, it logs the error and retries hourly; this never affects
+readiness, so publishing continues.
+
+**Accuracy:** it reads web search one day per request, as Google's guide
+advises, because the API keeps only the top 50,000 rows of a request. Page
+numbers come from a request without the query dimension, so they are exact.
+Searches are a separate request, in which Google leaves out rare ones. Ranges
+never reach before the first imported day. If a site ever nears 50,000 rows a
+day, Search Console's BigQuery bulk export (it needs billing) is the complete
+source.
 
 1. **Google Cloud project:** a project of its own (here `hush-cms-ba3574`,
    "hush CMS", owned by the owner's Google account, no billing) with the Search

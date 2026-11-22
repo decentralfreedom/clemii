@@ -252,7 +252,7 @@ describe.skipIf(!serverUrl)("hush-cms CLI", () => {
     expect((await cli(["posts", "search", "dictate-from-the-terminal"])).stdout).toContain("No Search Console numbers yet");
     // What the scheduler's import leaves (cms/src/search/import.ts).
     const { id } = (await cli(["posts", "get", "dictate-from-the-terminal", "--json"])).json();
-    await database()`insert into search_console_state (id, imported_at, imported_through) values (1, now(), '2026-11-20')`;
+    await database()`insert into search_console_state (id, imported_at, imported_from, imported_through) values (1, now(), '2025-07-24', '2026-11-20')`;
     await database()`insert into search_daily (post_id, date, impressions, clicks, position) values
       (${id}, '2026-11-01', 300, 6, 6), (${id}, '2026-11-20', 100, 4, 10)`;
     const { stdout, exitCode } = await cli(["posts", "search", "dictate-from-the-terminal"]);
@@ -263,5 +263,12 @@ describe.skipIf(!serverUrl)("hush-cms CLI", () => {
     const json = (await cli(["posts", "search", "dictate-from-the-terminal", "--days", "7", "--json"])).json();
     expect(json).toMatchObject({ from: "2026-11-14", to: "2026-11-20", totals: { impressions: 100, clicks: 4 } });
     expect((await cli(["posts", "search", "dictate-from-the-terminal", "--days", "0"])).exitCode).toBe(2);
+    // Since a day, never before the first day the CMS has; and the searches the post was found for.
+    expect((await cli(["posts", "search", "dictate-from-the-terminal", "--since", "2020-01-01", "--json"])).json()).toMatchObject({ from: "2025-07-24", totals: { impressions: 400 } });
+    await database()`insert into search_queries (post_id, date, query, impressions, clicks, position) values
+      (${id}, '2026-11-20', 'dictate in terminal', 80, 4, 9), (${id}, '2026-11-01', 'dictate in terminal', 20, 0, 13)`;
+    const searches = await cli(["posts", "search", "dictate-from-the-terminal", "--queries"]);
+    expect(searches.stdout).toContain("Google leaves out rare searches");
+    expect(searches.stdout).toMatch(/dictate in terminal\s+100\s+4\s+4\.0%\s+9\.8/);
   });
 });

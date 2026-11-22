@@ -215,11 +215,27 @@ export const searchDaily = pgTable("search_daily", {
   position: doublePrecision("position").notNull(),
 }, (table) => [primaryKey({ columns: [table.postId, table.date] })]);
 
+/**
+ * The search queries a post was found for, per day (PRD R12), with the same
+ * rules as search_daily. Google leaves out rare queries to protect searchers'
+ * privacy, so a post's queries add up to less than its page numbers.
+ */
+export const searchQueries = pgTable("search_queries", {
+  postId: uuid("post_id").notNull().references(() => posts.id, { onDelete: "cascade" }),
+  date: date("date", { mode: "string" }).notNull(),
+  query: text("query").notNull(),
+  impressions: integer("impressions").notNull(),
+  clicks: integer("clicks").notNull(),
+  position: doublePrecision("position").notNull(),
+}, (table) => [primaryKey({ columns: [table.postId, table.date, table.query] })]);
+
 /** The Search Console import's own state, one row: a failing import retries hourly, not every minute. */
 export const searchConsoleState = pgTable("search_console_state", {
   id: smallint("id").primaryKey().default(1),
   attemptedAt: timestamp("attempted_at", { withTimezone: true }),
   importedAt: timestamp("imported_at", { withTimezone: true }),
+  /** The first day the import covers: there are no numbers before it, which is not the same as zero. */
+  importedFrom: date("imported_from", { mode: "string" }),
   /** The last day the import has numbers for (Search Console lags two to three days). */
   importedThrough: date("imported_through", { mode: "string" }),
 }, (table) => [check("search_console_state_single_row", sql`${table.id} = 1`)]);

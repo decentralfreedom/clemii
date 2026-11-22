@@ -7,6 +7,11 @@
 // exchanged for an access token of at most an hour, scoped read-only. This is
 // the whole of what google-auth-library's JWT client does for this case, so
 // the CMS takes no dependency for it. The fetcher is injectable for tests.
+//
+// Numbers are read as Google's guide "Getting your performance data" advises:
+// web search (the report's default), one day per request, every page of rows.
+// The API returns at most 50,000 rows per day, the top ones by clicks, so a
+// request over many days could leave rows out where single days would not.
 import { createSign } from "node:crypto";
 import type { SearchConsoleConfig } from "../config";
 
@@ -18,6 +23,8 @@ const api = "https://searchconsole.googleapis.com/webmasters/v3";
 const pageRows = 25_000;
 
 export type SearchRow = { page: string; date: string; impressions: number; clicks: number; position: number };
+/** A search query's numbers on a page and day; Google leaves out rare queries to protect searchers' privacy. */
+export type QueryRow = SearchRow & { query: string };
 
 const base64url = (value: string | Buffer) => Buffer.from(value).toString("base64url");
 
@@ -52,6 +59,32 @@ export function searchConsoleClient(config: SearchConsoleConfig, fetcher: Fetch 
     return response.json() as Promise<Record<string, unknown>>;
   }
 
+  type Row = { keys: string[]; impressions: number; clicks: number; position: number };
+  /** searchAnalytics.query for one day over the given dimensions, every page of rows. */
+  async function queryDay(day: string, dimensions: string[]) {
+    const rows: Row[] = [];
+    for (let startRow = 0; ; startRow += pageRows) {
+      const body = await call(`/sites/${encodeURIComponent(config.site)}/searchAnalytics/query`, {
+        method: "POST",
+        body: JSON.stringify({ startDate: day, endDate: day, dimensions, type: "web", dataState: "all", rowLimit: pageRows, startRow }),
+      }) as { rows?: Row[] };
+      const page = body.rows ?? [];
+      rows.push(...page.map(({ keys, impressions, clicks, position }) => ({ keys, impressions, clicks, position })));
+      if (page.length < pageRows) return rows;
+    }
+  }
+
+  /** Every day from start to end (YYYY-MM-DD, inclusive), a few days at a time. */
+  async function query(start: string, end: string, dimensions: string[]) {
+    const days: string[] = [];
+    for (let time = Date.parse(start); time <= Date.parse(end); time += 86_400_000) days.push(new Date(time).toISOString().slice(0, 10));
+    const rows: Row[] = [];
+    for (let offset = 0; offset < days.length; offset += 4) {
+      for (const dayRows of await Promise.all(days.slice(offset, offset + 4).map((day) => queryDay(day, dimensions)))) rows.push(...dayRows);
+    }
+    return rows;
+  }
+
   return {
     /** Whether the account can read the configured property. */
     async canRead() {
@@ -64,17 +97,14 @@ export function searchConsoleClient(config: SearchConsoleConfig, fetcher: Fetch 
      * fresh data included (dataState all: a later import replaces it once
      * final), a page of rows at a time.
      */
-    async pageDays(start: string, end: string) {
-      const rows: SearchRow[] = [];
-      for (let startRow = 0; ; startRow += pageRows) {
-        const body = await call(`/sites/${encodeURIComponent(config.site)}/searchAnalytics/query`, {
-          method: "POST",
-          body: JSON.stringify({ startDate: start, endDate: end, dimensions: ["page", "date"], dataState: "all", rowLimit: pageRows, startRow }),
-        }) as { rows?: Array<{ keys: [string, string]; impressions: number; clicks: number; position: number }> };
-        const page = body.rows ?? [];
-        rows.push(...page.map(({ keys: [url, date], impressions, clicks, position }) => ({ page: url, date, impressions, clicks, position })));
-        if (page.length < pageRows) return rows;
-      }
+    async pageDays(start: string, end: string): Promise<SearchRow[]> {
+      return (await query(start, end, ["page", "date"])).map(({ keys: [page, date], ...numbers }) => ({ page: page!, date: date!, ...numbers }));
+    },
+
+    /** The same, per search query as well. */
+    async pageQueryDays(start: string, end: string): Promise<QueryRow[]> {
+      return (await query(start, end, ["page", "query", "date"]))
+        .map(({ keys: [page, searchQuery, date], ...numbers }) => ({ page: page!, query: searchQuery!, date: date!, ...numbers }));
     },
   };
 }
