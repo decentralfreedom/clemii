@@ -146,6 +146,44 @@ export interface AuditEntry {
   subject: string;
 }
 
+export type PostSearchTotals = {
+  impressions: number;
+  clicks: number;
+  /** Clicks per impression, 0 to 1 */
+  ctr: number;
+  /**
+     * Average position over the window, weighted by impressions; null without impressions
+     * @nullable
+     */
+  position: number | null;
+};
+
+export interface SearchDay {
+  /** Search Console's day, in US Pacific time */
+  date: string;
+  impressions: number;
+  clicks: number;
+  /** Average position, weighted by impressions */
+  position: number;
+}
+
+export interface PostSearch {
+  /** @nullable */
+  from: string | null;
+  /**
+     * The last day Search Console has numbers for
+     * @nullable
+     */
+  to: string | null;
+  /**
+     * When the CMS last read Search Console; null until the first import
+     * @nullable
+     */
+  importedAt: string | null;
+  totals: PostSearchTotals;
+  days: SearchDay[];
+}
+
 export type PostLang = typeof PostLang[keyof typeof PostLang];
 
 
@@ -436,6 +474,14 @@ export type ListAudit200 = {
   entries: AuditEntry[];
   /** @nullable */
   nextCursor: string | null;
+};
+
+export type GetPostSearchParams = {
+  /**
+   * @minimum 1
+   * @maximum 486
+   */
+  days?: number;
 };
 
 export type ListPostsParams = {
@@ -1116,6 +1162,73 @@ export const getListAuditUrl = (params?: ListAuditParams,) => {
 export const listAudit = async (params?: ListAuditParams, options?: Parameters<typeof cmsFetch>[1]): Promise<listAuditResponse> => {
 
   return cmsFetch<listAuditResponse>(getListAuditUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type getPostSearchResponse200 = {
+  data: PostSearch
+  status: 200
+}
+
+export type getPostSearchResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type getPostSearchResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type getPostSearchResponse404 = {
+  data: Error
+  status: 404
+}
+
+export type getPostSearchResponse422 = {
+  data: Error
+  status: 422
+}
+
+export type getPostSearchResponseSuccess = (getPostSearchResponse200) & {
+  headers: Headers;
+};
+export type getPostSearchResponseError = (getPostSearchResponse401 | getPostSearchResponse403 | getPostSearchResponse404 | getPostSearchResponse422) & {
+  headers: Headers;
+};
+
+export type getPostSearchResponse = (getPostSearchResponseSuccess | getPostSearchResponseError)
+
+export const getGetPostSearchUrl = (id: string,
+    params?: GetPostSearchParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/posts/${id}/search?${stringifiedParams}` : `/v1/posts/${id}/search`
+}
+
+/**
+ * The post's Google Search Console numbers: impressions, clicks and position per day and in total, over the last `days` days Search Console has (28 by default).
+ */
+export const getPostSearch = async (id: string,
+    params?: GetPostSearchParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getPostSearchResponse> => {
+
+  return cmsFetch<getPostSearchResponse>(getGetPostSearchUrl(id,params),
   {
     ...options,
     method: 'GET'

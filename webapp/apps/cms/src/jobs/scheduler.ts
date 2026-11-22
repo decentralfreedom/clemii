@@ -11,7 +11,10 @@
 // /health/live while it runs, /health/ready while its last tick without errors
 // is under five minutes old (or it started less than five minutes ago) and its
 // backup bucket has answered (config-check.ts), so the
-// image's health check and any platform's probe work for it unchanged. It
+// image's health check and any platform's probe work for it unchanged. Once a
+// day it imports Search Console numbers (search/import.ts) when it holds the
+// key; a failing import is logged and retried hourly, never counted against
+// readiness, so Google being down cannot hold up publishing. It
 // applies pending migrations before its first tick,
 // as the API does at start (under one advisory lock), so neither depends on
 // the other having started.
@@ -21,6 +24,8 @@ import { storeCheck, watchConfiguration } from "../config-check";
 import { connectDatabase } from "../db/client";
 import { migrateDatabase } from "../db/migrate";
 import { publishDuePosts } from "../posts/service";
+import { searchConsoleClient } from "../search/console";
+import { importSearchConsole, searchImportDue } from "../search/import";
 import { syncSite } from "../site/deploy";
 import { createObjectStore } from "../storage/object-store";
 
@@ -31,6 +36,7 @@ const config = loadConfig();
 await migrateDatabase(config.databaseUrl);
 const { db, close } = connectDatabase(config.databaseUrl);
 const backups = createObjectStore(config.backups);
+const searchConsole = config.searchConsole && searchConsoleClient(config.searchConsole);
 // Not ready until the backup bucket answers with these credentials (config-check.ts).
 const configuration = watchConfiguration([storeCheck("backup bucket", backups)]);
 const log = (level: "info" | "error", message: string, details: Record<string, unknown> = {}) =>
@@ -80,6 +86,17 @@ async function tick() {
   } catch (error) {
     healthy = false;
     log("error", "Backing up the CMS database failed", { error: String(error) });
+  }
+  // Outside the health count: Search Console being unreachable is Google's, not the CMS's.
+  if (searchConsole) {
+    try {
+      if (await searchImportDue(db)) {
+        const { otherPages, ...result } = await importSearchConsole(db, searchConsole);
+        log("info", "Imported Search Console numbers", { ...result, otherPages: otherPages.length });
+      }
+    } catch (error) {
+      log("error", "Importing Search Console numbers failed", { error: String(error) });
+    }
   }
   if (healthy) lastHealthyTick = Date.now();
 }

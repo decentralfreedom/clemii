@@ -19,6 +19,15 @@ export type CmsConfig = {
   site?: SiteConfig;
   /** Sign-in to the admin with GitHub; absent, only bearer tokens work. */
   admin?: AdminConfig;
+  /** Search Console numbers per post (PRD R12), read by the scheduler; absent, nothing is imported. */
+  searchConsole?: SearchConsoleConfig;
+};
+
+/** A Google service account with read-only access to one Search Console property. */
+export type SearchConsoleConfig = {
+  /** The property, such as sc-domain:behu.sh. */
+  site: string;
+  key: { clientEmail: string; privateKey: string; tokenUri: string };
 };
 
 export type AdminConfig = {
@@ -55,6 +64,35 @@ export function loadConfig(env: Env = process.env): CmsConfig {
     },
     site: siteConfig(env),
     admin: adminConfig(env),
+    searchConsole: searchConsoleConfig(env),
+  };
+}
+
+/**
+ * CMS_SEARCH_CONSOLE_KEY is the service account's JSON key, set only where the
+ * import runs (the scheduler). The property defaults to the website's domain
+ * property. Errors name the setting, never its value.
+ */
+function searchConsoleConfig(env: Env): SearchConsoleConfig | undefined {
+  const raw = env.CMS_SEARCH_CONSOLE_KEY;
+  if (!raw) return undefined;
+  let parsed: Record<string, unknown>;
+  try {
+    parsed = JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    throw new Error("CMS_SEARCH_CONSOLE_KEY must be the service account's JSON key");
+  }
+  const { type, client_email: clientEmail, private_key: privateKey, token_uri: tokenUri } = parsed;
+  if (type !== "service_account" || typeof clientEmail !== "string" || typeof privateKey !== "string" || !privateKey.includes("PRIVATE KEY")) {
+    throw new Error("CMS_SEARCH_CONSOLE_KEY must be a service account key (type service_account, with client_email and private_key)");
+  }
+  const siteUrl = env.CMS_SITE_URL;
+  const site = env.CMS_SEARCH_CONSOLE_SITE || (siteUrl ? `sc-domain:${new URL(siteUrl).hostname}` : undefined);
+  if (!site) throw new Error("CMS_SEARCH_CONSOLE_SITE (or CMS_SITE_URL) is required when CMS_SEARCH_CONSOLE_KEY is set");
+  if (!/^(sc-domain:[a-z0-9.-]+|https:\/\/\S+\/)$/.test(site)) throw new Error("CMS_SEARCH_CONSOLE_SITE must be sc-domain:<domain> or a URL-prefix property ending in /");
+  return {
+    site,
+    key: { clientEmail, privateKey, tokenUri: typeof tokenUri === "string" ? tokenUri : "https://oauth2.googleapis.com/token" },
   };
 }
 

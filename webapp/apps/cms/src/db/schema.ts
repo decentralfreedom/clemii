@@ -10,7 +10,7 @@
 // Authors and clusters are ids validated against @hush/article.
 import type { TocEntry } from "@hush/article";
 import { relations, sql } from "drizzle-orm";
-import { bigint, boolean, check, index, integer, jsonb, pgEnum, pgTable, primaryKey, smallint, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { bigint, boolean, check, date, doublePrecision, index, integer, jsonb, pgEnum, pgTable, primaryKey, smallint, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
 export const postStatus = pgEnum("post_status", ["draft", "scheduled", "published"]);
 export const tokenScope = pgEnum("token_scope", ["posts:read", "posts:write", "posts:publish"]);
@@ -198,6 +198,31 @@ export const auditLog = pgTable("audit_log", {
   index("audit_log_at").on(table.at, table.id),
   index("audit_log_post_at").on(table.postId, table.at),
 ]);
+
+/**
+ * Google Search Console numbers per post and day (PRD R12), as the property
+ * reports them for the post's page, at any address it has had. `date` is
+ * Search Console's day, in US Pacific time; Umami's days are UTC. `position`
+ * is the average position weighted by impressions, so combine days by
+ * weighting it by impressions, never by averaging averages. Search Console
+ * aggregates by page, so the sum over posts is not the site's total.
+ */
+export const searchDaily = pgTable("search_daily", {
+  postId: uuid("post_id").notNull().references(() => posts.id, { onDelete: "cascade" }),
+  date: date("date", { mode: "string" }).notNull(),
+  impressions: integer("impressions").notNull(),
+  clicks: integer("clicks").notNull(),
+  position: doublePrecision("position").notNull(),
+}, (table) => [primaryKey({ columns: [table.postId, table.date] })]);
+
+/** The Search Console import's own state, one row: a failing import retries hourly, not every minute. */
+export const searchConsoleState = pgTable("search_console_state", {
+  id: smallint("id").primaryKey().default(1),
+  attemptedAt: timestamp("attempted_at", { withTimezone: true }),
+  importedAt: timestamp("imported_at", { withTimezone: true }),
+  /** The last day the import has numbers for (Search Console lags two to three days). */
+  importedThrough: date("imported_through", { mode: "string" }),
+}, (table) => [check("search_console_state_single_row", sql`${table.id} = 1`)]);
 
 export const postRelations = relations(posts, ({ many, one }) => ({
   secondaryKeywords: many(postSecondaryKeywords),

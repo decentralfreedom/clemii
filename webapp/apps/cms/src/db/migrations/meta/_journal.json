@@ -64,6 +64,13 @@
       "when": 1795342030234,
       "tag": "0008_audit_log_append_only",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795344078649,
+      "tag": "0009_search_console",
+      "breakpoints": true
     }
   ]
 }

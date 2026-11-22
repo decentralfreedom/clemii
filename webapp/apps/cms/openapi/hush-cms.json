@@ -304,6 +304,101 @@
           "subject"
         ]
       },
+      "PostSearch": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "The last day Search Console has numbers for"
+          },
+          "importedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the CMS last read Search Console; null until the first import"
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "impressions": {
+                "type": "integer"
+              },
+              "clicks": {
+                "type": "integer"
+              },
+              "ctr": {
+                "type": "number",
+                "description": "Clicks per impression, 0 to 1"
+              },
+              "position": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Average position over the window, weighted by impressions; null without impressions"
+              }
+            },
+            "required": [
+              "impressions",
+              "clicks",
+              "ctr",
+              "position"
+            ]
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchDay"
+            }
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "importedAt",
+          "totals",
+          "days"
+        ]
+      },
+      "SearchDay": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "Search Console's day, in US Pacific time"
+          },
+          "impressions": {
+            "type": "integer"
+          },
+          "clicks": {
+            "type": "integer"
+          },
+          "position": {
+            "type": "number",
+            "description": "Average position, weighted by impressions"
+          }
+        },
+        "required": [
+          "date",
+          "impressions",
+          "clicks",
+          "position"
+        ]
+      },
       "Post": {
         "type": "object",
         "properties": {
@@ -1302,6 +1397,94 @@
           },
           "403": {
             "description": "Not the owner",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/posts/{id}/search": {
+      "get": {
+        "operationId": "getPostSearch",
+        "tags": [
+          "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "The post's Google Search Console numbers: impressions, clicks and position per day and in total, over the last `days` days Search Console has (28 by default).",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 486,
+              "default": 28
+            },
+            "required": false,
+            "name": "days",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The post's search numbers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostSearch"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The token lacks posts:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such post",
             "content": {
               "application/json": {
                 "schema": {
