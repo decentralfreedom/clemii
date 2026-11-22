@@ -1,3 +1,4 @@
+import { siteOrigin } from "../../shared/origin";
 import { useEffect } from "react";
 import { sitePages } from "../../shared/site";
 
@@ -33,13 +34,13 @@ export function DocumentMetadata(props: DocumentMetadataProps) {
     setMeta(
       'meta[property="og:url"]',
       "content",
-      `https://behu.sh${canonicalPath}`,
+      `${siteOrigin}${canonicalPath}`,
     );
 
     const canonical = document.head.querySelector<HTMLLinkElement>(
       'link[rel="canonical"]',
     );
-    canonical?.setAttribute("href", `https://behu.sh${canonicalPath}`);
+    canonical?.setAttribute("href", `${siteOrigin}${canonicalPath}`);
 
     let robots = document.head.querySelector<HTMLMetaElement>(
       'meta[name="robots"]',

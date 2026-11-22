@@ -25,6 +25,8 @@ const sitemap = [
 ].join("\n");
 
 await Bun.write("public/sitemap.xml", sitemap);
+// Private proof pages, short links and the API are not for search engines.
+await Bun.write("public/robots.txt", ["User-agent: *", "Allow: /", "Disallow: /p/", "Disallow: /s/", "Disallow: /v1/", "", `Sitemap: ${siteOrigin}/sitemap.xml`, ""].join("\n"));
 await Bun.write("public/llms.txt", [
   "# hush", "",
   "> Free, open-source voice dictation and local AI for Apple silicon Macs.", "",
