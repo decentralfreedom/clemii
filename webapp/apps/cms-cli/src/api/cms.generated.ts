@@ -281,6 +281,72 @@ export interface PostSearchQueries {
   queries: SearchQuery[];
 }
 
+/**
+ * @nullable
+ */
+export type SiteSearchPrevious = {
+  from: string;
+  to: string;
+  totals: SearchTotals;
+} | null;
+
+/**
+ * Against the earlier period; null without one, or when either period has fewer than 100 impressions
+ * @nullable
+ */
+export type SiteSearchChange = {
+  /** @nullable */
+  impressions: number | null;
+  /** @nullable */
+  clicks: number | null;
+  ctrPoints: number;
+  /** @nullable */
+  position: number | null;
+} | null;
+
+export type SearchTopPostStatus = typeof SearchTopPostStatus[keyof typeof SearchTopPostStatus];
+
+
+export const SearchTopPostStatus = {
+  draft: 'draft',
+  scheduled: 'scheduled',
+  published: 'published',
+} as const;
+
+export interface SearchTopPost {
+  postId: string;
+  /** The article's heading as published, else its title */
+  title: string;
+  lang: string;
+  slug: string;
+  status: SearchTopPostStatus;
+  impressions: number;
+  clicks: number;
+  ctr: number;
+  /** Average position, weighted by impressions */
+  position: number;
+}
+
+export interface SiteSearch {
+  /** @nullable */
+  from: string | null;
+  /** @nullable */
+  to: string | null;
+  /** @nullable */
+  importedAt: string | null;
+  totals: SearchTotals & unknown;
+  /** @nullable */
+  previous: SiteSearchPrevious;
+  /**
+     * Against the earlier period; null without one, or when either period has fewer than 100 impressions
+     * @nullable
+     */
+  change: SiteSearchChange;
+  days: SearchDay[];
+  /** Posts with the most clicks, then impressions, in the window */
+  topPosts: SearchTopPost[];
+}
+
 export type PostLang = typeof PostLang[keyof typeof PostLang];
 
 
@@ -594,6 +660,20 @@ export type GetPostSearchQueriesParams = {
   /**
    * @minimum 1
    * @maximum 500
+   */
+  limit?: number;
+};
+
+export type GetSiteSearchParams = {
+  /**
+   * @minimum 1
+   * @maximum 3650
+   */
+  days?: number;
+  since?: string;
+  /**
+   * @minimum 1
+   * @maximum 100
    */
   limit?: number;
 };
@@ -1410,6 +1490,66 @@ export const getPostSearchQueries = async (id: string,
     params?: GetPostSearchQueriesParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getPostSearchQueriesResponse> => {
 
   return cmsFetch<getPostSearchQueriesResponse>(getGetPostSearchQueriesUrl(id,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type getSiteSearchResponse200 = {
+  data: SiteSearch
+  status: 200
+}
+
+export type getSiteSearchResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type getSiteSearchResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type getSiteSearchResponse422 = {
+  data: Error
+  status: 422
+}
+
+export type getSiteSearchResponseSuccess = (getSiteSearchResponse200) & {
+  headers: Headers;
+};
+export type getSiteSearchResponseError = (getSiteSearchResponse401 | getSiteSearchResponse403 | getSiteSearchResponse422) & {
+  headers: Headers;
+};
+
+export type getSiteSearchResponse = (getSiteSearchResponseSuccess | getSiteSearchResponseError)
+
+export const getGetSiteSearchUrl = (params?: GetSiteSearchParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/search?${stringifiedParams}` : `/v1/search`
+}
+
+/**
+ * The site's Google Search Console numbers over the last `days` days Search Console has (28 by default), or since a day: Google's own site totals, the change from the period before, and the posts with the most search clicks.
+ */
+export const getSiteSearch = async (params?: GetSiteSearchParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getSiteSearchResponse> => {
+
+  return cmsFetch<getSiteSearchResponse>(getGetSiteSearchUrl(params),
   {
     ...options,
     method: 'GET'

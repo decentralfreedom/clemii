@@ -7,9 +7,9 @@
 // with the way back, the post and its actions, then Overview and Search tabs
 // over the range Ghost offers. Every number is one the CMS has (PRD R12).
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { formatDistanceToNowStrict } from "date-fns";
 import { ArrowLeft, ArrowUpRight, Pen } from "lucide-react";
 import { useGetPost, useGetPostSearch, type Post } from "@/api/cms.generated";
+import { DataSource } from "@/components/analytics/data-source";
 import { RangeSelect } from "@/components/analytics/range-select";
 import { SearchChanges } from "@/components/analytics/search-changes";
 import { SearchKpis } from "@/components/analytics/search-kpis";
@@ -32,14 +32,6 @@ export const Route = createFileRoute("/_app/posts/$id/analytics")({
 const day = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 
 /** Which numbers these are, from which days and when they were read: the page never shows a number without its source. */
-function DataSource({ from, to, importedAt }: { from: string; to: string; importedAt: string | null }) {
-  return (
-    <p className="text-sm text-text-secondary">
-      Google Search Console, web search, {day(from)} to {day(to)} (Search Console days, US Pacific)
-      {importedAt && <>; read {formatDistanceToNowStrict(new Date(importedAt), { addSuffix: true })}</>}. Search Console lags two to three days.
-    </p>
-  );
-}
 
 function PostAnalytics() {
   const { id } = Route.useParams();
@@ -93,7 +85,7 @@ function PostAnalytics() {
         <p className="py-24 text-center text-sm text-text-secondary">No Search Console numbers yet; the CMS reads them once a day.</p>
       ) : tab === "overview" ? (
         <div className="flex flex-col gap-6">
-          <SearchKpis search={{ ...numbers, from: numbers.from, to: numbers.to }} />
+          <SearchKpis id="post" search={{ ...numbers, from: numbers.from, to: numbers.to }} />
           <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2">
             <SearchQueriesCard postId={id} params={params} limit={5} more={{ tab: "search" }} compact />
             <SearchChanges markers={numbers.markers} />

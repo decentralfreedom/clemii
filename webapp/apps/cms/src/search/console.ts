@@ -61,12 +61,12 @@ export function searchConsoleClient(config: SearchConsoleConfig, fetcher: Fetch 
 
   type Row = { keys: string[]; impressions: number; clicks: number; position: number };
   /** searchAnalytics.query for one day over the given dimensions, every page of rows. */
-  async function queryDay(day: string, dimensions: string[]) {
+  async function queryDay(day: string, dimensions: string[], aggregationType?: "byProperty") {
     const rows: Row[] = [];
     for (let startRow = 0; ; startRow += pageRows) {
       const body = await call(`/sites/${encodeURIComponent(config.site)}/searchAnalytics/query`, {
         method: "POST",
-        body: JSON.stringify({ startDate: day, endDate: day, dimensions, type: "web", dataState: "all", rowLimit: pageRows, startRow }),
+        body: JSON.stringify({ startDate: day, endDate: day, dimensions, type: "web", dataState: "all", rowLimit: pageRows, startRow, ...(aggregationType ? { aggregationType } : {}) }),
       }) as { rows?: Row[] };
       const page = body.rows ?? [];
       rows.push(...page.map(({ keys, impressions, clicks, position }) => ({ keys, impressions, clicks, position })));
@@ -75,12 +75,12 @@ export function searchConsoleClient(config: SearchConsoleConfig, fetcher: Fetch 
   }
 
   /** Every day from start to end (YYYY-MM-DD, inclusive), a few days at a time. */
-  async function query(start: string, end: string, dimensions: string[]) {
+  async function query(start: string, end: string, dimensions: string[], aggregationType?: "byProperty") {
     const days: string[] = [];
     for (let time = Date.parse(start); time <= Date.parse(end); time += 86_400_000) days.push(new Date(time).toISOString().slice(0, 10));
     const rows: Row[] = [];
     for (let offset = 0; offset < days.length; offset += 4) {
-      for (const dayRows of await Promise.all(days.slice(offset, offset + 4).map((day) => queryDay(day, dimensions)))) rows.push(...dayRows);
+      for (const dayRows of await Promise.all(days.slice(offset, offset + 4).map((day) => queryDay(day, dimensions, aggregationType)))) rows.push(...dayRows);
     }
     return rows;
   }
@@ -99,6 +99,15 @@ export function searchConsoleClient(config: SearchConsoleConfig, fetcher: Fetch 
      */
     async pageDays(start: string, end: string): Promise<SearchRow[]> {
       return (await query(start, end, ["page", "date"])).map(({ keys: [page, date], ...numbers }) => ({ page: page!, date: date!, ...numbers }));
+    },
+
+    /**
+     * The whole property's numbers per day, aggregated by property: Google's
+     * site totals, which per-page numbers do not add up to ("For accurate
+     * counts, you must omit the page and query dimensions").
+     */
+    async siteDays(start: string, end: string): Promise<Array<Omit<SearchRow, "page">>> {
+      return (await query(start, end, ["date"], "byProperty")).map(({ keys: [date], ...numbers }) => ({ date: date!, ...numbers }));
     },
 
     /** The same, per search query as well. */

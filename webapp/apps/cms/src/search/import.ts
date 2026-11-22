@@ -11,7 +11,7 @@
 // log but not stored.
 import { eq } from "drizzle-orm";
 import type { Database } from "../db/client";
-import { searchConsoleState, searchDaily, searchQueries } from "../db/schema";
+import { searchConsoleState, searchDaily, searchQueries, searchSiteDaily } from "../db/schema";
 import { pagePathOf, postPathIndex } from "../posts/paths";
 import type { SearchConsoleClient, SearchRow } from "./console";
 
@@ -100,15 +100,17 @@ export async function importSearchConsole(db: Database, client: SearchConsoleCli
   for (let offset = 0; offset < days.length; offset += parallelDays) {
     const batch = days.slice(offset, offset + parallelDays);
     const read = await Promise.all(batch.map(async (day) => ({
-      day, pageRows: await client.pageDays(day, day), queryRows: await client.pageQueryDays(day, day),
+      day, pageRows: await client.pageDays(day, day), queryRows: await client.pageQueryDays(day, day), siteRows: await client.siteDays(day, day),
     })));
-    for (const { day, pageRows, queryRows } of read) {
+    for (const { day, pageRows, queryRows, siteRows } of read) {
       const pages = perPost(pageRows, index, (row) => row.date, unmatched).map(({ row, ...sum }) => ({ ...sum, date: row.date }));
       const queries = perPost(queryRows, index, (row) => row.query, new Set())
         .map(({ row, ...sum }) => ({ ...sum, date: row.date, query: row.query }));
       await db.transaction(async (tx) => {
         await tx.delete(searchDaily).where(eq(searchDaily.date, day));
         await tx.delete(searchQueries).where(eq(searchQueries.date, day));
+        await tx.delete(searchSiteDaily).where(eq(searchSiteDaily.date, day));
+        if (siteRows.length) await tx.insert(searchSiteDaily).values(siteRows.map(({ date, impressions, clicks, position }) => ({ date, impressions, clicks, position })));
         await insertInChunks(pages, (chunk) => tx.insert(searchDaily).values(chunk));
         await insertInChunks(queries, (chunk) => tx.insert(searchQueries).values(chunk));
       });

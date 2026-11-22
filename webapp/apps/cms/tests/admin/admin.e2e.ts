@@ -716,6 +716,47 @@ test("CMS-018 a published post's analytics page, as Ghost's: from the posts list
   await expect(signedIn).toHaveURL(new RegExp(`/posts/${seeded.id}/analytics$`));
 });
 
+test("CMS-019 the Analytics dashboard, as Ghost's: from the sidebar, Google's site totals with their valid change, top posts that open the post's analytics", async ({ signedIn }, testInfo) => {
+  const mobile = testInfo.project.name === "mobile";
+  await signedIn.goto("/");
+  if (mobile) await signedIn.getByRole("link", { name: "Analytics", exact: true }).click();
+  else await signedIn.getByRole("navigation").or(signedIn.locator("[data-sidebar=sidebar]")).getByRole("link", { name: "Analytics", exact: true }).click();
+  await expect(signedIn).toHaveURL(/\/analytics$/);
+  await expect(signedIn.getByRole("heading", { level: 1 })).toHaveText("Analytics");
+  // Last 30 days (22 Oct to 20 Nov): the site's own totals, against the 30 days before, which the CMS has and which hold 900 impressions.
+  if (mobile) {
+    await expect(signedIn.getByRole("button", { name: "Choose metric" })).toContainText("2,800");
+    await expect(signedIn.getByRole("button", { name: "Choose metric" })).toContainText("+211%");
+  } else {
+    const metrics = signedIn.getByRole("tablist", { name: "Search metrics" });
+    await expect(metrics.getByTestId("kpi-impressions")).toContainText("2,800");
+    await expect(metrics.getByTestId("kpi-impressions-diff")).toHaveText("+211%");
+    await expect(metrics.getByTestId("kpi-clicks-diff")).toHaveText("+344%");
+    await expect(metrics.getByTestId("kpi-ctr")).toContainText("2.9%");
+    await expect(metrics.getByTestId("kpi-ctr-diff")).toHaveText("+0.9 pt");
+    // A lower position is better: shown as an improvement.
+    await expect(metrics.getByTestId("kpi-position")).toContainText("6.4");
+    await expect(metrics.getByTestId("kpi-position-diff")).toHaveText("-2.6");
+    await expect(metrics.getByRole("tab", { name: /Avg. position/ })).toHaveAttribute("title", /lower is better/);
+  }
+  await expect(signedIn.getByText(/more than the posts add up to/)).toBeVisible();
+  const top = signedIn.getByRole("table", { name: "Top posts" });
+  await expect(top.getByRole("row")).toHaveCount(2);
+  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
+  await signedIn.screenshot({ path: testInfo.outputPath("dashboard.png"), fullPage: true });
+
+  // A range without an earlier period the CMS has shows no change.
+  await signedIn.getByRole("combobox", { name: "Date range" }).click();
+  await signedIn.getByRole("option", { name: "All time" }).click();
+  await expect(signedIn).toHaveURL(/range=all/);
+  await expect(signedIn.getByTestId("kpi-impressions-diff")).toHaveCount(0);
+
+  // Drill down, keeping the range.
+  await top.getByRole("link", { name: "How to dictate on a Mac without the cloud" }).click();
+  await expect(signedIn).toHaveURL(/\/posts\/[0-9a-f-]+\/analytics\?range=all$/);
+  await expect(signedIn.getByText(/web search, 24 Jul 2025 to 20 Nov 2026/)).toBeVisible();
+});
+
 test("the admin runs under its Content Security Policy without violations", async ({ signedIn, draft }) => {
   const violations: string[] = [];
   signedIn.on("console", (message) => { if (/Content.Security.Policy|Refused to/i.test(message.text())) violations.push(message.text()); });

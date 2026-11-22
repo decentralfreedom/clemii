@@ -11,18 +11,17 @@ import { requireScope, type AuthVariables } from "../auth/tokens";
 import type { Database } from "../db/client";
 import { searchDaily, searchQueries } from "../db/schema";
 import { getPost } from "../posts/service";
-import { changeFrom, minimumImpressions, previousPeriod, searchMarkers, totalsOf } from "../search/analytics";
-import { readSearchState } from "../search/import";
+import { changeFrom, minimumImpressions, previousPeriod, searchMarkers, searchWindow, totalsOf } from "../search/analytics";
 import { errorSchema, validationHook } from "./errors";
 
-const daySchema = z.object({
+export const daySchema = z.object({
   date: z.iso.date().describe("Search Console's day, in US Pacific time"),
   impressions: z.number().int(),
   clicks: z.number().int(),
   position: z.number().describe("Average position, weighted by impressions"),
 }).openapi("SearchDay");
 
-const totalsSchema = z.object({
+export const totalsSchema = z.object({
   impressions: z.number().int(),
   clicks: z.number().int(),
   ctr: z.number().describe("Clicks per impression, 0 to 1"),
@@ -66,24 +65,6 @@ const queriesSchema = z.object({
   importedAt: z.iso.datetime().nullable(),
   queries: z.array(querySchema).describe("Most impressions first. Google leaves out rare queries to protect searchers' privacy, so these add up to less than the post's totals."),
 }).openapi("PostSearchQueries");
-
-/**
- * The window ending on the last day Search Console has: from `since` when
- * given (as Ghost's "Year to date" and "All time"), else the last `span` days,
- * but never before the first day the CMS has numbers for. Inside it a day
- * without a row had no impressions; before it there are no numbers at all.
- */
-async function searchWindow(db: Database, span: number, since?: string) {
-  const state = await readSearchState(db);
-  const to = state?.importedThrough ?? null;
-  const coverage = state?.importedFrom ?? to;
-  if (!to || !coverage) return { from: null, to: null, coverage: null, importedAt: state?.importedAt?.toISOString() ?? null };
-  const wanted = since ?? new Date(Date.parse(to) - (span - 1) * 86_400_000).toISOString().slice(0, 10);
-  // Never before the first day the CMS has numbers for, and never after the last.
-  const start = wanted > coverage ? wanted : coverage;
-  const from = start < to ? start : to;
-  return { from, to, coverage, importedAt: state?.importedAt?.toISOString() ?? null };
-}
 
 /** A post's days in from..to, oldest first. */
 function postDays(db: Database, id: string, from: string, to: string) {
