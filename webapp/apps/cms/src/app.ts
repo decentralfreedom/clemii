@@ -8,6 +8,7 @@ import { secureHeaders } from "hono/secure-headers";
 import type { AdminConfig } from "./config";
 import type { Cms } from "./media/service";
 import { PostError } from "./posts/service";
+import { auditRoutes } from "./routes/audit";
 import { authRoutes } from "./routes/auth";
 import { deviceRoutes } from "./routes/device";
 import { healthRoutes } from "./routes/health";
@@ -76,6 +77,7 @@ export function createApp(cms: Cms, options: AppOptions = {}) {
   app.route("/", meRoutes(cms.db));
   app.route("/", deviceRoutes(cms.db, options.admin?.publicUrl));
   app.route("/", tokenRoutes(cms.db));
+  app.route("/", auditRoutes(cms.db));
   app.route("/", postRoutes(cms));
   app.route("/", siteRoutes(cms));
   app.openAPIRegistry.registerComponent("securitySchemes", "bearer", { type: "http", scheme: "bearer" });

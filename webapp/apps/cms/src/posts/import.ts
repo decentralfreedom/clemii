@@ -10,6 +10,7 @@ import { blogLanguages } from "@hush/article/taxonomy";
 import { and, eq } from "drizzle-orm";
 import { readdir } from "node:fs/promises";
 import { extname, join } from "node:path";
+import { systemActor, type Actor } from "../auth/tokens";
 import { posts } from "../db/schema";
 import { uploadMedia, type Cms } from "../media/service";
 import { checkPost } from "./contract";
@@ -26,7 +27,7 @@ type Candidate = {
 
 export type ImportReport = { imported: string[]; published: string[]; failed: Array<{ file: string; problems: string[] }> };
 
-export async function importArticles(cms: Cms, contentDir: string, actor = "import"): Promise<ImportReport> {
+export async function importArticles(cms: Cms, contentDir: string, actor: Actor = systemActor("import")): Promise<ImportReport> {
   const report: ImportReport = { imported: [], published: [], failed: [] };
   const toPublish: Candidate[] = [];
 
@@ -72,7 +73,7 @@ export async function importArticles(cms: Cms, contentDir: string, actor = "impo
  * the set is stable. Only then is anything published, so no published article
  * links to one that stays a draft.
  */
-async function publishTogether(cms: Cms, candidates: Candidate[], actor: string) {
+async function publishTogether(cms: Cms, candidates: Candidate[], actor: Actor) {
   const failed: ImportReport["failed"] = [];
   let set = candidates;
   for (;;) {

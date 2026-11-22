@@ -224,6 +224,86 @@
           "expiresAt"
         ]
       },
+      "AuditEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "post.created",
+              "post.edited",
+              "post.image_uploaded",
+              "post.scheduled",
+              "post.published",
+              "post.unpublished",
+              "post.approved",
+              "post.deleted",
+              "token.created",
+              "token.revoked",
+              "device.approved",
+              "device.denied",
+              "owner.signed_in"
+            ]
+          },
+          "actor": {
+            "type": "string",
+            "description": "github:<login> for the owner, token:<name> for a token, or scheduler, import, cms:token for the CMS itself"
+          },
+          "actorTokenId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The token that made the change; tells two tokens of one name apart"
+          },
+          "postId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "tokenId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "revisionId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The revision the change saved, to see what it changed"
+          },
+          "subject": {
+            "type": "string",
+            "description": "The post's title or the token's name at that moment"
+          }
+        },
+        "required": [
+          "id",
+          "at",
+          "action",
+          "actor",
+          "actorTokenId",
+          "postId",
+          "tokenId",
+          "revisionId",
+          "subject"
+        ]
+      },
       "Post": {
         "type": "object",
         "properties": {
@@ -1109,6 +1189,129 @@
           },
           "404": {
             "description": "No such token, or already revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/audit": {
+      "get": {
+        "operationId": "listAudit",
+        "tags": [
+          "Access"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "Who or which token changed what, and when: newest first, a page at a time. The owner only.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "nextCursor of the previous page"
+            },
+            "required": false,
+            "description": "nextCursor of the previous page",
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Only the entries about this post"
+            },
+            "required": false,
+            "description": "Only the entries about this post",
+            "name": "postId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "posts",
+                "access"
+              ],
+              "description": "posts: changes to posts; access: tokens, CLI sign-ins and the owner's sign-ins"
+            },
+            "required": false,
+            "description": "posts: changes to posts; access: tokens, CLI sign-ins and the owner's sign-ins",
+            "name": "area",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of the log",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entries": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AuditEntry"
+                      }
+                    },
+                    "nextCursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "entries",
+                    "nextCursor"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the owner",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid query",
             "content": {
               "application/json": {
                 "schema": {

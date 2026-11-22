@@ -108,7 +108,7 @@ export function postRoutes(cms: Cms) {
     request: { params: idParam },
     responses: { 204: { description: "The draft is gone" }, 401: errors[401], 403: errors[403], 404: errors[404], 409: errors[409] },
   }), async (context) => {
-    await deletePost(db, context.req.valid("param").id);
+    await deletePost(db, context.req.valid("param").id, context.var.actor);
     return context.body(null, 204);
   });
 

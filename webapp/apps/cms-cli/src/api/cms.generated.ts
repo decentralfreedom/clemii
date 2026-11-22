@@ -103,6 +103,49 @@ export interface Token {
   expiresAt: string | null;
 }
 
+export type AuditEntryAction = typeof AuditEntryAction[keyof typeof AuditEntryAction];
+
+
+export const AuditEntryAction = {
+  postcreated: 'post.created',
+  postedited: 'post.edited',
+  postimage_uploaded: 'post.image_uploaded',
+  postscheduled: 'post.scheduled',
+  postpublished: 'post.published',
+  postunpublished: 'post.unpublished',
+  postapproved: 'post.approved',
+  postdeleted: 'post.deleted',
+  tokencreated: 'token.created',
+  tokenrevoked: 'token.revoked',
+  deviceapproved: 'device.approved',
+  devicedenied: 'device.denied',
+  ownersigned_in: 'owner.signed_in',
+} as const;
+
+export interface AuditEntry {
+  id: string;
+  at: string;
+  action: AuditEntryAction;
+  /** github:<login> for the owner, token:<name> for a token, or scheduler, import, cms:token for the CMS itself */
+  actor: string;
+  /**
+     * The token that made the change; tells two tokens of one name apart
+     * @nullable
+     */
+  actorTokenId: string | null;
+  /** @nullable */
+  postId: string | null;
+  /** @nullable */
+  tokenId: string | null;
+  /**
+     * The revision the change saved, to see what it changed
+     * @nullable
+     */
+  revisionId: string | null;
+  /** The post's title or the token's name at that moment */
+  subject: string;
+}
+
 export type PostLang = typeof PostLang[keyof typeof PostLang];
 
 
@@ -365,6 +408,34 @@ export type PollDeviceSignInBody = {
 
 export type ListTokens200 = {
   tokens: Token[];
+};
+
+export type ListAuditParams = {
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  /** nextCursor of the previous page */
+  cursor?: string;
+  /** Only the entries about this post */
+  postId?: string;
+  /** posts: changes to posts; access: tokens, CLI sign-ins and the owner's sign-ins */
+  area?: ListAuditArea;
+};
+
+export type ListAuditArea = typeof ListAuditArea[keyof typeof ListAuditArea];
+
+
+export const ListAuditArea = {
+  posts: 'posts',
+  access: 'access',
+} as const;
+
+export type ListAudit200 = {
+  entries: AuditEntry[];
+  /** @nullable */
+  nextCursor: string | null;
 };
 
 export type ListPostsParams = {
@@ -988,6 +1059,66 @@ export const revokeToken = async (id: string, options?: Parameters<typeof cmsFet
   {
     ...options,
     method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export type listAuditResponse200 = {
+  data: ListAudit200
+  status: 200
+}
+
+export type listAuditResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type listAuditResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type listAuditResponse422 = {
+  data: Error
+  status: 422
+}
+
+export type listAuditResponseSuccess = (listAuditResponse200) & {
+  headers: Headers;
+};
+export type listAuditResponseError = (listAuditResponse401 | listAuditResponse403 | listAuditResponse422) & {
+  headers: Headers;
+};
+
+export type listAuditResponse = (listAuditResponseSuccess | listAuditResponseError)
+
+export const getListAuditUrl = (params?: ListAuditParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/audit?${stringifiedParams}` : `/v1/audit`
+}
+
+/**
+ * Who or which token changed what, and when: newest first, a page at a time. The owner only.
+ */
+export const listAudit = async (params?: ListAuditParams, options?: Parameters<typeof cmsFetch>[1]): Promise<listAuditResponse> => {
+
+  return cmsFetch<listAuditResponse>(getListAuditUrl(params),
+  {
+    ...options,
+    method: 'GET'
 
 
   }

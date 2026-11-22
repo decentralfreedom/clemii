@@ -12,6 +12,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createApp } from "../../src/app";
 import { createSession, setSessionCookie } from "../../src/auth/sessions";
+import { systemActor } from "../../src/auth/tokens";
 import { Hono } from "hono";
 import { createDraft, publishPost } from "../../src/posts/service";
 import { LocalObjectStore } from "../../src/storage/object-store";
@@ -29,12 +30,13 @@ const admin = {
   allowedGithubIds: new Set([1]),
 };
 
-const live = await createDraft(cms.db, validPost({ slug: "dictate-without-cloud", keyword: "dictate without cloud" }), "e2e");
-await publishPost(cms, live.id, "e2e");
+const e2e = systemActor("e2e");
+const live = await createDraft(cms.db, validPost({ slug: "dictate-without-cloud", keyword: "dictate without cloud" }), e2e);
+await publishPost(cms, live.id, e2e);
 await createDraft(cms.db, validPost({
   slug: "draft-in-progress", keyword: "draft in progress",
   title: "A draft that is still being written, slowly, step by step",
-}), "e2e");
+}), e2e);
 const app = new Hono();
 app.get("/__e2e/sign-in", async (context) => {
   const session = await createSession(cms.db, { githubUserId: 1, githubLogin: "owner" });

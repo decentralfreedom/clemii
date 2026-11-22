@@ -7,7 +7,7 @@
 // ("/" focuses it, Escape blurs it), and each group's sections, the one in
 // view marked.
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Blocks, Search, UserRound, X } from "lucide-react";
+import { ArrowLeft, Blocks, History, Search, UserRound, X } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
@@ -16,7 +16,7 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui
 import { cn } from "@/lib/utils";
 import { settingsSections, useSettings, type SettingsSectionId } from "./settings-context";
 
-const icons: Record<SettingsSectionId, ReactNode> = { account: <UserRound />, integrations: <Blocks /> };
+const icons: Record<SettingsSectionId, ReactNode> = { account: <UserRound />, integrations: <Blocks />, history: <History /> };
 
 /** Back to the posts, as Ghost's "Back to app (ESC)". */
 export function ExitSettingsButton() {

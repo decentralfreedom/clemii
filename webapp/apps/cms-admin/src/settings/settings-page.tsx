@@ -5,7 +5,8 @@
 // main-content.tsx, settings-sections.tsx; components/searchable-section.tsx,
 // top-level-group.tsx; advanced/integrations.tsx): each group's title over its
 // cards, the card in view marked in the navigation, Escape back to the app.
-// hush has two sections: the owner's account and the API's integrations.
+// hush has three sections: the owner's account, the API's integrations and
+// the history of changes (history.tsx).
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { formatDistanceToNowStrict, format } from "date-fns";
@@ -22,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { HistoryDialog } from "./history";
 import { settingsSections, useSettings, type SettingsSectionId } from "./settings-context";
 import { NoSearchResult, SettingsHeader } from "./settings-nav";
 import { latestEntry } from "@/lib/latest-entry";
@@ -174,6 +176,18 @@ function Integrations() {
   );
 }
 
+function History() {
+  const [open, setOpen] = useState(false);
+  return (
+    <SettingsCard
+      id="history" title="History" description="Who or which token changed what, and when."
+      buttons={<Button size="sm" variant="ghost" className="mt-[-5px]" onClick={() => setOpen(true)}>View history</Button>}
+    >
+      <HistoryDialog open={open} onOpenChange={setOpen} />
+    </SettingsCard>
+  );
+}
+
 export function SettingsPage({ section }: { section?: SettingsSectionId }) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -203,7 +217,7 @@ export function SettingsPage({ section }: { section?: SettingsSectionId }) {
         {isMobile && noResult && <NoSearchResult className="mx-auto max-w-[760px] px-8 pt-8" />}
         <div className="mx-auto flex max-w-[760px] flex-col gap-16 px-8 py-16 tablet:px-(--page-gutter)">
           <SettingsGroupSection title="General settings"><Account /></SettingsGroupSection>
-          <SettingsGroupSection title="Advanced"><Integrations /></SettingsGroupSection>
+          <SettingsGroupSection title="Advanced"><Integrations /><History /></SettingsGroupSection>
         </div>
       </div>
     </div>

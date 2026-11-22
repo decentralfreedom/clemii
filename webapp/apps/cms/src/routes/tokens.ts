@@ -62,7 +62,7 @@ export function tokenRoutes(db: Database) {
     const { id } = context.req.valid("param");
     const [token] = await db.select({ id: apiTokens.id }).from(apiTokens).where(and(eq(apiTokens.id, id), isNull(apiTokens.revokedAt)));
     if (!token) return context.json({ error: { code: "not_found", message: "No such token, or it is already revoked." } }, 404);
-    await revokeToken(db, id);
+    await revokeToken(db, id, context.var.actor);
     return context.body(null, 204);
   });
 

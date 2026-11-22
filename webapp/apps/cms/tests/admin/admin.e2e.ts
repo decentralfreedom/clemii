@@ -540,6 +540,48 @@ test("CMS-014 Settings, as Ghost's: the sidebar becomes its navigation, and Inte
   if (!mobile) await expect(signedIn.getByRole("link", { name: "View site" })).toBeVisible();
 });
 
+test("CMS-015 Settings > History, as Ghost's, lists who changed what and opens the post", async ({ signedIn, draft, baseURL }, testInfo) => {
+  const mobile = testInfo.project.name === "mobile";
+  const title = `History journey ${crypto.randomUUID().slice(0, 8)}: a post the owner edits`;
+  const post = await draft({ title });
+  expect((await signedIn.request.patch(`/v1/posts/${post.id}`, { headers: { origin: baseURL! }, data: { imageAlt: "A Mac with the dictation settings open." } })).status()).toBe(200);
+
+  await signedIn.goto("/settings/history");
+  const card = signedIn.getByTestId("history");
+  await expect(card).toContainText("Who or which token changed what, and when.");
+  if (!mobile) await expect(signedIn.getByRole("navigation", { name: "Settings" }).getByRole("button", { name: "History" })).toBeVisible();
+  await card.getByRole("button", { name: "View history" }).click();
+  const modal = signedIn.getByRole("dialog", { name: "History" });
+  const entries = modal.getByTestId("history-entry").filter({ hasText: title });
+  // Newest first: the edit, then the draft being added, each by the signed-in owner, with date and time.
+  await expect(entries.first()).toContainText(`Post edited: ${title} by @owner`);
+  await expect(entries.nth(1)).toContainText(`Post added: ${title} by @owner`);
+  await expect(entries.first()).toContainText(/\d{1,2} \w{3} \d{4} \| \d{2}:\d{2}:\d{2}/);
+  // The dialog has finished opening before it is looked at.
+  // A cancelled animation rejects its finished promise (WebKit does this); it has stopped all the same.
+  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
+  await signedIn.screenshot({ path: testInfo.outputPath("history.png") });
+
+  // The filter narrows the log; tokens and sign-ins hold no post entries.
+  await modal.getByRole("button", { name: "Filter history" }).click();
+  await signedIn.getByRole("menuitemradio", { name: "Tokens & sign-ins" }).click();
+  await expect(modal.getByTestId("history-entry").filter({ hasText: title })).toHaveCount(0);
+  await modal.getByRole("button", { name: "Filter history" }).click();
+  await signedIn.getByRole("menuitemradio", { name: "Posts" }).click();
+  await expect(entries.first()).toBeVisible();
+
+  // Close leaves the log, on a phone too, where it fills the screen.
+  await modal.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(modal).toBeHidden();
+  await card.getByRole("button", { name: "View history" }).click();
+  await modal.getByRole("button", { name: "Filter history" }).click();
+  await signedIn.getByRole("menuitemradio", { name: "Posts" }).click();
+
+  // An entry links to its post.
+  await entries.first().getByRole("link", { name: title }).click();
+  await expect(signedIn).toHaveURL(new RegExp(`/posts/${post.id}$`));
+});
+
 test("the admin runs under its Content Security Policy without violations", async ({ signedIn, draft }) => {
   const violations: string[] = [];
   signedIn.on("console", (message) => { if (/Content.Security.Policy|Refused to/i.test(message.text())) violations.push(message.text()); });

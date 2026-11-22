@@ -10,6 +10,7 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 export const settingsSections = [
   { id: "account", group: "General settings", title: "Account", keywords: ["account", "github", "sign in", "sign out", "session", "owner", "login"] },
   { id: "integrations", group: "Advanced", title: "Integrations", keywords: ["integrations", "api", "tokens", "token", "cli", "hush-cms", "devices", "connect", "revoke", "keys"] },
+  { id: "history", group: "Advanced", title: "History", keywords: ["history", "audit", "log", "changes", "who", "activity", "events"] },
 ] as const;
 export type SettingsSectionId = (typeof settingsSections)[number]["id"];
 

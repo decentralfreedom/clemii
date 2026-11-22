@@ -9,7 +9,7 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createApp } from "../src/app";
-import { createToken } from "../src/auth/tokens";
+import { createToken, systemActor } from "../src/auth/tokens";
 import type { Database } from "../src/db/client";
 import { LocalObjectStore } from "../src/storage/object-store";
 import { publishDuePosts } from "../src/posts/service";
@@ -26,9 +26,9 @@ describe.skipIf(!serverUrl)("CMS API", () => {
     database = await createTestDatabase();
     db = database.db;
     app = createApp({ db, media: new LocalObjectStore(await mkdtemp(join(tmpdir(), "hush-cms-media-"))) });
-    tokens.reader = await createToken(db, { name: "reader", scopes: ["posts:read"] });
-    tokens.writer = await createToken(db, { name: "agent", scopes: ["posts:read", "posts:write"] });
-    tokens.publisher = await createToken(db, { name: "agent-publisher", scopes: ["posts:read", "posts:write", "posts:publish"] });
+    tokens.reader = await createToken(db, { name: "reader", scopes: ["posts:read"] }, systemActor("test"));
+    tokens.writer = await createToken(db, { name: "agent", scopes: ["posts:read", "posts:write"] }, systemActor("test"));
+    tokens.publisher = await createToken(db, { name: "agent-publisher", scopes: ["posts:read", "posts:write", "posts:publish"] }, systemActor("test"));
     tokens.owner = await ownerSession(db);
   });
   afterAll(async () => { await database?.drop(); });
@@ -60,7 +60,7 @@ describe.skipIf(!serverUrl)("CMS API", () => {
     expect((await app.request("/v1/me")).status).toBe(401);
     expect(await read(await call("GET", "/v1/me", tokens.writer))).toEqual({ actor: "token:agent", scopes: ["posts:read", "posts:write"], expiresAt: null });
     const expiresAt = new Date("2030-01-01T00:00:00.000Z");
-    const expiring = await createToken(db, { name: "expiring", scopes: ["posts:read"], expiresAt });
+    const expiring = await createToken(db, { name: "expiring", scopes: ["posts:read"], expiresAt }, systemActor("test"));
     expect((await read(await call("GET", "/v1/me", expiring))).expiresAt).toBe(expiresAt.toISOString());
   });
 

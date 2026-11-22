@@ -4,7 +4,7 @@
 // Creates an API token and prints it once. Run inside the CMS container:
 //   bun run cms:token --name hush-seo --scopes posts:read,posts:write [--days 90]
 import { parseArgs } from "node:util";
-import { createToken, tokenScopes, type TokenScope } from "../auth/tokens";
+import { createToken, systemActor, tokenScopes, type TokenScope } from "../auth/tokens";
 import { connectDatabase } from "../db/client";
 import { loadConfig } from "../config";
 
@@ -18,7 +18,7 @@ if (!values.name || !scopes.length || unknown.length) {
 const expiresAt = values.days ? new Date(Date.now() + Number(values.days) * 86_400_000) : undefined;
 const { db, close } = connectDatabase(loadConfig().databaseUrl);
 try {
-  console.info(await createToken(db, { name: values.name, scopes: scopes as TokenScope[], expiresAt }));
+  console.info(await createToken(db, { name: values.name, scopes: scopes as TokenScope[], expiresAt }, systemActor("cms:token")));
 } finally {
   await close();
 }

@@ -23,7 +23,7 @@ export function meRoutes(db: Database) {
     },
   }), (context) => {
     const { actor, scopes, expiresAt } = context.var.caller;
-    return context.json({ actor, scopes: [...scopes], expiresAt: expiresAt?.toISOString() ?? null }, 200);
+    return context.json({ actor: actor.name, scopes: [...scopes], expiresAt: expiresAt?.toISOString() ?? null }, 200);
   });
 
   app.openapi(createRoute({
@@ -37,7 +37,7 @@ export function meRoutes(db: Database) {
   }), async (context) => {
     const { tokenId } = context.var.caller;
     if (!tokenId) return context.json({ error: { code: "not_a_token", message: "Only a token can revoke itself; sign out of the admin instead." } }, 409);
-    await revokeToken(db, tokenId);
+    await revokeToken(db, tokenId, context.var.actor);
     return context.body(null, 204);
   });
   return app;
