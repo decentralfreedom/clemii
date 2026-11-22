@@ -178,6 +178,15 @@ test("CMS-008 an image goes into a new post through its card and follows the pos
   // Saves a new post, uploads its image and moves it to the post's new address by design.
   test.slow();
   const png = await sharp({ create: { width: 800, height: 500, channels: 3, background: "#7667d7" } }).png().toBuffer();
+  // As on a slow connection: the list of the post's images, read when the first save names the post, answers
+  // without the new image, and reading it again takes longer than the card may wait.
+  let reads = 0;
+  await signedIn.route(/\/v1\/posts\/[0-9a-f-]{36}\/media$/, async (route) => {
+    reads += 1;
+    if (reads === 1) return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ media: [] }) });
+    await new Promise((resolve) => setTimeout(resolve, 15_000));
+    await route.continue().catch(() => undefined);
+  });
   await signedIn.goto("/posts/new");
   await article(signedIn).click();
   await signedIn.keyboard.type("/image");

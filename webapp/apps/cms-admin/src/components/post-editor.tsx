@@ -20,7 +20,7 @@ import {
 import { toast } from "sonner";
 import {
   approvePost, createDraft, deletePost, getGetPostQueryKey, getListMediaQueryKey, getListPostsQueryKey, getListRevisionsQueryKey, previewPost, publishPost,
-  schedulePost, unpublishPost, updatePost, uploadMedia, useListMedia, type Media, type Post, type Preview,
+  schedulePost, unpublishPost, updatePost, uploadMedia, useListMedia, type listMediaResponse, type Media, type Post, type Preview,
 } from "@/api/cms.generated";
 import { CmsError } from "@/api/fetcher";
 import { MarkdownEditor } from "@/components/markdown-editor";
@@ -395,8 +395,18 @@ export function PostEditor({ post, onCreated, onReopen }: { post?: Post; onCreat
       if (!id) return undefined;
       try {
         const name = mediaName(file);
-        await uploadMedia(id, name, file, { headers: { "Content-Type": file.type } });
-        await queryClient.invalidateQueries({ queryKey: getListMediaQueryKey(id) });
+        const uploaded = await uploadMedia(id, name, file, { headers: { "Content-Type": file.type } });
+        // The card finds its image in the list, so the list takes the stored image at once: a read
+        // of the list still in flight (the first save enables it) would otherwise answer without it.
+        const key = getListMediaQueryKey(id);
+        await queryClient.cancelQueries({ queryKey: key });
+        if (uploaded.status === 200) {
+          const image = uploaded.data;
+          queryClient.setQueryData<listMediaResponse>(key, (list) => list?.status === 200
+            ? { ...list, data: { media: [...list.data.media.filter((item) => item.name !== image.name), image] } }
+            : { status: 200, data: { media: [image] }, headers: new Headers() });
+        }
+        void queryClient.invalidateQueries({ queryKey: key });
         return `media/${(current.current.post ?? created.current)?.slug}/${name}`;
       } catch (error) {
         toast.error(error instanceof CmsError ? error.message : "The upload failed.");
