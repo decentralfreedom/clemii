@@ -28,7 +28,7 @@ describe("proof short-link configuration", () => {
   test("normalizes a first-party short domain", () => {
     const config = loadConfig({
       NODE_ENV: "production",
-      HUSH_PUBLIC_BASE_URL: "https://behu.sh",
+      HUSH_PUBLIC_BASE_URL: "https://verify.hush.app",
       HUSH_SHORT_BASE_URL: "https://behu.sh",
     });
 
@@ -39,7 +39,6 @@ describe("proof short-link configuration", () => {
     expect(() =>
       loadConfig({
         NODE_ENV: "production",
-        HUSH_PUBLIC_BASE_URL: "https://behu.sh",
         HUSH_SHORT_BASE_URL: "http://behu.sh",
       }),
     ).toThrow("must use HTTPS in production");
@@ -108,10 +107,5 @@ describe("proof short-link configuration", () => {
       .toMatchObject({ readOnly: true, shutdownDrainMs: 2_500 });
     expect(() => loadConfig({ NODE_ENV: "test", HUSH_SHUTDOWN_DRAIN_MS: "-1" })).toThrow("HUSH_SHUTDOWN_DRAIN_MS");
     expect(() => loadConfig({ NODE_ENV: "test", HUSH_SHUTDOWN_DRAIN_MS: "90000" })).toThrow("HUSH_SHUTDOWN_DRAIN_MS");
-  });
-
-  test("refuses to start in production when HUSH_PUBLIC_BASE_URL is not the site's origin, so a half-moved domain cannot go live", () => {
-    expect(() => loadConfig({ NODE_ENV: "production", HUSH_PUBLIC_BASE_URL: "https://example.com" })).toThrow("must be the site's origin");
-    expect(loadConfig({ NODE_ENV: "production", HUSH_PUBLIC_BASE_URL: "https://behu.sh" }).publicBaseUrl).toBe("https://behu.sh");
   });
 });

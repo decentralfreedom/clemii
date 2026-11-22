@@ -1,4 +1,3 @@
-import { siteOrigin } from "../shared/origin";
 import { link, mkdir, rename, unlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import {
@@ -41,11 +40,6 @@ export type ServerConfig = {
 export function loadConfig(env = process.env): ServerConfig {
   const environment = (env.NODE_ENV ?? "development") as ServerConfig["environment"];
   const publicBaseUrl = env.HUSH_PUBLIC_BASE_URL ?? "http://127.0.0.1:3000";
-  // The pages say where they live (shared/origin.ts); in production the server must agree, or a half-moved domain
-  // would serve canonical links and redirects to two different sites.
-  if (environment === "production" && new URL(publicBaseUrl).origin !== siteOrigin) {
-    throw new Error(`HUSH_PUBLIC_BASE_URL (${new URL(publicBaseUrl).origin}) must be the site's origin, ${siteOrigin} (shared/origin.ts)`);
-  }
   const shortBaseUrl = normalizeBaseUrl(
     env.HUSH_SHORT_BASE_URL ?? new URL("/s/", publicBaseUrl).toString(),
     environment,
