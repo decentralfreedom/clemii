@@ -1,97 +1,63 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 //
-// The site's analytics, as Ghost Admin's Analytics overview (apps/stats):
-// "Analytics" in the sidebar, a header with the range, the KPI tabs over the
-// chart, then the top posts, each opening its own analytics. The search
-// totals are Google's for the whole site, aggregated by property, so they
-// include the home and download pages and exceed the posts' sum (PRD R12).
+// The site's analytics, laid out as Ghost Admin's: tabs by the question they
+// answer (components/analytics/tabs), an Overview at a glance and the detail
+// one click further; a post opens its own analytics from any list. The tab,
+// range, channel and quarter live in the address, so a view can be shared.
+// The route file holds only the address and the frame: each tab is its own
+// component, and the router splits this route's component into its own chunk.
 import { createFileRoute } from "@tanstack/react-router";
-import { X } from "lucide-react";
-import { useGetSiteSearch, useGetSiteTraffic, type TrafficSourceRowChannel } from "@/api/cms.generated";
-import { DataSource } from "@/components/analytics/data-source";
-import { FunnelCard } from "@/components/analytics/funnel-card";
+import type { TrafficSourceRowChannel } from "@/api/cms.generated";
 import { GoalsView } from "@/components/analytics/goals-view";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LinksCard } from "@/components/analytics/links-card";
-import { PagesCard } from "@/components/analytics/pages-card";
 import { RangeSelect } from "@/components/analytics/range-select";
-import { SearchKpis } from "@/components/analytics/search-kpis";
-import { SourcesCard } from "@/components/analytics/sources-card";
-import { TopPostsCard } from "@/components/analytics/top-posts-card";
-import { defaultAnalyticsRange, isAnalyticsRange, rangeParams, type AnalyticsRangeKey } from "@/lib/analytics-ranges";
-import { channelLabels, isChannel } from "@/lib/traffic-labels";
+import { OverviewTab } from "@/components/analytics/tabs/overview-tab";
+import { SearchTab } from "@/components/analytics/tabs/search-tab";
+import { TrafficTab } from "@/components/analytics/tabs/traffic-tab";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { defaultAnalyticsRange, isAnalyticsRange, type AnalyticsRangeKey } from "@/lib/analytics-ranges";
+import { isChannel } from "@/lib/traffic-labels";
+
+const tabs = ["overview", "search", "traffic", "goals"] as const;
+type Tab = (typeof tabs)[number];
+const isTab = (value: unknown): value is Tab => typeof value === "string" && (tabs as readonly string[]).includes(value);
 
 export const Route = createFileRoute("/_app/analytics")({
-  validateSearch: (search: Record<string, unknown>): { tab?: "goals"; quarter?: string; range?: AnalyticsRangeKey; channel?: TrafficSourceRowChannel } => ({
-    ...(search.tab === "goals" ? { tab: "goals" as const } : {}),
+  validateSearch: (search: Record<string, unknown>): { tab?: Exclude<Tab, "overview">; quarter?: string; range?: AnalyticsRangeKey; channel?: TrafficSourceRowChannel } => ({
+    ...(isTab(search.tab) && search.tab !== "overview" ? { tab: search.tab } : {}),
     ...(typeof search.quarter === "string" && /^\d{4}-Q[1-4]$/.test(search.quarter) ? { quarter: search.quarter } : {}),
     ...(isAnalyticsRange(search.range) && search.range !== defaultAnalyticsRange ? { range: search.range } : {}),
-    // A channel picked in the Sources card filters the traffic cards, as a chip in the URL (Plausible's pattern).
     ...(isChannel(search.channel) ? { channel: search.channel } : {}),
   }),
   component: Analytics,
 });
 
 function Analytics() {
-  const { tab, quarter, range = defaultAnalyticsRange, channel } = Route.useSearch();
+  const { tab = "overview", quarter, range = defaultAnalyticsRange, channel } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const search = useGetSiteSearch({ ...rangeParams(range), limit: 10 });
-  const numbers = search.data?.status === 200 ? search.data.data : undefined;
-  const traffic = useGetSiteTraffic({ since: numbers?.from ?? undefined }, { query: { enabled: Boolean(numbers?.from) } });
-  const visits = traffic.data?.status === 200 ? traffic.data.data : undefined;
+  const go = (next: Tab, nextChannel?: TrafficSourceRowChannel) =>
+    void navigate({ search: (previous) => ({ ...previous, tab: next === "overview" ? undefined : next, channel: nextChannel }) });
 
   return (
     <div className="mx-auto flex w-full max-w-(--content-width) flex-col px-(--page-gutter) pb-12">
       <header className="flex flex-col gap-4 pt-[28px] pb-6">
         <h1 className="text-3xl leading-tight font-bold tracking-tight">Analytics</h1>
         <div className="flex items-center justify-between gap-4 border-b border-border-default">
-          <Tabs value={tab ?? "overview"} onValueChange={(value) => void navigate({ search: (previous) => ({ ...previous, tab: value === "goals" ? "goals" : undefined }) })} variant="underline">
+          <Tabs value={tab} onValueChange={(value) => go(value as Tab)} variant="underline">
             <TabsList aria-label="Analytics">
               <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="search">Search</TabsTrigger>
+              <TabsTrigger value="traffic">Traffic</TabsTrigger>
               <TabsTrigger value="goals">Goals</TabsTrigger>
             </TabsList>
           </Tabs>
           {tab !== "goals" && <RangeSelect value={range} onChange={(next) => void navigate({ search: (previous) => ({ ...previous, range: next === defaultAnalyticsRange ? undefined : next }) })} />}
         </div>
       </header>
-      {tab === "goals" ? (
-        <GoalsView quarter={quarter} onQuarter={(next) => void navigate({ search: (previous) => ({ ...previous, quarter: next }) })} />
-      ) : search.isPending ? (
-        <p className="py-24 text-center text-sm text-text-secondary">Loading…</p>
-      ) : !numbers ? (
-        <p className="py-24 text-center text-sm text-destructive">The numbers could not be loaded.</p>
-      ) : !numbers.from || !numbers.to ? (
-        <p className="py-24 text-center text-sm text-text-secondary">No Search Console numbers yet; the CMS reads them once a day.</p>
-      ) : (
-        <div className="flex flex-col gap-6">
-          <section aria-labelledby="google-search" className="flex flex-col gap-3">
-            <h2 id="google-search" className="text-lg font-semibold">Google Search</h2>
-            <SearchKpis id="site" search={{ ...numbers, from: numbers.from, to: numbers.to }} />
-          </section>
-          {visits && <FunnelCard search={{ from: numbers.from, to: numbers.to, days: numbers.days }} traffic={visits} />}
-          <TopPostsCard posts={numbers.topPosts} range={range} />
-          <section aria-labelledby="traffic" className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <h2 id="traffic" className="text-lg font-semibold">Traffic</h2>
-              {channel && (
-                <button type="button" onClick={() => void navigate({ search: (previous) => ({ ...previous, channel: undefined }) })}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border-default px-3 py-1 text-sm hover:bg-muted" aria-label={`Remove the ${channelLabels[channel]} filter`}>
-                  Channel: {channelLabels[channel]} <X className="size-3.5" />
-                </button>
-              )}
-            </div>
-            <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2">
-              <SourcesCard params={rangeParams(range)} channel={channel} onChannel={(next) => void navigate({ search: (previous) => ({ ...previous, channel: next }) })} />
-              <PagesCard params={rangeParams(range)} channel={channel} range={range} />
-            </div>
-            <LinksCard params={rangeParams(range)} />
-          </section>
-          <DataSource from={numbers.from} to={numbers.to} importedAt={numbers.importedAt} preliminaryFrom={numbers.preliminaryFrom}>
-            The totals are Google's for the whole site, home and download pages included, so they are more than the posts add up to.
-          </DataSource>
-        </div>
-      )}
+      {tab === "overview" && <OverviewTab range={range} onTraffic={(next) => go("traffic", next)} />}
+      {tab === "search" && <SearchTab range={range} />}
+      {tab === "traffic" && <TrafficTab range={range} channel={channel} onChannel={(next) => go("traffic", next)} />}
+      {tab === "goals" && <GoalsView quarter={quarter} onQuarter={(next) => void navigate({ search: (previous) => ({ ...previous, quarter: next }) })} />}
     </div>
   );
 }

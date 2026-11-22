@@ -732,13 +732,31 @@ test("CMS-018 a published post's analytics page, as Ghost's: from the posts list
   await expect(signedIn).toHaveURL(new RegExp(`/posts/${seeded.id}/analytics$`));
 });
 
-test("CMS-019 the Analytics dashboard, as Ghost's: from the sidebar, Google's site totals with their valid change, top posts that open the post's analytics", async ({ signedIn }, testInfo) => {
+test("CMS-019 Analytics, as Ghost's: an Overview at a glance from the sidebar, then the Search tab with Google's site totals, their valid change and top posts that open the post's analytics", async ({ signedIn }, testInfo) => {
   const mobile = testInfo.project.name === "mobile";
   await signedIn.goto("/");
   if (mobile) await signedIn.getByRole("link", { name: "Analytics", exact: true }).click();
   else await signedIn.getByRole("navigation").or(signedIn.locator("[data-sidebar=sidebar]")).getByRole("link", { name: "Analytics", exact: true }).click();
   await expect(signedIn).toHaveURL(/\/analytics$/);
   await expect(signedIn.getByRole("heading", { level: 1 })).toHaveText("Analytics");
+  // The Overview: four headline numbers over one chart, the top content and sources, nothing more.
+  if (!mobile) {
+    const headline = signedIn.getByRole("tablist", { name: "Headline numbers" });
+    await expect(headline.getByTestId("overview-pageviews")).toContainText("200");
+    await expect(headline.getByTestId("overview-downloads")).toContainText("15");
+    await expect(headline.getByTestId("overview-clicks")).toContainText("80");
+    await expect(headline.getByTestId("overview-clicks-diff")).toHaveText("+344%");
+    await expect(headline.getByTestId("overview-conversion")).toContainText("7.5%");
+  }
+  const content = signedIn.getByRole("table", { name: "Top content" });
+  await expect(content.getByRole("row").nth(1)).toContainText("/");
+  await expect(content.getByRole("row").nth(1)).toContainText("120");
+  await expect(content.getByRole("row").nth(1)).toContainText("10");
+  await expect(signedIn.getByRole("table", { name: "Top sources" }).getByRole("row").nth(1)).toContainText("Direct");
+  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
+  await signedIn.screenshot({ path: testInfo.outputPath("overview.png"), fullPage: true });
+  await signedIn.getByRole("tab", { name: "Search" }).click();
+  await expect(signedIn).toHaveURL(/tab=search/);
   // Last 30 days (22 Oct to 20 Nov): the site's own totals, against the 30 days before, which the CMS has and which hold 900 impressions.
   if (mobile) {
     await expect(signedIn.getByRole("button", { name: "Choose metric" })).toContainText("2,800");
@@ -783,7 +801,7 @@ test("CMS-019 the Analytics dashboard, as Ghost's: from the sidebar, Google's si
 });
 
 test("CMS-021 the dashboard shows where traffic comes from on every page, and a channel filters it, as a chip in the URL", async ({ signedIn }, testInfo) => {
-  await signedIn.goto("/analytics");
+  await signedIn.goto("/analytics?tab=traffic");
   const sources = signedIn.getByRole("table", { name: "Sources by channel" });
   // Every page counts, not only posts: 200 page views, most from direct (home and release notes).
   const names = sources.getByRole("row").filter({ hasNot: signedIn.getByRole("columnheader") });
@@ -797,11 +815,9 @@ test("CMS-021 the dashboard shows where traffic comes from on every page, and a 
   await expect(pages.getByRole("row").nth(1)).toContainText("Home");
   await expect(pages).toContainText("Release notes");
   await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
-  // The traffic section as it renders, after the scroll has painted.
-  const traffic = signedIn.locator("section", { has: signedIn.getByRole("heading", { name: "Traffic" }) });
-  await traffic.scrollIntoViewIfNeeded();
-  await signedIn.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-  await traffic.screenshot({ path: testInfo.outputPath("traffic.png") });
+  // Every page's downloads are exact here, tagged or not: the home page's 10.
+  await expect(pages.getByRole("row").nth(1)).toContainText("10");
+  await signedIn.screenshot({ path: testInfo.outputPath("traffic.png"), fullPage: true });
 
   // A channel row filters the traffic cards; the filter is a removable chip in the URL.
   await sources.getByRole("button", { name: "Show Organic social only" }).click();
@@ -834,7 +850,7 @@ test("CMS-021 the dashboard shows where traffic comes from on every page, and a 
 test("CMS-022 makes a tracked link from fixed choices, lists it with its numbers, and archives it, all in the History", async ({ signedIn }, testInfo) => {
   // Each browser project makes its own campaign: links with the same tags exist once.
   const campaign = `launch-${testInfo.project.name}`;
-  await signedIn.goto("/analytics");
+  await signedIn.goto("/analytics?tab=traffic");
   const card = signedIn.getByTestId("links-card");
   await signedIn.getByRole("button", { name: "New link" }).click();
   const dialog = signedIn.getByRole("dialog", { name: "New tracked link" });
