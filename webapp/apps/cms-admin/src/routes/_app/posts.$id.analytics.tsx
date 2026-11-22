@@ -8,8 +8,9 @@
 // over the range Ghost offers. Every number is one the CMS has (PRD R12).
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, ArrowUpRight, Pen } from "lucide-react";
-import { useGetPost, useGetPostSearch, type Post } from "@/api/cms.generated";
+import { useGetPost, useGetPostSearch, useGetPostTraffic, type Post } from "@/api/cms.generated";
 import { DataSource } from "@/components/analytics/data-source";
+import { FunnelCard } from "@/components/analytics/funnel-card";
 import { RangeSelect } from "@/components/analytics/range-select";
 import { SearchChanges } from "@/components/analytics/search-changes";
 import { SearchKpis } from "@/components/analytics/search-kpis";
@@ -42,6 +43,9 @@ function PostAnalytics() {
   const search = useGetPostSearch(id, params);
   const data = post.data?.status === 200 ? post.data.data as Post : undefined;
   const numbers = search.data?.status === 200 ? search.data.data : undefined;
+  // The funnel's later steps, from the same first day; the card keeps to the days both sources have.
+  const traffic = useGetPostTraffic(id, { since: numbers?.from ?? undefined }, { query: { enabled: Boolean(numbers?.from) } });
+  const visits = traffic.data?.status === 200 ? traffic.data.data : undefined;
   const title = data ? data.rendition?.heading ?? data.title : "";
 
   return (
@@ -86,6 +90,7 @@ function PostAnalytics() {
       ) : tab === "overview" ? (
         <div className="flex flex-col gap-6">
           <SearchKpis id="post" search={{ ...numbers, from: numbers.from, to: numbers.to }} />
+          {visits && <FunnelCard search={{ from: numbers.from, to: numbers.to, days: numbers.days }} traffic={visits} />}
           <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2">
             <SearchQueriesCard postId={id} params={params} limit={5} more={{ tab: "search" }} compact />
             <SearchChanges markers={numbers.markers} />

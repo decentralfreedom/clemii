@@ -7,8 +7,9 @@
 // totals are Google's for the whole site, aggregated by property, so they
 // include the home and download pages and exceed the posts' sum (PRD R12).
 import { createFileRoute } from "@tanstack/react-router";
-import { useGetSiteSearch } from "@/api/cms.generated";
+import { useGetSiteSearch, useGetSiteTraffic } from "@/api/cms.generated";
 import { DataSource } from "@/components/analytics/data-source";
+import { FunnelCard } from "@/components/analytics/funnel-card";
 import { RangeSelect } from "@/components/analytics/range-select";
 import { SearchKpis } from "@/components/analytics/search-kpis";
 import { TopPostsCard } from "@/components/analytics/top-posts-card";
@@ -25,6 +26,8 @@ function Analytics() {
   const navigate = Route.useNavigate();
   const search = useGetSiteSearch({ ...rangeParams(range), limit: 10 });
   const numbers = search.data?.status === 200 ? search.data.data : undefined;
+  const traffic = useGetSiteTraffic({ since: numbers?.from ?? undefined }, { query: { enabled: Boolean(numbers?.from) } });
+  const visits = traffic.data?.status === 200 ? traffic.data.data : undefined;
 
   return (
     <div className="mx-auto flex w-full max-w-(--content-width) flex-col px-(--page-gutter) pb-12">
@@ -44,6 +47,7 @@ function Analytics() {
             <h2 id="google-search" className="text-lg font-semibold">Google Search</h2>
             <SearchKpis id="site" search={{ ...numbers, from: numbers.from, to: numbers.to }} />
           </section>
+          {visits && <FunnelCard search={{ from: numbers.from, to: numbers.to, days: numbers.days }} traffic={visits} />}
           <TopPostsCard posts={numbers.topPosts} range={range} />
           <DataSource from={numbers.from} to={numbers.to} importedAt={numbers.importedAt} preliminaryFrom={numbers.preliminaryFrom}>
             The totals are Google's for the whole site, home and download pages included, so they are more than the posts add up to.

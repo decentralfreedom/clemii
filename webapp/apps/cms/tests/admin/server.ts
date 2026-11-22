@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { createApp } from "../../src/app";
 import { createSession, setSessionCookie } from "../../src/auth/sessions";
 import { systemActor } from "../../src/auth/tokens";
-import { searchConsoleState, searchDaily, searchQueries, searchSiteDaily } from "../../src/db/schema";
+import { searchConsoleState, searchDaily, searchQueries, searchSiteDaily, trafficDaily, trafficSiteDaily, trafficState } from "../../src/db/schema";
 import { Hono } from "hono";
 import { createDraft, publishPost } from "../../src/posts/service";
 import { LocalObjectStore } from "../../src/storage/object-store";
@@ -47,6 +47,17 @@ await cms.db.insert(searchSiteDaily).values([
   { date: "2026-10-10", impressions: 900, clicks: 18, position: 9 },
   { date: "2026-11-01", impressions: 2000, clicks: 60, position: 7 },
   { date: "2026-11-20", impressions: 800, clicks: 20, position: 5 },
+]);
+// What the Umami import leaves (src/traffic/import.ts): counting from 15 November, one day ahead of Search Console.
+await cms.db.insert(trafficState).values({ id: 1, importedAt: new Date(), importedFrom: "2026-11-15", importedThrough: "2026-11-21" });
+await cms.db.insert(trafficDaily).values([
+  { postId: live.id, date: "2026-11-20", pageviews: 40, downloads: 3 },
+  { postId: live.id, date: "2026-11-21", pageviews: 10, downloads: 1 },
+]);
+await cms.db.insert(trafficSiteDaily).values([
+  { date: "2026-11-19", pageviews: 30, downloads: 2 },
+  { date: "2026-11-20", pageviews: 120, downloads: 9 },
+  { date: "2026-11-21", pageviews: 50, downloads: 4 },
 ]);
 await cms.db.insert(searchQueries).values([
   { postId: live.id, date: "2026-11-20", query: "dictate without cloud", impressions: 200, clicks: 5, position: 5 },
