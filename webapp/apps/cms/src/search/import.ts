@@ -9,7 +9,7 @@
 // impressions. The same holds for the search queries each post was found
 // for. Pages that are not posts (the home page, releases) are counted in the
 // log but not stored.
-import { gte } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { Database } from "../db/client";
 import { searchConsoleState, searchDaily, searchQueries } from "../db/schema";
 import { pagePathOf, postPathIndex } from "../posts/paths";
@@ -64,6 +64,21 @@ async function insertInChunks<T>(values: T[], insert: (chunk: T[]) => Promise<un
   for (let offset = 0; offset < values.length; offset += 1000) await insert(values.slice(offset, offset + 1000));
 }
 
+/** How many days are read from Google at once; each is written on its own. */
+const parallelDays = 4;
+
+function daysBetween(start: string, end: string) {
+  const days: string[] = [];
+  for (let time = Date.parse(start); time <= Date.parse(end); time += dayMs) days.push(isoDay(new Date(time)));
+  return days;
+}
+
+/**
+ * Imports day by day, so memory stays bounded however large the site grows:
+ * a day's pages and searches are read, summed per post and written in one
+ * transaction that replaces that day as Google has it now. A run that stops
+ * part way is repeated by the next, which writes each day again.
+ */
 export async function importSearchConsole(db: Database, client: SearchConsoleClient, now = new Date()) {
   await db.insert(searchConsoleState).values({ id: 1, attemptedAt: now })
     .onConflictDoUpdate({ target: searchConsoleState.id, set: { attemptedAt: now } });
@@ -71,33 +86,38 @@ export async function importSearchConsole(db: Database, client: SearchConsoleCli
   // Until the start of the history is known, read all of it: that start is
   // what tells "no numbers" apart from zero.
   const full = !state?.importedFrom || !state.importedThrough;
-  const previous = full ? undefined : state.importedThrough!;
   const start = full
     ? isoDay(new Date(now.getTime() - historyDays * dayMs))
-    : isoDay(new Date(Date.parse(previous!) - refreshDays * dayMs));
-  const end = isoDay(now);
-  const [pageRows, queryRows] = await Promise.all([client.pageDays(start, end), client.pageQueryDays(start, end)]);
+    : isoDay(new Date(Date.parse(state.importedThrough!) - refreshDays * dayMs));
   const index = await postPathIndex(db);
   const unmatched = new Set<string>();
-  const days = perPost(pageRows, index, (row) => row.date, unmatched)
-    .map(({ row, ...day }) => ({ ...day, date: row.date }));
-  const queries = perPost(queryRows, index, (row) => `${row.date}\n${row.query}`, new Set())
-    .map(({ row, ...day }) => ({ ...day, date: row.date, query: row.query }));
-  const through = pageRows.reduce((latest, row) => (row.date > latest ? row.date : latest), previous ?? "");
+  const counts = { rows: 0, postDays: 0, queryRows: 0, postQueryDays: 0 };
+  let through = full ? "" : state.importedThrough!;
 
-  // The window is replaced as Google has it now, so a fresh number or query it
-  // later drops does not linger; days before the window stay as they are.
-  await db.transaction(async (tx) => {
-    await tx.delete(searchDaily).where(gte(searchDaily.date, start));
-    await tx.delete(searchQueries).where(gte(searchQueries.date, start));
-    await insertInChunks(days, (chunk) => tx.insert(searchDaily).values(chunk));
-    await insertInChunks(queries, (chunk) => tx.insert(searchQueries).values(chunk));
-    await tx.update(searchConsoleState).set({
-      importedAt: now, importedThrough: through || null, ...(full ? { importedFrom: start } : {}),
-    });
+  const days = daysBetween(start, isoDay(now));
+  for (let offset = 0; offset < days.length; offset += parallelDays) {
+    const batch = days.slice(offset, offset + parallelDays);
+    const read = await Promise.all(batch.map(async (day) => ({
+      day, pageRows: await client.pageDays(day, day), queryRows: await client.pageQueryDays(day, day),
+    })));
+    for (const { day, pageRows, queryRows } of read) {
+      const pages = perPost(pageRows, index, (row) => row.date, unmatched).map(({ row, ...sum }) => ({ ...sum, date: row.date }));
+      const queries = perPost(queryRows, index, (row) => row.query, new Set())
+        .map(({ row, ...sum }) => ({ ...sum, date: row.date, query: row.query }));
+      await db.transaction(async (tx) => {
+        await tx.delete(searchDaily).where(eq(searchDaily.date, day));
+        await tx.delete(searchQueries).where(eq(searchQueries.date, day));
+        await insertInChunks(pages, (chunk) => tx.insert(searchDaily).values(chunk));
+        await insertInChunks(queries, (chunk) => tx.insert(searchQueries).values(chunk));
+      });
+      counts.rows += pageRows.length; counts.postDays += pages.length;
+      counts.queryRows += queryRows.length; counts.postQueryDays += queries.length;
+      if (pageRows.length && day > through) through = day;
+    }
+  }
+
+  await db.update(searchConsoleState).set({
+    importedAt: now, importedThrough: through || null, ...(full ? { importedFrom: start } : {}),
   });
-  return {
-    from: start, through: through || null, rows: pageRows.length, postDays: days.length,
-    queryRows: queryRows.length, postQueryDays: queries.length, otherPages: [...unmatched].sort(),
-  };
+  return { from: start, through: through || null, ...counts, otherPages: [...unmatched].sort() };
 }

@@ -168,7 +168,10 @@ export interface SearchDay {
 }
 
 export interface PostSearch {
-  /** @nullable */
+  /**
+     * The first day counted: the requested start, or the first day the CMS has numbers for if that is later
+     * @nullable
+     */
   from: string | null;
   /**
      * The last day Search Console has numbers for

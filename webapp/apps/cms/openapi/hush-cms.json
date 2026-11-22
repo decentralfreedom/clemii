@@ -312,7 +312,8 @@
               "string",
               "null"
             ],
-            "format": "date"
+            "format": "date",
+            "description": "The first day counted: the requested start, or the first day the CMS has numbers for if that is later"
           },
           "to": {
             "type": [
