@@ -18,6 +18,7 @@ import {
 } from "react";
 import type { CreateDraftBody, Post } from "@/api/cms.generated";
 import { PostMedia } from "@/components/post-media";
+import { PostDelete } from "@/components/post-delete";
 import { PostRevisions } from "@/components/post-revisions";
 import { PostSearch } from "@/components/post-search";
 import { Button } from "@/components/ui/button";
@@ -253,7 +254,7 @@ function KeyboardShortcuts() {
   ));
 }
 
-export function PostSettingsSidebar({ fields, onChange, post, heading, markdownMode, onRestored, frameRef, opensInPlace = false }: {
+export function PostSettingsSidebar({ fields, onChange, post, heading, markdownMode, onRestored, onDelete, frameRef, opensInPlace = false }: {
   fields: Fields;
   onChange: (patch: Partial<Fields>) => void;
   /** The saved post: its status, address and history. A new post has none yet. */
@@ -263,6 +264,8 @@ export function PostSettingsSidebar({ fields, onChange, post, heading, markdownM
   /** The article is edited as Markdown, whose images are managed here. */
   markdownMode: boolean;
   onRestored: (post: Post) => void | Promise<void>;
+  /** Deletes the draft and leaves the editor (post-editor.tsx); returns why the CMS refused, if it did. */
+  onDelete: () => Promise<string | undefined>;
   /** The panel's frame, whose width transition the editor waits on before unmounting it. */
   frameRef?: Ref<HTMLDivElement | null>;
   /** The panel opens with the editor, restored as the writer left it, so it is in place without sliding in. */
@@ -438,6 +441,11 @@ export function PostSettingsSidebar({ fields, onChange, post, heading, markdownM
         </SettingsSubview>
       ),
     },
+    // Last, as in Ghost: once the post exists there is something to delete.
+    ...(post ? [{
+      key: "delete",
+      node: <SettingsSection><PostDelete post={post} title={fields.title.trim() || heading} onDelete={onDelete} /></SettingsSection>,
+    }] : []),
   ];
 
   return (

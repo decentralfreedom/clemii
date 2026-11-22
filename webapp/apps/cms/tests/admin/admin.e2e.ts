@@ -618,6 +618,41 @@ test("CMS-016 a published post's settings show its Google Search numbers over Gh
   await panel.screenshot({ path: testInfo.outputPath("search.png") });
 });
 
+test("CMS-017 a draft is deleted from its settings, as in Ghost, and a live post asks to be unpublished first", async ({ signedIn, draft }, testInfo) => {
+  const title = `Delete journey ${crypto.randomUUID().slice(0, 8)}: a draft that goes`;
+  const post = await draft({ title });
+  await signedIn.goto(`/posts/${post.id}`);
+  await expect(article(signedIn)).toBeVisible();
+  // A change still waiting for its autosave must not reach the deleted post.
+  await signedIn.keyboard.type(" and one more word");
+  await settingsToggle(signedIn).click();
+  await settings(signedIn).getByRole("button", { name: "Delete post" }).click();
+  const confirm = signedIn.getByRole("alertdialog", { name: "Are you sure you want to delete this post?" });
+  await expect(confirm).toContainText(`You're about to delete "${title}". This is permanent!`);
+  // Cancel keeps it.
+  await confirm.getByRole("button", { name: "Cancel" }).click();
+  await expect(confirm).toBeHidden();
+  await settings(signedIn).getByRole("button", { name: "Delete post" }).click();
+  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
+  await signedIn.screenshot({ path: testInfo.outputPath("delete.png") });
+  await confirm.getByRole("button", { name: "Delete", exact: true }).click();
+  // Back on the posts, without asking to leave, and the draft is gone.
+  await expect(signedIn).toHaveURL(/\/$/);
+  await expect(signedIn.getByRole("alertdialog")).toHaveCount(0);
+  await expect(signedIn.getByText(title)).toHaveCount(0);
+  expect((await signedIn.request.get(`/v1/posts/${post.id}`)).status()).toBe(404);
+  // The deletion stays in the History.
+  const history = await (await signedIn.request.get(`/v1/audit?postId=${post.id}`)).json() as { entries: Array<{ action: string; subject: string }> };
+  expect(history.entries[0]).toMatchObject({ action: "post.deleted", subject: title });
+
+  // A published post is not deleted from here: it is unpublished first.
+  const { posts } = await (await signedIn.request.get("/v1/posts?status=published")).json() as { posts: Array<Post & { slug: string }> };
+  await signedIn.goto(`/posts/${posts.find((live) => live.slug === "dictate-without-cloud")!.id}`);
+  await settingsToggle(signedIn).click();
+  await expect(settings(signedIn).getByRole("button", { name: "Delete post" })).toBeDisabled();
+  await expect(settings(signedIn).getByText("Unpublish this post to delete it")).toBeVisible();
+});
+
 test("the admin runs under its Content Security Policy without violations", async ({ signedIn, draft }) => {
   const violations: string[] = [];
   signedIn.on("console", (message) => { if (/Content.Security.Policy|Refused to/i.test(message.text())) violations.push(message.text()); });
