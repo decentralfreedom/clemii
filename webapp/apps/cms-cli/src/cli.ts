@@ -13,7 +13,7 @@ import { hostname } from "node:os";
 import { basename, dirname, extname, join } from "node:path";
 import { parseArgs } from "node:util";
 import {
-  createDraft, deletePost, getCaller, getMediaOriginal, getPost, listMedia, listPosts, listRevisions, pollDeviceSignIn, previewPost, publishPost,
+  createDraft, deletePost, getCaller, getMediaOriginal, getPost, getPostSearch, listMedia, listPosts, listRevisions, pollDeviceSignIn, previewPost, publishPost,
   restoreRevision, revokeCaller, schedulePost, startDeviceSignIn, unpublishPost, updatePost, uploadMedia,
   type CreateDraftBody, type ListPostsLang, type ListPostsStatus, type Post,
 } from "./api/cms.generated";
@@ -40,6 +40,9 @@ Posts
   posts delete <post>                Drafts only
   posts revisions <post>
   posts restore <post> <revision-id>
+  posts search <post> [--days <n>]   Google Search Console: impressions, clicks, CTR and average
+                                     position per day and in total, over the last n days Google
+                                     has (default 28; Google lags two to three days)
 
 Access
   auth login [--no-browser]          Signs in through the browser, as gh auth login: approve the
@@ -238,6 +241,20 @@ async function postsCommand(action: string | undefined, args: string[], values: 
       const post = ok(await restoreRevision((await findPost(args[0], lang)).id, args[1]));
       return { json: post, text: `Restored revision ${args[1]} of ${post.lang}/${post.slug}.` };
     }
+    case "search": {
+      const days = values.days === undefined ? 28 : Number(values.days);
+      if (!Number.isInteger(days) || days < 1 || days > 486) throw usageError("--days is a whole number from 1 to 486.");
+      const post = await findPost(args[0], lang);
+      const answer = ok(await getPostSearch(post.id, { days }));
+      if (!answer.to) return { json: answer, text: "No Search Console numbers yet: the CMS has not imported them." };
+      const { totals } = answer;
+      const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
+      const position = (value: number | null) => (value === null ? "-" : value.toFixed(1));
+      const summary = `${post.lang}/${post.slug}, ${answer.from} to ${answer.to} (Search Console days):\n`
+        + `${totals.impressions} impressions, ${totals.clicks} clicks, CTR ${percent(totals.ctr)}, average position ${position(totals.position)}`;
+      const rows = answer.days.map((day) => [day.date, String(day.impressions), String(day.clicks), position(day.position)]);
+      return { json: answer, text: rows.length ? `${summary}\n\n${table([["DAY", "IMPRESSIONS", "CLICKS", "POSITION"], ...rows])}` : `${summary}\nNo impressions in these days.` };
+    }
     default:
       throw usageError(action ? `Unknown command "posts ${action}".` : "posts needs a command.");
   }
@@ -316,7 +333,7 @@ export async function run(argv: string[]): Promise<number> {
           args: argv, allowPositionals: true, strict: true,
           options: {
             json: { type: "boolean" }, url: { type: "string" }, help: { type: "boolean", short: "h" },
-            lang: { type: "string" }, status: { type: "string" }, at: { type: "string" }, out: { type: "string" },
+            lang: { type: "string" }, status: { type: "string" }, at: { type: "string" }, out: { type: "string" }, days: { type: "string" },
             "with-token": { type: "boolean" }, "no-browser": { type: "boolean" },
           },
         });

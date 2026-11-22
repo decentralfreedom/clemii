@@ -247,4 +247,21 @@ describe.skipIf(!serverUrl)("hush-cms CLI", () => {
     expect(scriptToken!.revoked_at).not.toBeNull();
     expect((await cli(["auth", "login", "--with-token"], { token: null, stdin: "hcms_unknownunknownunknownunknown\n" })).exitCode).toBe(1);
   }, 60_000);
+
+  test("CMS-CLI-008 shows a post's Search Console numbers for the hush-seo skill", async () => {
+    expect((await cli(["posts", "search", "dictate-from-the-terminal"])).stdout).toContain("No Search Console numbers yet");
+    // What the scheduler's import leaves (cms/src/search/import.ts).
+    const { id } = (await cli(["posts", "get", "dictate-from-the-terminal", "--json"])).json();
+    await database()`insert into search_console_state (id, imported_at, imported_through) values (1, now(), '2026-11-20')`;
+    await database()`insert into search_daily (post_id, date, impressions, clicks, position) values
+      (${id}, '2026-11-01', 300, 6, 6), (${id}, '2026-11-20', 100, 4, 10)`;
+    const { stdout, exitCode } = await cli(["posts", "search", "dictate-from-the-terminal"]);
+    expect(exitCode).toBe(0);
+    // The position over the window is weighted by impressions: (300×6 + 100×10) / 400.
+    expect(stdout).toContain("400 impressions, 10 clicks, CTR 2.5%, average position 7.0");
+    expect(stdout).toMatch(/2026-11-20\s+100\s+4\s+10\.0/);
+    const json = (await cli(["posts", "search", "dictate-from-the-terminal", "--days", "7", "--json"])).json();
+    expect(json).toMatchObject({ from: "2026-11-14", to: "2026-11-20", totals: { impressions: 100, clicks: 4 } });
+    expect((await cli(["posts", "search", "dictate-from-the-terminal", "--days", "0"])).exitCode).toBe(2);
+  });
 });

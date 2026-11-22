@@ -19,6 +19,7 @@ import {
 import type { CreateDraftBody, Post } from "@/api/cms.generated";
 import { PostMedia } from "@/components/post-media";
 import { PostRevisions } from "@/components/post-revisions";
+import { PostSearch } from "@/components/post-search";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
@@ -309,6 +310,15 @@ export function PostSettingsSidebar({ fields, onChange, post, heading, markdownM
         </SettingsSection>
       ),
     },
+    ...(post && published ? [{
+      key: "search",
+      node: (
+        <SettingsSection>
+          <Label asChild><h3>Google Search <span className="font-normal text-text-secondary">· last 28 days</span></h3></Label>
+          <PostSearch postId={post.id} />
+        </SettingsSection>
+      ),
+    }] : []),
     {
       key: "language",
       node: (

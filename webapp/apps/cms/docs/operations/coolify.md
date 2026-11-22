@@ -134,6 +134,35 @@ The CMS reaches Coolify's API only over a private network, never the internet:
    `bun run cms:token --name website-build --scopes posts:read`, stored in
    `hush-website` as described in the website's deployment guide.
 
+### Google Search Console (PRD R12)
+
+The scheduler imports Search Console numbers per post once a day. If Google
+fails, it logs the error and retries hourly; this never affects readiness, so
+publishing continues.
+
+1. **Google Cloud project:** a project of its own (here `hush-cms-ba3574`,
+   "hush CMS", owned by the owner's Google account, no billing) with the Search
+   Console API enabled.
+2. **Service account:** `search-console@…`, with no project roles, and one
+   JSON key.
+3. **Search Console:** on `behu.sh`, **Settings > Users and permissions > Add
+   user**, add the account's email as **Restricted**, so it can read only.
+4. **Coolify:** in hush-cms-scheduler only, add `CMS_SEARCH_CONSOLE_KEY` with
+   the key's JSON as its value: locked, runtime only, Literal (no `$`
+   interpolation). Delete the downloaded key file afterwards.
+5. **Optional:** set `CMS_SEARCH_CONSOLE_SITE` when the property is not the
+   domain property of `CMS_SITE_URL`.
+
+**Check:** the first import after a deploy logs "Imported Search Console
+numbers" with `from` about 16 months back. A post's 28-day impressions and
+clicks in the admin match Search Console's Performance report filtered to that
+page.
+
+**After a domain move:** add the new domain's property, grant the same
+account, run Search Console's Change of address, and update
+`CMS_SEARCH_CONSOLE_SITE` if needed. Posts are matched by path, so their
+history carries over.
+
 Check after changes: from the `hush-cms-scheduler` container a request to
 `http://172.16.0.2:8000/api/v1/applications/<website uuid>` with the deploy
 token answers "Missing required permissions: read" (the IP is allowed, the

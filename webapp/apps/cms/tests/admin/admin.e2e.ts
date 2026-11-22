@@ -582,6 +582,24 @@ test("CMS-015 Settings > History, as Ghost's, lists who changed what and opens t
   await expect(signedIn).toHaveURL(new RegExp(`/posts/${post.id}$`));
 });
 
+test("CMS-016 a published post's settings show its Google Search numbers for the last 28 days", async ({ signedIn }, testInfo) => {
+  // The live post the test server seeds, with two days of Search Console numbers.
+  const { posts } = await (await signedIn.request.get("/v1/posts?status=published")).json() as { posts: Array<Post & { slug: string }> };
+  const live = posts.find((post) => post.slug === "dictate-without-cloud")!;
+  await signedIn.goto(`/posts/${live.id}`);
+  await settingsToggle(signedIn).click();
+  const block = settings(signedIn).getByRole("definition").first().locator("xpath=ancestor::dl");
+  await expect(settings(signedIn).getByRole("heading", { name: /Google Search/ })).toBeVisible();
+  // 1,500 impressions and 36 clicks; the position weighted by impressions: (1200×8 + 300×6) / 1500.
+  await expect(block).toContainText("1.5K");
+  await expect(block).toContainText("36");
+  await expect(block).toContainText("2.4%");
+  await expect(block).toContainText("7.6");
+  await expect(settings(signedIn).getByText(/Through 20 Nov, updated/)).toBeVisible();
+  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
+  await settings(signedIn).screenshot({ path: testInfo.outputPath("search.png") });
+});
+
 test("the admin runs under its Content Security Policy without violations", async ({ signedIn, draft }) => {
   const violations: string[] = [];
   signedIn.on("console", (message) => { if (/Content.Security.Policy|Refused to/i.test(message.text())) violations.push(message.text()); });

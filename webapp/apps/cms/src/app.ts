@@ -15,6 +15,7 @@ import { healthRoutes } from "./routes/health";
 import { meRoutes } from "./routes/me";
 import { validationHook } from "./routes/errors";
 import { postRoutes } from "./routes/posts";
+import { searchRoutes } from "./routes/search";
 import { siteRoutes } from "./routes/site";
 import { tokenRoutes } from "./routes/tokens";
 
@@ -78,6 +79,7 @@ export function createApp(cms: Cms, options: AppOptions = {}) {
   app.route("/", deviceRoutes(cms.db, options.admin?.publicUrl));
   app.route("/", tokenRoutes(cms.db));
   app.route("/", auditRoutes(cms.db));
+  app.route("/", searchRoutes(cms.db));
   app.route("/", postRoutes(cms));
   app.route("/", siteRoutes(cms));
   app.openAPIRegistry.registerComponent("securitySchemes", "bearer", { type: "http", scheme: "bearer" });
