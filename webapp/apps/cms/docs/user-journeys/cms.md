@@ -85,6 +85,7 @@ never indexed.
 | CMS-SITE-004 | IndexNow rate limits and server errors are retried on the next tick; a refusal (such as a missing key file) is logged and not retried. | `tests/site.test.ts` |
 | CMS-BACKUP-001 | A backup restores into a fresh database with every post, keyword and token intact. | `scripts/backup-drill.sh` (CI) |
 | CMS-BACKUP-002 | Backups are named by time, listed newest first and kept for the configured days; the newest is never removed. | `tests/backups.test.ts` |
+| CMS-BACKUP-003 | Once a day the scheduler exports every post, drafts and scheduled ones included, as its hush-seo Markdown file (`<lang>/<slug>.md`, live posts exactly as the website gets them) with a `posts.json` manifest of status, dates and image hashes, as one `markdown/<time>.tar.gz` in the backup bucket, kept as long as the database backups (PRD R15); `bun run cms:export-markdown` does it at once. | `tests/markdown-export.test.ts` |
 | CMS-SCHEDULER-001 | The scheduler publishes due posts every minute and takes a backup whenever the newest is a day old. | `src/jobs/scheduler.ts`, CMS-API-005 |
 | CMS-ISOLATION-001 | The CMS imports nothing from the website and never reads the proof service's database URL or signing key. | `tests/boundary.test.ts` |
 

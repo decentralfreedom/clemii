@@ -205,9 +205,15 @@ authentication: the admin inherits their sign-in.
    its code at cms.behu.sh/device ([CLI guide](../../../cms-cli/README.md)).
    `bun run cms:token` in the `cms` container is only for tokens no person
    signs in for, such as the website build's read token (step 7 above).
-2. Check the `cms-scheduler` logs for "Backed up the CMS database".
+2. Check the `cms-scheduler` logs for "Backed up the CMS database" and
+   "Exported the posts as Markdown".
 3. Restore drill: create a scratch database in `cms-postgres`
    (`createdb -U cms cms_restore`), run
    `bun run cms:restore --target-url postgresql://cms:<password>@cms-postgres:5432/cms_restore`
    in the `cms` container, compare `select count(*) from posts`, then drop it.
    Repeat after any change to the backup code and at least every quarter.
+4. Markdown export: the newest `markdown/<time>.tar.gz` in `hush-cms-backups`
+   opens with `tar -xzf` on any computer. It holds every post as
+   `<lang>/<slug>.md` (drafts marked `draft: true`) and `posts.json` with each
+   post's status, dates and image hashes; the images are in the media bucket
+   under those hashes. `hush-cms posts push <file>` brings a post back as a draft.

@@ -17,6 +17,7 @@
     "api:check": "bun run api:openapi && git diff --exit-code -- openapi/hush-cms.json",
     "cms:import": "bun src/commands/import.ts",
     "cms:backup": "bun src/commands/backup.ts",
+    "cms:export-markdown": "bun src/commands/export-markdown.ts",
     "cms:restore": "bun src/commands/restore.ts",
     "cms:scheduler": "bun src/jobs/scheduler.ts",
     "test:admin": "bun run --cwd ../cms-admin build && playwright test",
