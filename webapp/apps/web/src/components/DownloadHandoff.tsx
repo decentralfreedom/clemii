@@ -2,10 +2,11 @@ import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Lines } from "../i18n/Lines";
 import { m } from "../paraglide/messages";
+import { siteOrigin } from "../../shared/origin";
 import "./download-handoff.css";
 
 // Always share the public landing page, never the current URL or a private proof key.
-const publicURL = "https://behu.sh/";
+const publicURL = `${siteOrigin}/`;
 const emailURL = () => `mailto:?subject=${encodeURIComponent(m.handoff_email_subject())}&body=${encodeURIComponent(m.handoff_email_body({ url: publicURL }))}`;
 
 export function DownloadHandoff({ onClose }: { onClose: () => void }) {

@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bun run blog:generate && concurrently --kill-others --names web,api --prefix-colors blue,magenta \"bun run dev:web\" \"bun run dev:api\"",
+    "dev": "bun run blog:generate && bun run site:generate && concurrently --kill-others --names web,api --prefix-colors blue,magenta \"bun run dev:web\" \"bun run dev:api\"",
     "dev:web": "vite",
     "dev:api": "bun run blog:generate && bun --watch server/index.ts",
     "site:generate": "bun scripts/generate-site-files.ts",

@@ -22,6 +22,7 @@ apps/web/public/blog/
 apps/web/public/de/blog/
 apps/web/public/sitemap.xml
 apps/web/public/llms.txt
+apps/web/public/robots.txt
 # Local article previews; published articles live in the CMS
 apps/web/content/blog/*/*
 !apps/web/content/blog/*/.gitkeep
