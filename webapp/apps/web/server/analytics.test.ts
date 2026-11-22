@@ -1,9 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { Hono } from "hono";
-import { analyticsTag, registerAnalytics, withAnalytics } from "./analytics";
+import { analyticsTag, coarseAddress, registerAnalytics, withAnalytics } from "./analytics";
 import { loadConfig } from "./config";
 
-const analytics = { umamiUrl: "https://umami.example", websiteId: "0b6a3f0e-8c1d-4b8e-9d55-0d6c1e2f3a4b" };
+const analytics = { umamiUrl: "https://umami.example", websiteId: "0b6a3f0e-8c1d-4b8e-9d55-0d6c1e2f3a4b", pageViews: true };
+const downloadsOnly = { ...analytics, pageViews: false };
 const dmg = "https://updates.behu.sh/downloads/hush-0.1.0-alpha.5-build.14.dmg";
 
 function setup(options: { analytics?: typeof analytics; downloadURL?: string } = {}) {
@@ -42,7 +43,7 @@ describe("downloads counted at /download (PRD R10)", () => {
     expect(response.headers.get("location")).toBe("/releases");
   });
 
-  test("records a download event with the page it started on and the browser's User-Agent only", async () => {
+  test("records a download event with the page it started on, the browser's User-Agent and the shortened address only", async () => {
     const { app, sent } = setup();
     await app.request("/download?from=%2Fde%2Fblog%2Fdiktieren-am-mac", {
       headers: { "user-agent": "Mozilla/5.0 Safari", "cf-connecting-ip": "203.0.113.7" },
@@ -50,7 +51,7 @@ describe("downloads counted at /download (PRD R10)", () => {
     await Bun.sleep(0);
     expect(events(sent)).toEqual([{
       type: "event",
-      payload: { website: analytics.websiteId, hostname: "behu.sh", url: "/de/blog/diktieren-am-mac", name: "download" },
+      payload: { website: analytics.websiteId, hostname: "behu.sh", url: "/de/blog/diktieren-am-mac", name: "download", ip: "203.0.113.0" },
     }]);
     const headers = new Headers(sent[0]!.init?.headers);
     expect(headers.get("user-agent")).toBe("Mozilla/5.0 Safari");
@@ -96,6 +97,24 @@ describe("downloads counted at /download (PRD R10)", () => {
   });
 });
 
+describe("the visitor's address, shortened to its network", () => {
+  test("keeps the network of an IPv4 or IPv6 address, never the device", () => {
+    expect(coarseAddress("203.0.113.7")).toBe("203.0.113.0");
+    expect(coarseAddress("::ffff:203.0.113.7")).toBe("203.0.113.0");
+    expect(coarseAddress("2001:0db8:85a3:1234:0:8a2e:370:7334")).toBe("2001:db8:85a3::");
+    expect(coarseAddress("2001:db8::1")).toBe("2001:db8:0::");
+  });
+
+  test("sends no address it cannot read, and none without Cloudflare's header", async () => {
+    expect(coarseAddress("not an address")).toBeUndefined();
+    expect(coarseAddress(undefined)).toBeUndefined();
+    const { app, sent } = setup();
+    await app.request("/download?from=/", { headers: { "user-agent": "Mozilla/5.0", "x-forwarded-for": "198.51.100.9" } });
+    await Bun.sleep(0);
+    expect(events(sent)[0].payload.ip).toBeUndefined();
+  });
+});
+
 describe("Umami through this origin", () => {
   test("adds the tracker to a page, pointed at /stats, with search, hash and Do Not Track respected", () => {
     const tag = analyticsTag(analytics, "https://behu.sh");
@@ -122,6 +141,25 @@ describe("Umami through this origin", () => {
     expect([...new Headers(forwarded.init?.headers).keys()].sort()).toEqual(["content-type", "user-agent"]);
   });
 
+  test("drops a page view from a browser that sends Global Privacy Control", async () => {
+    const { app, sent } = setup();
+    const response = await app.request("/stats/api/send", {
+      method: "POST", body: JSON.stringify({ type: "event", payload: { url: "/" } }),
+      headers: { "content-type": "application/json", "user-agent": "Mozilla/5.0", "sec-gpc": "1" },
+    });
+    expect(response.status).toBe(204);
+    expect(events(sent)).toEqual([]);
+  });
+
+  test("counts downloads but has no tracker while page views are off", async () => {
+    const { app, sent } = setup({ analytics: downloadsOnly });
+    expect((await app.request("/stats/script.js")).status).toBe(404);
+    expect((await app.request("/stats/api/send", { method: "POST", body: "{}" })).status).toBe(404);
+    await app.request("/download?from=/", { headers: { "user-agent": "Mozilla/5.0" } });
+    await Bun.sleep(0);
+    expect(events(sent)).toHaveLength(1);
+  });
+
   test("has no /stats routes while analytics is off", async () => {
     const { app } = setup({ analytics: undefined });
     expect((await app.request("/stats/script.js")).status).toBe(404);
@@ -133,6 +171,8 @@ describe("analytics configuration", () => {
     expect(loadConfig({ NODE_ENV: "test" }).analytics).toBeUndefined();
     expect(() => loadConfig({ NODE_ENV: "test", HUSH_UMAMI_URL: "https://umami.example" })).toThrow(/both/);
     expect(loadConfig({ NODE_ENV: "test", HUSH_UMAMI_URL: "https://umami.example/", HUSH_UMAMI_WEBSITE_ID: analytics.websiteId }).analytics)
+      .toEqual(downloadsOnly);
+    expect(loadConfig({ NODE_ENV: "test", HUSH_UMAMI_URL: "https://umami.example", HUSH_UMAMI_WEBSITE_ID: analytics.websiteId, HUSH_UMAMI_PAGE_VIEWS: "1" }).analytics)
       .toEqual(analytics);
   });
 

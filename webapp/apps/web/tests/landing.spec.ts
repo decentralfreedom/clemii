@@ -316,7 +316,10 @@ test("discloses the confirmed host and processing limits in both languages", asy
     const article = page.locator("article");
     await expect(article.getByText(/Hetzner Online GmbH, Industriestr\. 25, 91710 Gunzenhausen/)).toBeVisible();
     await expect(article.getByText(german ? /Serverstandort: Deutschland/ : /Server location: Germany/)).toBeVisible();
-    await expect(article.getByText(german ? /Stand: 18\. November 2026/ : /Last updated: 18 November 2026/)).toBeVisible();
+    await expect(article.getByText(german ? /Stand: 21\. November 2026/ : /Last updated: 21 November 2026/)).toBeVisible();
+    await expect(article.getByText(german ? "9. Cookies, lokale Speicherung und Download-Zählung" : "9. Cookies, local storage and download counting")).toBeVisible();
+    await expect(article.getByText(german ? /kein Analyse-Skript in deinem Browser/ : /no analytics script in your browser/)).toBeVisible();
+    await expect(article.getByText(german ? /gekürzt auf ihr Netz/ : /shortened to its network/)).toBeVisible();
     await expect(article.locator('a[href="https://www.cloudflare.com/cloudflare-customer-dpa/"]')).toBeVisible();
     await expect(article.getByText(/iCloud Mail/)).toBeVisible();
     await expect(article.locator('a[href="https://www.apple.com/legal/privacy/"]')).toBeVisible();
