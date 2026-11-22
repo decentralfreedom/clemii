@@ -13,9 +13,9 @@ import { hostname } from "node:os";
 import { basename, dirname, extname, join } from "node:path";
 import { parseArgs } from "node:util";
 import {
-  createDraft, deletePost, getCaller, getMediaOriginal, getPost, getPostSearch, getPostSearchQueries, listMedia, listPosts, listRevisions, pollDeviceSignIn, previewPost, publishPost,
+  archiveLink, createDraft, createLink, deletePost, listLinks, getCaller, getMediaOriginal, getPost, getPostSearch, getPostSearchQueries, listMedia, listPosts, listRevisions, pollDeviceSignIn, previewPost, publishPost,
   restoreRevision, revokeCaller, schedulePost, startDeviceSignIn, unpublishPost, updatePost, uploadMedia,
-  type CreateDraftBody, type ListPostsLang, type ListPostsStatus, type Post,
+  type CreateDraftBody, type ListPostsLang, type ListPostsStatus, type NewTrackedLinkSharedOn, type Post,
 } from "./api/cms.generated";
 import { connect } from "./api/fetcher";
 import { CredentialError, deleteToken, promptToken, readToken, saveToken, storedToken } from "./credentials";
@@ -46,6 +46,16 @@ Posts
                                      days (default 28) or since a day, never before the first day
                                      the CMS has; --queries lists the searches instead (Google
                                      leaves out rare ones). Google lags two to three days.
+
+Tracked links (campaign tags for the links you share)
+  links list [--days <n> | --since <YYYY-MM-DD>] [--archived]
+                                     Each link with its page views and downloads
+  links create --to <post|path> --on <place> --campaign <name> [--who <name>] [--content <name>] [--name <text>]
+                                     Prints the link to share. <place>: reddit, linkedin, x,
+                                     hackernews, bluesky, youtube, newsletter, email, creator,
+                                     partner, ad; creator, partner and ad need --who. Names are
+                                     lowercase words joined by hyphens, e.g. launch-2026-12
+  links archive <id>                 Keeps its numbers, stops listing it
 
 Access
   auth login [--no-browser]          Signs in through the browser, as gh auth login: approve the
@@ -272,6 +282,44 @@ async function postsCommand(action: string | undefined, args: string[], values: 
   }
 }
 
+async function linksCommand(action: string | undefined, args: string[], values: Record<string, string | boolean | undefined>): Promise<Output> {
+  switch (action) {
+    case "list": {
+      const days = values.days === undefined ? 28 : Number(values.days);
+      if (!Number.isInteger(days) || days < 1 || days > 3650) throw usageError("--days is a whole number from 1 to 3650.");
+      const answer = ok(await listLinks({ days, since: values.since as string | undefined, archived: values.archived ? "true" : "false" }));
+      if (!answer.links.length) return { json: answer, text: "No tracked links yet: make one with hush-cms links create." };
+      const rows = answer.links.map((link) => [link.name, link.path, `${link.source}/${link.medium}/${link.campaign}${link.content ? `/${link.content}` : ""}`, String(link.pageviews), String(link.downloads), link.id]);
+      const window = answer.to ? `Page views and downloads ${answer.from} to ${answer.to}:` : "No page views imported yet.";
+      return { json: answer, text: `${window}\n\n${table([["NAME", "PAGE", "SOURCE/MEDIUM/CAMPAIGN", "PAGE VIEWS", "DOWNLOADS", "ID"], ...rows])}` };
+    }
+    case "create": {
+      const to = values.to as string | undefined;
+      const place = values.on as string | undefined;
+      const campaign = values.campaign as string | undefined;
+      if (!to || !place || !campaign) throw usageError("links create needs --to, --on and --campaign.");
+      // A path stays a path; anything else names a post, whose address the blog decides.
+      const destination = to.startsWith("/") ? to : await (async () => {
+        const post = await findPost(to, values.lang as string | undefined);
+        return blogPath(post.lang as BlogLanguage, post.slug);
+      })();
+      const link = ok(await createLink({
+        name: (values.name as string | undefined) ?? `${place} ${campaign}`,
+        path: destination, sharedOn: place as NewTrackedLinkSharedOn, campaign,
+        ...(values.who ? { who: values.who as string } : {}), ...(values.content ? { content: values.content as string } : {}),
+      }));
+      return { json: link, text: link.url ?? `${link.path}${link.query}` };
+    }
+    case "archive": {
+      if (!args[0]) throw usageError("links archive needs the link's id (hush-cms links list).");
+      const link = ok(await archiveLink(args[0]));
+      return { json: link, text: `Archived ${link.name}; its numbers stay.` };
+    }
+    default:
+      throw usageError(action ? `Unknown command "links ${action}".` : "links needs a command.");
+  }
+}
+
 /**
  * The OAuth 2.0 Device Authorization Grant (RFC 8628), as `gh auth login`:
  * show a one-time code, open the page that approves it, poll until the owner
@@ -346,6 +394,7 @@ export async function run(argv: string[]): Promise<number> {
           options: {
             json: { type: "boolean" }, url: { type: "string" }, help: { type: "boolean", short: "h" },
             lang: { type: "string" }, status: { type: "string" }, at: { type: "string" }, out: { type: "string" }, days: { type: "string" }, since: { type: "string" }, queries: { type: "boolean" },
+            to: { type: "string" }, on: { type: "string" }, campaign: { type: "string" }, who: { type: "string" }, content: { type: "string" }, name: { type: "string" }, archived: { type: "boolean" },
             "with-token": { type: "boolean" }, "no-browser": { type: "boolean" },
           },
         });
@@ -363,11 +412,11 @@ export async function run(argv: string[]): Promise<number> {
     let output: Output;
     if (group === "auth") {
       output = await authCommand(action, origin, values);
-    } else if (group === "posts") {
+    } else if (group === "posts" || group === "links") {
       const stored = await readToken(origin);
       if (!stored) throw new Failure(`No token for ${origin}. Run hush-cms auth login, or set HUSH_CMS_TOKEN.`);
       connect(origin, stored.token);
-      output = await postsCommand(action, args, values);
+      output = group === "posts" ? await postsCommand(action, args, values) : await linksCommand(action, args, values);
     } else {
       throw usageError(`Unknown command "${group}".`);
     }

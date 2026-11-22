@@ -8,7 +8,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { format } from "date-fns";
-import { Ban, Check, KeyRound, ListFilter, LogIn, Pencil, Plus, Send, Trash2, Undo2, ImageUp, CalendarClock, History as HistoryIcon } from "lucide-react";
+import { Archive, Ban, Check, KeyRound, Link2, ListFilter, LogIn, Pencil, Plus, Send, Trash2, Undo2, ImageUp, CalendarClock, History as HistoryIcon } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { listAudit, type AuditEntry, type ListAuditArea } from "@/api/cms.generated";
 import { ActionList, ActionListItem, ActionListItemContent } from "@/components/ui/action-list";
@@ -31,6 +31,8 @@ const actions: Record<AuditEntry["action"], { title: string; icon: ReactNode }> 
   "post.unpublished": { title: "Post unpublished", icon: <Undo2 /> },
   "post.approved": { title: "Post approved", icon: <Check /> },
   "post.deleted": { title: "Post deleted", icon: <Trash2 /> },
+  "link.created": { title: "Tracked link made", icon: <Link2 /> },
+  "link.archived": { title: "Tracked link archived", icon: <Archive /> },
   "token.created": { title: "Token added", icon: <KeyRound /> },
   "token.revoked": { title: "Token revoked", icon: <Ban /> },
   "device.approved": { title: "CLI sign-in approved", icon: <Check /> },

@@ -120,6 +120,8 @@ export const AuditEntryAction = {
   deviceapproved: 'device.approved',
   devicedenied: 'device.denied',
   ownersigned_in: 'owner.signed_in',
+  linkcreated: 'link.created',
+  linkarchived: 'link.archived',
 } as const;
 
 export interface AuditEntry {
@@ -466,6 +468,107 @@ export interface TrafficSources {
   totals: TrafficSourcesTotals;
   /** Most page views first */
   rows: TrafficSourceRow[];
+}
+
+export type TrackedLinkSharedOn = typeof TrackedLinkSharedOn[keyof typeof TrackedLinkSharedOn];
+
+
+export const TrackedLinkSharedOn = {
+  reddit: 'reddit',
+  linkedin: 'linkedin',
+  x: 'x',
+  hackernews: 'hackernews',
+  bluesky: 'bluesky',
+  youtube: 'youtube',
+  newsletter: 'newsletter',
+  email: 'email',
+  creator: 'creator',
+  partner: 'partner',
+  ad: 'ad',
+} as const;
+
+export interface TrackedLink {
+  id: string;
+  name: string;
+  path: string;
+  /** @nullable */
+  postId: string | null;
+  sharedOn: TrackedLinkSharedOn;
+  source: string;
+  medium: string;
+  campaign: string;
+  content: string;
+  /** The tags to append to the page's address, starting with ? */
+  query: string;
+  /**
+     * The whole link to share; null when the CMS does not know the website's address (CMS_SITE_URL)
+     * @nullable
+     */
+  url: string | null;
+  createdAt: string;
+  createdBy: string;
+  /** @nullable */
+  archivedAt: string | null;
+  /** Page views through this link on its page, in the window */
+  pageviews: number;
+  /** Downloads through this link, in the window */
+  downloads: number;
+}
+
+export interface TrackedLinks {
+  /** @nullable */
+  from: string | null;
+  /** @nullable */
+  to: string | null;
+  links: TrackedLink[];
+}
+
+export type NewTrackedLinkSharedOn = typeof NewTrackedLinkSharedOn[keyof typeof NewTrackedLinkSharedOn];
+
+
+export const NewTrackedLinkSharedOn = {
+  reddit: 'reddit',
+  linkedin: 'linkedin',
+  x: 'x',
+  hackernews: 'hackernews',
+  bluesky: 'bluesky',
+  youtube: 'youtube',
+  newsletter: 'newsletter',
+  email: 'email',
+  creator: 'creator',
+  partner: 'partner',
+  ad: 'ad',
+} as const;
+
+export interface NewTrackedLink {
+  /**
+     * What the link is for, e.g. "r/macapps launch post"
+     * @minLength 1
+     * @maxLength 120
+     */
+  name: string;
+  /**
+     * The destination's path on the website
+     * @minLength 1
+     * @maxLength 300
+     */
+  path: string;
+  sharedOn: NewTrackedLinkSharedOn;
+  /**
+     * For creator, partner and ad: their name as lowercase words joined by hyphens
+     * @maxLength 60
+     */
+  who?: string;
+  /**
+     * @maxLength 60
+     * @pattern ^[a-z0-9]+(?:-[a-z0-9]+)*$
+     */
+  campaign: string;
+  /**
+     * @maxLength 60
+     * @pattern ^[a-z0-9]+(?:-[a-z0-9]+)*$
+     */
+  content?: string;
 }
 
 export type PostLang = typeof PostLang[keyof typeof PostLang];
@@ -873,6 +976,24 @@ export const GetTrafficSourcesChannel = {
   referral: 'referral',
   paid: 'paid',
   other: 'other',
+} as const;
+
+export type ListLinksParams = {
+  /**
+   * @minimum 1
+   * @maximum 3650
+   */
+  days?: number;
+  since?: string;
+  archived?: ListLinksArchived;
+};
+
+export type ListLinksArchived = typeof ListLinksArchived[keyof typeof ListLinksArchived];
+
+
+export const ListLinksArchived = {
+  true: 'true',
+  false: 'false',
 } as const;
 
 export type ListPostsParams = {
@@ -1937,6 +2058,187 @@ export const getTrafficSources = async (params?: GetTrafficSourcesParams, option
   {
     ...options,
     method: 'GET'
+
+
+  }
+);}
+
+
+
+export type listLinksResponse200 = {
+  data: TrackedLinks
+  status: 200
+}
+
+export type listLinksResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type listLinksResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type listLinksResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type listLinksResponseSuccess = (listLinksResponse200) & {
+  headers: Headers;
+};
+export type listLinksResponseError = (listLinksResponse400 | listLinksResponse401 | listLinksResponse403) & {
+  headers: Headers;
+};
+
+export type listLinksResponse = (listLinksResponseSuccess | listLinksResponseError)
+
+export const getListLinksUrl = (params?: ListLinksParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/links?${stringifiedParams}` : `/v1/links`
+}
+
+/**
+ * Tracked links, newest first, with their page views and tagged downloads over the last `days` complete days the CMS has, or since a day.
+ */
+export const listLinks = async (params?: ListLinksParams, options?: Parameters<typeof cmsFetch>[1]): Promise<listLinksResponse> => {
+
+  return cmsFetch<listLinksResponse>(getListLinksUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type createLinkResponse201 = {
+  data: TrackedLink
+  status: 201
+}
+
+export type createLinkResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type createLinkResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type createLinkResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type createLinkResponse409 = {
+  data: Error
+  status: 409
+}
+
+export type createLinkResponse422 = {
+  data: Error
+  status: 422
+}
+
+export type createLinkResponseSuccess = (createLinkResponse201) & {
+  headers: Headers;
+};
+export type createLinkResponseError = (createLinkResponse400 | createLinkResponse401 | createLinkResponse403 | createLinkResponse409 | createLinkResponse422) & {
+  headers: Headers;
+};
+
+export type createLinkResponse = (createLinkResponseSuccess | createLinkResponseError)
+
+export const getCreateLinkUrl = () => {
+
+
+
+
+  return `/v1/links`
+}
+
+/**
+ * Makes a tracked link: where it is shared decides utm_source and utm_medium (creator, partner and ad add `who` as the source); the campaign and optional content are lowercase words joined by hyphens. A link with the same page and tags exists only once.
+ */
+export const createLink = async (newTrackedLink: NewTrackedLink, options?: Parameters<typeof cmsFetch>[1]): Promise<createLinkResponse> => {
+
+  return cmsFetch<createLinkResponse>(getCreateLinkUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
+    body: JSON.stringify(newTrackedLink)
+  }
+);}
+
+
+
+export type archiveLinkResponse200 = {
+  data: TrackedLink
+  status: 200
+}
+
+export type archiveLinkResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type archiveLinkResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type archiveLinkResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type archiveLinkResponse404 = {
+  data: Error
+  status: 404
+}
+
+export type archiveLinkResponseSuccess = (archiveLinkResponse200) & {
+  headers: Headers;
+};
+export type archiveLinkResponseError = (archiveLinkResponse400 | archiveLinkResponse401 | archiveLinkResponse403 | archiveLinkResponse404) & {
+  headers: Headers;
+};
+
+export type archiveLinkResponse = (archiveLinkResponseSuccess | archiveLinkResponseError)
+
+export const getArchiveLinkUrl = (id: string,) => {
+
+
+
+
+  return `/v1/links/${id}`
+}
+
+/**
+ * Archives a link: its numbers stay, but it is no longer listed.
+ */
+export const archiveLink = async (id: string, options?: Parameters<typeof cmsFetch>[1]): Promise<archiveLinkResponse> => {
+
+  return cmsFetch<archiveLinkResponse>(getArchiveLinkUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
 
 
   }

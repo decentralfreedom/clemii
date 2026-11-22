@@ -271,4 +271,19 @@ describe.skipIf(!serverUrl)("hush-cms CLI", () => {
     expect(searches.stdout).toContain("Google leaves out rare searches");
     expect(searches.stdout).toMatch(/dictate in terminal\s+100\s+4\s+4\.0%\s+9\.8/);
   });
+
+  test("CMS-CLI-009 makes a tracked link for a post or a path, lists it and archives it", async () => {
+    const made = await cli(["links", "create", "--to", "dictate-from-the-terminal", "--on", "reddit", "--campaign", "launch-2026-12", "--name", "r/macapps"]);
+    expect(made.exitCode).toBe(0);
+    // Without the website's address (CMS_SITE_URL) the CMS gives the path and the tags.
+    expect(made.stdout.trim()).toBe("/blog/dictate-from-the-terminal?utm_source=reddit&utm_medium=social&utm_campaign=launch-2026-12");
+    const creator = await cli(["links", "create", "--to", "/", "--on", "creator", "--campaign", "launch-2026-12", "--json"]);
+    expect(creator.exitCode).toBe(1);
+    expect(creator.json()).toMatchObject({ error: { code: "invalid_link" } });
+    const list = await cli(["links", "list"]);
+    expect(list.stdout).toMatch(/r\/macapps\s+\/blog\/dictate-from-the-terminal\s+reddit\/social\/launch-2026-12\s+0\s+0/);
+    const id = (await cli(["links", "list", "--json"])).json().links[0].id;
+    expect((await cli(["links", "archive", id])).stdout).toContain("Archived r/macapps");
+    expect((await cli(["links", "list"])).stdout).toContain("No tracked links yet");
+  });
 });

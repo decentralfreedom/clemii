@@ -22,6 +22,7 @@ const app = createApp({ db, media }, {
   isDraining: () => draining,
   isConfigured: configuration.configured,
   admin: config.admin,
+  siteUrl: config.site?.url,
   adminDir: await Bun.file(`${adminDir}/index.html`).exists() ? adminDir : undefined,
 });
 const server = Bun.serve({ port: config.port, fetch: app.fetch, idleTimeout: 30 });

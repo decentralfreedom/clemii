@@ -40,8 +40,9 @@ export async function listAudit(db: Database, options: { limit: number; before?:
     .where(and(
       postId ? eq(auditLog.postId, postId) : undefined,
       // Posts are post.*; access is tokens, CLI sign-ins and the owner's sign-ins.
-      area === "posts" ? sql`${auditLog.action}::text like 'post.%'` : undefined,
-      area === "access" ? sql`${auditLog.action}::text not like 'post.%'` : undefined,
+      // Tracked links are content work, beside posts; access is tokens, devices and sign-ins.
+      area === "posts" ? sql`(${auditLog.action}::text like 'post.%' or ${auditLog.action}::text like 'link.%')` : undefined,
+      area === "access" ? sql`${auditLog.action}::text not like 'post.%' and ${auditLog.action}::text not like 'link.%'` : undefined,
       before ? sql`(${auditLog.at}, ${auditLog.id}) < (select at, id from audit_log where id = ${before})` : undefined,
     ))
     .orderBy(desc(auditLog.at), desc(auditLog.id))
