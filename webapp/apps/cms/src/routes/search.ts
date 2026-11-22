@@ -46,7 +46,7 @@ const searchSchema = z.object({
     date: z.iso.date().describe("The Search Console day (US Pacific) it happened on"),
     kind: z.enum(["published", "scheduled", "unpublished", "edited"]),
     changes: z.array(z.enum(["title", "description", "content"])).describe("For an edit: what it changed"),
-    actor: z.string(),
+    actor: z.string().nullable().describe("Who did it; null for a publication from before the audit log, whose time the post records but not who"),
   })).describe("When the post went live or changed in the window, to read its numbers against"),
 }).openapi("PostSearch");
 

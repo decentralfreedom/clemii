@@ -12,7 +12,7 @@ import { join } from "node:path";
 import { createApp } from "../src/app";
 import { createToken, systemActor } from "../src/auth/tokens";
 import { loadConfig, type SearchConsoleConfig } from "../src/config";
-import { auditLog, postRevisions, searchDaily, searchConsoleState, searchQueries, searchSiteDaily } from "../src/db/schema";
+import { auditLog, postRevisions, posts, searchDaily, searchConsoleState, searchQueries, searchSiteDaily } from "../src/db/schema";
 import { pagePathOf } from "../src/posts/paths";
 import { createDraft, publishPost, updatePost } from "../src/posts/service";
 import { searchConsoleClient, type QueryRow, type SearchRow } from "../src/search/console";
@@ -288,6 +288,18 @@ describe.skipIf(!serverUrl)("CMS Search Console import", () => {
     const { body: searches } = await call(`/v1/posts/${moved}/search/queries?days=28`);
     expect(searches.queries.map((query: { query: string; striking: boolean }) => [query.query, query.striking]))
       .toEqual([["dictate on mac", false], ["mac dictation offline", true]]);
+  });
+
+  test("CMS-SEARCH-007 a publication from before the audit log still shows, from the post's own time, without an actor", async () => {
+    // As on behu.sh: published on 13 November, the audit log started on the 22nd.
+    // The audit log (append-only) has no entry for that day.
+    await database.db.update(posts).set({ publishedAt: new Date("2026-11-13T09:00:00.000Z") }).where(eq(posts.id, moved));
+    const { body } = await call(`/v1/posts/${moved}/search?days=28`);
+    expect(body.markers[0]).toEqual({ date: "2026-11-13", kind: "published", changes: [], actor: null });
+    // With an audit entry for that day, it is shown once, with who did it.
+    await database.db.insert(auditLog).values({ action: "post.published", actor: "github:owner", postId: moved, subject: "x", at: new Date("2026-11-13T09:00:00.000Z") });
+    const { body: logged } = await call(`/v1/posts/${moved}/search?days=28`);
+    expect(logged.markers.filter((marker: { date: string }) => marker.date === "2026-11-13")).toEqual([{ date: "2026-11-13", kind: "published", changes: [], actor: "github:owner" }]);
   });
 
   test("CMS-SEARCH-008 the dashboard's site totals are Google's own, by property, with the posts that brought the most search traffic", async () => {

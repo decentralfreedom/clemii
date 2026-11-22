@@ -436,7 +436,11 @@
                   "description": "For an edit: what it changed"
                 },
                 "actor": {
-                  "type": "string"
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Who did it; null for a publication from before the audit log, whose time the post records but not who"
                 }
               },
               "required": [
