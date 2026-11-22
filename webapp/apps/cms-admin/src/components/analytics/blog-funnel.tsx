@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 //
-// The blog's funnel as the page's headline, in Ghost's KPI tabs: Google
-// impressions, clicks, page views and downloads of the posts, left to right,
-// each a tab over its chart. Downloads lead, the one number the blog is for;
+// The blog's numbers as the page's headline, in Ghost's KPI tabs: Google
+// impressions and clicks (Search Console), then page views and downloads of
+// the posts (Umami), each a tab over its chart. The two sources stand side by
+// side under their own labels, never as one step leading into the next:
+// Google says its clicks and an analytics tool's visits measure different
+// things. Downloads lead, the one number the blog is for;
 // the steps before them say where readers are lost. Rates show only where one
 // step is a share of the one before and the count is large enough to mean
 // something: a share of a handful of page views is noise. Before Umami counts
@@ -45,8 +48,12 @@ export function BlogFunnel({ blog }: { blog: BlogAnalytics & { from: string; to:
   return (
     <Card>
       <CardContent>
+        <div aria-hidden className="-mx-6 hidden grid-cols-2 border-b border-border-default px-6 pt-4 pb-3 text-xs text-text-secondary md:grid">
+          <span><span className="font-medium">Google Search</span> · Search Console</span>
+          <span className="ps-6"><span className="font-medium">On behu.sh</span> · Umami</span>
+        </div>
         <Tabs value={metric} onValueChange={(value) => setMetric(value as BlogMetric)} variant="kpis">
-          <TabsList className="-mx-6 hidden grid-cols-4 md:visible! md:grid!" aria-label="The blog's funnel">
+          <TabsList className="-mx-6 hidden grid-cols-4 md:visible! md:grid!" aria-label="The blog's numbers">
             {steps.map((key) => <KpiTabTrigger key={key} value={key} title={notes[key]} disabled={!selectable(key)}>{tile(key)}</KpiTabTrigger>)}
           </TabsList>
           <DropdownMenu>

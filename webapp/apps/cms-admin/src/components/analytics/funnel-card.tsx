@@ -40,22 +40,35 @@ export function FunnelCard({ search, traffic }: { search: { from: string; to: st
     { key: "pageviews", label: "Page views", value: formatMetric("impressions", pageviews), note: "From every source" },
     { key: "downloads", label: "Downloads", value: formatMetric("impressions", downloads), note: `${percent(downloads, pageviews)} of page views` },
   ];
+  // Each source in its own group, as Google's Search Console integration joins them: side by side, never one
+  // step leading into the other. Search Console's clicks and Umami's page views measure different things.
+  const groups = [
+    { label: "Google Search", source: "Search Console", steps: steps.slice(0, 2) },
+    { label: "On behu.sh", source: "Umami", steps: steps.slice(2) },
+  ];
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Funnel</CardTitle>
-        <CardDescription>From Google Search to a download, {analyticsDay(window.from)} to {analyticsDay(window.to)}: the days both Search Console and Umami have.</CardDescription>
+        <CardTitle>Search and site</CardTitle>
+        <CardDescription>Google Search and the visits on the site, each from its own source, {analyticsDay(window.from)} to {analyticsDay(window.to)}: the days both Search Console and Umami have.</CardDescription>
       </CardHeader>
       <CardContent>
-        <ol aria-label="Funnel" className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-4">
-          {steps.map((step, index) => (
-            <li key={step.key} className="relative flex flex-col gap-1.5" data-testid={`funnel-${step.key}`}>
-              <MetricValue label={step.label} value={step.value} size="lg" valueTestId={`funnel-${step.key}-value`} />
-              <span className="text-sm text-text-secondary">{step.note}</span>
-              {index < steps.length - 1 && <ChevronRight aria-hidden className="absolute top-8 -right-3 hidden size-4 text-muted-foreground md:block" />}
-            </li>
+        <div className="grid gap-6 md:grid-cols-2">
+          {groups.map((group) => (
+            <section key={group.label} aria-label={group.label} className="flex flex-col gap-3">
+              <p className="text-xs font-medium text-text-secondary">{group.label} <span className="font-normal">· {group.source}</span></p>
+              <ol aria-label={`${group.label} steps`} className="grid grid-cols-2 gap-x-4">
+                {group.steps.map((step, index) => (
+                  <li key={step.key} className="relative flex flex-col gap-1.5" data-testid={`funnel-${step.key}`}>
+                    <MetricValue label={step.label} value={step.value} size="lg" valueTestId={`funnel-${step.key}-value`} />
+                    <span className="text-sm text-text-secondary">{step.note}</span>
+                    {index === 0 && <ChevronRight aria-hidden className="absolute top-8 -right-3 size-4 text-muted-foreground" />}
+                  </li>
+                ))}
+              </ol>
+            </section>
           ))}
-        </ol>
+        </div>
         <p className="mt-6 text-sm text-text-secondary">
           Page views and downloads are counted on behu.sh's server, without cookies, and not for visitors who ask not to be tracked (Do Not Track, Global Privacy Control).
         </p>

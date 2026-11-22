@@ -40,8 +40,8 @@ export function BlogPostsCard({ posts, range, counted }: { posts: BlogAnalyticsP
               <TableRow>
                 <TableHead>Post</TableHead>
                 <TableHead className="hidden text-right whitespace-nowrap md:table-cell">Google clicks</TableHead>
-                <TableHead className="text-right whitespace-nowrap">Page views</TableHead>
-                <TableHead className="text-right whitespace-nowrap">Downloads</TableHead>
+                <TableHead className="text-right whitespace-nowrap" title="Umami: page views of the post">Page views</TableHead>
+                <TableHead className="text-right whitespace-nowrap" title="Umami: downloads started on the post">Downloads</TableHead>
                 <TableHead className="hidden text-right md:table-cell" title={`Shown from ${minimumViewsForRate} page views`}>Per view</TableHead>
               </TableRow>
             </TableHeader>
