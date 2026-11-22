@@ -20,6 +20,17 @@ type Fetch = (input: string, init?: RequestInit) => Promise<Response>;
 
 /** What Umami counted on one page on one day. */
 export type TrafficRow = { path: string; pageviews: number; downloads: number };
+/** A download, with the campaign tags of the page it started on (query, without "?"). */
+export type DownloadEvent = { path: string; query: string };
+/** Page views on one page from one source: the referring domain and the link's campaign tags. */
+export type SourceRow = {
+  path: string; referrer: string | null; utmSource: string | null; utmMedium: string | null;
+  utmCampaign: string | null; utmContent: string | null; pageviews: number;
+};
+
+/** Umami's breakdown report returns at most this many rows, with no paging (getBreakdown.ts). */
+const breakdownCap = 500;
+const sourceFields = ["path", "referrer", "utmSource", "utmMedium", "utmCampaign", "utmContent"];
 
 const pageSize = 500;
 const hourMs = 3_600_000;
@@ -65,7 +76,7 @@ export function umamiClient(config: UmamiConfig, fetcher: Fetch = fetch) {
     },
 
     /** Every page's page views and downloads on a US Pacific day. */
-    async day(day: string): Promise<TrafficRow[]> {
+    async day(day: string): Promise<{ pages: TrafficRow[]; downloads: DownloadEvent[] }> {
       const range = pacificDayRange(day);
       const rows = new Map<string, TrafficRow>();
       const row = (path: string) => rows.get(path) ?? rows.set(path, { path, pageviews: 0, downloads: 0 }).get(path)!;
@@ -74,12 +85,55 @@ export function umamiClient(config: UmamiConfig, fetcher: Fetch = fetch) {
         for (const entry of page) row(entry.name).pageviews += Number(entry.pageviews);
         if (page.length < pageSize) break;
       }
+      const downloads: DownloadEvent[] = [];
       for (let number = 1; ; number++) {
-        const { data } = await call("/events", { event: "download", page: number, pageSize, ...range }) as { data: Array<{ urlPath: string; eventName: string }> };
-        for (const event of data) if (event.eventName === "download") row(event.urlPath).downloads += 1;
+        const { data } = await call("/events", { event: "download", page: number, pageSize, ...range }) as { data: Array<{ urlPath: string; urlQuery?: string | null; eventName: string }> };
+        for (const event of data) {
+          if (event.eventName !== "download") continue;
+          row(event.urlPath).downloads += 1;
+          downloads.push({ path: event.urlPath, query: event.urlQuery ?? "" });
+        }
         if (data.length < pageSize) break;
       }
-      return [...rows.values()];
+      return { pages: [...rows.values()], downloads };
+    },
+
+    /**
+     * Page views per page and source on a US Pacific day, from Umami's
+     * breakdown report (POST /api/reports/breakdown, page views only). The
+     * report stops at 500 rows without paging, so a day that reaches it is
+     * read again page by page: no source row is ever cut off.
+     */
+    async sources(day: string, paths: string[]): Promise<SourceRow[]> {
+      const { startAt, endAt } = pacificDayRange(day);
+      const read = async (filters: Record<string, unknown>) => {
+        const response = await fetcher(`${config.url}/api/reports/breakdown`, {
+          method: "POST", redirect: "manual", signal: AbortSignal.timeout(30_000),
+          headers: { ...headers, "content-type": "application/json" },
+          body: JSON.stringify({
+            websiteId: config.websiteId, type: "breakdown", filters,
+            parameters: { startDate: new Date(startAt).toISOString(), endDate: new Date(endAt).toISOString(), fields: sourceFields },
+          }),
+        });
+        if (response.status >= 300 && response.status < 400) throw new Error("Umami redirected the breakdown report (a Cloudflare Access sign-in?): check CMS_UMAMI_ACCESS_CLIENT_ID");
+        if (!response.ok) throw new Error(`Umami answered ${response.status} for the breakdown report`);
+        const rows = await response.json() as Array<Record<string, string | number | null>>;
+        return rows.map((row) => ({
+          path: String(row.path), referrer: (row.referrer as string | null) ?? null,
+          utmSource: (row.utmSource as string | null) ?? null, utmMedium: (row.utmMedium as string | null) ?? null,
+          utmCampaign: (row.utmCampaign as string | null) ?? null, utmContent: (row.utmContent as string | null) ?? null,
+          pageviews: Number(row.views),
+        }));
+      };
+      const all = await read({});
+      if (all.length < breakdownCap) return all;
+      const perPage: SourceRow[] = [];
+      for (const path of paths) {
+        const rows = await read({ path });
+        if (rows.length >= breakdownCap) throw new Error(`More than ${breakdownCap} sources for ${path} on ${day}: the breakdown report cannot list them all`);
+        perPage.push(...rows);
+      }
+      return perPage;
     },
   };
 }

@@ -68,7 +68,7 @@ export function siteSearchRoutes(db: Database) {
       200: json(siteSearchSchema, "The site's search numbers"),
       401: json(errorSchema, "Missing or invalid token"),
       403: json(errorSchema, "The token lacks posts:read"),
-      422: json(errorSchema, "Invalid query"),
+      400: json(errorSchema, "Invalid query"),
     },
   }), async (context) => {
     const { days: span, since, limit } = context.req.valid("query");
