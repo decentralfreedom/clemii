@@ -12,7 +12,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createApp } from "../src/app";
 import { createToken, systemActor } from "../src/auth/tokens";
-import { trafficDaily, trafficSiteDaily } from "../src/db/schema";
+import { trafficDaily, trafficSiteDaily, trafficSourceDaily } from "../src/db/schema";
 import { createDraft, publishPost } from "../src/posts/service";
 import { pacificDay } from "../src/search/analytics";
 import { LocalObjectStore } from "../src/storage/object-store";
@@ -42,14 +42,29 @@ test.skipIf(!url || !websiteId || !apiKey || !serverUrl)("FUNNEL-001 the CMS imp
 
     const sum = (rows: Array<{ pageviews: number; downloads: number }>) =>
       rows.reduce((total, row) => ({ pageviews: total.pageviews + row.pageviews, downloads: total.downloads + row.downloads }), { pageviews: 0, downloads: 0 });
-    expect(sum(await cms.db.select().from(trafficDaily))).toEqual({ pageviews: 2, downloads: 1 });
-    expect(sum(await cms.db.select().from(trafficSiteDaily))).toEqual({ pageviews: 4, downloads: 1 });
+    expect(sum(await cms.db.select().from(trafficDaily))).toEqual({ pageviews: 5, downloads: 1 });
+    expect(sum(await cms.db.select().from(trafficSiteDaily))).toEqual({ pageviews: 10, downloads: 2 });
+
+    // Each visit in its channel; the tagged Reddit link without a referrer is social, not direct;
+    // only the tagged download is attributed to a source.
+    const channels: Record<string, { pageviews: number; downloads: number }> = {};
+    for (const row of await cms.db.select().from(trafficSourceDaily)) {
+      const total = channels[row.channel] ?? { pageviews: 0, downloads: 0 };
+      channels[row.channel] = { pageviews: total.pageviews + row.pageviews, downloads: total.downloads + row.downloads };
+    }
+    expect(channels).toEqual({
+      direct: { pageviews: 5, downloads: 0 },
+      organicSearch: { pageviews: 1, downloads: 0 },
+      organicSocial: { pageviews: 2, downloads: 0 },
+      ai: { pageviews: 1, downloads: 0 },
+      email: { pageviews: 1, downloads: 1 },
+    });
 
     // And the API serves them as the funnel's page view and download steps.
     const app = createApp(cms);
     const reader = await createToken(cms.db, { name: "funnel-reader", scopes: ["posts:read"] }, systemActor("e2e"));
     const response = await app.request(`/v1/posts/${post.id}/traffic?days=7`, { headers: credentials(reader) });
-    expect(await response.json()).toMatchObject({ totals: { pageviews: 2, downloads: 1 } });
+    expect(await response.json()).toMatchObject({ totals: { pageviews: 5, downloads: 1 } });
   } finally {
     await database.drop();
   }

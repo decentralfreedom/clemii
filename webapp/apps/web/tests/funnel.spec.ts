@@ -49,6 +49,28 @@ test("FUNNEL-001 counts real visits and downloads per page, and nothing that is 
   await (await second.newPage()).goto(article);
   await second.close();
 
+  // Counted, each through its channel: a search engine, a social site, an AI assistant (their
+  // referrers), a tagged Reddit link opened in an app (no referrer), and a tagged newsletter link
+  // to the home page whose download keeps the newsletter's tags.
+  const arrivals: Array<[string, string, string | undefined]> = [
+    ["198.51.100.31", article, "https://www.google.com/"],
+    ["198.51.100.32", "/", "https://www.linkedin.com/"],
+    ["198.51.100.33", article, "https://chatgpt.com/"],
+    ["198.51.100.34", `${article}?utm_source=reddit&utm_medium=social&utm_campaign=launch`, undefined],
+  ];
+  for (const [address, path, referer] of arrivals) {
+    const context = await visitor(browser, address);
+    await (await context.newPage()).goto(path, referer ? { referer } : {});
+    await context.close();
+  }
+  const subscriber = await visitor(browser, "198.51.100.35");
+  const home = await subscriber.newPage();
+  await home.goto("/?utm_source=newsletter&utm_medium=email&utm_campaign=december");
+  const homeDownload = home.getByRole("link", { name: "Download for Mac" }).first();
+  await expect(homeDownload).toHaveAttribute("href", "/download?from=%2F&utm_source=newsletter&utm_medium=email&utm_campaign=december");
+  await Promise.all([home.waitForRequest(/\.dmg($|\?)/), homeDownload.click()]);
+  await subscriber.close();
+
   // Not counted: visitors who ask not to be tracked, a known bot, and requests that are not a page being opened.
   for (const headers of [{ dnt: "1" }, { "sec-gpc": "1" }] as Array<Record<string, string>>) {
     const declined = await visitor(browser, "192.0.2.30", headers);
@@ -67,13 +89,13 @@ test("FUNNEL-001 counts real visits and downloads per page, and nothing that is 
 
   // The server sends events after answering: wait until Umami has all that should arrive, then a little longer for any that should not.
   const range = `startAt=${Date.now() - 3_600_000}&endAt=${Date.now() + 3_600_000}`;
-  await expect.poll(async () => (await umami(`/stats?${range}`)).pageviews, { timeout: 15_000 }).toBe(4);
+  await expect.poll(async () => (await umami(`/stats?${range}`)).pageviews, { timeout: 15_000 }).toBe(10);
   await new Promise((resolve) => setTimeout(resolve, 2_000));
   const pages = await umami(`/metrics/expanded?type=path&${range}`) as Array<{ name: string; pageviews: string }>;
   const views = Object.fromEntries(pages.map((row) => [row.name, Number(row.pageviews)]));
   const releaseNotes = Object.keys(views).filter((path) => path.startsWith("/releases/"));
   expect(releaseNotes).toHaveLength(1);
-  expect(views).toEqual({ [article]: 2, "/": 1, [releaseNotes[0]!]: 1 });
+  expect(views).toEqual({ [article]: 5, "/": 3, [releaseNotes[0]!]: 2 });
   const { data: downloads } = await umami(`/events?event=download&pageSize=100&${range}`) as { data: Array<{ urlPath: string }> };
-  expect(downloads.map((event) => event.urlPath)).toEqual([article]);
+  expect(downloads.map((event) => event.urlPath).sort()).toEqual(["/", article]);
 });
