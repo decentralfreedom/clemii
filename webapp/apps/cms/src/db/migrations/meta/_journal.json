@@ -134,6 +134,13 @@
       "when": 1795361381545,
       "tag": "0018_tracked_links",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1795362600160,
+      "tag": "0019_goals",
+      "breakpoints": true
     }
   ]
 }

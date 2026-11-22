@@ -13,9 +13,9 @@ import { hostname } from "node:os";
 import { basename, dirname, extname, join } from "node:path";
 import { parseArgs } from "node:util";
 import {
-  archiveLink, createDraft, createLink, deletePost, listLinks, getCaller, getMediaOriginal, getPost, getPostSearch, getPostSearchQueries, listMedia, listPosts, listRevisions, pollDeviceSignIn, previewPost, publishPost,
+  archiveLink, createDraft, createLink, deletePost, getGoalCatalog, listGoals, listLinks, proposeGoal, getCaller, getMediaOriginal, getPost, getPostSearch, getPostSearchQueries, listMedia, listPosts, listRevisions, pollDeviceSignIn, previewPost, publishPost,
   restoreRevision, revokeCaller, schedulePost, startDeviceSignIn, unpublishPost, updatePost, uploadMedia,
-  type CreateDraftBody, type ListPostsLang, type ListPostsStatus, type NewTrackedLinkSharedOn, type Post,
+  type CreateDraftBody, type NewGoalObjective, type ListPostsLang, type ListPostsStatus, type NewTrackedLinkSharedOn, type Post,
 } from "./api/cms.generated";
 import { connect } from "./api/fetcher";
 import { CredentialError, deleteToken, promptToken, readToken, saveToken, storedToken } from "./credentials";
@@ -56,6 +56,14 @@ Tracked links (campaign tags for the links you share)
                                      partner, ad; creator, partner and ad need --who. Names are
                                      lowercase words joined by hyphens, e.g. launch-2026-12
   links archive <id>                 Keeps its numbers, stops listing it
+
+Goals (objectives and key results, measured from the CMS's numbers)
+  goals catalog                      What a key result can measure, and the posts, page types,
+                                     channels, sources and campaigns that occur in the data
+  goals list [--quarter <YYYY-Qn>]   Objectives with each key result's value, target and pace
+  goals propose <file.json>          Proposes an objective (quarter, title, keyResults); the CMS
+                                     checks it against the catalog, reads the baselines itself and
+                                     keeps it as a draft until the owner approves it in the admin
 
 Access
   auth login [--no-browser]          Signs in through the browser, as gh auth login: approve the
@@ -282,6 +290,48 @@ async function postsCommand(action: string | undefined, args: string[], values: 
   }
 }
 
+async function goalsCommand(action: string | undefined, args: string[], values: Record<string, string | boolean | undefined>): Promise<Output> {
+  const number = (value: number | null | undefined, digits = 0) => (value === null || value === undefined ? "-" : value.toFixed(digits));
+  switch (action) {
+    case "catalog": {
+      const catalog = ok(await getGoalCatalog());
+      const lines = [
+        "Metrics:", ...catalog.metrics.map((metric) => `  ${metric.name.padEnd(12)} ${metric.label} (${metric.source}); scope: ${metric.scopes}${metric.note ? `; ${metric.note}` : ""}`),
+        "Posts:", ...catalog.posts.map((post) => `  ${post.id}  ${post.path}  ${post.title}`),
+        `Page types: ${catalog.pageTypes.join(", ") || "-"}`, `Channels: ${catalog.channels.join(", ") || "-"}`,
+        `Sources: ${catalog.sources.join(", ") || "-"}`, `Campaigns: ${catalog.campaigns.join(", ") || "-"}`,
+        `Search Console days: ${catalog.coverage.search ? `${catalog.coverage.search.from} to ${catalog.coverage.search.to}` : "none yet"}`,
+        `Umami days: ${catalog.coverage.traffic ? `${catalog.coverage.traffic.from} to ${catalog.coverage.traffic.to}` : "none yet"}`,
+      ];
+      return { json: catalog, text: lines.join("\n") };
+    }
+    case "list": {
+      const answer = ok(await listGoals({ quarter: values.quarter as string | undefined }));
+      if (!answer.objectives.length) return { json: answer, text: `No goals for ${answer.quarter}.` };
+      const blocks = answer.objectives.map((objective) => [
+        `${objective.title} (${objective.status}, ${objective.period.from} to ${objective.period.to})`,
+        table([["KEY RESULT", "VALUE", "TARGET", "PACE", "ON TRACK", "FROM"], ...objective.keyResults.map((keyResult) => {
+          const digits = keyResult.metric === "ctr" || keyResult.metric === "conversion" ? 3 : keyResult.metric === "position" ? 1 : 0;
+          return [
+            `${keyResult.title}${keyResult.kind === "manual" ? " (manual)" : keyResult.measured?.taggedOnly ? " (tagged links)" : ""}`,
+            number(keyResult.progress.value, digits), number(keyResult.target, digits), number(keyResult.progress.projected, digits),
+            keyResult.progress.onTrack === null ? "-" : keyResult.progress.onTrack ? "yes" : "no", keyResult.measured?.from ?? "-",
+          ];
+        })]),
+      ].join("\n"));
+      return { json: answer, text: `${answer.quarter}\n\n${blocks.join("\n\n")}` };
+    }
+    case "propose": {
+      if (!args[0]) throw usageError("goals propose needs a JSON file with quarter, title and keyResults (see hush-cms goals catalog).");
+      const spec = await Bun.file(args[0]).json().catch(() => { throw usageError(`${args[0]} is not a JSON file.`); }) as NewGoalObjective;
+      const objective = ok(await proposeGoal(spec));
+      return { json: objective, text: `Proposed "${objective.title}" for ${objective.quarter} as a ${objective.status}: the owner approves it in the admin (Analytics, Goals).` };
+    }
+    default:
+      throw usageError(action ? `Unknown command "goals ${action}".` : "goals needs a command.");
+  }
+}
+
 async function linksCommand(action: string | undefined, args: string[], values: Record<string, string | boolean | undefined>): Promise<Output> {
   switch (action) {
     case "list": {
@@ -394,6 +444,7 @@ export async function run(argv: string[]): Promise<number> {
           options: {
             json: { type: "boolean" }, url: { type: "string" }, help: { type: "boolean", short: "h" },
             lang: { type: "string" }, status: { type: "string" }, at: { type: "string" }, out: { type: "string" }, days: { type: "string" }, since: { type: "string" }, queries: { type: "boolean" },
+            quarter: { type: "string" },
             to: { type: "string" }, on: { type: "string" }, campaign: { type: "string" }, who: { type: "string" }, content: { type: "string" }, name: { type: "string" }, archived: { type: "boolean" },
             "with-token": { type: "boolean" }, "no-browser": { type: "boolean" },
           },
@@ -412,11 +463,12 @@ export async function run(argv: string[]): Promise<number> {
     let output: Output;
     if (group === "auth") {
       output = await authCommand(action, origin, values);
-    } else if (group === "posts" || group === "links") {
+    } else if (group === "posts" || group === "links" || group === "goals") {
       const stored = await readToken(origin);
       if (!stored) throw new Failure(`No token for ${origin}. Run hush-cms auth login, or set HUSH_CMS_TOKEN.`);
       connect(origin, stored.token);
-      output = group === "posts" ? await postsCommand(action, args, values) : await linksCommand(action, args, values);
+      output = group === "posts" ? await postsCommand(action, args, values)
+        : group === "links" ? await linksCommand(action, args, values) : await goalsCommand(action, args, values);
     } else {
       throw usageError(`Unknown command "${group}".`);
     }

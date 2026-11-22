@@ -11,6 +11,8 @@ import { X } from "lucide-react";
 import { useGetSiteSearch, useGetSiteTraffic, type TrafficSourceRowChannel } from "@/api/cms.generated";
 import { DataSource } from "@/components/analytics/data-source";
 import { FunnelCard } from "@/components/analytics/funnel-card";
+import { GoalsView } from "@/components/analytics/goals-view";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LinksCard } from "@/components/analytics/links-card";
 import { PagesCard } from "@/components/analytics/pages-card";
 import { RangeSelect } from "@/components/analytics/range-select";
@@ -21,7 +23,9 @@ import { defaultAnalyticsRange, isAnalyticsRange, rangeParams, type AnalyticsRan
 import { channelLabels, isChannel } from "@/lib/traffic-labels";
 
 export const Route = createFileRoute("/_app/analytics")({
-  validateSearch: (search: Record<string, unknown>): { range?: AnalyticsRangeKey; channel?: TrafficSourceRowChannel } => ({
+  validateSearch: (search: Record<string, unknown>): { tab?: "goals"; quarter?: string; range?: AnalyticsRangeKey; channel?: TrafficSourceRowChannel } => ({
+    ...(search.tab === "goals" ? { tab: "goals" as const } : {}),
+    ...(typeof search.quarter === "string" && /^\d{4}-Q[1-4]$/.test(search.quarter) ? { quarter: search.quarter } : {}),
     ...(isAnalyticsRange(search.range) && search.range !== defaultAnalyticsRange ? { range: search.range } : {}),
     // A channel picked in the Sources card filters the traffic cards, as a chip in the URL (Plausible's pattern).
     ...(isChannel(search.channel) ? { channel: search.channel } : {}),
@@ -30,7 +34,7 @@ export const Route = createFileRoute("/_app/analytics")({
 });
 
 function Analytics() {
-  const { range = defaultAnalyticsRange, channel } = Route.useSearch();
+  const { tab, quarter, range = defaultAnalyticsRange, channel } = Route.useSearch();
   const navigate = Route.useNavigate();
   const search = useGetSiteSearch({ ...rangeParams(range), limit: 10 });
   const numbers = search.data?.status === 200 ? search.data.data : undefined;
@@ -39,11 +43,21 @@ function Analytics() {
 
   return (
     <div className="mx-auto flex w-full max-w-(--content-width) flex-col px-(--page-gutter) pb-12">
-      <header className="flex items-center justify-between gap-4 pt-[28px] pb-6">
+      <header className="flex flex-col gap-4 pt-[28px] pb-6">
         <h1 className="text-3xl leading-tight font-bold tracking-tight">Analytics</h1>
-        <RangeSelect value={range} onChange={(next) => void navigate({ search: (previous) => ({ ...previous, range: next === defaultAnalyticsRange ? undefined : next }) })} />
+        <div className="flex items-center justify-between gap-4 border-b border-border-default">
+          <Tabs value={tab ?? "overview"} onValueChange={(value) => void navigate({ search: (previous) => ({ ...previous, tab: value === "goals" ? "goals" : undefined }) })} variant="underline">
+            <TabsList aria-label="Analytics">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="goals">Goals</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          {tab !== "goals" && <RangeSelect value={range} onChange={(next) => void navigate({ search: (previous) => ({ ...previous, range: next === defaultAnalyticsRange ? undefined : next }) })} />}
+        </div>
       </header>
-      {search.isPending ? (
+      {tab === "goals" ? (
+        <GoalsView quarter={quarter} onQuarter={(next) => void navigate({ search: (previous) => ({ ...previous, quarter: next }) })} />
+      ) : search.isPending ? (
         <p className="py-24 text-center text-sm text-text-secondary">Loading…</p>
       ) : !numbers ? (
         <p className="py-24 text-center text-sm text-destructive">The numbers could not be loaded.</p>

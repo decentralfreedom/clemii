@@ -141,6 +141,11 @@ export const AuditEntryAction = {
   ownersigned_in: 'owner.signed_in',
   linkcreated: 'link.created',
   linkarchived: 'link.archived',
+  goalproposed: 'goal.proposed',
+  goalcreated: 'goal.created',
+  goalapproved: 'goal.approved',
+  goalarchived: 'goal.archived',
+  goalchecked_in: 'goal.checked_in',
 } as const;
 
 export interface AuditEntry {
@@ -590,6 +595,239 @@ export interface NewTrackedLink {
   content?: string;
 }
 
+export type GoalCatalogMetricsItemName = typeof GoalCatalogMetricsItemName[keyof typeof GoalCatalogMetricsItemName];
+
+
+export const GoalCatalogMetricsItemName = {
+  impressions: 'impressions',
+  clicks: 'clicks',
+  ctr: 'ctr',
+  position: 'position',
+  pageviews: 'pageviews',
+  downloads: 'downloads',
+  conversion: 'conversion',
+} as const;
+
+export type GoalCatalogMetricsItem = {
+  name: GoalCatalogMetricsItemName;
+  label: string;
+  source: string;
+  scopes: string;
+  note?: string;
+};
+
+export type GoalCatalogPostsItem = {
+  id: string;
+  title: string;
+  path: string;
+};
+
+/**
+ * @nullable
+ */
+export type GoalCatalogCoverageSearch = {
+  from: string;
+  to: string;
+} | null;
+
+/**
+ * @nullable
+ */
+export type GoalCatalogCoverageTraffic = {
+  from: string;
+  to: string;
+} | null;
+
+export type GoalCatalogCoverage = {
+  /** @nullable */
+  search: GoalCatalogCoverageSearch;
+  /** @nullable */
+  traffic: GoalCatalogCoverageTraffic;
+};
+
+export interface GoalCatalog {
+  metrics: GoalCatalogMetricsItem[];
+  posts: GoalCatalogPostsItem[];
+  pageTypes: string[];
+  channels: string[];
+  sources: string[];
+  campaigns: string[];
+  coverage: GoalCatalogCoverage;
+}
+
+export type GoalObjectiveStatus = typeof GoalObjectiveStatus[keyof typeof GoalObjectiveStatus];
+
+
+export const GoalObjectiveStatus = {
+  draft: 'draft',
+  active: 'active',
+  archived: 'archived',
+} as const;
+
+export type GoalKeyResultKind = typeof GoalKeyResultKind[keyof typeof GoalKeyResultKind];
+
+
+export const GoalKeyResultKind = {
+  measured: 'measured',
+  manual: 'manual',
+} as const;
+
+/**
+ * @nullable
+ */
+export type GoalKeyResultMetric = typeof GoalKeyResultMetric[keyof typeof GoalKeyResultMetric] | null;
+
+
+export const GoalKeyResultMetric = {
+  impressions: 'impressions',
+  clicks: 'clicks',
+  ctr: 'ctr',
+  position: 'position',
+  pageviews: 'pageviews',
+  downloads: 'downloads',
+  conversion: 'conversion',
+} as const;
+
+export interface GoalScope {
+  postId?: string;
+  /** @maxLength 40 */
+  pageType?: string;
+  /** @maxLength 40 */
+  channel?: string;
+  /** @maxLength 200 */
+  source?: string;
+  /** @maxLength 200 */
+  campaign?: string;
+}
+
+/**
+ * For a measured key result: the value and the days it covers
+ * @nullable
+ */
+export type GoalMeasurement = {
+  /** @nullable */
+  value: number | null;
+  /** @nullable */
+  from: string | null;
+  /** @nullable */
+  to: string | null;
+  /** Downloads through tagged links only */
+  taggedOnly: boolean;
+} | null;
+
+export type GoalKeyResultProgress = {
+  /** @nullable */
+  value: number | null;
+  /**
+     * Value of target; for position, target of value
+     * @nullable
+     */
+  share: number | null;
+  /**
+     * Counts: the value plus the measured days' rate over the days left; rates and positions: their value
+     * @nullable
+     */
+  projected: number | null;
+  /** @nullable */
+  onTrack: boolean | null;
+};
+
+export interface GoalKeyResult {
+  id: string;
+  title: string;
+  kind: GoalKeyResultKind;
+  /** @nullable */
+  metric: GoalKeyResultMetric;
+  scope: GoalScope;
+  target: number;
+  /**
+     * The metric over the period of equal length before, when the CMS has all of it
+     * @nullable
+     */
+  baseline: number | null;
+  /** @nullable */
+  manualValue: number | null;
+  measured: GoalMeasurement | null;
+  progress: GoalKeyResultProgress;
+}
+
+export type GoalObjectivePeriod = {
+  from: string;
+  to: string;
+};
+
+export interface GoalObjective {
+  id: string;
+  quarter: string;
+  title: string;
+  status: GoalObjectiveStatus;
+  createdBy: string;
+  createdAt: string;
+  /** @nullable */
+  approvedBy: string | null;
+  /** @nullable */
+  approvedAt: string | null;
+  period: GoalObjectivePeriod;
+  keyResults: GoalKeyResult[];
+}
+
+export interface Goals {
+  quarter: string;
+  objectives: GoalObjective[];
+}
+
+export type NewGoalObjectiveKeyResultsItemKind = typeof NewGoalObjectiveKeyResultsItemKind[keyof typeof NewGoalObjectiveKeyResultsItemKind];
+
+
+export const NewGoalObjectiveKeyResultsItemKind = {
+  measured: 'measured',
+  manual: 'manual',
+} as const;
+
+export type NewGoalObjectiveKeyResultsItemMetric = typeof NewGoalObjectiveKeyResultsItemMetric[keyof typeof NewGoalObjectiveKeyResultsItemMetric];
+
+
+export const NewGoalObjectiveKeyResultsItemMetric = {
+  impressions: 'impressions',
+  clicks: 'clicks',
+  ctr: 'ctr',
+  position: 'position',
+  pageviews: 'pageviews',
+  downloads: 'downloads',
+  conversion: 'conversion',
+} as const;
+
+export type NewGoalObjectiveKeyResultsItem = {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title: string;
+  kind: NewGoalObjectiveKeyResultsItemKind;
+  metric?: NewGoalObjectiveKeyResultsItemMetric;
+  scope?: GoalScope;
+  /** @minimum 0 */
+  target: number;
+};
+
+export interface NewGoalObjective {
+  /**
+     * e.g. 2026-Q4
+     * @pattern ^\d{4}-Q[1-4]$
+     */
+  quarter: string;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title: string;
+  /**
+     * @minItems 1
+     * @maxItems 5
+     */
+  keyResults: NewGoalObjectiveKeyResultsItem[];
+}
+
 export type PostLang = typeof PostLang[keyof typeof PostLang];
 
 
@@ -1014,6 +1252,24 @@ export const ListLinksArchived = {
   true: 'true',
   false: 'false',
 } as const;
+
+export type ListGoalsParams = {
+  /** @pattern ^\d{4}-Q[1-4]$ */
+  quarter?: string;
+  archived?: ListGoalsArchived;
+};
+
+export type ListGoalsArchived = typeof ListGoalsArchived[keyof typeof ListGoalsArchived];
+
+
+export const ListGoalsArchived = {
+  true: 'true',
+  false: 'false',
+} as const;
+
+export type CheckInGoalBody = {
+  value: number;
+};
 
 export type ListPostsParams = {
   lang?: ListPostsLang;
@@ -3479,6 +3735,698 @@ export const useArchiveLink = <TError = Error,
         TContext
       > => {
       return useMutation(getArchiveLinkMutationOptions(options), queryClient);
+    }
+
+export type getGoalCatalogResponse200 = {
+  data: GoalCatalog
+  status: 200
+}
+
+export type getGoalCatalogResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type getGoalCatalogResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type getGoalCatalogResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type getGoalCatalogResponseSuccess = (getGoalCatalogResponse200) & {
+  headers: Headers;
+};
+export type getGoalCatalogResponseError = (getGoalCatalogResponse400 | getGoalCatalogResponse401 | getGoalCatalogResponse403) & {
+  headers: Headers;
+};
+
+export type getGoalCatalogResponse = (getGoalCatalogResponseSuccess | getGoalCatalogResponseError)
+
+export const getGetGoalCatalogUrl = () => {
+
+
+
+
+  return `/v1/goals/catalog`
+}
+
+/**
+ * What a key result can measure: the metrics the CMS computes exactly, with the scopes each allows, the values that occur in its data (published posts, page types, channels, sources, campaigns, tracked links' tags) and the days it has numbers for. A proposal can name nothing else.
+ */
+export const getGoalCatalog = async ( options?: Parameters<typeof cmsFetch>[1]): Promise<getGoalCatalogResponse> => {
+
+  return cmsFetch<getGoalCatalogResponse>(getGetGoalCatalogUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetGoalCatalogQueryKey = () => {
+    return [
+    `/v1/goals/catalog`
+    ] as const;
+    }
+
+
+export const getGetGoalCatalogQueryOptions = <TData = Awaited<ReturnType<typeof getGoalCatalog>>, TError = Error>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGoalCatalog>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetGoalCatalogQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getGoalCatalog>>> = ({ signal }) => getGoalCatalog({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getGoalCatalog>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetGoalCatalogQueryResult = NonNullable<Awaited<ReturnType<typeof getGoalCatalog>>>
+export type GetGoalCatalogQueryError = Error
+
+
+/** What a key result can measure: the metrics the CMS computes exactly, with the scopes each allows, the values that occur in its data (published posts, page types, channels, sources, campaigns, tracked links' tags) and the days it has numbers for. A proposal can name nothing else. */
+export function useGetGoalCatalog<TData = Awaited<ReturnType<typeof getGoalCatalog>>, TError = Error>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGoalCatalog>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getGoalCatalog>>,
+          TError,
+          Awaited<ReturnType<typeof getGoalCatalog>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** What a key result can measure: the metrics the CMS computes exactly, with the scopes each allows, the values that occur in its data (published posts, page types, channels, sources, campaigns, tracked links' tags) and the days it has numbers for. A proposal can name nothing else. */
+export function useGetGoalCatalog<TData = Awaited<ReturnType<typeof getGoalCatalog>>, TError = Error>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGoalCatalog>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getGoalCatalog>>,
+          TError,
+          Awaited<ReturnType<typeof getGoalCatalog>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** What a key result can measure: the metrics the CMS computes exactly, with the scopes each allows, the values that occur in its data (published posts, page types, channels, sources, campaigns, tracked links' tags) and the days it has numbers for. A proposal can name nothing else. */
+export function useGetGoalCatalog<TData = Awaited<ReturnType<typeof getGoalCatalog>>, TError = Error>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGoalCatalog>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** What a key result can measure: the metrics the CMS computes exactly, with the scopes each allows, the values that occur in its data (published posts, page types, channels, sources, campaigns, tracked links' tags) and the days it has numbers for. A proposal can name nothing else. */
+export function useGetGoalCatalog<TData = Awaited<ReturnType<typeof getGoalCatalog>>, TError = Error>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getGoalCatalog>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetGoalCatalogQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type listGoalsResponse200 = {
+  data: Goals
+  status: 200
+}
+
+export type listGoalsResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type listGoalsResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type listGoalsResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type listGoalsResponseSuccess = (listGoalsResponse200) & {
+  headers: Headers;
+};
+export type listGoalsResponseError = (listGoalsResponse400 | listGoalsResponse401 | listGoalsResponse403) & {
+  headers: Headers;
+};
+
+export type listGoalsResponse = (listGoalsResponseSuccess | listGoalsResponseError)
+
+export const getListGoalsUrl = (params?: ListGoalsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/goals?${stringifiedParams}` : `/v1/goals`
+}
+
+/**
+ * A quarter's objectives (default: the current one), newest first, each key result with its progress from the CMS's numbers.
+ */
+export const listGoals = async (params?: ListGoalsParams, options?: Parameters<typeof cmsFetch>[1]): Promise<listGoalsResponse> => {
+
+  return cmsFetch<listGoalsResponse>(getListGoalsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListGoalsQueryKey = (params?: ListGoalsParams,) => {
+    return [
+    `/v1/goals`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListGoalsQueryOptions = <TData = Awaited<ReturnType<typeof listGoals>>, TError = Error>(params?: ListGoalsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoals>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListGoalsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listGoals>>> = ({ signal }) => listGoals(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listGoals>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListGoalsQueryResult = NonNullable<Awaited<ReturnType<typeof listGoals>>>
+export type ListGoalsQueryError = Error
+
+
+/** A quarter's objectives (default: the current one), newest first, each key result with its progress from the CMS's numbers. */
+export function useListGoals<TData = Awaited<ReturnType<typeof listGoals>>, TError = Error>(
+ params: undefined |  ListGoalsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoals>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listGoals>>,
+          TError,
+          Awaited<ReturnType<typeof listGoals>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** A quarter's objectives (default: the current one), newest first, each key result with its progress from the CMS's numbers. */
+export function useListGoals<TData = Awaited<ReturnType<typeof listGoals>>, TError = Error>(
+ params?: ListGoalsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoals>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listGoals>>,
+          TError,
+          Awaited<ReturnType<typeof listGoals>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** A quarter's objectives (default: the current one), newest first, each key result with its progress from the CMS's numbers. */
+export function useListGoals<TData = Awaited<ReturnType<typeof listGoals>>, TError = Error>(
+ params?: ListGoalsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoals>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** A quarter's objectives (default: the current one), newest first, each key result with its progress from the CMS's numbers. */
+export function useListGoals<TData = Awaited<ReturnType<typeof listGoals>>, TError = Error>(
+ params?: ListGoalsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoals>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListGoalsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type proposeGoalResponse201 = {
+  data: GoalObjective
+  status: 201
+}
+
+export type proposeGoalResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type proposeGoalResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type proposeGoalResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type proposeGoalResponse422 = {
+  data: Error
+  status: 422
+}
+
+export type proposeGoalResponseSuccess = (proposeGoalResponse201) & {
+  headers: Headers;
+};
+export type proposeGoalResponseError = (proposeGoalResponse400 | proposeGoalResponse401 | proposeGoalResponse403 | proposeGoalResponse422) & {
+  headers: Headers;
+};
+
+export type proposeGoalResponse = (proposeGoalResponseSuccess | proposeGoalResponseError)
+
+export const getProposeGoalUrl = () => {
+
+
+
+
+  return `/v1/goals`
+}
+
+/**
+ * Proposes an objective with one to five key results from the catalog. The CMS checks every metric and scope against its data and reads each baseline itself. From a token the objective is a draft until the owner approves it in the admin; from the owner it is active.
+ */
+export const proposeGoal = async (newGoalObjective: NewGoalObjective, options?: Parameters<typeof cmsFetch>[1]): Promise<proposeGoalResponse> => {
+
+  return cmsFetch<proposeGoalResponse>(getProposeGoalUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
+    body: JSON.stringify(newGoalObjective)
+  }
+);}
+
+
+
+
+
+export const getProposeGoalMutationKey = () => ['proposeGoal'] as const;
+
+export const getProposeGoalMutationOptions = <TError = Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof proposeGoal>>, TError,ProposeGoalMutationVariables, TContext>, request?: SecondParameter<typeof cmsFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof proposeGoal>>, TError,ProposeGoalMutationVariables, TContext> => {
+
+const mutationKey = getProposeGoalMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof proposeGoal>>, ProposeGoalMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  proposeGoal(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProposeGoalMutationResult = NonNullable<Awaited<ReturnType<typeof proposeGoal>>>
+    export type ProposeGoalMutationBody = NewGoalObjective
+    export type ProposeGoalMutationError = Error
+    export type ProposeGoalMutationVariables = {data: NewGoalObjective}
+
+    /** Proposes an objective with one to five key results from the catalog. The CMS checks every metric and scope against its data and reads each baseline itself. From a token the objective is a draft until the owner approves it in the admin; from the owner it is active. */
+export const useProposeGoal = <TError = Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof proposeGoal>>, TError,ProposeGoalMutationVariables, TContext>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof proposeGoal>>,
+        TError,
+        ProposeGoalMutationVariables,
+        TContext
+      > => {
+      return useMutation(getProposeGoalMutationOptions(options), queryClient);
+    }
+
+export type approveGoalResponse204 = {
+  data: void
+  status: 204
+}
+
+export type approveGoalResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type approveGoalResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type approveGoalResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type approveGoalResponse404 = {
+  data: Error
+  status: 404
+}
+
+export type approveGoalResponseSuccess = (approveGoalResponse204) & {
+  headers: Headers;
+};
+export type approveGoalResponseError = (approveGoalResponse400 | approveGoalResponse401 | approveGoalResponse403 | approveGoalResponse404) & {
+  headers: Headers;
+};
+
+export type approveGoalResponse = (approveGoalResponseSuccess | approveGoalResponseError)
+
+export const getApproveGoalUrl = (id: string,) => {
+
+
+
+
+  return `/v1/goals/${id}/approve`
+}
+
+/**
+ * The owner, signed in to the admin, approves a proposed objective. Tokens are refused.
+ */
+export const approveGoal = async (id: string, options?: Parameters<typeof cmsFetch>[1]): Promise<approveGoalResponse> => {
+
+  return cmsFetch<approveGoalResponse>(getApproveGoalUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getApproveGoalMutationKey = () => ['approveGoal'] as const;
+
+export const getApproveGoalMutationOptions = <TError = Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveGoal>>, TError,ApproveGoalMutationVariables, TContext>, request?: SecondParameter<typeof cmsFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof approveGoal>>, TError,ApproveGoalMutationVariables, TContext> => {
+
+const mutationKey = getApproveGoalMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof approveGoal>>, ApproveGoalMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  approveGoal(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ApproveGoalMutationResult = NonNullable<Awaited<ReturnType<typeof approveGoal>>>
+
+    export type ApproveGoalMutationError = Error
+    export type ApproveGoalMutationVariables = {id: string}
+
+    /** The owner, signed in to the admin, approves a proposed objective. Tokens are refused. */
+export const useApproveGoal = <TError = Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveGoal>>, TError,ApproveGoalMutationVariables, TContext>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof approveGoal>>,
+        TError,
+        ApproveGoalMutationVariables,
+        TContext
+      > => {
+      return useMutation(getApproveGoalMutationOptions(options), queryClient);
+    }
+
+export type archiveGoalResponse204 = {
+  data: void
+  status: 204
+}
+
+export type archiveGoalResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type archiveGoalResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type archiveGoalResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type archiveGoalResponse404 = {
+  data: Error
+  status: 404
+}
+
+export type archiveGoalResponseSuccess = (archiveGoalResponse204) & {
+  headers: Headers;
+};
+export type archiveGoalResponseError = (archiveGoalResponse400 | archiveGoalResponse401 | archiveGoalResponse403 | archiveGoalResponse404) & {
+  headers: Headers;
+};
+
+export type archiveGoalResponse = (archiveGoalResponseSuccess | archiveGoalResponseError)
+
+export const getArchiveGoalUrl = (id: string,) => {
+
+
+
+
+  return `/v1/goals/${id}`
+}
+
+/**
+ * The owner archives an objective, a draft or an active one. Tokens are refused.
+ */
+export const archiveGoal = async (id: string, options?: Parameters<typeof cmsFetch>[1]): Promise<archiveGoalResponse> => {
+
+  return cmsFetch<archiveGoalResponse>(getArchiveGoalUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getArchiveGoalMutationKey = () => ['archiveGoal'] as const;
+
+export const getArchiveGoalMutationOptions = <TError = Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof archiveGoal>>, TError,ArchiveGoalMutationVariables, TContext>, request?: SecondParameter<typeof cmsFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof archiveGoal>>, TError,ArchiveGoalMutationVariables, TContext> => {
+
+const mutationKey = getArchiveGoalMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof archiveGoal>>, ArchiveGoalMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  archiveGoal(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ArchiveGoalMutationResult = NonNullable<Awaited<ReturnType<typeof archiveGoal>>>
+
+    export type ArchiveGoalMutationError = Error
+    export type ArchiveGoalMutationVariables = {id: string}
+
+    /** The owner archives an objective, a draft or an active one. Tokens are refused. */
+export const useArchiveGoal = <TError = Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof archiveGoal>>, TError,ArchiveGoalMutationVariables, TContext>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof archiveGoal>>,
+        TError,
+        ArchiveGoalMutationVariables,
+        TContext
+      > => {
+      return useMutation(getArchiveGoalMutationOptions(options), queryClient);
+    }
+
+export type checkInGoalResponse204 = {
+  data: void
+  status: 204
+}
+
+export type checkInGoalResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type checkInGoalResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type checkInGoalResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type checkInGoalResponse404 = {
+  data: Error
+  status: 404
+}
+
+export type checkInGoalResponseSuccess = (checkInGoalResponse204) & {
+  headers: Headers;
+};
+export type checkInGoalResponseError = (checkInGoalResponse400 | checkInGoalResponse401 | checkInGoalResponse403 | checkInGoalResponse404) & {
+  headers: Headers;
+};
+
+export type checkInGoalResponse = (checkInGoalResponseSuccess | checkInGoalResponseError)
+
+export const getCheckInGoalUrl = (id: string,) => {
+
+
+
+
+  return `/v1/goals/key-results/${id}/value`
+}
+
+/**
+ * The owner enters a manual key result's current value. Measured key results take theirs from the data only.
+ */
+export const checkInGoal = async (id: string,
+    checkInGoalBody: CheckInGoalBody, options?: Parameters<typeof cmsFetch>[1]): Promise<checkInGoalResponse> => {
+
+  return cmsFetch<checkInGoalResponse>(getCheckInGoalUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
+    body: JSON.stringify(checkInGoalBody)
+  }
+);}
+
+
+
+
+
+export const getCheckInGoalMutationKey = () => ['checkInGoal'] as const;
+
+export const getCheckInGoalMutationOptions = <TError = Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkInGoal>>, TError,CheckInGoalMutationVariables, TContext>, request?: SecondParameter<typeof cmsFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof checkInGoal>>, TError,CheckInGoalMutationVariables, TContext> => {
+
+const mutationKey = getCheckInGoalMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof checkInGoal>>, CheckInGoalMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  checkInGoal(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CheckInGoalMutationResult = NonNullable<Awaited<ReturnType<typeof checkInGoal>>>
+    export type CheckInGoalMutationBody = CheckInGoalBody
+    export type CheckInGoalMutationError = Error
+    export type CheckInGoalMutationVariables = {id: string;data: CheckInGoalBody}
+
+    /** The owner enters a manual key result's current value. Measured key results take theirs from the data only. */
+export const useCheckInGoal = <TError = Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkInGoal>>, TError,CheckInGoalMutationVariables, TContext>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof checkInGoal>>,
+        TError,
+        CheckInGoalMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCheckInGoalMutationOptions(options), queryClient);
     }
 
 export type listPostsResponse200 = {

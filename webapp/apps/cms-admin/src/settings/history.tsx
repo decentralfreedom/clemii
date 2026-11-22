@@ -8,9 +8,10 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { format } from "date-fns";
-import { Archive, Ban, Check, KeyRound, Link2, ListFilter, LogIn, Pencil, Plus, Send, Trash2, Undo2, ImageUp, CalendarClock, History as HistoryIcon } from "lucide-react";
+import { Archive, Ban, Check, Flag, KeyRound, Link2, ListFilter, LogIn, Pencil, Plus, Send, Trash2, Undo2, ImageUp, CalendarClock, History as HistoryIcon } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { listAudit, type AuditEntry, type ListAuditArea } from "@/api/cms.generated";
+import { actorName } from "@/lib/actor-name";
 import { ActionList, ActionListItem, ActionListItemContent } from "@/components/ui/action-list";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,11 @@ const actions: Record<AuditEntry["action"], { title: string; icon: ReactNode }> 
   "post.deleted": { title: "Post deleted", icon: <Trash2 /> },
   "link.created": { title: "Tracked link made", icon: <Link2 /> },
   "link.archived": { title: "Tracked link archived", icon: <Archive /> },
+  "goal.proposed": { title: "Goal proposed", icon: <Flag /> },
+  "goal.created": { title: "Goal set", icon: <Flag /> },
+  "goal.approved": { title: "Goal approved", icon: <Check /> },
+  "goal.archived": { title: "Goal archived", icon: <Archive /> },
+  "goal.checked_in": { title: "Goal checked in", icon: <Pencil /> },
   "token.created": { title: "Token added", icon: <KeyRound /> },
   "token.revoked": { title: "Token revoked", icon: <Ban /> },
   "device.approved": { title: "CLI sign-in approved", icon: <Check /> },
@@ -40,12 +46,6 @@ const actions: Record<AuditEntry["action"], { title: string; icon: ReactNode }> 
   "owner.signed_in": { title: "Signed in", icon: <LogIn /> },
 };
 
-/** The actor as a person reads it: @login for the owner, the token's name, or the CMS itself. */
-function actorName(actor: string) {
-  if (actor.startsWith("github:")) return `@${actor.slice("github:".length)}`;
-  if (actor.startsWith("token:")) return actor.slice("token:".length);
-  return { scheduler: "the scheduler", import: "the import", "cms:token": "the server console" }[actor] ?? actor;
-}
 
 function HistoryAvatar({ entry }: { entry: AuditEntry }) {
   const name = actorName(entry.actor);

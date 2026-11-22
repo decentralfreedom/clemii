@@ -6,13 +6,13 @@
 // Console's (US Pacific), as the chart's.
 import { CalendarClock, Pencil, Send, Undo2 } from "lucide-react";
 import type { PostSearch } from "@/api/cms.generated";
+import { actorName } from "@/lib/actor-name";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const labels = { published: "Published", scheduled: "Scheduled", unpublished: "Unpublished", edited: "Changed" } as const;
 const icons = { published: <Send />, scheduled: <CalendarClock />, unpublished: <Undo2 />, edited: <Pencil /> } as const;
 
 const day = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
-const actorName = (actor: string) => (actor.startsWith("github:") ? `@${actor.slice(7)}` : actor.startsWith("token:") ? actor.slice(6) : actor);
 
 export function SearchChanges({ markers }: { markers: PostSearch["markers"] }) {
   return (

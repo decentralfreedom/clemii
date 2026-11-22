@@ -16,6 +16,7 @@ import { systemActor } from "../../src/auth/tokens";
 import { searchConsoleState, searchDaily, searchQueries, searchSiteDaily, trafficDaily, trafficSiteDaily, trafficSourceDaily, trafficState } from "../../src/db/schema";
 import { Hono } from "hono";
 import { createDraft, publishPost } from "../../src/posts/service";
+import { proposeObjective } from "../../src/goals/service";
 import { LocalObjectStore } from "../../src/storage/object-store";
 import { createTestDatabase } from "../database";
 import { validPost } from "../fixtures";
@@ -78,6 +79,13 @@ await cms.db.insert(searchQueries).values([
   { postId: live.id, date: "2026-11-20", query: "dictate without cloud", impressions: 200, clicks: 5, position: 5 },
   { postId: live.id, date: "2026-11-20", query: "offline dictation mac", impressions: 60, clicks: 1, position: 8 },
 ]);
+// An agent's proposal waiting for the owner (src/goals/service.ts), as hush-cms goals propose leaves it.
+await proposeObjective(cms.db, { quarter: "2026-Q4", title: "Become the answer for private Mac dictation", keyResults: [
+  { title: "Page views of the post", kind: "measured", metric: "pageviews", scope: { postId: live.id }, target: 100 },
+  { title: "Downloads from the Reddit launch", kind: "measured", metric: "downloads", scope: { source: "reddit", campaign: "launch" }, target: 5 },
+  { title: "Google clicks on the post", kind: "measured", metric: "clicks", scope: { postId: live.id }, target: 60 },
+  { title: "Partner articles published", kind: "manual", target: 3 },
+] }, { actor: { name: "token:hush-seo" }, owner: false, scopes: ["posts:read", "posts:write"], expiresAt: null, tokenId: null });
 await createDraft(cms.db, validPost({
   slug: "draft-in-progress", keyword: "draft in progress",
   title: "A draft that is still being written, slowly, step by step",

@@ -173,6 +173,7 @@ export const auditAction = pgEnum("audit_action", [
   "post.created", "post.edited", "post.image_uploaded", "post.scheduled", "post.published", "post.unpublished", "post.approved", "post.deleted",
   "token.created", "token.revoked", "device.approved", "device.denied", "owner.signed_in",
   "link.created", "link.archived",
+  "goal.proposed", "goal.created", "goal.approved", "goal.archived", "goal.checked_in",
 ]);
 
 /**
@@ -317,6 +318,41 @@ export const trackedLinks = pgTable("tracked_links", {
   createdBy: text("created_by").notNull(),
   archivedAt: timestamp("archived_at", { withTimezone: true }),
 }, (table) => [uniqueIndex("tracked_links_tags").on(table.path, table.source, table.medium, table.campaign, table.content)]);
+
+/**
+ * Goals (PRD: the Goals tab): a quarter's objectives and their key results.
+ * An agent's objective is a draft until the owner approves it; the owner's
+ * own is active at once. A measured key result names a metric and a scope
+ * the CMS can compute exactly (goals/metrics.ts), so its progress always
+ * comes from the imported numbers; a manual one is entered by the owner and
+ * labelled so.
+ */
+export const goalObjectives = pgTable("goal_objectives", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** The quarter, e.g. 2026-Q4; its days are US Pacific days, as the numbers'. */
+  quarter: text("quarter").notNull(),
+  title: text("title").notNull(),
+  status: text("status", { enum: ["draft", "active", "archived"] }).notNull(),
+  createdBy: text("created_by").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  approvedBy: text("approved_by"),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
+}, (table) => [index("goal_objectives_quarter").on(table.quarter, table.status)]);
+
+export const goalKeyResults = pgTable("goal_key_results", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  objectiveId: uuid("objective_id").notNull().references(() => goalObjectives.id, { onDelete: "cascade" }),
+  position: integer("position").notNull(),
+  title: text("title").notNull(),
+  kind: text("kind", { enum: ["measured", "manual"] }).notNull(),
+  metric: text("metric"),
+  scope: jsonb("scope").$type<Record<string, string>>().notNull().default({}),
+  target: doublePrecision("target").notNull(),
+  /** The metric over the period of equal length before, when the CMS has all of it; null otherwise. */
+  baseline: doublePrecision("baseline"),
+  manualValue: doublePrecision("manual_value"),
+  manualAt: timestamp("manual_at", { withTimezone: true }),
+});
 
 /** The Umami import's state, one row. */
 export const trafficState = pgTable("traffic_state", {

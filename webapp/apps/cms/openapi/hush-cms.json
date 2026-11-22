@@ -252,7 +252,12 @@
               "device.denied",
               "owner.signed_in",
               "link.created",
-              "link.archived"
+              "link.archived",
+              "goal.proposed",
+              "goal.created",
+              "goal.approved",
+              "goal.archived",
+              "goal.checked_in"
             ]
           },
           "actor": {
@@ -1174,6 +1179,487 @@
           "path",
           "sharedOn",
           "campaign"
+        ]
+      },
+      "GoalCatalog": {
+        "type": "object",
+        "properties": {
+          "metrics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "enum": [
+                    "impressions",
+                    "clicks",
+                    "ctr",
+                    "position",
+                    "pageviews",
+                    "downloads",
+                    "conversion"
+                  ]
+                },
+                "label": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "scopes": {
+                  "type": "string"
+                },
+                "note": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "label",
+                "source",
+                "scopes"
+              ]
+            }
+          },
+          "posts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "path"
+              ]
+            }
+          },
+          "pageTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "campaigns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "coverage": {
+            "type": "object",
+            "properties": {
+              "search": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ]
+              },
+              "traffic": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "to": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ]
+              }
+            },
+            "required": [
+              "search",
+              "traffic"
+            ]
+          }
+        },
+        "required": [
+          "metrics",
+          "posts",
+          "pageTypes",
+          "channels",
+          "sources",
+          "campaigns",
+          "coverage"
+        ]
+      },
+      "Goals": {
+        "type": "object",
+        "properties": {
+          "quarter": {
+            "type": "string"
+          },
+          "objectives": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalObjective"
+            }
+          }
+        },
+        "required": [
+          "quarter",
+          "objectives"
+        ]
+      },
+      "GoalObjective": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quarter": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "active",
+              "archived"
+            ]
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "approvedBy": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "approvedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "period": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "format": "date"
+              },
+              "to": {
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "required": [
+              "from",
+              "to"
+            ]
+          },
+          "keyResults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GoalKeyResult"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "quarter",
+          "title",
+          "status",
+          "createdBy",
+          "createdAt",
+          "approvedBy",
+          "approvedAt",
+          "period",
+          "keyResults"
+        ]
+      },
+      "GoalKeyResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "measured",
+              "manual"
+            ]
+          },
+          "metric": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "impressions",
+              "clicks",
+              "ctr",
+              "position",
+              "pageviews",
+              "downloads",
+              "conversion",
+              null
+            ]
+          },
+          "scope": {
+            "$ref": "#/components/schemas/GoalScope"
+          },
+          "target": {
+            "type": "number"
+          },
+          "baseline": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "The metric over the period of equal length before, when the CMS has all of it"
+          },
+          "manualValue": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "measured": {
+            "$ref": "#/components/schemas/GoalMeasurement"
+          },
+          "progress": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "share": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Value of target; for position, target of value"
+              },
+              "projected": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "Counts: the value plus the measured days' rate over the days left; rates and positions: their value"
+              },
+              "onTrack": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "value",
+              "share",
+              "projected",
+              "onTrack"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "kind",
+          "metric",
+          "scope",
+          "target",
+          "baseline",
+          "manualValue",
+          "measured",
+          "progress"
+        ]
+      },
+      "GoalScope": {
+        "type": "object",
+        "properties": {
+          "postId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "pageType": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "channel": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "source": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "campaign": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "additionalProperties": false
+      },
+      "GoalMeasurement": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "properties": {
+          "value": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "taggedOnly": {
+            "type": "boolean",
+            "description": "Downloads through tagged links only"
+          }
+        },
+        "required": [
+          "value",
+          "from",
+          "to",
+          "taggedOnly"
+        ],
+        "description": "For a measured key result: the value and the days it covers"
+      },
+      "NewGoalObjective": {
+        "type": "object",
+        "properties": {
+          "quarter": {
+            "type": "string",
+            "pattern": "^\\d{4}-Q[1-4]$",
+            "description": "e.g. 2026-Q4"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "keyResults": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "measured",
+                    "manual"
+                  ]
+                },
+                "metric": {
+                  "type": "string",
+                  "enum": [
+                    "impressions",
+                    "clicks",
+                    "ctr",
+                    "position",
+                    "pageviews",
+                    "downloads",
+                    "conversion"
+                  ]
+                },
+                "scope": {
+                  "$ref": "#/components/schemas/GoalScope"
+                },
+                "target": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "title",
+                "kind",
+                "target"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 5
+          }
+        },
+        "required": [
+          "quarter",
+          "title",
+          "keyResults"
         ]
       },
       "Post": {
@@ -3067,6 +3553,444 @@
           },
           "404": {
             "description": "No such link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/goals/catalog": {
+      "get": {
+        "operationId": "getGoalCatalog",
+        "tags": [
+          "Goals"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "What a key result can measure: the metrics the CMS computes exactly, with the scopes each allows, the values that occur in its data (published posts, page types, channels, sources, campaigns, tracked links' tags) and the days it has numbers for. A proposal can name nothing else.",
+        "responses": {
+          "200": {
+            "description": "The catalog",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalCatalog"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/goals": {
+      "get": {
+        "operationId": "listGoals",
+        "tags": [
+          "Goals"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "A quarter's objectives (default: the current one), newest first, each key result with its progress from the CMS's numbers.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-Q[1-4]$"
+            },
+            "required": false,
+            "name": "quarter",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
+            },
+            "required": false,
+            "name": "archived",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The goals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Goals"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "proposeGoal",
+        "tags": [
+          "Goals"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "Proposes an objective with one to five key results from the catalog. The CMS checks every metric and scope against its data and reads each baseline itself. From a token the objective is a draft until the owner approves it in the admin; from the owner it is active.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewGoalObjective"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The objective",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalObjective"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Names something the catalog does not have",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/goals/{id}/approve": {
+      "post": {
+        "operationId": "approveGoal",
+        "tags": [
+          "Goals"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "The owner, signed in to the admin, approves a proposed objective. Tokens are refused.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Approved"
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such draft",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/goals/{id}": {
+      "delete": {
+        "operationId": "archiveGoal",
+        "tags": [
+          "Goals"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "The owner archives an objective, a draft or an active one. Tokens are refused.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Archived"
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such objective",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/goals/key-results/{id}/value": {
+      "put": {
+        "operationId": "checkInGoal",
+        "tags": [
+          "Goals"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "The owner enters a manual key result's current value. Measured key results take theirs from the data only.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "value"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Saved"
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such manual key result",
             "content": {
               "application/json": {
                 "schema": {
