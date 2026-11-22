@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import sharp from "sharp";
 import { createApp } from "../src/app";
-import { createToken } from "../src/auth/tokens";
+import { createToken, systemActor } from "../src/auth/tokens";
 import { LocalObjectStore } from "../src/storage/object-store";
 import { createTestDatabase, serverUrl } from "./database";
 import { credentials, ownerSession, validPost } from "./fixtures";
@@ -26,7 +26,7 @@ describe.skipIf(!serverUrl)("CMS approvals", () => {
     database = await createTestDatabase();
     app = createApp({ db: database.db, media: new LocalObjectStore(await mkdtemp(join(tmpdir(), "hush-cms-approval-"))) });
     // Even with every scope, a token is an agent.
-    agent = await createToken(database.db, { name: "hush-seo", scopes: ["posts:read", "posts:write", "posts:publish"] });
+    agent = await createToken(database.db, { name: "hush-seo", scopes: ["posts:read", "posts:write", "posts:publish"] }, systemActor("test"));
     owner = await ownerSession(database.db);
   });
   afterAll(async () => { await database.drop(); });

@@ -11,7 +11,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createApp } from "../src/app";
 import { normalizeUserCode } from "../src/auth/device";
-import { createToken } from "../src/auth/tokens";
+import { createToken, systemActor } from "../src/auth/tokens";
 import type { AdminConfig } from "../src/config";
 import { deviceAuthorizations } from "../src/db/schema";
 import { LocalObjectStore } from "../src/storage/object-store";
@@ -88,7 +88,7 @@ describe.skipIf(!serverUrl)("CMS device sign-in", () => {
 
   test("CMS-DEVICE-002 a denied or expired sign-in gets no token, and only the owner decides", async () => {
     const denied = (await cli("/v1/auth/device", { clientName: "hush-cms elsewhere" })).body;
-    const token = await createToken(database.db, { name: "agent", scopes: ["posts:read", "posts:write", "posts:publish"] });
+    const token = await createToken(database.db, { name: "agent", scopes: ["posts:read", "posts:write", "posts:publish"] }, systemActor("test"));
     expect((await cli(`/v1/auth/device/${denied.userCode}/approve`, undefined, token)).status).toBe(403);
     // Signed out, even from the admin's own origin.
     expect((await app.request(`/v1/auth/device/${denied.userCode}/approve`, { method: "POST", headers: { origin: admin.publicUrl } })).status).toBe(401);
@@ -105,7 +105,7 @@ describe.skipIf(!serverUrl)("CMS device sign-in", () => {
   });
 
   test("CMS-DEVICE-004 the owner sees every working token, never its secret, and revokes one", async () => {
-    const service = await createToken(database.db, { name: "website-build", scopes: ["posts:read"] });
+    const service = await createToken(database.db, { name: "website-build", scopes: ["posts:read"] }, systemActor("test"));
     const listed = await asOwner("GET", "/v1/tokens");
     expect(listed.status).toBe(200);
     const byName = Object.fromEntries((listed.body.tokens as Array<Record<string, any>>).map((token) => [token.name, token]));
@@ -121,7 +121,7 @@ describe.skipIf(!serverUrl)("CMS device sign-in", () => {
   });
 
   test("CMS-DEVICE-003 a token revokes itself when the CLI signs out", async () => {
-    const token = await createToken(database.db, { name: "signing-out", scopes: ["posts:read"] });
+    const token = await createToken(database.db, { name: "signing-out", scopes: ["posts:read"] }, systemActor("test"));
     expect((await cli("/v1/me", undefined, token, "DELETE")).status).toBe(204);
     expect((await cli("/v1/me", undefined, token, "GET")).status).toBe(401);
     expect((await asOwner("DELETE", "/v1/me")).body.error.code).toBe("not_a_token");

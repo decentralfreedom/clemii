@@ -9,7 +9,7 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createApp } from "../src/app";
-import { createToken } from "../src/auth/tokens";
+import { createToken, systemActor } from "../src/auth/tokens";
 import type { SiteConfig } from "../src/config";
 import { siteChanges, siteState } from "../src/db/schema";
 import { publishDuePosts } from "../src/posts/service";
@@ -53,7 +53,7 @@ describe.skipIf(!serverUrl)("CMS site", () => {
     store = new LocalObjectStore(await mkdtemp(join(tmpdir(), "hush-cms-media-")));
     app = createApp({ db: database.db, media: store });
     owner = await ownerSession(database.db);
-    reader = await createToken(database.db, { name: "website-build", scopes: ["posts:read"] });
+    reader = await createToken(database.db, { name: "website-build", scopes: ["posts:read"] }, systemActor("test"));
   });
   afterAll(async () => { await database?.drop(); });
 

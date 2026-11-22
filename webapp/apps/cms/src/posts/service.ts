@@ -10,10 +10,13 @@
 // Agents (every token) change what readers see only with the owner's approval:
 // they schedule or publish a post only while the owner's approval covers its
 // content, and never change, restore or unpublish a live one. These checks run
-// on the post as it is inside the write's transaction.
+// on the post as it is inside the write's transaction. Every change also
+// writes its audit log entry (PRD R13) in that transaction; a run of autosaves
+// is one entry, as it is one revision.
 import { blogPath, type BlogLanguage } from "@hush/article/taxonomy";
 import { and, asc, desc, eq, inArray, like, lte, or, sql } from "drizzle-orm";
-import { isAgent } from "../auth/tokens";
+import { recordAudit, recordAudits, type AuditAction } from "../audit/log";
+import { isAgent, systemActor, type Actor } from "../auth/tokens";
 import type { Database } from "../db/client";
 import { postApprovals, postRenditions, postRevisions, postSecondaryKeywords, posts, siteChanges, siteState } from "../db/schema";
 import { writeRenditions, type Cms } from "../media/service";
@@ -98,7 +101,9 @@ async function recordSiteChange(tx: Transaction, articlePaths: string[]) {
  * Writes a post's state in one transaction: its row, its keywords, its
  * rendition (set, removed or left alone) and a revision.
  */
-async function write(db: Database, actor: string, change: {
+async function write(db: Database, actor: Actor, change: {
+  /** What the audit log records this change as. */
+  action: AuditAction;
   id?: string;
   fields?: PostFields;
   row?: Partial<typeof posts.$inferInsert>;
@@ -154,19 +159,25 @@ async function write(db: Database, actor: string, change: {
       if (change.autosave) {
         const [latest] = await tx.select().from(postRevisions).where(eq(postRevisions.postId, id))
           .orderBy(desc(postRevisions.createdAt), desc(postRevisions.id)).limit(1);
-        if (latest?.autosave && latest.actor === actor && latest.status === post.status
+        if (latest?.autosave && latest.actor === actor.name && latest.status === post.status
           && Date.now() - latest.createdAt.getTime() < autosaveRunMs) {
           await tx.update(postRevisions).set({ snapshot }).where(eq(postRevisions.id, latest.id));
           return post;
         }
       }
-      await tx.insert(postRevisions).values({ postId: id, status: post.status, snapshot, actor, autosave: Boolean(change.autosave) });
+      const [revision] = await tx.insert(postRevisions)
+        .values({ postId: id, status: post.status, snapshot, actor: actor.name, autosave: Boolean(change.autosave) })
+        .returning({ id: postRevisions.id });
+      await recordAudit(tx, actor, change.action, { postId: id, subject: subjectOf(post), revisionId: revision!.id });
       return post;
     });
   } catch (error) {
     throw uniqueSlug(error);
   }
 }
+
+/** How the audit log names a post: its title, or its slug while it has none. */
+const subjectOf = (post: { title: string; slug: string }) => post.title.trim() || post.slug;
 
 /** Refuses a change prepared from `seen` (a rendition, a status) when the post's status changed since. */
 const sameStatus = (seen: Post) => (current: Post) => {
@@ -219,12 +230,12 @@ const moveImages = (fields: PostFields, from: string): PostFields => (fields.slu
   : { ...fields, markdown: fields.markdown.replaceAll(`](media/${from}/`, `](media/${fields.slug}/`) });
 
 /** Starts a draft from whatever is given; without a slug it takes one from its heading. */
-export function createDraft(db: Database, input: PostPatch, actor: string) {
+export function createDraft(db: Database, input: PostPatch, actor: Actor) {
   const fields = postFields.parse({ ...draftDefaults, ...input, slug: input.slug ?? untitledSlug });
-  return write(db, actor, { fields, slugFrom: input.slug ? undefined : suggestedSlug(fields) });
+  return write(db, actor, { action: "post.created", fields, slugFrom: input.slug ? undefined : suggestedSlug(fields) });
 }
 
-export async function updatePost(cms: Cms, id: string, patch: PostPatch, actor: string, options: { autosave?: boolean } = {}) {
+export async function updatePost(cms: Cms, id: string, patch: PostPatch, actor: Actor, options: { autosave?: boolean } = {}) {
   const post = await load(cms.db, id);
   requireDraftFor(actor, post);
   const merged = postFields.parse({ ...editableFields(post), ...patch });
@@ -237,7 +248,7 @@ export async function updatePost(cms: Cms, id: string, patch: PostPatch, actor: 
   // A live post's page changes, at its old and its new address.
   const sitePaths = post.status === "published" ? [pagePath(post), blogPath(fields.lang, fields.slug)] : undefined;
   return write(cms.db, actor, {
-    id, fields, row: { updatedAt }, rendition, sitePaths,
+    action: "post.edited", id, fields, row: { updatedAt }, rendition, sitePaths,
     check: (current) => { sameStatus(post)(current); requireDraftFor(actor, current); },
     // Only a draft is autosaved; every change to a live post is a revision of its own.
     autosave: options.autosave && post.status === "draft",
@@ -245,22 +256,29 @@ export async function updatePost(cms: Cms, id: string, patch: PostPatch, actor: 
   });
 }
 
-/** Removes a draft with its history and images. A live post is unpublished first, so nothing public disappears unannounced. */
-export async function deletePost(db: Database, id: string) {
-  const post = await load(db, id);
-  if (post.status !== "draft") throw new PostError(409, "not_a_draft", "Unpublish the post before deleting it.");
-  // Rows of the post go with it (cascade). Stored originals are named by their content and may be shared, so they stay.
-  await db.delete(posts).where(and(eq(posts.id, id), eq(posts.status, "draft")));
+/**
+ * Removes a draft with its revisions and images; its audit log entries stay. A
+ * live post is unpublished first, so nothing public disappears unannounced.
+ */
+export async function deletePost(db: Database, id: string, actor: Actor) {
+  await db.transaction(async (tx) => {
+    await tx.select({ id: posts.id }).from(posts).where(eq(posts.id, id)).for("update");
+    const post = await load(tx, id);
+    if (post.status !== "draft") throw new PostError(409, "not_a_draft", "Unpublish the post before deleting it.");
+    // Rows of the post go with it (cascade). Stored originals are named by their content and may be shared, so they stay.
+    await tx.delete(posts).where(and(eq(posts.id, id), eq(posts.status, "draft")));
+    await recordAudit(tx, actor, "post.deleted", { postId: id, subject: subjectOf(post) });
+  });
 }
 
-export async function schedulePost(cms: Cms, id: string, at: Date, actor: string) {
+export async function schedulePost(cms: Cms, id: string, at: Date, actor: Actor) {
   if (at.getTime() <= Date.now()) throw new PostError(422, "not_in_future", "Schedule a time in the future, or publish now.");
   const post = await load(cms.db, id);
   if (post.status === "published") throw new PostError(409, "already_published", "Unpublish the post before scheduling it.");
   requireApproval(actor, post);
   const rendition = await render(cms, id, editableFields(post), at, at);
   return write(cms.db, actor, {
-    id, row: { status: "scheduled", publishedAt: at }, rendition,
+    action: "post.scheduled", id, row: { status: "scheduled", publishedAt: at }, rendition,
     check: (current) => { sameContent(post)(current); requireApproval(actor, current); },
   });
 }
@@ -270,7 +288,7 @@ export async function schedulePost(cms: Cms, id: string, at: Date, actor: string
  * otherwise a post published before keeps its date and a new one goes live now.
  * @param coPublished posts going live in the same import, which it may link to
  */
-export async function publishPost(cms: Cms, id: string, actor: string, dates?: { publishedAt: Date; updatedAt: Date }, coPublished: CoPublished = []) {
+export async function publishPost(cms: Cms, id: string, actor: Actor, dates?: { publishedAt: Date; updatedAt: Date }, coPublished: CoPublished = []) {
   const post = await load(cms.db, id);
   if (post.status === "published") return post;
   requireApproval(actor, post);
@@ -279,33 +297,34 @@ export async function publishPost(cms: Cms, id: string, actor: string, dates?: {
   const updatedAt = dates?.updatedAt ?? post.updatedAt;
   const rendition = await render(cms, id, editableFields(post), publishedAt, updatedAt, coPublished);
   return write(cms.db, actor, {
-    id, row: { status: "published", publishedAt, updatedAt }, rendition, sitePaths: [pagePath(post)],
+    action: "post.published", id, row: { status: "published", publishedAt, updatedAt }, rendition, sitePaths: [pagePath(post)],
     check: (current) => { sameContent(post)(current); requireApproval(actor, current); },
   });
 }
 
-export async function unpublishPost(db: Database, id: string, actor: string) {
+export async function unpublishPost(db: Database, id: string, actor: Actor) {
   const post = await load(db, id);
   if (post.status === "draft") return post;
   if (isAgent(actor)) throw new PostError(403, "owner_only", "Only the owner unpublishes a post, in the admin.");
   const keepDate = post.publishedAt && post.publishedAt.getTime() <= Date.now();
   const sitePaths = post.status === "published" ? [pagePath(post)] : undefined;
-  return write(db, actor, { id, row: { status: "draft", publishedAt: keepDate ? post.publishedAt : null }, rendition: null, sitePaths });
+  return write(db, actor, { action: "post.unpublished", id, row: { status: "draft", publishedAt: keepDate ? post.publishedAt : null }, rendition: null, sitePaths });
 }
 
 /**
  * The owner approves a post as they reviewed it: `reviewedHash` is the
  * contentHash they saw, so a change made meanwhile is never approved unseen.
  */
-export async function approvePost(db: Database, id: string, reviewedHash: string, actor: string) {
+export async function approvePost(db: Database, id: string, reviewedHash: string, actor: Actor) {
   return db.transaction(async (tx) => {
     await tx.select({ id: posts.id }).from(posts).where(eq(posts.id, id)).for("update");
     const post = await load(tx, id);
     if (post.contentHash !== reviewedHash) {
       throw new PostError(409, "changed_since_review", "The post changed after you reviewed it; review it again before approving.");
     }
-    const approval = { contentHash: post.contentHash, approvedBy: actor, approvedAt: new Date() };
+    const approval = { contentHash: post.contentHash, approvedBy: actor.name, approvedAt: new Date() };
     await tx.insert(postApprovals).values({ postId: id, ...approval }).onConflictDoUpdate({ target: postApprovals.postId, set: approval });
+    await recordAudit(tx, actor, "post.approved", { postId: id, subject: subjectOf(post) });
     return load(tx, id);
   });
 }
@@ -315,7 +334,7 @@ export async function listRevisions(db: Database, id: string) {
   return db.select().from(postRevisions).where(eq(postRevisions.postId, id)).orderBy(desc(postRevisions.createdAt), desc(postRevisions.id));
 }
 
-export async function restoreRevision(cms: Cms, id: string, revisionId: string, actor: string) {
+export async function restoreRevision(cms: Cms, id: string, revisionId: string, actor: Actor) {
   const [revision] = await cms.db.select().from(postRevisions).where(and(eq(postRevisions.id, revisionId), eq(postRevisions.postId, id)));
   if (!revision) throw new PostError(404, "not_found", "No revision with this id for this post.");
   return updatePost(cms, id, postFields.parse(revision.snapshot), actor);
@@ -333,7 +352,13 @@ export async function publishDuePosts(db: Database) {
     if (!due.length) return [];
     const rows: Loaded[] = await tx.query.posts.findMany({ where: inArray(posts.id, due.map((row) => row.id)), with: withRelations });
     const published = rows.map(compose);
-    await tx.insert(postRevisions).values(published.map((post) => ({ postId: post.id, status: post.status, snapshot: editableFields(post), actor: "scheduler" })));
+    const scheduler = systemActor("scheduler");
+    const revisions = await tx.insert(postRevisions)
+      .values(published.map((post) => ({ postId: post.id, status: post.status, snapshot: editableFields(post), actor: scheduler.name })))
+      .returning({ id: postRevisions.id, postId: postRevisions.postId });
+    await recordAudits(tx, scheduler, "post.published", published.map((post) => ({
+      postId: post.id, subject: subjectOf(post), revisionId: revisions.find((revision) => revision.postId === post.id)?.id,
+    })));
     await recordSiteChange(tx, published.map(pagePath));
     return published;
   });

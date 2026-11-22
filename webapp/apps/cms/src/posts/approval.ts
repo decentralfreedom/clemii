@@ -6,7 +6,7 @@
 // content it covers by a hash of the post's fields and images, so any later
 // change to either leaves it lapsed, whoever makes it.
 import { createHash } from "node:crypto";
-import { isAgent } from "../auth/tokens";
+import { isAgent, type Actor } from "../auth/tokens";
 import { PostError } from "./errors";
 import type { PostFields } from "./fields";
 import type { Post } from "./service";
@@ -19,7 +19,7 @@ export function contentHash(fields: PostFields, images: ReadonlyArray<{ name: st
 export type Approval = { approvedBy: string; approvedAt: Date; current: boolean };
 
 /** An agent schedules or publishes only what the owner approved, as it is now. */
-export function requireApproval(actor: string, post: Post) {
+export function requireApproval(actor: Actor, post: Post) {
   if (!isAgent(actor)) return;
   if (!post.approval) {
     throw new PostError(403, "approval_required", "The owner has not approved this post. Ask the owner to approve it in the admin, then schedule or publish it.");
@@ -30,7 +30,7 @@ export function requireApproval(actor: string, post: Post) {
 }
 
 /** An agent changes drafts only; a scheduled or published post changes through the owner. */
-export function requireDraftFor(actor: string, post: Pick<Post, "status">) {
+export function requireDraftFor(actor: Actor, post: Pick<Post, "status">) {
   if (isAgent(actor) && post.status !== "draft") {
     throw new PostError(403, "live_post", "Only the owner changes a scheduled or published post, in the admin.");
   }

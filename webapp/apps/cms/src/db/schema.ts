@@ -169,6 +169,36 @@ export const postApprovals = pgTable("post_approvals", {
   approvedAt: timestamp("approved_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const auditAction = pgEnum("audit_action", [
+  "post.created", "post.edited", "post.image_uploaded", "post.scheduled", "post.published", "post.unpublished", "post.approved", "post.deleted",
+  "token.created", "token.revoked", "device.approved", "device.denied", "owner.signed_in",
+]);
+
+/**
+ * Who or which token changed what, and when (PRD R13), written in the
+ * transaction of the change. Append-only: a trigger refuses updates and deletes
+ * (migration 0008). Posts, tokens and revisions are named by id without a
+ * foreign key, so a deleted draft keeps its history; `subject` is the post's
+ * title or the token's name at that moment, a historical record like a
+ * revision's snapshot. The actor's name is what revisions show; the token or
+ * GitHub id tells two tokens of one name, or a renamed login, apart.
+ */
+export const auditLog = pgTable("audit_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+  action: auditAction("action").notNull(),
+  actor: text("actor").notNull(),
+  actorTokenId: uuid("actor_token_id"),
+  actorGithubUserId: bigint("actor_github_user_id", { mode: "number" }),
+  postId: uuid("post_id"),
+  tokenId: uuid("token_id"),
+  revisionId: uuid("revision_id"),
+  subject: text("subject").notNull(),
+}, (table) => [
+  index("audit_log_at").on(table.at, table.id),
+  index("audit_log_post_at").on(table.postId, table.at),
+]);
+
 export const postRelations = relations(posts, ({ many, one }) => ({
   secondaryKeywords: many(postSecondaryKeywords),
   media: many(media),

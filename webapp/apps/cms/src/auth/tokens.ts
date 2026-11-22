@@ -11,6 +11,7 @@ import type { Database } from "../db/client";
 import { hashToken } from "./hash";
 import { sessionUser } from "./sessions";
 import { apiTokenScopes, apiTokens } from "../db/schema";
+import { recordAudit } from "../audit/log";
 
 export const tokenScopes = ["posts:read", "posts:write", "posts:publish"] as const;
 export type TokenScope = (typeof tokenScopes)[number];
@@ -21,33 +22,50 @@ type TokenInput = { name: string; scopes: readonly TokenScope[]; expiresAt?: Dat
 type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 
 /** Stores a new token within the caller's transaction; the token itself is returned once and never stored. */
-export async function insertToken(tx: Transaction, input: TokenInput) {
+export async function insertToken(tx: Transaction, input: TokenInput, actor: Actor) {
   const token = `hcms_${randomBytes(32).toString("base64url")}`;
   const [row] = await tx.insert(apiTokens).values({ name: input.name, expiresAt: input.expiresAt, tokenHash: hashToken(token) }).returning();
   await tx.insert(apiTokenScopes).values(input.scopes.map((scope) => ({ tokenId: row!.id, scope })));
+  await recordAudit(tx, actor, "token.created", { tokenId: row!.id, subject: input.name });
   return { token, id: row!.id };
 }
 
-export async function createToken(db: Database, input: TokenInput) {
-  return (await db.transaction((tx) => insertToken(tx, input))).token;
+export async function createToken(db: Database, input: TokenInput, actor: Actor) {
+  return (await db.transaction((tx) => insertToken(tx, input, actor))).token;
 }
 
 /** Ends a token at once; requests with it get 401 from then on. */
-export async function revokeToken(db: Database, id: string) {
-  await db.update(apiTokens).set({ revokedAt: new Date() }).where(and(eq(apiTokens.id, id), isNull(apiTokens.revokedAt)));
+export async function revokeToken(db: Database, id: string, actor: Actor) {
+  await db.transaction(async (tx) => {
+    const [revoked] = await tx.update(apiTokens).set({ revokedAt: new Date() })
+      .where(and(eq(apiTokens.id, id), isNull(apiTokens.revokedAt)))
+      .returning({ name: apiTokens.name });
+    if (revoked) await recordAudit(tx, actor, "token.revoked", { tokenId: id, subject: revoked.name });
+  });
 }
 
+/**
+ * Who changes something: the signed-in owner (github:<login>, with the GitHub
+ * id), a token (token:<name>, with its id), or the CMS itself (scheduler,
+ * import). The name is what revisions and the audit log show; the ids tell a
+ * renamed login or two tokens of one name apart.
+ */
+export type Actor = { name: string; tokenId?: string; githubUserId?: number };
+
+/** The CMS acting on its own, such as the scheduler publishing a due post. */
+export const systemActor = (name: string): Actor => ({ name });
+
 /** Who sent a request: a token with its scopes and expiry, or the signed-in owner, who holds every scope. */
-export type Caller = { actor: string; owner: boolean; scopes: readonly TokenScope[]; expiresAt: Date | null; tokenId: string | null };
+export type Caller = { actor: Actor; owner: boolean; scopes: readonly TokenScope[]; expiresAt: Date | null; tokenId: string | null };
 
 /**
  * Every token acts for an agent, the owner's own included: what readers see
  * changes through a token only with the owner's approval (posts/service.ts).
  * The owner acts through the admin.
  */
-export const isAgent = (actor: string) => actor.startsWith("token:");
+export const isAgent = (actor: Actor) => actor.tokenId !== undefined;
 
-export type AuthVariables = { actor: string; caller: Caller };
+export type AuthVariables = { actor: Actor; caller: Caller };
 
 const unauthorized = { code: "unauthorized", message: "Sign in or send a bearer token." };
 
@@ -57,7 +75,9 @@ async function authenticate(db: Database, context: Context): Promise<Caller | { 
   const token = /^Bearer (\S+)$/.exec(header)?.[1];
   if (!token) {
     const admin = await sessionUser(db, context);
-    return admin ? { actor: `github:${admin.githubLogin}`, owner: true, scopes: tokenScopes, expiresAt: null, tokenId: null } : unauthorized;
+    return admin
+      ? { actor: { name: `github:${admin.githubLogin}`, githubUserId: admin.githubUserId }, owner: true, scopes: tokenScopes, expiresAt: null, tokenId: null }
+      : unauthorized;
   }
   const [row] = await db.select().from(apiTokens).where(and(
     eq(apiTokens.tokenHash, hashToken(token)),
@@ -68,7 +88,7 @@ async function authenticate(db: Database, context: Context): Promise<Caller | { 
   const granted = await db.select({ scope: apiTokenScopes.scope }).from(apiTokenScopes).where(eq(apiTokenScopes.tokenId, row.id));
   await db.update(apiTokens).set({ lastUsedAt: new Date() }).where(eq(apiTokens.id, row.id));
   return {
-    actor: `token:${row.name}`,
+    actor: { name: `token:${row.name}`, tokenId: row.id },
     owner: false,
     scopes: tokenScopes.filter((scope) => granted.some((grant) => grant.scope === scope)),
     expiresAt: row.expiresAt,

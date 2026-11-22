@@ -11,7 +11,8 @@ import { and, eq, gt, isNull } from "drizzle-orm";
 import type { Database } from "../db/client";
 import { deviceAuthorizations } from "../db/schema";
 import { hashToken } from "./hash";
-import { insertToken, tokenScopes } from "./tokens";
+import { recordAudit } from "../audit/log";
+import { insertToken, tokenScopes, type Actor } from "./tokens";
 
 export const deviceCodeSeconds = 15 * 60;
 /** The least time between two polls, in seconds (RFC 8628, section 3.5). */
@@ -58,7 +59,8 @@ export async function pollDeviceAuthorization(db: Database, deviceCode: string, 
       return { error: tooSoon ? "slow_down" : "authorization_pending" };
     }
     const expiresAt = new Date(now.getTime() + deviceTokenDays * 86_400_000);
-    const { token, id } = await insertToken(tx, { name: row.clientName, scopes: deviceTokenScopes, expiresAt });
+    // The token is the owner's grant: the audit log names who approved the sign-in.
+    const { token, id } = await insertToken(tx, { name: row.clientName, scopes: deviceTokenScopes, expiresAt }, { name: row.decidedBy ?? "owner" });
     await tx.update(deviceAuthorizations).set({ tokenId: id }).where(eq(deviceAuthorizations.id, row.id));
     return { token, actor: `token:${row.clientName}`, expiresAt };
   });
@@ -74,16 +76,20 @@ export async function pendingDeviceAuthorization(db: Database, userCode: string,
 }
 
 /** The owner's decision on a pending sign-in; false when there is none to decide. */
-export async function decideDeviceAuthorization(db: Database, userCode: string, decision: "approve" | "deny", actor: string, now = new Date()) {
+export async function decideDeviceAuthorization(db: Database, userCode: string, decision: "approve" | "deny", actor: Actor, now = new Date()) {
   const pending = await pendingDeviceAuthorization(db, userCode, now);
   if (!pending) return false;
-  const updated = await db.update(deviceAuthorizations)
-    .set(decision === "approve" ? { approvedAt: now, decidedBy: actor } : { deniedAt: now, decidedBy: actor })
-    // Only while still undecided and unexpired: of two decisions at once, one wins.
-    .where(and(
-      eq(deviceAuthorizations.userCode, pending.userCode), isNull(deviceAuthorizations.approvedAt),
-      isNull(deviceAuthorizations.deniedAt), gt(deviceAuthorizations.expiresAt, now),
-    ))
-    .returning({ id: deviceAuthorizations.id });
-  return updated.length === 1;
+  return db.transaction(async (tx) => {
+    const updated = await tx.update(deviceAuthorizations)
+      .set(decision === "approve" ? { approvedAt: now, decidedBy: actor.name } : { deniedAt: now, decidedBy: actor.name })
+      // Only while still undecided and unexpired: of two decisions at once, one wins.
+      .where(and(
+        eq(deviceAuthorizations.userCode, pending.userCode), isNull(deviceAuthorizations.approvedAt),
+        isNull(deviceAuthorizations.deniedAt), gt(deviceAuthorizations.expiresAt, now),
+      ))
+      .returning({ id: deviceAuthorizations.id });
+    if (updated.length !== 1) return false;
+    await recordAudit(tx, actor, decision === "approve" ? "device.approved" : "device.denied", { subject: pending.clientName });
+    return true;
+  });
 }

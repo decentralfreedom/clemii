@@ -9,6 +9,7 @@
 import { CodeChallengeMethod, OAuth2Client, generateCodeVerifier, generateState } from "arctic";
 import { Hono, type Context } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
+import { recordAudit } from "../audit/log";
 import { createSession, endSession, sessionUser, setSessionCookie } from "../auth/sessions";
 import type { AdminConfig } from "../config";
 import type { Database } from "../db/client";
@@ -73,6 +74,7 @@ export function authRoutes(db: Database, admin: AdminConfig) {
       return signInFailed(context, "This GitHub account may not use the hush CMS.", 403);
     }
     const session = await createSession(db, { githubUserId: user.id, githubLogin: user.login });
+    await recordAudit(db, { name: `github:${user.login}`, githubUserId: user.id }, "owner.signed_in", { subject: user.login });
     setSessionCookie(context, session.token, session.expiresAt);
     return context.redirect(next ?? "/");
   });

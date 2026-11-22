@@ -50,6 +50,20 @@
       "when": 1794785607279,
       "tag": "0006_device_authorizations",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795342030061,
+      "tag": "0007_audit_log",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795342030234,
+      "tag": "0008_audit_log_append_only",
+      "breakpoints": true
     }
   ]
 }

@@ -9,6 +9,8 @@ import { media, posts } from "../db/schema";
 import { requireDraftFor } from "../posts/approval";
 import { PostError } from "../posts/errors";
 import type { ObjectStore } from "../storage/object-store";
+import { recordAudit } from "../audit/log";
+import type { Actor } from "../auth/tokens";
 
 export type Cms = { db: Database; media: ObjectStore };
 
@@ -20,7 +22,7 @@ export const originalKey = (sha256: string) => `originals/${sha256}`;
  * Stores an image a post references as media/<slug>/<name>, replacing one of
  * the same name. Agents add images to drafts only (posts/approval.ts).
  */
-export async function uploadMedia(cms: Cms, postId: string, name: string, bytes: Uint8Array, contentType: string, actor: string) {
+export async function uploadMedia(cms: Cms, postId: string, name: string, bytes: Uint8Array, contentType: string, actor: Actor) {
   const extension = /^[a-z0-9]+(?:-[a-z0-9]+)*\.(png|jpe?g|webp)$/.exec(name)?.[1];
   if (!extension) throw new PostError(422, "invalid_name", "Name the image like screenshot-name.png (lowercase, digits and dashes; png, jpg or webp).");
   if (imageTypes[extension] !== contentType) throw new PostError(422, "invalid_type", `A .${extension} file must be sent as ${imageTypes[extension]}.`);
@@ -33,12 +35,13 @@ export async function uploadMedia(cms: Cms, postId: string, name: string, bytes:
   await cms.media.put(originalKey(sha256), bytes, contentType);
   const values = { postId, name, contentType, sha256, sizeBytes: bytes.byteLength, width, height };
   return cms.db.transaction(async (tx) => {
-    const [post] = await tx.select({ status: posts.status }).from(posts).where(eq(posts.id, postId)).for("update");
+    const [post] = await tx.select({ status: posts.status, title: posts.title, slug: posts.slug }).from(posts).where(eq(posts.id, postId)).for("update");
     if (!post) throw new PostError(404, "not_found", "No post with this id.");
     requireDraftFor(actor, post);
     const [row] = await tx.insert(media).values(values)
       .onConflictDoUpdate({ target: [media.postId, media.name], set: { ...values, createdAt: new Date() } })
       .returning();
+    await recordAudit(tx, actor, "post.image_uploaded", { postId, subject: `${post.title.trim() || post.slug}: ${name}` });
     return row!;
   });
 }
