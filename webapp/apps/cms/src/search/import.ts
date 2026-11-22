@@ -35,7 +35,9 @@ export async function readSearchState(db: Pick<Database, "select">) {
 export async function searchImportDue(db: Pick<Database, "select">, now = new Date()) {
   const state = await readSearchState(db);
   if (state?.attemptedAt && now.getTime() - state.attemptedAt.getTime() < retryAfterMs) return false;
-  return !state?.importedAt || now.getTime() - state.importedAt.getTime() >= importEveryMs;
+  // Without the first day of the history, the numbers cannot be told from "no numbers": read it all now.
+  if (!state?.importedFrom) return true;
+  return !state.importedAt || now.getTime() - state.importedAt.getTime() >= importEveryMs;
 }
 
 /**
