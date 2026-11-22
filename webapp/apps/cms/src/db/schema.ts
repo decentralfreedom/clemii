@@ -213,7 +213,11 @@ export const searchDaily = pgTable("search_daily", {
   impressions: integer("impressions").notNull(),
   clicks: integer("clicks").notNull(),
   position: doublePrecision("position").notNull(),
-}, (table) => [primaryKey({ columns: [table.postId, table.date] })]);
+}, (table) => [
+  primaryKey({ columns: [table.postId, table.date] }),
+  // The dashboard and the import read and replace whole days across all posts.
+  index("search_daily_date").on(table.date),
+]);
 
 /**
  * The search queries a post was found for, per day (PRD R12), with the same
@@ -227,7 +231,10 @@ export const searchQueries = pgTable("search_queries", {
   impressions: integer("impressions").notNull(),
   clicks: integer("clicks").notNull(),
   position: doublePrecision("position").notNull(),
-}, (table) => [primaryKey({ columns: [table.postId, table.date, table.query] })]);
+}, (table) => [
+  primaryKey({ columns: [table.postId, table.date, table.query] }),
+  index("search_queries_date").on(table.date),
+]);
 
 /**
  * The whole property's Search Console numbers per day (PRD R12, the
@@ -251,6 +258,8 @@ export const searchConsoleState = pgTable("search_console_state", {
   importedFrom: date("imported_from", { mode: "string" }),
   /** The last day the import has numbers for (Search Console lags two to three days). */
   importedThrough: date("imported_through", { mode: "string" }),
+  /** The first day Google was still counting at the last import: numbers from it on are preliminary. Null when all were final. */
+  incompleteFrom: date("incomplete_from", { mode: "string" }),
 }, (table) => [check("search_console_state_single_row", sql`${table.id} = 1`)]);
 
 export const postRelations = relations(posts, ({ many, one }) => ({

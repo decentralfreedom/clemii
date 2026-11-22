@@ -92,6 +92,20 @@
       "when": 1795350150170,
       "tag": "0012_search_site_history",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1795350518629,
+      "tag": "0013_search_incomplete_from",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1795351376140,
+      "tag": "0014_search_date_indexes",
+      "breakpoints": true
     }
   ]
 }

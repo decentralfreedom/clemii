@@ -2,8 +2,9 @@
 // MIT License, Copyright (c) 2013-2026 Ghost Foundation (see packages/theme/LICENSE.ghost).
 // Changed for search numbers: a point's value may be null (a day without
 // impressions has no CTR or position: a gap, never 0), and yAxisReversed puts
-// rank 1 at the top of a position chart, and showDots draws each point, so a
-// day between gaps is seen rather than lost.
+// rank 1 at the top of a position chart, showDots draws each point, so a
+// day between gaps is seen rather than lost, and preliminaryFrom marks where
+// the source's numbers are not final yet.
 import {
   calculateYAxisWidth,
   formatDisplayDateWithRange,
@@ -13,7 +14,7 @@ import {
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { AlignedAxisTick, ChartConfig, ChartContainer, ChartTooltip } from '@/components/ui/chart';
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 import { useShade } from '@/providers/shade-context';
 
@@ -106,6 +107,8 @@ interface GhAreaChartProps {
   yAxisReversed?: boolean;
   /** Draws every point: a series with gaps would otherwise hide a day between two of them. */
   showDots?: boolean;
+  /** The first point whose numbers are still preliminary: a dashed line marks it. */
+  preliminaryFrom?: string;
   range: number;
   yAxisRange?: [number, number];
   color?: string;
@@ -136,6 +139,7 @@ const GhAreaChart: React.FC<GhAreaChartProps> = ({
   tooltipContent,
   yAxisReversed = false,
   showDots = false,
+  preliminaryFrom,
 }) => {
   const { admin7Design } = useShade();
   // Empty points (null) are gaps and take no part in the scale.
@@ -229,6 +233,16 @@ const GhAreaChart: React.FC<GhAreaChartProps> = ({
           strokeWidth={1.5}
           type="linear"
         />
+        {preliminaryFrom && (
+          <ReferenceLine
+            x={preliminaryFrom}
+            stroke="var(--muted-foreground)"
+            strokeDasharray="3 3"
+            strokeOpacity={0.6}
+            label={{ value: 'Preliminary', position: 'insideTopRight', fill: 'var(--muted-foreground)', fontSize: 11 }}
+            data-testid="preliminary-line"
+          />
+        )}
       </AreaChart>
     </ChartContainer>
   );

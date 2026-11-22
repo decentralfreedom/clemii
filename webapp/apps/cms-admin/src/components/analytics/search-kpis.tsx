@@ -13,14 +13,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { GhAreaChart } from "@/components/ui/gh-chart";
 import { KpiDropdownButton, KpiTabTrigger, KpiTabValue } from "@/components/ui/kpi-tabs";
 import { Tabs, TabsList } from "@/components/ui/tabs";
-import { formatMetric, metricLabels, searchSeries, spanOf, type SearchMetric } from "@/lib/search-chart";
+import { formatMetric, metricLabels, pointOf, searchSeries, spanOf, type SearchMetric } from "@/lib/search-chart";
 
 const colors: Record<SearchMetric, string> = {
   impressions: "var(--chart-blue)", clicks: "var(--chart-green)", ctr: "var(--chart-orange)", position: "var(--chart-darkblue)",
 };
 
 /** A post's or the whole site's numbers over a range the CMS has: totals, the valid change, and the days. */
-export type SearchNumbers = Pick<PostSearch | SiteSearch, "totals" | "previous" | "change" | "days"> & { from: string; to: string };
+export type SearchNumbers = Pick<PostSearch | SiteSearch, "totals" | "previous" | "change" | "days" | "preliminaryFrom"> & { from: string; to: string };
 
 type Diff = { direction: "up" | "down" | "same" | "hidden"; value?: string; tooltip?: string };
 
@@ -95,6 +95,7 @@ export function SearchKpis({ search, id }: { search: SearchNumbers; id: string }
             id={`${id}-${metric}`} data={series} range={spanOf(search.from, search.to)} color={colors[metric]}
             yAxisReversed={metric === "position"}
             showDots={metric === "ctr" || metric === "position"}
+            preliminaryFrom={search.preliminaryFrom ? pointOf(search.preliminaryFrom, search.from, search.to) : undefined}
             dataFormatter={(value) => formatMetric(metric, value)}
             className="-mb-3 aspect-auto h-[16vw] max-h-[320px] min-h-[180px] w-full"
           />

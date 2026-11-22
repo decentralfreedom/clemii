@@ -9,11 +9,17 @@ import type { ReactNode } from "react";
 export const analyticsDay = (iso: string) =>
   new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 
-export function DataSource({ from, to, importedAt, children }: { from: string; to: string; importedAt: string | null; children?: ReactNode }) {
+export function DataSource({ from, to, importedAt, preliminaryFrom, children }: {
+  from: string; to: string; importedAt: string | null;
+  /** The first day Google was still counting, by its own report. */
+  preliminaryFrom: string | null;
+  children?: ReactNode;
+}) {
   return (
     <p className="text-sm text-text-secondary">
       Google Search Console, web search, {analyticsDay(from)} to {analyticsDay(to)} (Search Console days, US Pacific)
-      {importedAt && <>; read {formatDistanceToNowStrict(new Date(importedAt), { addSuffix: true })}</>}. Search Console lags two to three days.
+      {importedAt && <>; read {formatDistanceToNowStrict(new Date(importedAt), { addSuffix: true })}</>}. Search Console lags two to three days
+      {preliminaryFrom ? <>, and Google is still counting {preliminaryFrom === to ? analyticsDay(to) : <>from {analyticsDay(preliminaryFrom)}</>}: those numbers may still change.</> : "."}
       {children && <> {children}</>}
     </p>
   );

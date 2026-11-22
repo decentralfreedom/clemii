@@ -32,6 +32,7 @@ const searchSchema = z.object({
   from: z.iso.date().nullable().describe("The first day counted: the requested start, or the first day the CMS has numbers for if that is later"),
   to: z.iso.date().nullable().describe("The last day Search Console has numbers for"),
   importedAt: z.iso.datetime().nullable().describe("When the CMS last read Search Console; null until the first import"),
+  preliminaryFrom: z.iso.date().nullable().describe("The first day in the window Google was still counting at the last import: numbers from it on may still change. Null when all are final"),
   totals: totalsSchema,
   previous: z.object({ from: z.iso.date(), to: z.iso.date(), totals: totalsSchema }).nullable()
     .describe("The period of equal length just before; null when it reaches before the first day the CMS has numbers for"),
@@ -101,16 +102,16 @@ export function searchRoutes(db: Database) {
     const { id } = context.req.valid("param");
     const { days: span, since } = context.req.valid("query");
     await getPost(db, id);
-    const { from, to, coverage, importedAt } = await searchWindow(db, span, since);
+    const { from, to, coverage, importedAt, preliminaryFrom } = await searchWindow(db, span, since);
     if (!from || !to || !coverage) {
-      return context.json({ from, to, importedAt, totals: totalsOf([]), previous: null, change: null, days: [], markers: [] }, 200);
+      return context.json({ from, to, importedAt, preliminaryFrom, totals: totalsOf([]), previous: null, change: null, days: [], markers: [] }, 200);
     }
     const days = await postDays(db, id, from, to);
     const totals = totalsOf(days);
     const earlier = previousPeriod(from, to, coverage);
     const previous = earlier ? { ...earlier, totals: totalsOf(await postDays(db, id, earlier.from, earlier.to)) } : null;
     return context.json({
-      from, to, importedAt, totals, previous,
+      from, to, importedAt, preliminaryFrom, totals, previous,
       change: changeFrom(totals, previous?.totals),
       days,
       markers: await searchMarkers(db, id, from, to),

@@ -31,6 +31,9 @@ const bucketOf = (date: string, from: string, span: number) => {
   return date;
 };
 
+/** The point a day falls in on the chart of from..to (a day, week or month). */
+export const pointOf = (date: string, from: string, to: string) => bucketOf(date, from, spanOf(from, to));
+
 /** The range's length in days, inclusive. */
 export const spanOf = (from: string, to: string) => Math.round((Date.parse(to) - Date.parse(from)) / dayMs) + 1;
 

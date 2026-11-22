@@ -90,12 +90,12 @@ function PostAnalytics() {
             <SearchQueriesCard postId={id} params={params} limit={5} more={{ tab: "search" }} compact />
             <SearchChanges markers={numbers.markers} />
           </div>
-          <DataSource from={numbers.from} to={numbers.to} importedAt={numbers.importedAt} />
+          <DataSource from={numbers.from} to={numbers.to} importedAt={numbers.importedAt} preliminaryFrom={numbers.preliminaryFrom} />
         </div>
       ) : (
         <div className="flex flex-col gap-6">
           <SearchQueriesCard postId={id} params={params} limit={100} />
-          <DataSource from={numbers.from} to={numbers.to} importedAt={numbers.importedAt} />
+          <DataSource from={numbers.from} to={numbers.to} importedAt={numbers.importedAt} preliminaryFrom={numbers.preliminaryFrom} />
         </div>
       )}
     </div>

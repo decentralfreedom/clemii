@@ -17,7 +17,7 @@ import { pagePathOf } from "../src/posts/paths";
 import { createDraft, publishPost, updatePost } from "../src/posts/service";
 import { searchConsoleClient, type QueryRow, type SearchRow } from "../src/search/console";
 import { changeFrom, pacificDay, previousPeriod, totalsOf } from "../src/search/analytics";
-import { importSearchConsole, searchImportDue } from "../src/search/import";
+import { importSearchConsole, readSearchState, searchImportDue } from "../src/search/import";
 import { LocalObjectStore } from "../src/storage/object-store";
 import { createTestDatabase, serverUrl } from "./database";
 import { credentials, ownerSession, validPost } from "./fixtures";
@@ -33,6 +33,8 @@ function fakeGoogle(rows: (start: string, end: string) => SearchRow[], options: 
   fail?: boolean; queries?: (start: string, end: string) => QueryRow[];
   /** The property's own totals per day, as Google aggregates a site. */
   site?: Array<Omit<SearchRow, "page">>;
+  /** The first day Google reports as still incomplete (response metadata). */
+  incompleteFrom?: string;
 } = {}) {
   const calls: Array<{ url: string; body: string }> = [];
   const fetcher = async (url: string, init?: RequestInit) => {
@@ -47,7 +49,8 @@ function fakeGoogle(rows: (start: string, end: string) => SearchRow[], options: 
     if (!dimensions.includes("page")) {
       expect(aggregationType).toBe("byProperty");
       const page = inRange((options.site ?? []).map((row) => ({ ...row, page: "" }))).slice(startRow, startRow + rowLimit);
-      return Response.json({ rows: page.map(({ date, impressions, clicks, position }) => ({ keys: [date], impressions, clicks, position })) });
+      const incomplete = options.incompleteFrom && options.incompleteFrom <= endDate ? { metadata: { first_incomplete_date: options.incompleteFrom } } : {};
+      return Response.json({ rows: page.map(({ date, impressions, clicks, position }) => ({ keys: [date], impressions, clicks, position })), ...incomplete });
     }
     if (dimensions.includes("query")) {
       const page = inRange(options.queries?.(startDate, endDate) ?? []).slice(startRow, startRow + rowLimit);
@@ -305,5 +308,22 @@ describe.skipIf(!serverUrl)("CMS Search Console import", () => {
     expect(body.totals.ctr).toBeCloseTo(21 / 640, 6);
     expect(body.topPosts[0]).toMatchObject({ postId: moved, slug: "dictate-on-mac", impressions: 10, status: "published" });
     expect((await call("/v1/search", "none")).status).toBe(401);
+  });
+
+  test("CMS-SEARCH-009 the days Google is still counting are named as preliminary, from its own response metadata", async () => {
+    const google = fakeGoogle(() => [{ page: "https://behu.sh/blog/dictate-on-mac", date: "2026-11-21", impressions: 10, clicks: 0, position: 9 }], {
+      site: [{ date: "2026-11-21", impressions: 640, clicks: 21, position: 4.2 }], incompleteFrom: "2026-11-20",
+    });
+    await importSearchConsole(database.db, google.client, new Date("2026-11-27T06:00:00.000Z"));
+    expect((await readSearchState(database.db))?.incompleteFrom).toBe("2026-11-20");
+    const reader = await createToken(database.db, { name: "preliminary-reader", scopes: ["posts:read"] }, systemActor("test"));
+    expect((await call("/v1/search?days=7", reader)).body.preliminaryFrom).toBe("2026-11-20");
+    expect((await call(`/v1/posts/${moved}/search?days=7`, reader)).body.preliminaryFrom).toBe("2026-11-20");
+    // A window that ends before it has none; one that starts after it is preliminary from its first day.
+    expect((await call("/v1/search?since=2026-11-21", reader)).body.preliminaryFrom).toBe("2026-11-21");
+    // Once every day is final, nothing is preliminary.
+    await importSearchConsole(database.db, fakeGoogle(() => [], { site: [] }).client, new Date("2026-11-28T06:00:00.000Z"));
+    expect((await readSearchState(database.db))?.incompleteFrom).toBeNull();
+    expect((await call("/v1/search?days=7", reader)).body.preliminaryFrom).toBeNull();
   });
 });

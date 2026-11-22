@@ -120,8 +120,10 @@ export async function importSearchConsole(db: Database, client: SearchConsoleCli
     }
   }
 
+  // Which of these days Google may still change, asked once over the days just read.
+  const incompleteFrom = through ? await client.firstIncompleteDate(days.at(-refreshDays - 1) ?? start, through) : null;
   await db.update(searchConsoleState).set({
-    importedAt: now, importedThrough: through || null, ...(full ? { importedFrom: start } : {}),
+    importedAt: now, importedThrough: through || null, incompleteFrom, ...(full ? { importedFrom: start } : {}),
   });
   return { from: start, through: through || null, ...counts, otherPages: [...unmatched].sort() };
 }

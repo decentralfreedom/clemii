@@ -242,6 +242,11 @@ export interface PostSearch {
      * @nullable
      */
   importedAt: string | null;
+  /**
+     * The first day in the window Google was still counting at the last import: numbers from it on may still change. Null when all are final
+     * @nullable
+     */
+  preliminaryFrom: string | null;
   totals: SearchTotals;
   /**
      * The period of equal length just before; null when it reaches before the first day the CMS has numbers for
@@ -334,6 +339,11 @@ export interface SiteSearch {
   to: string | null;
   /** @nullable */
   importedAt: string | null;
+  /**
+     * The first day in the window Google was still counting at the last import: numbers from it on may still change. Null when all are final
+     * @nullable
+     */
+  preliminaryFrom: string | null;
   totals: SearchTotals & unknown;
   /** @nullable */
   previous: SiteSearchPrevious;
