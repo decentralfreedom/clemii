@@ -1,10 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { Hono } from "hono";
-import { analyticsTag, coarseAddress, registerAnalytics, withAnalytics } from "./analytics";
+import { coarseAddress, registerAnalytics } from "./analytics";
 import { loadConfig } from "./config";
 
-const analytics = { umamiUrl: "https://umami.example", websiteId: "0b6a3f0e-8c1d-4b8e-9d55-0d6c1e2f3a4b", tracker: true };
-const serverOnly = { ...analytics, tracker: false };
+const analytics = { umamiUrl: "https://umami.example", websiteId: "0b6a3f0e-8c1d-4b8e-9d55-0d6c1e2f3a4b" };
 const dmg = "https://updates.behu.sh/downloads/hush-0.1.0-alpha.5-build.14.dmg";
 
 function setup(options: { analytics?: typeof analytics; downloadURL?: string } = {}) {
@@ -106,7 +105,7 @@ describe("page views counted on this server", () => {
   };
 
   test("records a browser's navigation to a page with its path, origin of the referrer, language and shortened address", async () => {
-    const { app, sent } = setup({ analytics: serverOnly });
+    const { app, sent } = setup();
     const response = await app.request("/blog/dictate-on-mac?utm_source=x", { headers: navigation });
     expect(await response.text()).toContain("article");
     await Bun.sleep(0);
@@ -121,7 +120,7 @@ describe("page views counted on this server", () => {
   });
 
   test("ignores prefetches, prerenders, scripts, other methods, files and missing pages", async () => {
-    const { app, sent } = setup({ analytics: serverOnly });
+    const { app, sent } = setup();
     await app.request("/blog/dictate-on-mac", { headers: { ...navigation, "sec-purpose": "prefetch;prerender" } });
     await app.request("/blog/dictate-on-mac", { headers: { ...navigation, purpose: "prefetch" } });
     await app.request("/blog/dictate-on-mac", { headers: { ...navigation, "sec-fetch-dest": "empty" } });
@@ -134,7 +133,7 @@ describe("page views counted on this server", () => {
   });
 
   test("honours Do Not Track and Global Privacy Control, and counts one client at most 60 times a minute", async () => {
-    const { app, sent } = setup({ analytics: serverOnly });
+    const { app, sent } = setup();
     await app.request("/blog/dictate-on-mac", { headers: { ...navigation, dnt: "1" } });
     await app.request("/blog/dictate-on-mac", { headers: { ...navigation, "sec-gpc": "1" } });
     await Bun.sleep(0);
@@ -170,54 +169,11 @@ describe("the visitor's address, shortened to its network", () => {
   });
 });
 
-describe("Umami through this origin", () => {
-  test("adds the tracker to a page, pointed at /stats, with search, hash and Do Not Track respected", () => {
-    const tag = analyticsTag(analytics, "https://behu.sh");
-    expect(withAnalytics("<html><head><title>x</title></head><body></body></html>", tag))
-      .toBe(`<html><head><title>x</title>${tag}</head><body></body></html>`);
-    expect(tag).toContain('src="/stats/script.js"');
-    expect(tag).toContain('data-host-url="/stats"');
-    expect(tag).toContain('data-domains="behu.sh"');
-    expect(tag).toContain('data-exclude-search="true"');
-    expect(tag).toContain('data-do-not-track="true"');
-  });
-
-  test("serves the tracker script and forwards events without the visitor's address", async () => {
-    const { app, sent } = setup();
-    const script = await app.request("/stats/script.js");
-    expect(await script.text()).toBe("/* umami */");
-    expect(script.headers.get("content-type")).toContain("javascript");
-    const response = await app.request("/stats/api/send", {
-      method: "POST", body: JSON.stringify({ type: "event", payload: { url: "/" } }),
-      headers: { "content-type": "application/json", "user-agent": "Mozilla/5.0", "cf-connecting-ip": "203.0.113.7", "x-forwarded-for": "203.0.113.7" },
-    });
-    expect(response.status).toBe(200);
-    const forwarded = sent.find((request) => request.url === "https://umami.example/api/send")!;
-    expect([...new Headers(forwarded.init?.headers).keys()].sort()).toEqual(["content-type", "user-agent"]);
-  });
-
-  test("drops a page view from a browser that sends Global Privacy Control", async () => {
-    const { app, sent } = setup();
-    const response = await app.request("/stats/api/send", {
-      method: "POST", body: JSON.stringify({ type: "event", payload: { url: "/" } }),
-      headers: { "content-type": "application/json", "user-agent": "Mozilla/5.0", "sec-gpc": "1" },
-    });
-    expect(response.status).toBe(204);
-    expect(events(sent)).toEqual([]);
-  });
-
-  test("counts downloads but has no tracker while page views are off", async () => {
-    const { app, sent } = setup({ analytics: serverOnly });
+describe("only this server counts", () => {
+  test("has no browser tracker, so a page view or download is never counted twice", async () => {
+    const { app } = setup();
     expect((await app.request("/stats/script.js")).status).toBe(404);
     expect((await app.request("/stats/api/send", { method: "POST", body: "{}" })).status).toBe(404);
-    await app.request("/download?from=/", { headers: { "user-agent": "Mozilla/5.0" } });
-    await Bun.sleep(0);
-    expect(events(sent)).toHaveLength(1);
-  });
-
-  test("has no /stats routes while analytics is off", async () => {
-    const { app } = setup({ analytics: undefined });
-    expect((await app.request("/stats/script.js")).status).toBe(404);
   });
 });
 
@@ -226,8 +182,6 @@ describe("analytics configuration", () => {
     expect(loadConfig({ NODE_ENV: "test" }).analytics).toBeUndefined();
     expect(() => loadConfig({ NODE_ENV: "test", HUSH_UMAMI_URL: "https://umami.example" })).toThrow(/both/);
     expect(loadConfig({ NODE_ENV: "test", HUSH_UMAMI_URL: "https://umami.example/", HUSH_UMAMI_WEBSITE_ID: analytics.websiteId }).analytics)
-      .toEqual(serverOnly);
-    expect(loadConfig({ NODE_ENV: "test", HUSH_UMAMI_URL: "https://umami.example", HUSH_UMAMI_WEBSITE_ID: analytics.websiteId, HUSH_UMAMI_TRACKER: "1" }).analytics)
       .toEqual(analytics);
   });
 

@@ -1,47 +1,24 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 //
-// The blog funnel's measurements (PRD R10), counted on this server, where an
-// ad blocker cannot hide them and no script runs in the browser: page views of
-// real navigations, and downloads at /download. Umami's browser tracker (page
-// views with screen size, download clicks) stays off unless switched on.
-// Umami is reached through this origin (/stats), as Umami documents for
-// proxying, so the Content Security Policy stays 'self'. The proxy forwards the
-// request body and the browser's User-Agent (Umami ignores bots by it), never
-// the visitor's IP address. A download event carries the address shortened to
-// its network (coarseAddress), so Umami can tell the country, region or city,
-// and the full address never leaves this server.
+// The blog funnel's measurements (PRD R10), counted only on this server, where
+// an ad blocker cannot hide them and no script runs in the browser, so no
+// consent banner is needed: page views of real navigations, and downloads at
+// /download. Every event carries the browser's User-Agent (Umami ignores bots
+// by it) and the address shortened to its network (coarseAddress), so Umami
+// can tell the country, region or city, and the full address never leaves
+// this server. There is no browser tracker: it would count each page view and
+// download a second time.
 import { isIPv4, isIPv6 } from "node:net";
 import type { Env, Hono } from "hono";
-import { bodyLimit } from "hono/body-limit";
 import type { ServerConfig } from "./config";
-import { RateLimitStore, clientKey, rateLimiter } from "./http/rate-limiter";
+import { RateLimitStore, clientKey } from "./http/rate-limiter";
 
 export type Analytics = NonNullable<ServerConfig["analytics"]>;
 type Fetch = (input: string, init?: RequestInit) => Promise<Response>;
 
-const proxyPath = "/stats";
 // A page's path on this site, as download buttons send it; anything else is not recorded.
 const pagePath = /^\/[A-Za-z0-9._~/-]{0,200}$/;
-
-/** The tracker's script tag. Search and hash are left out of what it records; Do Not Track is honoured. */
-export function analyticsTag(analytics: Analytics, publicBaseUrl: string) {
-  const attributes = {
-    src: `${proxyPath}/script.js`,
-    "data-website-id": analytics.websiteId,
-    "data-host-url": proxyPath,
-    "data-domains": new URL(publicBaseUrl).hostname,
-    "data-exclude-search": "true",
-    "data-exclude-hash": "true",
-    "data-do-not-track": "true",
-  };
-  return `<script defer ${Object.entries(attributes).map(([name, value]) => `${name}="${value}"`).join(" ")}></script>`;
-}
-
-/** Adds the tracker to a rendered page, at the end of its head. */
-export function withAnalytics(html: string, tag: string) {
-  return html.includes("</head>") ? html.replace("</head>", `${tag}</head>`) : html;
-}
 
 /** Whether the browser asks not to be tracked (Do Not Track or Global Privacy Control). */
 const declinesTracking = (headers: Headers) => headers.get("dnt") === "1" || headers.get("sec-gpc") === "1";
@@ -127,38 +104,6 @@ export function registerAnalytics<E extends Env>(app: Hono<E>, input: {
     }
     return context.redirect(input.downloadURL, 302);
   });
-
-  const { analytics } = input;
-  if (!analytics?.tracker) return;
-  let script: { body: string; expires: number } | undefined;
-  app.get(`${proxyPath}/script.js`, async (context) => {
-    if (!script || script.expires < Date.now()) {
-      const response = await fetcher(`${analytics.umamiUrl}/script.js`, { signal: AbortSignal.timeout(5_000) }).catch(() => undefined);
-      if (!response?.ok) {
-        context.header("cache-control", "no-store");
-        return context.body("", 503);
-      }
-      script = { body: await response.text(), expires: Date.now() + 3_600_000 };
-    }
-    context.header("content-type", "text/javascript; charset=utf-8");
-    context.header("cache-control", "public, max-age=3600");
-    return context.body(script.body);
-  });
-  app.use(`${proxyPath}/api/send`, rateLimiter({ windowMs: 60_000, limit: 120 }));
-  app.post(`${proxyPath}/api/send`, bodyLimit({ maxSize: 8_192 }), async (context) => {
-    context.header("cache-control", "no-store");
-    // The tracker honours Do Not Track itself; Global Privacy Control is honoured here.
-    if (declinesTracking(context.req.raw.headers)) return context.body(null, 204);
-    const body = await context.req.text();
-    const response = await fetcher(`${analytics.umamiUrl}/api/send`, {
-      method: "POST",
-      headers: { "content-type": "application/json", "user-agent": context.req.header("user-agent") ?? "" },
-      body,
-      signal: AbortSignal.timeout(5_000),
-    }).catch(() => undefined);
-    if (!response) return context.body(null, 502);
-    return context.body(await response.text(), response.status as 200);
-  });
 }
 
 /** Where the visitor came from, without its query or fragment; browsers send only the origin of another site. */
@@ -172,7 +117,7 @@ function referrerOf(referer: string | null) {
   }
 }
 
-/** The browser's first preferred language, as Umami's tracker reports it. */
+/** The browser's first preferred language, in the form Umami records. */
 function languageOf(acceptLanguage: string | null) {
   const first = acceptLanguage?.split(",")[0]?.split(";")[0]?.trim();
   return first && /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(first) ? first : undefined;

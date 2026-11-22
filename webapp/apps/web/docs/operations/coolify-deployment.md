@@ -251,7 +251,7 @@ Docker Swarm, Kubernetes, Fly.io) works without code changes:
 | Background cleanup | Idempotent; two instances may run it during an overlap. |
 | Shared volume | Object writes are atomic (temporary file, then rename). |
 | `HUSH_READ_ONLY=1` | Proof writes return 503 with `Retry-After: 300`; pages and proof reads keep working. Used during data moves. |
-| `HUSH_UMAMI_URL`, `HUSH_UMAMI_WEBSITE_ID` | Optional, set together (PRD R10). The server then counts page views and downloads and sends them to that Umami (`/api/send`). Without them nothing is counted. The browser tracker additionally needs `HUSH_UMAMI_TRACKER=1` and stays off until the legal review (`docs/legal-review.md`, item 6). |
+| `HUSH_UMAMI_URL`, `HUSH_UMAMI_WEBSITE_ID` | Optional, set together (PRD R10). The server then counts page views and downloads and sends them to that Umami (`/api/send`). Without them nothing is counted. There is no browser tracker. |
 
 **Migrations must stay additive.** The previous release keeps serving from the
 new schema until its replacement is healthy. Add tables, nullable columns and
