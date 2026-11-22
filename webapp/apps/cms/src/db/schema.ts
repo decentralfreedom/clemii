@@ -172,6 +172,7 @@ export const postApprovals = pgTable("post_approvals", {
 export const auditAction = pgEnum("audit_action", [
   "post.created", "post.edited", "post.image_uploaded", "post.scheduled", "post.published", "post.unpublished", "post.approved", "post.deleted",
   "token.created", "token.revoked", "device.approved", "device.denied", "owner.signed_in",
+  "link.created", "link.archived",
 ]);
 
 /**
@@ -293,6 +294,29 @@ export const trafficSourceDaily = pgTable("traffic_source_daily", {
   primaryKey({ columns: [table.date, table.path, table.channel, table.source, table.medium, table.campaign, table.content] }),
   index("traffic_source_daily_post").on(table.postId, table.date),
 ]);
+
+/**
+ * Links we share, with campaign tags from a fixed list (PRD: tracked links),
+ * so each Reddit post, newsletter or creator counts on its own row in the
+ * traffic sources. A link is never edited: a changed link would split its
+ * numbers, so it is archived and a new one made.
+ */
+export const trackedLinks = pgTable("tracked_links", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  /** The destination's path on the website, e.g. /blog/dictation-not-working-on-mac. */
+  path: text("path").notNull(),
+  postId: uuid("post_id").references(() => posts.id, { onDelete: "set null" }),
+  /** Where the link is shared, as the builder offers it (reddit, newsletter, creator, ...). */
+  sharedOn: text("shared_on").notNull(),
+  source: text("source").notNull(),
+  medium: text("medium").notNull(),
+  campaign: text("campaign").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  createdBy: text("created_by").notNull(),
+  archivedAt: timestamp("archived_at", { withTimezone: true }),
+}, (table) => [uniqueIndex("tracked_links_tags").on(table.path, table.source, table.medium, table.campaign, table.content)]);
 
 /** The Umami import's state, one row. */
 export const trafficState = pgTable("traffic_state", {

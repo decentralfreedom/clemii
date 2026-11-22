@@ -18,6 +18,7 @@ import { postRoutes } from "./routes/posts";
 import { searchRoutes } from "./routes/search";
 import { siteSearchRoutes } from "./routes/site-search";
 import { trafficRoutes } from "./routes/traffic";
+import { linksRoutes } from "./routes/links";
 import { siteRoutes } from "./routes/site";
 import { tokenRoutes } from "./routes/tokens";
 
@@ -29,6 +30,8 @@ export type AppOptions = {
   admin?: AdminConfig;
   /** The built admin (apps/cms-admin/dist), served on this origin. */
   adminDir?: string;
+  /** The website's address (CMS_SITE_URL), for whole tracked links. */
+  siteUrl?: string;
 };
 
 /** Paths the admin app never owns; everything else falls back to its index.html. */
@@ -84,6 +87,7 @@ export function createApp(cms: Cms, options: AppOptions = {}) {
   app.route("/", searchRoutes(cms.db));
   app.route("/", siteSearchRoutes(cms.db));
   app.route("/", trafficRoutes(cms.db));
+  app.route("/", linksRoutes(cms.db, options.siteUrl));
   app.route("/", postRoutes(cms));
   app.route("/", siteRoutes(cms));
   app.openAPIRegistry.registerComponent("securitySchemes", "bearer", { type: "http", scheme: "bearer" });

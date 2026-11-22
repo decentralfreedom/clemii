@@ -822,6 +822,50 @@ test("CMS-021 the dashboard shows where traffic comes from on every page, and a 
   await expect(postSources.getByRole("row")).toHaveCount(4);
 });
 
+test("CMS-022 makes a tracked link from fixed choices, lists it with its numbers, and archives it, all in the History", async ({ signedIn }, testInfo) => {
+  // Each browser project makes its own campaign: links with the same tags exist once.
+  const campaign = `launch-${testInfo.project.name}`;
+  await signedIn.goto("/analytics");
+  const card = signedIn.getByTestId("links-card");
+  await signedIn.getByRole("button", { name: "New link" }).click();
+  const dialog = signedIn.getByRole("dialog", { name: "New tracked link" });
+  await dialog.getByRole("combobox", { name: "Page" }).click();
+  await signedIn.getByRole("option", { name: /\/blog\/dictate-without-cloud$/ }).click();
+  // A creator needs a name; until then the link cannot be made.
+  await dialog.getByRole("combobox", { name: "Shared on" }).click();
+  await signedIn.getByRole("option", { name: "A creator" }).click();
+  await dialog.getByLabel("Campaign").fill(campaign);
+  await expect(dialog.getByRole("button", { name: "Make link" })).toBeDisabled();
+  await expect(dialog).toContainText("Name who shares it");
+  await dialog.getByRole("combobox", { name: "Shared on" }).click();
+  await signedIn.getByRole("option", { name: "Reddit" }).click();
+  // Capitals are made lowercase as typed, so a campaign cannot be split in two.
+  await dialog.getByLabel("Campaign").fill(campaign.toUpperCase());
+  await expect(dialog.getByLabel("Campaign")).toHaveValue(campaign);
+  await dialog.getByLabel("Name (optional)").fill(`r/macapps ${testInfo.project.name}`);
+  await dialog.getByRole("button", { name: "Make link" }).click();
+  const made = signedIn.getByRole("dialog", { name: "Your link" });
+  await expect(made.getByTestId("new-link")).toHaveText(`/blog/dictate-without-cloud?utm_source=reddit&utm_medium=social&utm_campaign=${campaign}`);
+  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
+  await signedIn.screenshot({ path: testInfo.outputPath("link-made.png") });
+  await made.getByRole("button", { name: "Done" }).click();
+
+  const table = signedIn.getByRole("table", { name: "Tracked links" });
+  const row = table.getByRole("row").filter({ hasText: `r/macapps ${testInfo.project.name}` });
+  await expect(row).toContainText(`/blog/dictate-without-cloud · reddit · social · ${campaign}`);
+  await card.scrollIntoViewIfNeeded();
+  await signedIn.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await card.screenshot({ path: testInfo.outputPath("links.png") });
+  await row.getByRole("button", { name: `Archive r/macapps ${testInfo.project.name}` }).click();
+  await expect(row).toHaveCount(0);
+
+  await signedIn.goto("/settings/history");
+  await signedIn.getByTestId("history").getByRole("button", { name: "View history" }).click();
+  const entries = signedIn.getByRole("dialog", { name: "History" }).getByTestId("history-entry").filter({ hasText: `r/macapps ${testInfo.project.name}` });
+  await expect(entries.first()).toContainText("Tracked link archived");
+  await expect(entries.nth(1)).toContainText("Tracked link made");
+});
+
 test("the admin runs under its Content Security Policy without violations", async ({ signedIn, draft }) => {
   const violations: string[] = [];
   signedIn.on("console", (message) => { if (/Content.Security.Policy|Refused to/i.test(message.text())) violations.push(message.text()); });

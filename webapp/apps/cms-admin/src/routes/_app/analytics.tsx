@@ -11,6 +11,7 @@ import { X } from "lucide-react";
 import { useGetSiteSearch, useGetSiteTraffic, type TrafficSourceRowChannel } from "@/api/cms.generated";
 import { DataSource } from "@/components/analytics/data-source";
 import { FunnelCard } from "@/components/analytics/funnel-card";
+import { LinksCard } from "@/components/analytics/links-card";
 import { PagesCard } from "@/components/analytics/pages-card";
 import { RangeSelect } from "@/components/analytics/range-select";
 import { SearchKpis } from "@/components/analytics/search-kpis";
@@ -70,6 +71,7 @@ function Analytics() {
               <SourcesCard params={rangeParams(range)} channel={channel} onChannel={(next) => void navigate({ search: (previous) => ({ ...previous, channel: next }) })} />
               <PagesCard params={rangeParams(range)} channel={channel} range={range} />
             </div>
+            <LinksCard params={rangeParams(range)} />
           </section>
           <DataSource from={numbers.from} to={numbers.to} importedAt={numbers.importedAt} preliminaryFrom={numbers.preliminaryFrom}>
             The totals are Google's for the whole site, home and download pages included, so they are more than the posts add up to.

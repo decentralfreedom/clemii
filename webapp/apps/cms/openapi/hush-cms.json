@@ -250,7 +250,9 @@
               "token.revoked",
               "device.approved",
               "device.denied",
-              "owner.signed_in"
+              "owner.signed_in",
+              "link.created",
+              "link.archived"
             ]
           },
           "actor": {
@@ -987,6 +989,191 @@
         "required": [
           "pageviews",
           "downloads"
+        ]
+      },
+      "TrackedLinks": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrackedLink"
+            }
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "links"
+        ]
+      },
+      "TrackedLink": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "postId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "sharedOn": {
+            "type": "string",
+            "enum": [
+              "reddit",
+              "linkedin",
+              "x",
+              "hackernews",
+              "bluesky",
+              "youtube",
+              "newsletter",
+              "email",
+              "creator",
+              "partner",
+              "ad"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "medium": {
+            "type": "string"
+          },
+          "campaign": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string",
+            "description": "The tags to append to the page's address, starting with ?"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The whole link to share; null when the CMS does not know the website's address (CMS_SITE_URL)"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "archivedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "pageviews": {
+            "type": "integer",
+            "description": "Page views through this link on its page, in the window"
+          },
+          "downloads": {
+            "type": "integer",
+            "description": "Downloads through this link, in the window"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "path",
+          "postId",
+          "sharedOn",
+          "source",
+          "medium",
+          "campaign",
+          "content",
+          "query",
+          "url",
+          "createdAt",
+          "createdBy",
+          "archivedAt",
+          "pageviews",
+          "downloads"
+        ]
+      },
+      "NewTrackedLink": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "description": "What the link is for, e.g. \"r/macapps launch post\""
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300,
+            "description": "The destination's path on the website"
+          },
+          "sharedOn": {
+            "type": "string",
+            "enum": [
+              "reddit",
+              "linkedin",
+              "x",
+              "hackernews",
+              "bluesky",
+              "youtube",
+              "newsletter",
+              "email",
+              "creator",
+              "partner",
+              "ad"
+            ]
+          },
+          "who": {
+            "type": "string",
+            "maxLength": 60,
+            "description": "For creator, partner and ad: their name as lowercase words joined by hyphens"
+          },
+          "campaign": {
+            "type": "string",
+            "maxLength": 60,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 60,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        },
+        "required": [
+          "name",
+          "path",
+          "sharedOn",
+          "campaign"
         ]
       },
       "Post": {
@@ -2628,6 +2815,258 @@
           },
           "403": {
             "description": "The token lacks posts:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/links": {
+      "get": {
+        "operationId": "listLinks",
+        "tags": [
+          "Links"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "Tracked links, newest first, with their page views and tagged downloads over the last `days` complete days the CMS has, or since a day.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3650,
+              "default": 28
+            },
+            "required": false,
+            "name": "days",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "required": false,
+            "name": "since",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
+            },
+            "required": false,
+            "name": "archived",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The links",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackedLinks"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The token lacks the scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createLink",
+        "tags": [
+          "Links"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "Makes a tracked link: where it is shared decides utm_source and utm_medium (creator, partner and ad add `who` as the source); the campaign and optional content are lowercase words joined by hyphens. A link with the same page and tags exists only once.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewTrackedLink"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackedLink"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The token lacks the scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A link with these tags to this page exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Not a valid link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/links/{id}": {
+      "delete": {
+        "operationId": "archiveLink",
+        "tags": [
+          "Links"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "Archives a link: its numbers stay, but it is no longer listed.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The archived link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackedLink"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The token lacks the scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such link",
             "content": {
               "application/json": {
                 "schema": {
