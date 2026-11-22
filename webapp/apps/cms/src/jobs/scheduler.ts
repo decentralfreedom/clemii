@@ -25,7 +25,8 @@ import { exportMarkdown, markdownExports } from "../backups/markdown-export";
 import { loadConfig } from "../config";
 import { storeCheck, watchConfiguration } from "../config-check";
 import { connectDatabase } from "../db/client";
-import { migrateDatabase } from "../db/migrate";
+import { databaseIsNewer, migrateDatabase } from "../db/migrate";
+import { singleRunner } from "./single-runner";
 import { publishDuePosts } from "../posts/service";
 import { searchConsoleClient } from "../search/console";
 import { importSearchConsole, searchImportDue } from "../search/import";
@@ -66,7 +67,14 @@ const health = Bun.serve({
   },
 });
 
+// Another instance holding the round is healthy standby: this one is ready to take over.
 async function tick() {
+  if (!(await singleRunner(db, "hush-cms scheduler round", round).catch((error: unknown) => { log("error", "The scheduler round failed", { error: String(error) }); return true; }))) {
+    lastHealthyTick = Date.now();
+  }
+}
+
+async function round() {
   let healthy = true;
   try {
     const published = await publishDuePosts(db);
@@ -102,8 +110,12 @@ async function tick() {
     healthy = false;
     log("error", "Exporting the posts as Markdown failed", { error: String(error) });
   }
+  // A newer release migrated the database while this one still runs: the imports wait for it,
+  // or they would fill only the tables this release knows and leave the new ones short.
+  const outdated = await databaseIsNewer(db).catch(() => false);
+  if (outdated && (searchConsole || umami)) log("info", "Imports wait: the database is newer than this scheduler, whose update is on its way");
   // Outside the health count: Search Console being unreachable is Google's, not the CMS's.
-  if (searchConsole) {
+  if (searchConsole && !outdated) {
     try {
       if (await searchImportDue(db)) {
         const { otherPages, ...result } = await importSearchConsole(db, searchConsole);
@@ -114,7 +126,7 @@ async function tick() {
     }
   }
   // Likewise outside the health count: Umami is a separate service.
-  if (umami) {
+  if (umami && !outdated) {
     try {
       if (await trafficImportDue(db)) {
         const { otherPages, ...result } = await importTraffic(db, umami);
