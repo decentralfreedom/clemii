@@ -25,10 +25,9 @@ export type ServerConfig = {
   /**
    * Umami (blog funnel, PRD R10), off unless both HUSH_UMAMI_URL and
    * HUSH_UMAMI_WEBSITE_ID are set; then this server counts page views and
-   * downloads. Umami's browser tracker also needs HUSH_UMAMI_TRACKER=1, which
-   * waits for the legal review (docs/legal-review.md, item 6).
+   * downloads, on the server only: there is no browser tracker.
    */
-  analytics?: { umamiUrl: string; websiteId: string; tracker: boolean };
+  analytics?: { umamiUrl: string; websiteId: string };
   s3?: {
     bucket: string;
     region: string;
@@ -84,7 +83,7 @@ function loadAnalytics(env: Record<string, string | undefined>, environment: Ser
   if (environment === "production" && url.protocol !== "https:") throw new Error("HUSH_UMAMI_URL must use HTTPS in production");
   if (url.username || url.password || url.search || url.hash) throw new Error("HUSH_UMAMI_URL must be a plain origin or path");
   if (!/^[0-9a-f-]{36}$/i.test(websiteId)) throw new Error("HUSH_UMAMI_WEBSITE_ID must be the website's UUID from Umami");
-  return { umamiUrl: url.toString().replace(/\/$/, ""), websiteId, tracker: env.HUSH_UMAMI_TRACKER === "1" };
+  return { umamiUrl: url.toString().replace(/\/$/, ""), websiteId };
 }
 
 function boundedInteger(

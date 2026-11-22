@@ -65,7 +65,6 @@ export function DownloadLink({ mobileLabel = m.download_mobile(), ...props }: Do
       href={downloadPath(page)}
       download={release.downloadName}
       onClick={startDownload}
-      data-umami-event="download-click"
     />
   );
 }

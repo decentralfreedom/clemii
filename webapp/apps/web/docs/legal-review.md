@@ -85,10 +85,10 @@ Noindex is an indexing choice, not a substitute for legal obligations.
      - The legal basis given is Article 6(1)(f) GDPR. The basis for this
        choice is the CNIL's audience-measurement criteria: location no finer
        than a city, address shortened.
-   - **Page views through the browser tracker stay off**
-     (`HUSH_UMAMI_TRACKER`). The tracker reads screen size and language in
-     the browser. Whether that needs consent under section 25 TDDDG must be
-     reviewed before it is switched on.
+   - **No browser tracker:** it was removed (2026-11-22). It would have read
+     screen size and language in the browser, which may need consent under
+     section 25 TDDDG, and it would have counted page views and downloads a
+     second time beside the server.
    - **Open for review:**
      - Whether shortened IPs plus city-level location keep the events outside
        personal data or within Article 6(1)(f).
