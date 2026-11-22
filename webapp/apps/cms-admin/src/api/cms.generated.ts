@@ -494,6 +494,100 @@ export interface TrafficSources {
   rows: TrafficSourceRow[];
 }
 
+export type TrafficPagesTotals = {
+  pageviews: number;
+  downloads: number;
+};
+
+export type TrafficPagePageType = typeof TrafficPagePageType[keyof typeof TrafficPagePageType];
+
+
+export const TrafficPagePageType = {
+  home: 'home',
+  post: 'post',
+  release: 'release',
+  other: 'other',
+} as const;
+
+export interface TrafficPage {
+  path: string;
+  /** @nullable */
+  postId: string | null;
+  pageType: TrafficPagePageType;
+  pageviews: number;
+  /** Every download started from this page, tagged or not */
+  downloads: number;
+}
+
+export interface TrafficPages {
+  /** @nullable */
+  from: string | null;
+  /** @nullable */
+  to: string | null;
+  /** @nullable */
+  importedAt: string | null;
+  totals: TrafficPagesTotals;
+  rows: TrafficPage[];
+}
+
+export type TrafficFlowLinksItemChannel = typeof TrafficFlowLinksItemChannel[keyof typeof TrafficFlowLinksItemChannel];
+
+
+export const TrafficFlowLinksItemChannel = {
+  direct: 'direct',
+  ai: 'ai',
+  organicSearch: 'organicSearch',
+  paidSearch: 'paidSearch',
+  organicSocial: 'organicSocial',
+  paidSocial: 'paidSocial',
+  email: 'email',
+  video: 'video',
+  referral: 'referral',
+  paid: 'paid',
+  other: 'other',
+} as const;
+
+export type TrafficFlowLinksItemPageType = typeof TrafficFlowLinksItemPageType[keyof typeof TrafficFlowLinksItemPageType];
+
+
+export const TrafficFlowLinksItemPageType = {
+  home: 'home',
+  post: 'post',
+  release: 'release',
+  other: 'other',
+} as const;
+
+export type TrafficFlowLinksItem = {
+  channel: TrafficFlowLinksItemChannel;
+  pageType: TrafficFlowLinksItemPageType;
+  pageviews: number;
+};
+
+export type TrafficFlowPageTypesItemPageType = typeof TrafficFlowPageTypesItemPageType[keyof typeof TrafficFlowPageTypesItemPageType];
+
+
+export const TrafficFlowPageTypesItemPageType = {
+  home: 'home',
+  post: 'post',
+  release: 'release',
+  other: 'other',
+} as const;
+
+export type TrafficFlowPageTypesItem = {
+  pageType: TrafficFlowPageTypesItemPageType;
+  pageviews: number;
+  downloads: number;
+};
+
+export interface TrafficFlow {
+  /** @nullable */
+  from: string | null;
+  /** @nullable */
+  to: string | null;
+  links: TrafficFlowLinksItem[];
+  pageTypes: TrafficFlowPageTypesItem[];
+}
+
 export type TrackedLinkSharedOn = typeof TrackedLinkSharedOn[keyof typeof TrackedLinkSharedOn];
 
 
@@ -1234,6 +1328,40 @@ export const GetTrafficSourcesChannel = {
   paid: 'paid',
   other: 'other',
 } as const;
+
+export type GetTrafficPagesParams = {
+  /**
+   * @minimum 1
+   * @maximum 3650
+   */
+  days?: number;
+  since?: string;
+  pageType?: GetTrafficPagesPageType;
+  /**
+   * @minimum 1
+   * @maximum 500
+   */
+  limit?: number;
+};
+
+export type GetTrafficPagesPageType = typeof GetTrafficPagesPageType[keyof typeof GetTrafficPagesPageType];
+
+
+export const GetTrafficPagesPageType = {
+  home: 'home',
+  post: 'post',
+  release: 'release',
+  other: 'other',
+} as const;
+
+export type GetTrafficFlowParams = {
+  /**
+   * @minimum 1
+   * @maximum 3650
+   */
+  days?: number;
+  since?: string;
+};
 
 export type ListLinksParams = {
   /**
@@ -3371,6 +3499,280 @@ export function useGetTrafficSources<TData = Awaited<ReturnType<typeof getTraffi
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetTrafficSourcesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getTrafficPagesResponse200 = {
+  data: TrafficPages
+  status: 200
+}
+
+export type getTrafficPagesResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type getTrafficPagesResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type getTrafficPagesResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type getTrafficPagesResponseSuccess = (getTrafficPagesResponse200) & {
+  headers: Headers;
+};
+export type getTrafficPagesResponseError = (getTrafficPagesResponse400 | getTrafficPagesResponse401 | getTrafficPagesResponse403) & {
+  headers: Headers;
+};
+
+export type getTrafficPagesResponse = (getTrafficPagesResponseSuccess | getTrafficPagesResponseError)
+
+export const getGetTrafficPagesUrl = (params?: GetTrafficPagesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/traffic/pages?${stringifiedParams}` : `/v1/traffic/pages`
+}
+
+/**
+ * Every page of the site with its page views and all its downloads, over complete US Pacific days, most viewed first; optionally one page type.
+ */
+export const getTrafficPages = async (params?: GetTrafficPagesParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getTrafficPagesResponse> => {
+
+  return cmsFetch<getTrafficPagesResponse>(getGetTrafficPagesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrafficPagesQueryKey = (params?: GetTrafficPagesParams,) => {
+    return [
+    `/v1/traffic/pages`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetTrafficPagesQueryOptions = <TData = Awaited<ReturnType<typeof getTrafficPages>>, TError = Error>(params?: GetTrafficPagesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficPages>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrafficPagesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrafficPages>>> = ({ signal }) => getTrafficPages(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrafficPages>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrafficPagesQueryResult = NonNullable<Awaited<ReturnType<typeof getTrafficPages>>>
+export type GetTrafficPagesQueryError = Error
+
+
+/** Every page of the site with its page views and all its downloads, over complete US Pacific days, most viewed first; optionally one page type. */
+export function useGetTrafficPages<TData = Awaited<ReturnType<typeof getTrafficPages>>, TError = Error>(
+ params: undefined |  GetTrafficPagesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficPages>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrafficPages>>,
+          TError,
+          Awaited<ReturnType<typeof getTrafficPages>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** Every page of the site with its page views and all its downloads, over complete US Pacific days, most viewed first; optionally one page type. */
+export function useGetTrafficPages<TData = Awaited<ReturnType<typeof getTrafficPages>>, TError = Error>(
+ params?: GetTrafficPagesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficPages>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrafficPages>>,
+          TError,
+          Awaited<ReturnType<typeof getTrafficPages>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** Every page of the site with its page views and all its downloads, over complete US Pacific days, most viewed first; optionally one page type. */
+export function useGetTrafficPages<TData = Awaited<ReturnType<typeof getTrafficPages>>, TError = Error>(
+ params?: GetTrafficPagesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficPages>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** Every page of the site with its page views and all its downloads, over complete US Pacific days, most viewed first; optionally one page type. */
+export function useGetTrafficPages<TData = Awaited<ReturnType<typeof getTrafficPages>>, TError = Error>(
+ params?: GetTrafficPagesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficPages>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrafficPagesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getTrafficFlowResponse200 = {
+  data: TrafficFlow
+  status: 200
+}
+
+export type getTrafficFlowResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type getTrafficFlowResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type getTrafficFlowResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type getTrafficFlowResponseSuccess = (getTrafficFlowResponse200) & {
+  headers: Headers;
+};
+export type getTrafficFlowResponseError = (getTrafficFlowResponse400 | getTrafficFlowResponse401 | getTrafficFlowResponse403) & {
+  headers: Headers;
+};
+
+export type getTrafficFlowResponse = (getTrafficFlowResponseSuccess | getTrafficFlowResponseError)
+
+export const getGetTrafficFlowUrl = (params?: GetTrafficFlowParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/traffic/flow?${stringifiedParams}` : `/v1/traffic/flow`
+}
+
+/**
+ * From channel to page type to download, over complete US Pacific days: page views from each channel to each page type, and each page type's page views and downloads. Both come from the same daily reads, so a page type's page views equal the sum of its channels'.
+ */
+export const getTrafficFlow = async (params?: GetTrafficFlowParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getTrafficFlowResponse> => {
+
+  return cmsFetch<getTrafficFlowResponse>(getGetTrafficFlowUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrafficFlowQueryKey = (params?: GetTrafficFlowParams,) => {
+    return [
+    `/v1/traffic/flow`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetTrafficFlowQueryOptions = <TData = Awaited<ReturnType<typeof getTrafficFlow>>, TError = Error>(params?: GetTrafficFlowParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficFlow>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrafficFlowQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrafficFlow>>> = ({ signal }) => getTrafficFlow(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrafficFlow>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrafficFlowQueryResult = NonNullable<Awaited<ReturnType<typeof getTrafficFlow>>>
+export type GetTrafficFlowQueryError = Error
+
+
+/** From channel to page type to download, over complete US Pacific days: page views from each channel to each page type, and each page type's page views and downloads. Both come from the same daily reads, so a page type's page views equal the sum of its channels'. */
+export function useGetTrafficFlow<TData = Awaited<ReturnType<typeof getTrafficFlow>>, TError = Error>(
+ params: undefined |  GetTrafficFlowParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficFlow>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrafficFlow>>,
+          TError,
+          Awaited<ReturnType<typeof getTrafficFlow>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** From channel to page type to download, over complete US Pacific days: page views from each channel to each page type, and each page type's page views and downloads. Both come from the same daily reads, so a page type's page views equal the sum of its channels'. */
+export function useGetTrafficFlow<TData = Awaited<ReturnType<typeof getTrafficFlow>>, TError = Error>(
+ params?: GetTrafficFlowParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficFlow>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrafficFlow>>,
+          TError,
+          Awaited<ReturnType<typeof getTrafficFlow>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** From channel to page type to download, over complete US Pacific days: page views from each channel to each page type, and each page type's page views and downloads. Both come from the same daily reads, so a page type's page views equal the sum of its channels'. */
+export function useGetTrafficFlow<TData = Awaited<ReturnType<typeof getTrafficFlow>>, TError = Error>(
+ params?: GetTrafficFlowParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficFlow>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** From channel to page type to download, over complete US Pacific days: page views from each channel to each page type, and each page type's page views and downloads. Both come from the same daily reads, so a page type's page views equal the sum of its channels'. */
+export function useGetTrafficFlow<TData = Awaited<ReturnType<typeof getTrafficFlow>>, TError = Error>(
+ params?: GetTrafficFlowParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficFlow>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrafficFlowQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

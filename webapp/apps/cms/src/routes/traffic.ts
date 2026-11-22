@@ -10,7 +10,7 @@ import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { and, asc, desc, eq, gte, lte, ne, or, sql, type SQL } from "drizzle-orm";
 import { requireScope, type AuthVariables } from "../auth/tokens";
 import type { Database } from "../db/client";
-import { trafficDaily, trafficSiteDaily, trafficSourceDaily } from "../db/schema";
+import { trafficDaily, trafficPageDaily, trafficSiteDaily, trafficSourceDaily } from "../db/schema";
 import { channels, pageTypes } from "../traffic/channels";
 import { getPost } from "../posts/service";
 import { clampedStart } from "../search/analytics";
@@ -85,6 +85,8 @@ export function trafficRoutes(db: Database) {
   const app = new OpenAPIHono<{ Variables: AuthVariables }>({ defaultHook: validationHook });
   app.use("/v1/traffic", requireScope(db, "posts:read"));
   app.use("/v1/traffic/sources", requireScope(db, "posts:read"));
+  app.use("/v1/traffic/pages", requireScope(db, "posts:read"));
+  app.use("/v1/traffic/flow", requireScope(db, "posts:read"));
   app.use("/v1/posts/:id/traffic", requireScope(db, "posts:read"));
   const errors = {
     401: json(errorSchema, "Missing or invalid token"),
@@ -160,6 +162,55 @@ export function trafficRoutes(db: Database) {
     const [totals] = await db.select({ pageviews: sql<number>`coalesce(sum(${t.pageviews}), 0)::int`, downloads: sql<number>`coalesce(sum(${t.downloads}), 0)::int` })
       .from(t).where(and(...where));
     return context.json({ from, to, importedAt, groupBy, totals: totals!, rows: rows as Array<z.infer<typeof sourceRowSchema>> }, 200);
+  });
+
+  const pageRowSchema = z.object({
+    path: z.string(), postId: z.uuid().nullable(), pageType: z.enum(pageTypes),
+    pageviews: z.number().int(), downloads: z.number().int().describe("Every download started from this page, tagged or not"),
+  }).openapi("TrafficPage");
+
+  app.openapi(createRoute({
+    method: "get", path: "/v1/traffic/pages", operationId: "getTrafficPages", tags: ["Posts"], security: [{ bearer: [] }],
+    description: "Every page of the site with its page views and all its downloads, over complete US Pacific days, most viewed first; optionally one page type.",
+    request: { query: rangeQuery.extend({ pageType: z.enum(pageTypes).optional(), limit: z.coerce.number().int().min(1).max(500).default(50) }) },
+    responses: { 200: json(z.object({
+      from: z.iso.date().nullable(), to: z.iso.date().nullable(), importedAt: z.iso.datetime().nullable(),
+      totals: z.object({ pageviews: z.number().int(), downloads: z.number().int() }), rows: z.array(pageRowSchema),
+    }).openapi("TrafficPages"), "The pages"), ...errors },
+  }), async (context) => {
+    const { days: span, since, pageType, limit } = context.req.valid("query");
+    const { from, to, importedAt } = await trafficWindow(db, span, since);
+    if (!from || !to) return context.json({ from, to, importedAt, totals: totalsOf([]), rows: [] }, 200);
+    const t = trafficPageDaily;
+    const where: SQL[] = [gte(t.date, from), lte(t.date, to)];
+    if (pageType) where.push(eq(t.pageType, pageType));
+    const pageviews = sql<number>`sum(${t.pageviews})::int`;
+    const downloads = sql<number>`sum(${t.downloads})::int`;
+    const rows = await db.select({ path: t.path, postId: t.postId, pageType: t.pageType, pageviews, downloads }).from(t).where(and(...where))
+      .groupBy(t.path, t.postId, t.pageType).orderBy(desc(pageviews), desc(downloads), asc(t.path)).limit(limit);
+    const [totals] = await db.select({ pageviews: sql<number>`coalesce(sum(${t.pageviews}), 0)::int`, downloads: sql<number>`coalesce(sum(${t.downloads}), 0)::int` }).from(t).where(and(...where));
+    return context.json({ from, to, importedAt, totals: totals!, rows: rows as Array<z.infer<typeof pageRowSchema>> }, 200);
+  });
+
+  app.openapi(createRoute({
+    method: "get", path: "/v1/traffic/flow", operationId: "getTrafficFlow", tags: ["Posts"], security: [{ bearer: [] }],
+    description: "From channel to page type to download, over complete US Pacific days: page views from each channel to each page type, and each page type's page views and downloads. Both come from the same daily reads, so a page type's page views equal the sum of its channels'.",
+    request: { query: rangeQuery },
+    responses: { 200: json(z.object({
+      from: z.iso.date().nullable(), to: z.iso.date().nullable(),
+      links: z.array(z.object({ channel: z.enum(channels), pageType: z.enum(pageTypes), pageviews: z.number().int() })),
+      pageTypes: z.array(z.object({ pageType: z.enum(pageTypes), pageviews: z.number().int(), downloads: z.number().int() })),
+    }).openapi("TrafficFlow"), "The flow"), ...errors },
+  }), async (context) => {
+    const { days: span, since } = context.req.valid("query");
+    const { from, to } = await trafficWindow(db, span, since);
+    if (!from || !to) return context.json({ from, to, links: [], pageTypes: [] }, 200);
+    const s = trafficSourceDaily, p = trafficPageDaily;
+    const links = await db.select({ channel: s.channel, pageType: s.pageType, pageviews: sql<number>`sum(${s.pageviews})::int` })
+      .from(s).where(and(gte(s.date, from), lte(s.date, to))).groupBy(s.channel, s.pageType).orderBy(desc(sql`sum(${s.pageviews})`));
+    const types = await db.select({ pageType: p.pageType, pageviews: sql<number>`sum(${p.pageviews})::int`, downloads: sql<number>`sum(${p.downloads})::int` })
+      .from(p).where(and(gte(p.date, from), lte(p.date, to))).groupBy(p.pageType).orderBy(desc(sql`sum(${p.pageviews})`));
+    return context.json({ from, to, links: links as Array<{ channel: (typeof channels)[number]; pageType: (typeof pageTypes)[number]; pageviews: number }>, pageTypes: types as Array<{ pageType: (typeof pageTypes)[number]; pageviews: number; downloads: number }> }, 200);
   });
 
   return app;

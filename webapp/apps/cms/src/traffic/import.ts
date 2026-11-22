@@ -7,13 +7,13 @@
 // whole site. A day is read and replaced in one transaction, so a run that
 // stops part way is repeated by the next. Today is left for tomorrow: a day
 // still being counted would look like a drop.
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { Database } from "../db/client";
-import { trafficDaily, trafficSiteDaily, trafficSourceDaily, trafficState } from "../db/schema";
+import { trafficDaily, trafficPageDaily, trafficSiteDaily, trafficSourceDaily, trafficState } from "../db/schema";
 import { channelOf, pageTypeOf } from "./channels";
 import { pagePathOf, postPathIndex } from "../posts/paths";
 import { pacificDay } from "../search/analytics";
-import type { DownloadEvent, SourceRow, UmamiClient } from "./umami";
+import type { DownloadEvent, SourceRow, TrafficRow, UmamiClient } from "./umami";
 
 const dayMs = 86_400_000;
 /** A failed import is tried again after this long. */
@@ -32,10 +32,32 @@ export async function readTrafficState(db: Pick<Database, "select">) {
 const yesterday = (now: Date) => isoDay(Date.parse(pacificDay(now)) - dayMs);
 
 /** Whether the scheduler should import now: a complete day is missing and the last attempt is an hour old. */
-export async function trafficImportDue(db: Pick<Database, "select">, now = new Date()) {
+export async function trafficImportDue(db: Database, now = new Date()) {
   const state = await readTrafficState(db);
   if (state?.attemptedAt && now.getTime() - state.attemptedAt.getTime() < retryAfterMs) return false;
-  return !state?.importedThrough || state.importedThrough < yesterday(now);
+  if (!state?.importedThrough || state.importedThrough < yesterday(now)) return true;
+  return Boolean(state.importedFrom && await firstIncompleteDay(db, state.importedFrom, state.importedThrough));
+}
+
+/**
+ * The first day from..through whose numbers are not all there: no site row,
+ * or pages or sources that do not add up to the site's page views. That
+ * happens when a version that did not yet fill a table imported the day
+ * (the API and the scheduler update one after the other), so the import
+ * resumes there instead of trusting the last imported day.
+ */
+export async function firstIncompleteDay(db: Database, from: string, through: string) {
+  const rows = await db.execute<{ day: string }>(sql`
+    select to_char(day, 'YYYY-MM-DD') as day
+    from generate_series(${from}::date, ${through}::date, interval '1 day') as day
+    left join ${trafficSiteDaily} site on site.date = day::date
+    left join (select date, sum(pageviews) as pageviews from ${trafficSourceDaily} group by date) sources on sources.date = day::date
+    left join (select date, sum(pageviews) as pageviews from ${trafficPageDaily} group by date) pages on pages.date = day::date
+    where site.date is null
+      or coalesce(sources.pageviews, 0) <> site.pageviews
+      or coalesce(pages.pageviews, 0) <> site.pageviews
+    order by day limit 1`);
+  return rows[0]?.day;
 }
 
 export async function importTraffic(db: Database, client: UmamiClient, now = new Date()) {
@@ -44,7 +66,10 @@ export async function importTraffic(db: Database, client: UmamiClient, now = new
   const state = await readTrafficState(db);
   const from = state?.importedFrom ?? pacificDay(await client.createdAt());
   const last = yesterday(now);
-  const start = state?.importedThrough ? isoDay(Date.parse(state.importedThrough) - rereadDays * dayMs) : from;
+  const reread = state?.importedThrough ? isoDay(Date.parse(state.importedThrough) - rereadDays * dayMs) : from;
+  // A day another version left incomplete is read again, however long ago.
+  const incomplete = state?.importedFrom && state.importedThrough ? await firstIncompleteDay(db, state.importedFrom, state.importedThrough) : undefined;
+  const start = incomplete && incomplete < reread ? incomplete : reread;
   const index = await postPathIndex(db);
   const otherPages = new Set<string>();
   let days = 0;
@@ -65,6 +90,7 @@ export async function importTraffic(db: Database, client: UmamiClient, now = new
     }
     const site = rows.reduce((sum, row) => ({ pageviews: sum.pageviews + row.pageviews, downloads: sum.downloads + row.downloads }), { pageviews: 0, downloads: 0 });
     const sources = sourcesOf(await client.sources(day, rows.map((row) => row.path)), downloads, index);
+    const pages = pagesOf(rows, index);
     // Every page view has exactly one source row: anything else means a read was cut short, and the day is not stored.
     const sourced = sources.reduce((sum, row) => sum + row.pageviews, 0);
     if (sourced !== site.pageviews) throw new Error(`Umami's sources for ${day} add up to ${sourced} page views, its pages to ${site.pageviews}`);
@@ -74,6 +100,10 @@ export async function importTraffic(db: Database, client: UmamiClient, now = new
       if (perPost.size) await tx.insert(trafficDaily).values([...perPost].map(([postId, sum]) => ({ postId, date: day, ...sum })));
       await tx.insert(trafficSiteDaily).values({ date: day, ...site });
       await tx.delete(trafficSourceDaily).where(eq(trafficSourceDaily.date, day));
+      await tx.delete(trafficPageDaily).where(eq(trafficPageDaily.date, day));
+      for (let offset = 0; offset < pages.length; offset += 1000) {
+        await tx.insert(trafficPageDaily).values(pages.slice(offset, offset + 1000).map((row) => ({ date: day, ...row })));
+      }
       for (let offset = 0; offset < sources.length; offset += 1000) {
         await tx.insert(trafficSourceDaily).values(sources.slice(offset, offset + 1000).map((row) => ({ date: day, ...row })));
       }
@@ -117,6 +147,20 @@ function sourcesOf(rows: SourceRow[], downloads: DownloadEvent[], index: Map<str
       referrer: null, utmSource: tags.get("utm_source"), utmMedium: tags.get("utm_medium"),
       utmCampaign: tags.get("utm_campaign"), utmContent: tags.get("utm_content"),
     }, 0, 1);
+  }
+  return [...sums.values()];
+}
+
+/** Every page's page views and downloads, a page at an address a post once had counted for that post. */
+function pagesOf(rows: TrafficRow[], index: Map<string, string>) {
+  const sums = new Map<string, { path: string; postId: string | null; pageType: string; pageviews: number; downloads: number }>();
+  for (const row of rows) {
+    const path = pagePathOf(row.path) ?? row.path;
+    const postId = index.get(path) ?? null;
+    const sum = sums.get(path) ?? { path, postId, pageType: pageTypeOf(path, Boolean(postId)), pageviews: 0, downloads: 0 };
+    sum.pageviews += row.pageviews;
+    sum.downloads += row.downloads;
+    sums.set(path, sum);
   }
   return [...sums.values()];
 }
