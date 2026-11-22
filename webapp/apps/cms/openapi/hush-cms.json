@@ -331,6 +331,14 @@
             "format": "date-time",
             "description": "When the CMS last read Search Console; null until the first import"
           },
+          "preliminaryFrom": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "The first day in the window Google was still counting at the last import: numbers from it on may still change. Null when all are final"
+          },
           "totals": {
             "$ref": "#/components/schemas/SearchTotals"
           },
@@ -457,6 +465,7 @@
           "from",
           "to",
           "importedAt",
+          "preliminaryFrom",
           "totals",
           "previous",
           "change",
@@ -615,6 +624,14 @@
             ],
             "format": "date-time"
           },
+          "preliminaryFrom": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "The first day in the window Google was still counting at the last import: numbers from it on may still change. Null when all are final"
+          },
           "totals": {
             "allOf": [
               {
@@ -703,6 +720,7 @@
           "from",
           "to",
           "importedAt",
+          "preliminaryFrom",
           "totals",
           "previous",
           "change",

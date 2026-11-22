@@ -740,6 +740,10 @@ test("CMS-019 the Analytics dashboard, as Ghost's: from the sidebar, Google's si
     await expect(metrics.getByRole("tab", { name: /Avg. position/ })).toHaveAttribute("title", /lower is better/);
   }
   await expect(signedIn.getByText(/more than the posts add up to/)).toBeVisible();
+  // Google's own word on which days it is still counting, on the chart and in words.
+  await expect(signedIn.locator(".recharts-reference-line")).toHaveCount(1);
+  await expect(signedIn.getByText("Preliminary", { exact: true })).toBeVisible();
+  await expect(signedIn.getByText(/Google is still counting from 19 Nov 2026: those numbers may still change/)).toBeVisible();
   const top = signedIn.getByRole("table", { name: "Top posts" });
   await expect(top.getByRole("row")).toHaveCount(2);
   await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));

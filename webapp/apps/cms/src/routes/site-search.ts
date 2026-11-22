@@ -31,6 +31,7 @@ const siteSearchSchema = z.object({
   from: z.iso.date().nullable(),
   to: z.iso.date().nullable(),
   importedAt: z.iso.datetime().nullable(),
+  preliminaryFrom: z.iso.date().nullable().describe("The first day in the window Google was still counting at the last import: numbers from it on may still change. Null when all are final"),
   totals: totalsSchema.describe("The property's totals, as Google aggregates a site; not the sum of the posts"),
   previous: z.object({ from: z.iso.date(), to: z.iso.date(), totals: totalsSchema }).nullable(),
   change: z.object({
@@ -71,9 +72,9 @@ export function siteSearchRoutes(db: Database) {
     },
   }), async (context) => {
     const { days: span, since, limit } = context.req.valid("query");
-    const { from, to, coverage, importedAt } = await searchWindow(db, span, since);
+    const { from, to, coverage, importedAt, preliminaryFrom } = await searchWindow(db, span, since);
     if (!from || !to || !coverage) {
-      return context.json({ from, to, importedAt, totals: totalsOf([]), previous: null, change: null, days: [], topPosts: [] }, 200);
+      return context.json({ from, to, importedAt, preliminaryFrom, totals: totalsOf([]), previous: null, change: null, days: [], topPosts: [] }, 200);
     }
     const days = await siteDays(db, from, to);
     const totals = totalsOf(days);
@@ -94,7 +95,7 @@ export function siteSearchRoutes(db: Database) {
       .orderBy(desc(clicks), desc(impressions), asc(posts.slug))
       .limit(limit);
     return context.json({
-      from, to, importedAt, totals, previous,
+      from, to, importedAt, preliminaryFrom, totals, previous,
       change: changeFrom(totals, previous?.totals),
       days,
       topPosts: top.map((row) => ({ ...row, position: Number(row.position ?? 0), ctr: row.impressions ? row.clicks / row.impressions : 0 })),

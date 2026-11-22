@@ -45,7 +45,7 @@ function Analytics() {
             <SearchKpis id="site" search={{ ...numbers, from: numbers.from, to: numbers.to }} />
           </section>
           <TopPostsCard posts={numbers.topPosts} range={range} />
-          <DataSource from={numbers.from} to={numbers.to} importedAt={numbers.importedAt}>
+          <DataSource from={numbers.from} to={numbers.to} importedAt={numbers.importedAt} preliminaryFrom={numbers.preliminaryFrom}>
             The totals are Google's for the whole site, home and download pages included, so they are more than the posts add up to.
           </DataSource>
         </div>

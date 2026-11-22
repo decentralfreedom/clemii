@@ -110,6 +110,20 @@ export function searchConsoleClient(config: SearchConsoleConfig, fetcher: Fetch 
       return (await query(start, end, ["date"], "byProperty")).map(({ keys: [date], ...numbers }) => ({ date: date!, ...numbers }));
     },
 
+    /**
+     * The first day Google is still collecting and processing, from the
+     * response metadata of a by-date query over start..end with fresh data
+     * (first_incomplete_date, US Pacific); null when every day in it is final.
+     * Numbers from that day on "may still change noticeably".
+     */
+    async firstIncompleteDate(start: string, end: string): Promise<string | null> {
+      const body = await call(`/sites/${encodeURIComponent(config.site)}/searchAnalytics/query`, {
+        method: "POST",
+        body: JSON.stringify({ startDate: start, endDate: end, dimensions: ["date"], type: "web", dataState: "all", aggregationType: "byProperty", rowLimit: 1 }),
+      }) as { metadata?: { first_incomplete_date?: string; firstIncompleteDate?: string } };
+      return body.metadata?.first_incomplete_date ?? body.metadata?.firstIncompleteDate ?? null;
+    },
+
     /** The same, per search query as well. */
     async pageQueryDays(start: string, end: string): Promise<QueryRow[]> {
       return (await query(start, end, ["page", "query", "date"]))

@@ -110,10 +110,13 @@ export async function searchWindow(db: Database, span: number, since?: string) {
   const state = await readSearchState(db);
   const to = state?.importedThrough ?? null;
   const coverage = state?.importedFrom ?? to;
-  if (!to || !coverage) return { from: null, to: null, coverage: null, importedAt: state?.importedAt?.toISOString() ?? null };
+  if (!to || !coverage) return { from: null, to: null, coverage: null, preliminaryFrom: null, importedAt: state?.importedAt?.toISOString() ?? null };
   const wanted = since ?? new Date(Date.parse(to) - (span - 1) * 86_400_000).toISOString().slice(0, 10);
   // Never before the first day the CMS has numbers for, and never after the last.
   const start = wanted > coverage ? wanted : coverage;
   const from = start < to ? start : to;
-  return { from, to, coverage, importedAt: state?.importedAt?.toISOString() ?? null };
+  // Google's still-incomplete days inside the window, from its first one shown.
+  const incomplete = state?.incompleteFrom;
+  const preliminaryFrom = !incomplete || incomplete > to ? null : incomplete < from ? from : incomplete;
+  return { from, to, coverage, preliminaryFrom, importedAt: state?.importedAt?.toISOString() ?? null };
 }

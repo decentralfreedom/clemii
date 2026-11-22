@@ -35,7 +35,8 @@ const e2e = systemActor("e2e");
 const live = await createDraft(cms.db, validPost({ slug: "dictate-without-cloud", keyword: "dictate without cloud" }), e2e);
 await publishPost(cms, live.id, e2e);
 // What the scheduler's Search Console import leaves for the live post (src/search/import.ts).
-await cms.db.insert(searchConsoleState).values({ id: 1, importedAt: new Date(), importedFrom: "2025-07-24", importedThrough: "2026-11-20" });
+// Google was still counting 19 and 20 November.
+await cms.db.insert(searchConsoleState).values({ id: 1, importedAt: new Date(), importedFrom: "2025-07-24", importedThrough: "2026-11-20", incompleteFrom: "2026-11-19" });
 await cms.db.insert(searchDaily).values([
   { postId: live.id, date: "2026-11-01", impressions: 1200, clicks: 30, position: 8 },
   { postId: live.id, date: "2026-11-20", impressions: 300, clicks: 6, position: 6 },

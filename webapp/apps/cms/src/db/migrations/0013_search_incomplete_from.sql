@@ -1,0 +1,1 @@
+ALTER TABLE "search_console_state" ADD COLUMN "incomplete_from" date;
