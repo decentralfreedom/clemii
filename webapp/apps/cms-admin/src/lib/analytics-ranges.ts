@@ -17,7 +17,8 @@ export const analyticsRanges = [
 ] as const;
 
 export type AnalyticsRangeKey = (typeof analyticsRanges)[number]["key"];
-export const defaultAnalyticsRange: AnalyticsRangeKey = "30";
+// Ninety days in weekly points: the blog's few daily readers make single days noise.
+export const defaultAnalyticsRange: AnalyticsRangeKey = "90";
 
 export const isAnalyticsRange = (value: unknown): value is AnalyticsRangeKey =>
   analyticsRanges.some((range) => range.key === value);

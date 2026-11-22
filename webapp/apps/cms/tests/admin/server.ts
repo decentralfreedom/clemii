@@ -88,6 +88,8 @@ await cms.db.insert(trafficPageDaily).values([
 await cms.db.insert(searchQueries).values([
   { postId: live.id, date: "2026-11-20", query: "dictate without cloud", impressions: 200, clicks: 5, position: 5 },
   { postId: live.id, date: "2026-11-20", query: "offline dictation mac", impressions: 60, clicks: 1, position: 8 },
+  // More than the five shown first, so the rest open in place.
+  ...["voice typing mac", "mac speech to text", "local dictation app", "dictation without internet", "private dictation"].map((query, index) => ({ postId: live.id, date: "2026-11-20", query, impressions: 10 - index, clicks: 0, position: 30 })),
 ]);
 // An agent's proposal waiting for the owner (src/goals/service.ts), as hush-cms goals propose leaves it.
 await proposeObjective(cms.db, { quarter: "2026-Q4", title: "Become the answer for private Mac dictation", keyResults: [

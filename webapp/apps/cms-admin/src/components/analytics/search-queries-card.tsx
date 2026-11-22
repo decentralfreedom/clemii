@@ -4,8 +4,9 @@
 // The Google searches a post was found for, as Ghost's top-content cards:
 // impressions, clicks, CTR and position, with the searches in striking
 // distance of the first page marked. Only what Google reports: it leaves out
-// rare searches, and too few impressions say little, as the card notes.
-import { Link } from "@tanstack/react-router";
+// rare searches, and too few impressions say little, as the card notes. The
+// top five first; the rest open in place.
+import { useState } from "react";
 import { useGetPostSearchQueries, type GetPostSearchParams } from "@/api/cms.generated";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,13 +14,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatMetric } from "@/lib/search-chart";
 
-export function SearchQueriesCard({ postId, params, limit, more, compact = false }: {
-  postId: string; params: GetPostSearchParams; limit: number;
-  /** Search, impressions and position only, for a half-width card. */
-  compact?: boolean;
-  /** A link to all searches, on the Overview. */
-  more?: { tab: "search" };
-}) {
+const shown = 5;
+const all = 100;
+
+export function SearchQueriesCard({ postId, params }: { postId: string; params: GetPostSearchParams }) {
+  const [open, setOpen] = useState(false);
+  const limit = open ? all : shown + 1;
   const queries = useGetPostSearchQueries(postId, { ...params, limit });
   const rows = queries.data?.status === 200 ? queries.data.data.queries : [];
   return (
@@ -39,13 +39,13 @@ export function SearchQueriesCard({ postId, params, limit, more, compact = false
               <TableRow>
                 <TableHead>Search</TableHead>
                 <TableHead className="text-right">Impressions</TableHead>
-                {!compact && <TableHead className="text-right">Clicks</TableHead>}
-                {!compact && <TableHead className="text-right">CTR</TableHead>}
+                <TableHead className="hidden text-right md:table-cell">Clicks</TableHead>
+                <TableHead className="hidden text-right md:table-cell">CTR</TableHead>
                 <TableHead className="text-right">Position</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((row) => (
+              {(open ? rows : rows.slice(0, shown)).map((row) => (
                 <TableRow key={row.query}>
                   <TableCell className="max-w-[18rem] whitespace-normal">
                     <span className="flex items-center gap-2">
@@ -54,17 +54,17 @@ export function SearchQueriesCard({ postId, params, limit, more, compact = false
                     </span>
                   </TableCell>
                   <TableCell className="text-right tabular-nums">{formatMetric("impressions", row.impressions)}</TableCell>
-                  {!compact && <TableCell className="text-right tabular-nums">{formatMetric("clicks", row.clicks)}</TableCell>}
-                  {!compact && <TableCell className="text-right tabular-nums">{formatMetric("ctr", row.ctr)}</TableCell>}
+                  <TableCell className="hidden text-right tabular-nums md:table-cell">{formatMetric("clicks", row.clicks)}</TableCell>
+                  <TableCell className="hidden text-right tabular-nums md:table-cell">{formatMetric("ctr", row.ctr)}</TableCell>
                   <TableCell className="text-right tabular-nums">{formatMetric("position", row.position)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         )}
-        {more && rows.length >= limit && (
-          <Button asChild variant="outline" size="sm" className="mt-4">
-            <Link to="." search={(previous) => ({ ...previous, tab: more.tab })}>See all searches</Link>
+        {(open || rows.length > shown) && (
+          <Button variant="outline" size="sm" className="mt-4" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+            {open ? "Show the top 5" : "Show all searches"}
           </Button>
         )}
       </CardContent>

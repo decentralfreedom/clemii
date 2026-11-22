@@ -387,6 +387,64 @@ export interface SiteSearch {
   topPosts: SearchTopPost[];
 }
 
+export type BlogAnalyticsTotals = {
+  impressions: number;
+  /** Clicks from Google Search */
+  clicks: number;
+  /** From every source */
+  pageviews: number;
+  /** Downloads started on the post's pages */
+  downloads: number;
+};
+
+export type BlogAnalyticsDaysItem = {
+  date: string;
+  impressions: number;
+  /** Clicks from Google Search */
+  clicks: number;
+  /** From every source */
+  pageviews: number;
+  /** Downloads started on the post's pages */
+  downloads: number;
+};
+
+export type BlogAnalyticsPostsItem = {
+  postId: string;
+  title: string;
+  status: string;
+  impressions: number;
+  /** Clicks from Google Search */
+  clicks: number;
+  /** From every source */
+  pageviews: number;
+  /** Downloads started on the post's pages */
+  downloads: number;
+};
+
+export interface BlogAnalytics {
+  /**
+     * The first day both Search Console and Umami have in the window; null when they share none
+     * @nullable
+     */
+  from: string | null;
+  /** @nullable */
+  to: string | null;
+  /**
+     * The first day Google was still counting at its last import; its numbers may still change
+     * @nullable
+     */
+  preliminaryFrom: string | null;
+  /** @nullable */
+  searchImportedAt: string | null;
+  /** @nullable */
+  trafficImportedAt: string | null;
+  totals: BlogAnalyticsTotals;
+  /** Only days with numbers; a day in the window without one had none */
+  days: BlogAnalyticsDaysItem[];
+  /** Every post with numbers in the window, most downloads first */
+  posts: BlogAnalyticsPostsItem[];
+}
+
 export type TrafficTotals = {
   pageviews: number;
   downloads: number;
@@ -870,6 +928,10 @@ export interface Goals {
   objectives: GoalObjective[];
 }
 
+export interface GoalDrafts {
+  objectives: GoalObjective[];
+}
+
 export type NewGoalObjectiveKeyResultsItemKind = typeof NewGoalObjectiveKeyResultsItemKind[keyof typeof NewGoalObjectiveKeyResultsItemKind];
 
 
@@ -1251,6 +1313,15 @@ export type GetSiteSearchParams = {
    * @maximum 100
    */
   limit?: number;
+};
+
+export type GetBlogAnalyticsParams = {
+  /**
+   * @minimum 1
+   * @maximum 3650
+   */
+  days?: number;
+  since?: string;
 };
 
 export type GetPostTrafficParams = {
@@ -3087,6 +3158,143 @@ export function useGetSiteSearch<TData = Awaited<ReturnType<typeof getSiteSearch
 
 
 
+export type getBlogAnalyticsResponse200 = {
+  data: BlogAnalytics
+  status: 200
+}
+
+export type getBlogAnalyticsResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type getBlogAnalyticsResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type getBlogAnalyticsResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type getBlogAnalyticsResponseSuccess = (getBlogAnalyticsResponse200) & {
+  headers: Headers;
+};
+export type getBlogAnalyticsResponseError = (getBlogAnalyticsResponse400 | getBlogAnalyticsResponse401 | getBlogAnalyticsResponse403) & {
+  headers: Headers;
+};
+
+export type getBlogAnalyticsResponse = (getBlogAnalyticsResponseSuccess | getBlogAnalyticsResponseError)
+
+export const getGetBlogAnalyticsUrl = (params?: GetBlogAnalyticsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/blog?${stringifiedParams}` : `/v1/blog`
+}
+
+/**
+ * The blog's funnel and every post's part in it: Google impressions and clicks, page views and downloads, over the last `days` days (or since a day) that both Search Console and Umami have.
+ */
+export const getBlogAnalytics = async (params?: GetBlogAnalyticsParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getBlogAnalyticsResponse> => {
+
+  return cmsFetch<getBlogAnalyticsResponse>(getGetBlogAnalyticsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBlogAnalyticsQueryKey = (params?: GetBlogAnalyticsParams,) => {
+    return [
+    `/v1/blog`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetBlogAnalyticsQueryOptions = <TData = Awaited<ReturnType<typeof getBlogAnalytics>>, TError = Error>(params?: GetBlogAnalyticsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBlogAnalytics>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBlogAnalyticsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBlogAnalytics>>> = ({ signal }) => getBlogAnalytics(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBlogAnalytics>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetBlogAnalyticsQueryResult = NonNullable<Awaited<ReturnType<typeof getBlogAnalytics>>>
+export type GetBlogAnalyticsQueryError = Error
+
+
+/** The blog's funnel and every post's part in it: Google impressions and clicks, page views and downloads, over the last `days` days (or since a day) that both Search Console and Umami have. */
+export function useGetBlogAnalytics<TData = Awaited<ReturnType<typeof getBlogAnalytics>>, TError = Error>(
+ params: undefined |  GetBlogAnalyticsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBlogAnalytics>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBlogAnalytics>>,
+          TError,
+          Awaited<ReturnType<typeof getBlogAnalytics>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** The blog's funnel and every post's part in it: Google impressions and clicks, page views and downloads, over the last `days` days (or since a day) that both Search Console and Umami have. */
+export function useGetBlogAnalytics<TData = Awaited<ReturnType<typeof getBlogAnalytics>>, TError = Error>(
+ params?: GetBlogAnalyticsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBlogAnalytics>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBlogAnalytics>>,
+          TError,
+          Awaited<ReturnType<typeof getBlogAnalytics>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** The blog's funnel and every post's part in it: Google impressions and clicks, page views and downloads, over the last `days` days (or since a day) that both Search Console and Umami have. */
+export function useGetBlogAnalytics<TData = Awaited<ReturnType<typeof getBlogAnalytics>>, TError = Error>(
+ params?: GetBlogAnalyticsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBlogAnalytics>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** The blog's funnel and every post's part in it: Google impressions and clicks, page views and downloads, over the last `days` days (or since a day) that both Search Console and Umami have. */
+export function useGetBlogAnalytics<TData = Awaited<ReturnType<typeof getBlogAnalytics>>, TError = Error>(
+ params?: GetBlogAnalyticsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBlogAnalytics>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetBlogAnalyticsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export type getPostTrafficResponse200 = {
   data: Traffic
   status: 200
@@ -4511,6 +4719,136 @@ export const useProposeGoal = <TError = Error,
       > => {
       return useMutation(getProposeGoalMutationOptions(options), queryClient);
     }
+
+export type listGoalDraftsResponse200 = {
+  data: GoalDrafts
+  status: 200
+}
+
+export type listGoalDraftsResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type listGoalDraftsResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type listGoalDraftsResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type listGoalDraftsResponseSuccess = (listGoalDraftsResponse200) & {
+  headers: Headers;
+};
+export type listGoalDraftsResponseError = (listGoalDraftsResponse400 | listGoalDraftsResponse401 | listGoalDraftsResponse403) & {
+  headers: Headers;
+};
+
+export type listGoalDraftsResponse = (listGoalDraftsResponseSuccess | listGoalDraftsResponseError)
+
+export const getListGoalDraftsUrl = () => {
+
+
+
+
+  return `/v1/goals/drafts`
+}
+
+/**
+ * Every proposed objective still waiting for the owner's approval, whatever its quarter, newest first.
+ */
+export const listGoalDrafts = async ( options?: Parameters<typeof cmsFetch>[1]): Promise<listGoalDraftsResponse> => {
+
+  return cmsFetch<listGoalDraftsResponse>(getListGoalDraftsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListGoalDraftsQueryKey = () => {
+    return [
+    `/v1/goals/drafts`
+    ] as const;
+    }
+
+
+export const getListGoalDraftsQueryOptions = <TData = Awaited<ReturnType<typeof listGoalDrafts>>, TError = Error>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoalDrafts>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListGoalDraftsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listGoalDrafts>>> = ({ signal }) => listGoalDrafts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listGoalDrafts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListGoalDraftsQueryResult = NonNullable<Awaited<ReturnType<typeof listGoalDrafts>>>
+export type ListGoalDraftsQueryError = Error
+
+
+/** Every proposed objective still waiting for the owner's approval, whatever its quarter, newest first. */
+export function useListGoalDrafts<TData = Awaited<ReturnType<typeof listGoalDrafts>>, TError = Error>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoalDrafts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listGoalDrafts>>,
+          TError,
+          Awaited<ReturnType<typeof listGoalDrafts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** Every proposed objective still waiting for the owner's approval, whatever its quarter, newest first. */
+export function useListGoalDrafts<TData = Awaited<ReturnType<typeof listGoalDrafts>>, TError = Error>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoalDrafts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listGoalDrafts>>,
+          TError,
+          Awaited<ReturnType<typeof listGoalDrafts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** Every proposed objective still waiting for the owner's approval, whatever its quarter, newest first. */
+export function useListGoalDrafts<TData = Awaited<ReturnType<typeof listGoalDrafts>>, TError = Error>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoalDrafts>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** Every proposed objective still waiting for the owner's approval, whatever its quarter, newest first. */
+export function useListGoalDrafts<TData = Awaited<ReturnType<typeof listGoalDrafts>>, TError = Error>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listGoalDrafts>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListGoalDraftsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export type approveGoalResponse204 = {
   data: void

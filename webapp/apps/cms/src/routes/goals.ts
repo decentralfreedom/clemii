@@ -8,7 +8,7 @@ import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { requireScope, type AuthVariables } from "../auth/tokens";
 import type { Database } from "../db/client";
 import { metrics, type Metric } from "../goals/metrics";
-import { approveObjective, archiveObjective, catalog, checkIn, listObjectives, proposeObjective } from "../goals/service";
+import { approveObjective, archiveObjective, catalog, checkIn, listDrafts, listObjectives, proposeObjective } from "../goals/service";
 import { pacificDay } from "../search/analytics";
 import { errorSchema, validationHook } from "./errors";
 
@@ -95,6 +95,12 @@ export function goalsRoutes(db: Database) {
     const { quarter = currentQuarter(), archived } = context.req.valid("query");
     return context.json({ quarter, objectives: (await listObjectives(db, quarter, archived)).map(present) }, 200);
   });
+
+  app.openapi(createRoute({
+    method: "get", path: "/v1/goals/drafts", operationId: "listGoalDrafts", tags: ["Goals"], security: [{ bearer: [] }],
+    description: "Every proposed objective still waiting for the owner's approval, whatever its quarter, newest first.",
+    responses: { 200: json(z.object({ objectives: z.array(objectiveSchema) }).openapi("GoalDrafts"), "The drafts"), ...errors },
+  }), async (context) => context.json({ objectives: (await listDrafts(db)).map(present) }, 200));
 
   app.openapi(createRoute({
     method: "post", path: "/v1/goals", operationId: "proposeGoal", tags: ["Goals"], security: [{ bearer: [] }],

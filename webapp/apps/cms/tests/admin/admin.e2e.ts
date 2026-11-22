@@ -599,9 +599,9 @@ test("CMS-016 a published post's settings show its Google Search numbers over Gh
   await settingsToggle(signedIn).click();
   const panel = settings(signedIn);
   await expect(panel.getByRole("heading", { name: /Google Search/ })).toBeVisible();
-  // Last 30 days by default, as Ghost: both days are in it.
+  // Last 90 days by default (the blog's few daily readers make short ranges noise): both days are in it.
   const stats = panel.getByRole("definition").first().locator("xpath=ancestor::dl");
-  await expect(panel.getByText(/Web search, 22 Oct 2026 to 20 Nov 2026/)).toBeVisible();
+  await expect(panel.getByText(/Web search, 23 Aug 2026 to 20 Nov 2026/)).toBeVisible();
   await expect(stats).toContainText("1.5K");
   const range = async (name: string) => {
     await panel.getByRole("combobox", { name: "Date range" }).click();
@@ -665,7 +665,7 @@ test("CMS-017 a draft is deleted from its settings, as in Ghost, and a live post
   await expect(settings(signedIn).getByText("Unpublish this post to delete it")).toBeVisible();
 });
 
-test("CMS-018 a published post's analytics page, as Ghost's: from the posts list, KPI tabs over the chart, searches and changes, only days the CMS has", async ({ signedIn }, testInfo) => {
+test("CMS-018 a published post's analytics page, as Ghost's: from the posts list, one view with KPI tabs over the chart, the funnel, searches that open in place and changes, only days the CMS has", async ({ signedIn }, testInfo) => {
   // The live post the test server seeds: impressions on 1 and 20 November, history from 24 July 2025.
   // Other journeys publish posts with the same heading, so it is found by its id.
   const { posts: published } = await (await signedIn.request.get("/v1/posts?status=published")).json() as { posts: Array<Post & { slug: string }> };
@@ -677,7 +677,7 @@ test("CMS-018 a published post's analytics page, as Ghost's: from the posts list
   await analytics.click();
   await expect(signedIn).toHaveURL(/\/posts\/[0-9a-f-]+\/analytics$/);
   await expect(signedIn.getByRole("heading", { level: 1 })).toContainText("How to dictate on a Mac without the cloud");
-  // Last 30 days, as Ghost: both days are in it; the 30 days before have no impressions, so no change is claimed.
+  // Last 90 days by default: both days are in it; the 90 days before have no impressions, so no change is claimed.
   if (testInfo.project.name === "mobile") {
     // On a phone, as Ghost, the metrics are a menu over the chart.
     const choose = signedIn.getByRole("button", { name: "Choose metric" });
@@ -706,7 +706,7 @@ test("CMS-018 a published post's analytics page, as Ghost's: from the posts list
   await expect(signedIn.locator(".recharts-area-dots circle")).toHaveCount(2);
   await expect(signedIn.getByRole("table", { name: "Top searches" }).getByRole("row").nth(1)).toContainText("dictate without cloud");
   await expect(signedIn.getByText("Changes in this period", { exact: true })).toBeVisible();
-  await expect(signedIn.getByText(/Google Search Console, web search, 22 Oct 2026 to 20 Nov 2026/)).toBeVisible();
+  await expect(signedIn.getByText(/Google Search Console, web search, 23 Aug 2026 to 20 Nov 2026/)).toBeVisible();
   await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
   await signedIn.screenshot({ path: testInfo.outputPath("analytics-overview.png"), fullPage: true });
 
@@ -716,215 +716,98 @@ test("CMS-018 a published post's analytics page, as Ghost's: from the posts list
   await expect(signedIn).toHaveURL(/range=all/);
   await expect(signedIn.getByText(/web search, 24 Jul 2025 to 20 Nov 2026/)).toBeVisible();
 
-  // The Search tab lists every search, the ones close to the first page marked.
-  await signedIn.getByRole("tab", { name: "Search", exact: true }).click();
-  await expect(signedIn).toHaveURL(/tab=search/);
+  // The top five searches first; every search opens in place, no tab: the ones close to the first page marked.
+  const searches = signedIn.getByRole("table", { name: "Top searches" }).getByRole("row");
+  await expect(searches).toHaveCount(6);
+  await signedIn.getByRole("button", { name: "Show all searches" }).click();
+  await expect(searches).toHaveCount(8);
   const offline = signedIn.getByRole("row").filter({ hasText: "offline dictation mac" });
   await expect(offline).toContainText("Striking distance");
+  await expect(signedIn).not.toHaveURL(/tab=/);
   await signedIn.screenshot({ path: testInfo.outputPath("analytics-search.png"), fullPage: true });
 
-  // Back to the posts; and from the editor's Google Search block in.
-  await signedIn.getByRole("link", { name: "Posts", exact: true }).first().click();
-  await expect(signedIn).toHaveURL(/\/(\?.*)?$/);
+  // Back to Analytics, keeping the range; and from the editor's Google Search block in.
+  await signedIn.locator('a[href="/analytics?range=all"]').filter({ hasText: "Analytics" }).click();
+  await expect(signedIn).toHaveURL(/\/analytics\?range=all$/);
   await signedIn.goto(`/posts/${seeded.id}`);
   await settingsToggle(signedIn).click();
   await settings(signedIn).getByRole("link", { name: "Open analytics" }).click();
   await expect(signedIn).toHaveURL(new RegExp(`/posts/${seeded.id}/analytics$`));
 });
 
-test("CMS-019 Analytics, as Ghost's: an Overview at a glance from the sidebar, then the Search tab with Google's site totals, their valid change and top posts that open the post's analytics", async ({ signedIn }, testInfo) => {
+test("CMS-019 Analytics is one blog page, as Ghost's: the blog's funnel to downloads over the days both sources have, then the posts by downloads, each opening its own analytics", async ({ signedIn }, testInfo) => {
   const mobile = testInfo.project.name === "mobile";
   await signedIn.goto("/");
   if (mobile) await signedIn.getByRole("link", { name: "Analytics", exact: true }).click();
   else await signedIn.getByRole("navigation").or(signedIn.locator("[data-sidebar=sidebar]")).getByRole("link", { name: "Analytics", exact: true }).click();
   await expect(signedIn).toHaveURL(/\/analytics$/);
   await expect(signedIn.getByRole("heading", { level: 1 })).toHaveText("Analytics");
-  // The Overview: four headline numbers over one chart, the top content and sources, nothing more.
-  if (!mobile) {
-    const headline = signedIn.getByRole("tablist", { name: "Headline numbers" });
-    await expect(headline.getByTestId("overview-pageviews")).toContainText("200");
-    await expect(headline.getByTestId("overview-downloads")).toContainText("15");
-    await expect(headline.getByTestId("overview-clicks")).toContainText("80");
-    await expect(headline.getByTestId("overview-clicks-diff")).toHaveText("+344%");
-    await expect(headline.getByTestId("overview-conversion")).toContainText("7.5%");
-  }
-  const content = signedIn.getByRole("table", { name: "Top content" });
-  await expect(content.getByRole("row").nth(1)).toContainText("/");
-  await expect(content.getByRole("row").nth(1)).toContainText("120");
-  await expect(content.getByRole("row").nth(1)).toContainText("10");
-  await expect(signedIn.getByRole("table", { name: "Top sources" }).getByRole("row").nth(1)).toContainText("Direct");
-  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
-  await signedIn.screenshot({ path: testInfo.outputPath("overview.png"), fullPage: true });
-  await signedIn.getByRole("tab", { name: "Search" }).click();
-  await expect(signedIn).toHaveURL(/tab=search/);
-  // Last 30 days (22 Oct to 20 Nov): the site's own totals, against the 30 days before, which the CMS has and which hold 900 impressions.
+  // One page: no tabs to choose from.
+  await expect(signedIn.getByRole("tab", { name: "Traffic" })).toHaveCount(0);
+  await expect(signedIn.getByRole("combobox", { name: "Date range" })).toContainText("Last 90 days");
+  // Posts only, over the days both Search Console and Umami have (15 to 20 November): the 1 November impressions and the 21 November visits are left out.
   if (mobile) {
-    await expect(signedIn.getByRole("button", { name: "Choose metric" })).toContainText("2,800");
-    await expect(signedIn.getByRole("button", { name: "Choose metric" })).toContainText("+211%");
+    await expect(signedIn.getByRole("button", { name: "Choose step" })).toContainText("3");
   } else {
-    const metrics = signedIn.getByRole("tablist", { name: "Search metrics" });
-    await expect(metrics.getByTestId("kpi-impressions")).toContainText("2,800");
-    await expect(metrics.getByTestId("kpi-impressions-diff")).toHaveText("+211%");
-    await expect(metrics.getByTestId("kpi-clicks-diff")).toHaveText("+344%");
-    await expect(metrics.getByTestId("kpi-ctr")).toContainText("2.9%");
-    await expect(metrics.getByTestId("kpi-ctr-diff")).toHaveText("+0.9 pt");
-    // A lower position is better: shown as an improvement.
-    await expect(metrics.getByTestId("kpi-position")).toContainText("6.4");
-    await expect(metrics.getByTestId("kpi-position-diff")).toHaveText("-2.6");
-    await expect(metrics.getByRole("tab", { name: /Avg. position/ })).toHaveAttribute("title", /lower is better/);
+    const funnel = signedIn.getByRole("tablist", { name: "The blog's funnel" });
+    await expect(funnel.getByTestId("blog-impressions")).toContainText("300");
+    await expect(funnel.getByTestId("blog-clicks")).toContainText("6");
+    await expect(funnel.getByTestId("blog-pageviews")).toContainText("40");
+    await expect(funnel.getByTestId("blog-downloads")).toContainText("3");
+    // Downloads lead: the one number the blog is for, with its share of page views (40 page views are enough to mean something).
+    await expect(funnel.getByRole("tab", { name: /Downloads/ })).toHaveAttribute("aria-selected", "true");
   }
-  await expect(signedIn.getByText(/more than the posts add up to/)).toBeVisible();
-  const funnel = signedIn.getByRole("list", { name: "Funnel" });
-  await expect(funnel.getByTestId("funnel-impressions-value")).toHaveText("800");
-  await expect(funnel.getByTestId("funnel-clicks")).toContainText("2.5% CTR");
-  await expect(funnel.getByTestId("funnel-pageviews-value")).toHaveText("150");
-  await expect(funnel.getByTestId("funnel-downloads-value")).toHaveText("11");
-  // Google's own word on which days it is still counting, on the chart and in words.
+  await expect(signedIn.getByTestId("blog-step-note")).toHaveText("Downloads: 7.5% of page views.");
   await expect(signedIn.locator(".recharts-reference-line")).toHaveCount(1);
-  await expect(signedIn.getByText("Preliminary", { exact: true })).toBeVisible();
-  await expect(signedIn.getByText(/Google is still counting from 19 Nov 2026: those numbers may still change/)).toBeVisible();
-  const top = signedIn.getByRole("table", { name: "Top posts" });
-  await expect(top.getByRole("row")).toHaveCount(2);
+  await expect(signedIn.getByText(/Posts only: impressions and clicks from Google Search Console, page views and downloads from Umami, over the same days/)).toBeVisible();
+  const posts = signedIn.getByRole("table", { name: "Posts" });
+  await expect(posts.getByRole("row")).toHaveCount(2);
+  await expect(posts.getByRole("row").nth(1)).toContainText("How to dictate on a Mac without the cloud");
+  await expect(posts.getByRole("row").nth(1)).toContainText("40");
   await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
-  await signedIn.screenshot({ path: testInfo.outputPath("dashboard.png"), fullPage: true });
+  await signedIn.screenshot({ path: testInfo.outputPath("analytics.png"), fullPage: true });
+  await posts.scrollIntoViewIfNeeded();
+  await signedIn.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await signedIn.screenshot({ path: testInfo.outputPath("analytics-posts.png") });
 
-  // A range without an earlier period the CMS has shows no change.
+  // Deeper by clicking, keeping the range.
   await signedIn.getByRole("combobox", { name: "Date range" }).click();
   await signedIn.getByRole("option", { name: "All time" }).click();
   await expect(signedIn).toHaveURL(/range=all/);
-  await expect(signedIn.getByTestId("kpi-impressions-diff")).toHaveCount(0);
-
-  // Drill down, keeping the range.
-  await top.getByRole("link", { name: "How to dictate on a Mac without the cloud" }).click();
+  await posts.getByRole("link", { name: "How to dictate on a Mac without the cloud" }).click();
   await expect(signedIn).toHaveURL(/\/posts\/[0-9a-f-]+\/analytics\?range=all$/);
   await expect(signedIn.getByText(/web search, 24 Jul 2025 to 20 Nov 2026/)).toBeVisible();
 });
 
-test("CMS-021 the dashboard shows where traffic comes from on every page, and a channel filters it, as a chip in the URL", async ({ signedIn }, testInfo) => {
-  await signedIn.goto("/analytics?tab=traffic");
+test("CMS-021 a post's analytics shows where its readers came from, and a channel opens its sources in place", async ({ signedIn }, testInfo) => {
+  const { posts } = await (await signedIn.request.get("/v1/posts?status=published")).json() as { posts: Array<Post & { slug: string }> };
+  await signedIn.goto(`/posts/${posts.find((post) => post.slug === "dictate-without-cloud")!.id}/analytics`);
   const sources = signedIn.getByRole("table", { name: "Sources by channel" });
-  // Every page counts, not only posts: 200 page views, most from direct (home and release notes).
-  const names = sources.getByRole("row").filter({ hasNot: signedIn.getByRole("columnheader") });
-  await expect(names).toHaveCount(5);
-  await expect(names.nth(0)).toContainText("Direct");
-  await expect(names.nth(0)).toContainText("130");
-  await expect(names.nth(1)).toContainText("Organic search");
-  await expect(names.nth(1)).toContainText("35");
-  const pages = signedIn.getByRole("table", { name: "Pages" });
-  await expect(pages.getByRole("row").nth(1)).toContainText("/");
-  await expect(pages.getByRole("row").nth(1)).toContainText("Home");
-  await expect(pages).toContainText("Release notes");
-  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
-  // Every page's downloads are exact here, tagged or not: the home page's 10.
-  await expect(pages.getByRole("row").nth(1)).toContainText("10");
-  await signedIn.screenshot({ path: testInfo.outputPath("traffic.png"), fullPage: true });
-
-  // A channel row filters the traffic cards; the filter is a removable chip in the URL.
+  await expect(sources.getByRole("row").nth(1)).toContainText("Organic search");
+  await expect(sources.getByRole("row").nth(1)).toContainText("35");
+  await expect(sources.getByRole("row")).toHaveCount(4);
   await sources.getByRole("button", { name: "Show Organic social only" }).click();
-  await expect(signedIn).toHaveURL(/channel=organicSocial/);
-  const filtered = signedIn.getByRole("table", { name: "Sources by source" });
-  await expect(filtered.getByRole("row").nth(1)).toContainText("reddit");
-  await expect(filtered.getByRole("row").nth(1)).toContainText("10");
+  const within = signedIn.getByRole("table", { name: "Sources by source" });
+  await expect(within.getByRole("row").nth(1)).toContainText("reddit");
   // Its tagged downloads are exact.
-  await expect(filtered.getByRole("row").nth(1)).toContainText("2");
-  await expect(pages.getByRole("row")).toHaveCount(2);
-  await expect(pages.getByRole("row").nth(1)).toContainText("/blog/dictate-without-cloud");
-  await signedIn.getByRole("button", { name: "Remove the Organic social filter" }).click();
-  await expect(signedIn).not.toHaveURL(/channel=/);
-
-  // Campaigns are our tagged links.
-  await signedIn.getByRole("tab", { name: "Campaigns" }).click();
-  const campaigns = signedIn.getByRole("table", { name: "Sources by campaign" });
-  await expect(campaigns).toContainText("december");
-  await expect(campaigns).toContainText("launch");
-
-  // A post's analytics has its own Sources card; the post opens from the Pages card.
-  await pages.getByRole("link", { name: "/blog/dictate-without-cloud" }).click();
-  await expect(signedIn).toHaveURL(/\/posts\/[0-9a-f-]+\/analytics$/);
-  const postSources = signedIn.getByRole("table", { name: "Sources by channel" });
-  await expect(postSources.getByRole("row").nth(1)).toContainText("Organic search");
-  await expect(postSources.getByRole("row").nth(1)).toContainText("35");
-  await expect(postSources.getByRole("row")).toHaveCount(4);
+  await expect(within.getByRole("row").nth(1)).toContainText("2");
+  await signedIn.getByRole("button", { name: "All channels" }).click();
+  await expect(signedIn.getByRole("table", { name: "Sources by channel" })).toBeVisible();
+  await signedIn.screenshot({ path: testInfo.outputPath("post-sources.png"), fullPage: true });
 });
 
-test("CMS-022 makes a tracked link from fixed choices, lists it with its numbers, and archives it, all in the History", async ({ signedIn }, testInfo) => {
-  // Each browser project makes its own campaign: links with the same tags exist once.
-  const campaign = `launch-${testInfo.project.name}`;
-  await signedIn.goto("/analytics?tab=traffic");
-  const card = signedIn.getByTestId("links-card");
-  await signedIn.getByRole("button", { name: "New link" }).click();
-  const dialog = signedIn.getByRole("dialog", { name: "New tracked link" });
-  await dialog.getByRole("combobox", { name: "Page" }).click();
-  await signedIn.getByRole("option", { name: /\/blog\/dictate-without-cloud$/ }).click();
-  // A creator needs a name; until then the link cannot be made.
-  await dialog.getByRole("combobox", { name: "Shared on" }).click();
-  await signedIn.getByRole("option", { name: "A creator" }).click();
-  await dialog.getByLabel("Campaign").fill(campaign);
-  await expect(dialog.getByRole("button", { name: "Make link" })).toBeDisabled();
-  await expect(dialog).toContainText("Name who shares it");
-  await dialog.getByRole("combobox", { name: "Shared on" }).click();
-  await signedIn.getByRole("option", { name: "Reddit" }).click();
-  // Capitals are made lowercase as typed, so a campaign cannot be split in two.
-  await dialog.getByLabel("Campaign").fill(campaign.toUpperCase());
-  await expect(dialog.getByLabel("Campaign")).toHaveValue(campaign);
-  await dialog.getByLabel("Name (optional)").fill(`r/macapps ${testInfo.project.name}`);
-  await dialog.getByRole("button", { name: "Make link" }).click();
-  const made = signedIn.getByRole("dialog", { name: "Your link" });
-  await expect(made.getByTestId("new-link")).toHaveText(`/blog/dictate-without-cloud?utm_source=reddit&utm_medium=social&utm_campaign=${campaign}`);
-  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
-  await signedIn.screenshot({ path: testInfo.outputPath("link-made.png") });
-  await made.getByRole("button", { name: "Done" }).click();
-
-  const table = signedIn.getByRole("table", { name: "Tracked links" });
-  const row = table.getByRole("row").filter({ hasText: `r/macapps ${testInfo.project.name}` });
-  await expect(row).toContainText(`/blog/dictate-without-cloud · reddit · social · ${campaign}`);
-  await card.scrollIntoViewIfNeeded();
-  await signedIn.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-  await card.screenshot({ path: testInfo.outputPath("links.png") });
-  await row.getByRole("button", { name: `Archive r/macapps ${testInfo.project.name}` }).click();
-  await expect(row).toHaveCount(0);
-
-  await signedIn.goto("/settings/history");
-  await signedIn.getByTestId("history").getByRole("button", { name: "View history" }).click();
-  const entries = signedIn.getByRole("dialog", { name: "History" }).getByTestId("history-entry").filter({ hasText: `r/macapps ${testInfo.project.name}` });
-  await expect(entries.first()).toContainText("Tracked link archived");
-  await expect(entries.nth(1)).toContainText("Tracked link made");
-});
-
-test("CMS-023 the Goals tab shows an agent's proposal with progress from the numbers, the owner approves it, checks in and sets a goal", async ({ signedIn }, testInfo) => {
+test("CMS-023 a goal an agent proposed waits on Analytics until the owner approves it, and the History says so", async ({ signedIn }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "one shared proposal: the owner approves it once");
-  await signedIn.goto("/analytics?tab=goals&quarter=2026-Q4");
-  const proposal = signedIn.getByTestId("objective").filter({ hasText: "Become the answer for private Mac dictation" });
-  await expect(proposal).toContainText("Draft");
-  await expect(proposal).toContainText("Proposed by hush-seo");
-  const result = (title: string) => proposal.getByTestId("key-result").filter({ hasText: title });
-  // Every value comes from the imported numbers, from the day they start.
-  await expect(result("Page views of the post")).toContainText("50 of 100");
-  await expect(result("Page views of the post")).toContainText("Counted from 15 Nov 2026, when the numbers start");
-  await expect(result("Downloads from the Reddit launch")).toContainText("2 of 5");
-  await expect(result("Downloads from the Reddit launch")).toContainText("Downloads through tagged links only");
-  await expect(result("Google clicks on the post")).toContainText("36 of 60");
-  await expect(result("Partner articles published")).toContainText("Manual: entered by hand, not yet");
-  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
-  await signedIn.screenshot({ path: testInfo.outputPath("goals.png"), fullPage: true });
-
-  await proposal.getByRole("button", { name: "Approve" }).click();
-  await expect(proposal).not.toContainText("Draft");
-  await result("Partner articles published").getByLabel("Partner articles published: current value").fill("1");
-  await result("Partner articles published").getByRole("button", { name: "Check in" }).click();
-  await expect(result("Partner articles published")).toContainText("1 of 3");
-
-  // The owner's own goal, from the same catalog: active at once.
-  await signedIn.getByRole("button", { name: "New objective" }).click();
-  const dialog = signedIn.getByRole("dialog", { name: "New objective for 2026-Q4" });
-  await dialog.getByLabel("Objective").fill("Grow the whole site");
-  await dialog.getByRole("textbox", { name: "Key result 1" }).fill("Page views of the site");
-  await dialog.getByLabel("Target").fill("500");
-  await dialog.getByRole("button", { name: "Save objective" }).click();
-  const own = signedIn.getByTestId("objective").filter({ hasText: "Grow the whole site" });
-  await expect(own.getByTestId("key-result")).toContainText("200 of 500");
-  await expect(own).not.toContainText("Draft");
-
+  await signedIn.goto("/analytics");
+  const card = signedIn.getByRole("region", { name: "Goal proposals" }).or(signedIn.locator("[aria-label='Goal proposals']"));
+  await expect(card).toContainText("A goal proposal waits for you");
+  await expect(card).toContainText("Become the answer for private Mac dictation");
+  await expect(card).toContainText("proposed by hush-seo");
+  await expect(card).toContainText("Partner articles published");
+  await signedIn.screenshot({ path: testInfo.outputPath("proposal.png"), fullPage: true });
+  await card.getByRole("button", { name: "Approve" }).click();
+  // Nothing waits any more: the card leaves the page.
+  await expect(card).toHaveCount(0);
   await signedIn.goto("/settings/history");
   await signedIn.getByTestId("history").getByRole("button", { name: "View history" }).click();
   const history = signedIn.getByRole("dialog", { name: "History" });

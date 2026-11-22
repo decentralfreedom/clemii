@@ -17,6 +17,7 @@ import { validationHook } from "./routes/errors";
 import { postRoutes } from "./routes/posts";
 import { searchRoutes } from "./routes/search";
 import { siteSearchRoutes } from "./routes/site-search";
+import { blogRoutes } from "./routes/blog";
 import { trafficRoutes } from "./routes/traffic";
 import { linksRoutes } from "./routes/links";
 import { goalsRoutes } from "./routes/goals";
@@ -87,6 +88,7 @@ export function createApp(cms: Cms, options: AppOptions = {}) {
   app.route("/", auditRoutes(cms.db));
   app.route("/", searchRoutes(cms.db));
   app.route("/", siteSearchRoutes(cms.db));
+  app.route("/", blogRoutes(cms.db));
   app.route("/", trafficRoutes(cms.db));
   app.route("/", linksRoutes(cms.db, options.siteUrl));
   app.route("/", goalsRoutes(cms.db));
