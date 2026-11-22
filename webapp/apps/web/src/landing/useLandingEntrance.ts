@@ -13,8 +13,21 @@ export function useLandingEntrance(root: RefObject<HTMLDivElement | null>) {
     const finish = () => { if (!disposed) entry.dataset.opening = "complete"; };
     // Read the CSS fallback clock, including after delayed hydration. The scene
     // may start the choreography only while the first composition is unrevealed.
-    if (!canStartLandingEntrance(entry) || motion.matches ||
-        scrollY >= 100 || location.hash || document.hidden) finish();
+    const decide = () => {
+      if (disposed) return;
+      if (!canStartLandingEntrance(entry) || motion.matches ||
+          scrollY >= 100 || location.hash || document.hidden) finish();
+    };
+    // The fallback clock lives in the landing's stylesheet. The script can run
+    // before a slow stylesheet arrives (the first paint still waits for it), so
+    // an absent clock then means "not yet", not "too late".
+    const pending = [...document.querySelectorAll<HTMLLinkElement>('head link[rel="stylesheet"]')].filter(link => !link.sheet);
+    if (pending.length) {
+      void Promise.all(pending.map(link => new Promise(resolve => {
+        link.addEventListener("load", resolve, { once: true });
+        link.addEventListener("error", resolve, { once: true });
+      }))).then(decide);
+    } else decide();
     const fallbackEnd = (event: AnimationEvent) => {
       if (event.animationName === "entrance-fallback" && entry.dataset.opening === "pending") finish();
     };

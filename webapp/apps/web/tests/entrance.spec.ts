@@ -29,6 +29,8 @@ test("LANDING-ENTRY-001 plays the text entrance from the first paint and coordin
   });
   try {
     await page.goto("/", { waitUntil: "domcontentloaded" });
+    // The first paint waits for every stylesheet in the head; DOMContentLoaded does not.
+    await page.waitForFunction(() => [...document.querySelectorAll<HTMLLinkElement>('head link[rel="stylesheet"]')].every(link => link.sheet));
     await expect(page.locator(".site-header")).toHaveCSS("position", "relative");
     // The text runs its own entrance from the first paint while the universe still waits.
     const text = await page.evaluate(() => [".site-header", ".hero-introduction", ".hero-download-area"].map(selector => {
@@ -139,6 +141,16 @@ test("LANDING-ENTRY-004 keeps the public page readable when application JavaScri
   await page.locator("footer a[href='/verified-messages']").click();
   await expect(page).toHaveURL(/\/verified-messages$/);
   await expect(page.locator("h1")).toBeVisible();
+});
+
+test("LANDING-ENTRY-009 plays the entrance when the landing's stylesheet arrives after the application JavaScript", async ({ page }) => {
+  // A slow connection: the page's own stylesheet comes last. The first paint waits for it, so the entrance must too.
+  await page.route(/\/assets\/Landing-.*\.css$/, async route => { await new Promise(resolve => setTimeout(resolve, 1500)); await route.continue(); });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => [...document.querySelectorAll<HTMLLinkElement>('head link[rel="stylesheet"]')].every(link => link.sheet));
+  await expect(page.locator(".hush-landing")).not.toHaveAttribute("data-opening", "complete");
+  const header = await page.evaluate(() => document.querySelector(".site-header")!.getAnimations().map(animation => (animation as CSSAnimation).animationName));
+  expect(header).toContain("header-arrive");
 });
 
 test("LANDING-ENTRY-008 links every page's own styles in its prerendered head", async ({ page, request }) => {
