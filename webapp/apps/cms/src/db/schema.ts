@@ -269,6 +269,31 @@ export const trafficSiteDaily = pgTable("traffic_site_daily", {
   downloads: integer("downloads").notNull(),
 });
 
+/**
+ * Page views and tagged downloads per page, day and source (PRD: traffic
+ * sources and channels): every page of the site, not only posts. `source` is
+ * the link's utm_source when it has one, else the referring domain ("" for
+ * none); medium, campaign and content are the link's tags ("" without). A
+ * download counts here only when its link was tagged: an untagged download's
+ * source is unknown, and it stays counted per page in traffic_daily.
+ */
+export const trafficSourceDaily = pgTable("traffic_source_daily", {
+  date: date("date", { mode: "string" }).notNull(),
+  path: text("path").notNull(),
+  postId: uuid("post_id").references(() => posts.id, { onDelete: "set null" }),
+  pageType: text("page_type").notNull(),
+  channel: text("channel").notNull(),
+  source: text("source").notNull(),
+  medium: text("medium").notNull(),
+  campaign: text("campaign").notNull(),
+  content: text("content").notNull(),
+  pageviews: integer("pageviews").notNull(),
+  downloads: integer("downloads").notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.date, table.path, table.channel, table.source, table.medium, table.campaign, table.content] }),
+  index("traffic_source_daily_post").on(table.postId, table.date),
+]);
+
 /** The Umami import's state, one row. */
 export const trafficState = pgTable("traffic_state", {
   id: smallint("id").primaryKey().default(1),

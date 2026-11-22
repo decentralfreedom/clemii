@@ -113,6 +113,20 @@
       "when": 1795351910201,
       "tag": "0015_umami_traffic",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1795360643970,
+      "tag": "0016_traffic_sources",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1795360651796,
+      "tag": "0017_traffic_sources_history",
+      "breakpoints": true
     }
   ]
 }

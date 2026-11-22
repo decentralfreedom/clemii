@@ -411,6 +411,82 @@ export interface Traffic {
   days: TrafficDay[];
 }
 
+export type TrafficSourcesGroupBy = typeof TrafficSourcesGroupBy[keyof typeof TrafficSourcesGroupBy];
+
+
+export const TrafficSourcesGroupBy = {
+  channel: 'channel',
+  source: 'source',
+  campaign: 'campaign',
+  page: 'page',
+  pageType: 'pageType',
+} as const;
+
+/**
+ * Over the filtered rows, before the limit
+ */
+export type TrafficSourcesTotals = {
+  pageviews: number;
+  downloads: number;
+};
+
+export type TrafficSourceRowChannel = typeof TrafficSourceRowChannel[keyof typeof TrafficSourceRowChannel];
+
+
+export const TrafficSourceRowChannel = {
+  direct: 'direct',
+  ai: 'ai',
+  organicSearch: 'organicSearch',
+  paidSearch: 'paidSearch',
+  organicSocial: 'organicSocial',
+  paidSocial: 'paidSocial',
+  email: 'email',
+  video: 'video',
+  referral: 'referral',
+  paid: 'paid',
+  other: 'other',
+} as const;
+
+export type TrafficSourceRowPageType = typeof TrafficSourceRowPageType[keyof typeof TrafficSourceRowPageType];
+
+
+export const TrafficSourceRowPageType = {
+  home: 'home',
+  post: 'post',
+  release: 'release',
+  other: 'other',
+} as const;
+
+export interface TrafficSourceRow {
+  channel?: TrafficSourceRowChannel;
+  /** The link's utm_source, else the referring domain; "" for none */
+  source?: string;
+  medium?: string;
+  campaign?: string;
+  content?: string;
+  path?: string;
+  /** @nullable */
+  postId?: string | null;
+  pageType?: TrafficSourceRowPageType;
+  pageviews: number;
+  /** Downloads through tagged links only: an untagged download's source is unknown */
+  downloads: number;
+}
+
+export interface TrafficSources {
+  /** @nullable */
+  from: string | null;
+  /** @nullable */
+  to: string | null;
+  /** @nullable */
+  importedAt: string | null;
+  groupBy: TrafficSourcesGroupBy;
+  /** Over the filtered rows, before the limit */
+  totals: TrafficSourcesTotals;
+  /** Most page views first */
+  rows: TrafficSourceRow[];
+}
+
 export type PostLang = typeof PostLang[keyof typeof PostLang];
 
 
@@ -759,6 +835,64 @@ export type GetSiteTrafficParams = {
   days?: number;
   since?: string;
 };
+
+export type GetTrafficSourcesParams = {
+  /**
+   * @minimum 1
+   * @maximum 3650
+   */
+  days?: number;
+  since?: string;
+  groupBy?: GetTrafficSourcesGroupBy;
+  postId?: string;
+  pageType?: GetTrafficSourcesPageType;
+  channel?: GetTrafficSourcesChannel;
+  /** @maxLength 200 */
+  source?: string;
+  /**
+   * @minimum 1
+   * @maximum 500
+   */
+  limit?: number;
+};
+
+export type GetTrafficSourcesGroupBy = typeof GetTrafficSourcesGroupBy[keyof typeof GetTrafficSourcesGroupBy];
+
+
+export const GetTrafficSourcesGroupBy = {
+  channel: 'channel',
+  source: 'source',
+  campaign: 'campaign',
+  page: 'page',
+  pageType: 'pageType',
+} as const;
+
+export type GetTrafficSourcesPageType = typeof GetTrafficSourcesPageType[keyof typeof GetTrafficSourcesPageType];
+
+
+export const GetTrafficSourcesPageType = {
+  home: 'home',
+  post: 'post',
+  release: 'release',
+  other: 'other',
+} as const;
+
+export type GetTrafficSourcesChannel = typeof GetTrafficSourcesChannel[keyof typeof GetTrafficSourcesChannel];
+
+
+export const GetTrafficSourcesChannel = {
+  direct: 'direct',
+  ai: 'ai',
+  organicSearch: 'organicSearch',
+  paidSearch: 'paidSearch',
+  organicSocial: 'organicSocial',
+  paidSocial: 'paidSocial',
+  email: 'email',
+  video: 'video',
+  referral: 'referral',
+  paid: 'paid',
+  other: 'other',
+} as const;
 
 export type ListPostsParams = {
   lang?: ListPostsLang;
@@ -1879,6 +2013,11 @@ export type listAuditResponse200 = {
   status: 200
 }
 
+export type listAuditResponse400 = {
+  data: Error
+  status: 400
+}
+
 export type listAuditResponse401 = {
   data: Error
   status: 401
@@ -1889,15 +2028,10 @@ export type listAuditResponse403 = {
   status: 403
 }
 
-export type listAuditResponse422 = {
-  data: Error
-  status: 422
-}
-
 export type listAuditResponseSuccess = (listAuditResponse200) & {
   headers: Headers;
 };
-export type listAuditResponseError = (listAuditResponse401 | listAuditResponse403 | listAuditResponse422) & {
+export type listAuditResponseError = (listAuditResponse400 | listAuditResponse401 | listAuditResponse403) & {
   headers: Headers;
 };
 
@@ -2016,6 +2150,11 @@ export type getPostSearchResponse200 = {
   status: 200
 }
 
+export type getPostSearchResponse400 = {
+  data: Error
+  status: 400
+}
+
 export type getPostSearchResponse401 = {
   data: Error
   status: 401
@@ -2031,15 +2170,10 @@ export type getPostSearchResponse404 = {
   status: 404
 }
 
-export type getPostSearchResponse422 = {
-  data: Error
-  status: 422
-}
-
 export type getPostSearchResponseSuccess = (getPostSearchResponse200) & {
   headers: Headers;
 };
-export type getPostSearchResponseError = (getPostSearchResponse401 | getPostSearchResponse403 | getPostSearchResponse404 | getPostSearchResponse422) & {
+export type getPostSearchResponseError = (getPostSearchResponse400 | getPostSearchResponse401 | getPostSearchResponse403 | getPostSearchResponse404) & {
   headers: Headers;
 };
 
@@ -2166,6 +2300,11 @@ export type getPostSearchQueriesResponse200 = {
   status: 200
 }
 
+export type getPostSearchQueriesResponse400 = {
+  data: Error
+  status: 400
+}
+
 export type getPostSearchQueriesResponse401 = {
   data: Error
   status: 401
@@ -2181,15 +2320,10 @@ export type getPostSearchQueriesResponse404 = {
   status: 404
 }
 
-export type getPostSearchQueriesResponse422 = {
-  data: Error
-  status: 422
-}
-
 export type getPostSearchQueriesResponseSuccess = (getPostSearchQueriesResponse200) & {
   headers: Headers;
 };
-export type getPostSearchQueriesResponseError = (getPostSearchQueriesResponse401 | getPostSearchQueriesResponse403 | getPostSearchQueriesResponse404 | getPostSearchQueriesResponse422) & {
+export type getPostSearchQueriesResponseError = (getPostSearchQueriesResponse400 | getPostSearchQueriesResponse401 | getPostSearchQueriesResponse403 | getPostSearchQueriesResponse404) & {
   headers: Headers;
 };
 
@@ -2316,6 +2450,11 @@ export type getSiteSearchResponse200 = {
   status: 200
 }
 
+export type getSiteSearchResponse400 = {
+  data: Error
+  status: 400
+}
+
 export type getSiteSearchResponse401 = {
   data: Error
   status: 401
@@ -2326,15 +2465,10 @@ export type getSiteSearchResponse403 = {
   status: 403
 }
 
-export type getSiteSearchResponse422 = {
-  data: Error
-  status: 422
-}
-
 export type getSiteSearchResponseSuccess = (getSiteSearchResponse200) & {
   headers: Headers;
 };
-export type getSiteSearchResponseError = (getSiteSearchResponse401 | getSiteSearchResponse403 | getSiteSearchResponse422) & {
+export type getSiteSearchResponseError = (getSiteSearchResponse400 | getSiteSearchResponse401 | getSiteSearchResponse403) & {
   headers: Headers;
 };
 
@@ -2453,6 +2587,11 @@ export type getPostTrafficResponse200 = {
   status: 200
 }
 
+export type getPostTrafficResponse400 = {
+  data: Error
+  status: 400
+}
+
 export type getPostTrafficResponse401 = {
   data: Error
   status: 401
@@ -2468,15 +2607,10 @@ export type getPostTrafficResponse404 = {
   status: 404
 }
 
-export type getPostTrafficResponse422 = {
-  data: Error
-  status: 422
-}
-
 export type getPostTrafficResponseSuccess = (getPostTrafficResponse200) & {
   headers: Headers;
 };
-export type getPostTrafficResponseError = (getPostTrafficResponse401 | getPostTrafficResponse403 | getPostTrafficResponse404 | getPostTrafficResponse422) & {
+export type getPostTrafficResponseError = (getPostTrafficResponse400 | getPostTrafficResponse401 | getPostTrafficResponse403 | getPostTrafficResponse404) & {
   headers: Headers;
 };
 
@@ -2603,6 +2737,11 @@ export type getSiteTrafficResponse200 = {
   status: 200
 }
 
+export type getSiteTrafficResponse400 = {
+  data: Error
+  status: 400
+}
+
 export type getSiteTrafficResponse401 = {
   data: Error
   status: 401
@@ -2613,15 +2752,10 @@ export type getSiteTrafficResponse403 = {
   status: 403
 }
 
-export type getSiteTrafficResponse422 = {
-  data: Error
-  status: 422
-}
-
 export type getSiteTrafficResponseSuccess = (getSiteTrafficResponse200) & {
   headers: Headers;
 };
-export type getSiteTrafficResponseError = (getSiteTrafficResponse401 | getSiteTrafficResponse403 | getSiteTrafficResponse422) & {
+export type getSiteTrafficResponseError = (getSiteTrafficResponse400 | getSiteTrafficResponse401 | getSiteTrafficResponse403) & {
   headers: Headers;
 };
 
@@ -2723,6 +2857,143 @@ export function useGetSiteTraffic<TData = Awaited<ReturnType<typeof getSiteTraff
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetSiteTrafficQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getTrafficSourcesResponse200 = {
+  data: TrafficSources
+  status: 200
+}
+
+export type getTrafficSourcesResponse400 = {
+  data: Error
+  status: 400
+}
+
+export type getTrafficSourcesResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type getTrafficSourcesResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type getTrafficSourcesResponseSuccess = (getTrafficSourcesResponse200) & {
+  headers: Headers;
+};
+export type getTrafficSourcesResponseError = (getTrafficSourcesResponse400 | getTrafficSourcesResponse401 | getTrafficSourcesResponse403) & {
+  headers: Headers;
+};
+
+export type getTrafficSourcesResponse = (getTrafficSourcesResponseSuccess | getTrafficSourcesResponseError)
+
+export const getGetTrafficSourcesUrl = (params?: GetTrafficSourcesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/traffic/sources?${stringifiedParams}` : `/v1/traffic/sources`
+}
+
+/**
+ * Page views and tagged downloads by channel, source, campaign, page or page type, over complete US Pacific days: the whole site, or narrowed to a post, a page type, a channel or a source. Every page of the site counts, not only posts.
+ */
+export const getTrafficSources = async (params?: GetTrafficSourcesParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getTrafficSourcesResponse> => {
+
+  return cmsFetch<getTrafficSourcesResponse>(getGetTrafficSourcesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrafficSourcesQueryKey = (params?: GetTrafficSourcesParams,) => {
+    return [
+    `/v1/traffic/sources`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetTrafficSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getTrafficSources>>, TError = Error>(params?: GetTrafficSourcesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficSources>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrafficSourcesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrafficSources>>> = ({ signal }) => getTrafficSources(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrafficSources>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrafficSourcesQueryResult = NonNullable<Awaited<ReturnType<typeof getTrafficSources>>>
+export type GetTrafficSourcesQueryError = Error
+
+
+/** Page views and tagged downloads by channel, source, campaign, page or page type, over complete US Pacific days: the whole site, or narrowed to a post, a page type, a channel or a source. Every page of the site counts, not only posts. */
+export function useGetTrafficSources<TData = Awaited<ReturnType<typeof getTrafficSources>>, TError = Error>(
+ params: undefined |  GetTrafficSourcesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficSources>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrafficSources>>,
+          TError,
+          Awaited<ReturnType<typeof getTrafficSources>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** Page views and tagged downloads by channel, source, campaign, page or page type, over complete US Pacific days: the whole site, or narrowed to a post, a page type, a channel or a source. Every page of the site counts, not only posts. */
+export function useGetTrafficSources<TData = Awaited<ReturnType<typeof getTrafficSources>>, TError = Error>(
+ params?: GetTrafficSourcesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficSources>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrafficSources>>,
+          TError,
+          Awaited<ReturnType<typeof getTrafficSources>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** Page views and tagged downloads by channel, source, campaign, page or page type, over complete US Pacific days: the whole site, or narrowed to a post, a page type, a channel or a source. Every page of the site counts, not only posts. */
+export function useGetTrafficSources<TData = Awaited<ReturnType<typeof getTrafficSources>>, TError = Error>(
+ params?: GetTrafficSourcesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficSources>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** Page views and tagged downloads by channel, source, campaign, page or page type, over complete US Pacific days: the whole site, or narrowed to a post, a page type, a channel or a source. Every page of the site counts, not only posts. */
+export function useGetTrafficSources<TData = Awaited<ReturnType<typeof getTrafficSources>>, TError = Error>(
+ params?: GetTrafficSourcesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrafficSources>>, TError, TData>>, request?: SecondParameter<typeof cmsFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrafficSourcesQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

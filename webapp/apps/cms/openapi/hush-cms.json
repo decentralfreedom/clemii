@@ -858,6 +858,137 @@
           "downloads"
         ]
       },
+      "TrafficSources": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "importedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "groupBy": {
+            "type": "string",
+            "enum": [
+              "channel",
+              "source",
+              "campaign",
+              "page",
+              "pageType"
+            ]
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "pageviews": {
+                "type": "integer"
+              },
+              "downloads": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "pageviews",
+              "downloads"
+            ],
+            "description": "Over the filtered rows, before the limit"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrafficSourceRow"
+            },
+            "description": "Most page views first"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "importedAt",
+          "groupBy",
+          "totals",
+          "rows"
+        ]
+      },
+      "TrafficSourceRow": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "direct",
+              "ai",
+              "organicSearch",
+              "paidSearch",
+              "organicSocial",
+              "paidSocial",
+              "email",
+              "video",
+              "referral",
+              "paid",
+              "other"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "description": "The link's utm_source, else the referring domain; \"\" for none"
+          },
+          "medium": {
+            "type": "string"
+          },
+          "campaign": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "postId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "pageType": {
+            "type": "string",
+            "enum": [
+              "home",
+              "post",
+              "release",
+              "other"
+            ]
+          },
+          "pageviews": {
+            "type": "integer"
+          },
+          "downloads": {
+            "type": "integer",
+            "description": "Downloads through tagged links only: an untagged download's source is unknown"
+          }
+        },
+        "required": [
+          "pageviews",
+          "downloads"
+        ]
+      },
       "Post": {
         "type": "object",
         "properties": {
@@ -1844,6 +1975,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not signed in",
             "content": {
@@ -1856,16 +1997,6 @@
           },
           "403": {
             "description": "Not the owner",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Invalid query",
             "content": {
               "application/json": {
                 "schema": {
@@ -1933,6 +2064,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Missing or invalid token",
             "content": {
@@ -1955,16 +2096,6 @@
           },
           "404": {
             "description": "No such post",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Invalid query",
             "content": {
               "application/json": {
                 "schema": {
@@ -2043,6 +2174,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Missing or invalid token",
             "content": {
@@ -2065,16 +2206,6 @@
           },
           "404": {
             "description": "No such post",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Invalid query",
             "content": {
               "application/json": {
                 "schema": {
@@ -2142,6 +2273,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Missing or invalid token",
             "content": {
@@ -2154,16 +2295,6 @@
           },
           "403": {
             "description": "The token lacks posts:read",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Invalid query",
             "content": {
               "application/json": {
                 "schema": {
@@ -2229,6 +2360,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Missing or invalid token",
             "content": {
@@ -2251,16 +2392,6 @@
           },
           "404": {
             "description": "No such post",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Invalid query",
             "content": {
               "application/json": {
                 "schema": {
@@ -2317,6 +2448,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Missing or invalid token",
             "content": {
@@ -2336,9 +2477,157 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/v1/traffic/sources": {
+      "get": {
+        "operationId": "getTrafficSources",
+        "tags": [
+          "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "Page views and tagged downloads by channel, source, campaign, page or page type, over complete US Pacific days: the whole site, or narrowed to a post, a page type, a channel or a source. Every page of the site counts, not only posts.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3650,
+              "default": 28
+            },
+            "required": false,
+            "name": "days",
+            "in": "query"
           },
-          "422": {
+          {
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "required": false,
+            "name": "since",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "channel",
+                "source",
+                "campaign",
+                "page",
+                "pageType"
+              ],
+              "default": "channel"
+            },
+            "required": false,
+            "name": "groupBy",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "postId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "home",
+                "post",
+                "release",
+                "other"
+              ]
+            },
+            "required": false,
+            "name": "pageType",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "direct",
+                "ai",
+                "organicSearch",
+                "paidSearch",
+                "organicSocial",
+                "paidSocial",
+                "email",
+                "video",
+                "referral",
+                "paid",
+                "other"
+              ]
+            },
+            "required": false,
+            "name": "channel",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "required": false,
+            "name": "source",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 50
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The traffic by source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrafficSources"
+                }
+              }
+            }
+          },
+          "400": {
             "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The token lacks posts:read",
             "content": {
               "application/json": {
                 "schema": {

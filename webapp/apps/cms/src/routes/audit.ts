@@ -44,7 +44,7 @@ export function auditRoutes(db: Database) {
       200: json(z.object({ entries: z.array(entrySchema), nextCursor: z.string().nullable() }), "A page of the log"),
       401: json(errorSchema, "Not signed in"),
       403: json(errorSchema, "Not the owner"),
-      422: json(errorSchema, "Invalid query"),
+      400: json(errorSchema, "Invalid query"),
     },
   }), async (context) => {
     const { limit, cursor, postId, area } = context.req.valid("query");
