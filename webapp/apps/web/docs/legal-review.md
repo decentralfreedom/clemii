@@ -69,13 +69,15 @@ Noindex is an indexing choice, not a substitute for legal obligations.
    of these backups. Live-object cleanup and authenticated revocation are
    implemented separately; neither establishes GDPR compliance alone.
 6. Analytics (PRD R10, November 2026):
-   - **Download counting is on, by the operator's decision of 21 November
-     2026, ahead of the lawyer review.** The privacy policy (section 9)
+   - **Server-side counting of page views and downloads is on, by the
+     operator's decision of 21 November 2026, ahead of the lawyer review.** The privacy policy (section 9)
      describes it.
-     - It runs server-side at `/download`, on the operator's own Umami
+     - It runs on this server (page views of real navigations, by Fetch
+       Metadata, without prefetches; downloads at `/download`), on the operator's own Umami
        instance (Hetzner, Germany, behind Cloudflare Access with only
        `/script.js` and `/api/send` public).
-     - It sends the page path, the User-Agent and the IP address shortened on
+     - It sends the page path, the referrer's origin, the preferred
+       language, the User-Agent and the IP address shortened on
        the server (IPv4 /24, IPv6 /48). Umami derives country, region and city
        and stores neither address.
      - No script runs in the browser and nothing is stored on the device.
@@ -84,7 +86,7 @@ Noindex is an indexing choice, not a substitute for legal obligations.
        choice is the CNIL's audience-measurement criteria: location no finer
        than a city, address shortened.
    - **Page views through the browser tracker stay off**
-     (`HUSH_UMAMI_PAGE_VIEWS`). The tracker reads screen size and language in
+     (`HUSH_UMAMI_TRACKER`). The tracker reads screen size and language in
      the browser. Whether that needs consent under section 25 TDDDG must be
      reviewed before it is switched on.
    - **Open for review:**

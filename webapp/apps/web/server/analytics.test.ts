@@ -3,8 +3,8 @@ import { Hono } from "hono";
 import { analyticsTag, coarseAddress, registerAnalytics, withAnalytics } from "./analytics";
 import { loadConfig } from "./config";
 
-const analytics = { umamiUrl: "https://umami.example", websiteId: "0b6a3f0e-8c1d-4b8e-9d55-0d6c1e2f3a4b", pageViews: true };
-const downloadsOnly = { ...analytics, pageViews: false };
+const analytics = { umamiUrl: "https://umami.example", websiteId: "0b6a3f0e-8c1d-4b8e-9d55-0d6c1e2f3a4b", tracker: true };
+const serverOnly = { ...analytics, tracker: false };
 const dmg = "https://updates.behu.sh/downloads/hush-0.1.0-alpha.5-build.14.dmg";
 
 function setup(options: { analytics?: typeof analytics; downloadURL?: string } = {}) {
@@ -20,6 +20,8 @@ function setup(options: { analytics?: typeof analytics; downloadURL?: string } =
     },
     log: () => {},
   });
+  app.get("/blog/dictate-on-mac", (context) => context.html("<html><head></head><body>article</body></html>"));
+  app.get("/feed.json", (context) => context.json({ items: [] }));
   return { app, sent };
 }
 
@@ -97,6 +99,59 @@ describe("downloads counted at /download (PRD R10)", () => {
   });
 });
 
+describe("page views counted on this server", () => {
+  const navigation = {
+    "sec-fetch-dest": "document", "sec-fetch-mode": "navigate", "user-agent": "Mozilla/5.0 Safari",
+    "cf-connecting-ip": "203.0.113.7", "referer": "https://www.google.com/search?q=dictation", "accept-language": "de-DE,de;q=0.9,en;q=0.8",
+  };
+
+  test("records a browser's navigation to a page with its path, origin of the referrer, language and shortened address", async () => {
+    const { app, sent } = setup({ analytics: serverOnly });
+    const response = await app.request("/blog/dictate-on-mac?utm_source=x", { headers: navigation });
+    expect(await response.text()).toContain("article");
+    await Bun.sleep(0);
+    expect(events(sent)).toEqual([{
+      type: "event",
+      payload: {
+        website: analytics.websiteId, hostname: "behu.sh", url: "/blog/dictate-on-mac",
+        referrer: "https://www.google.com/search", language: "de-DE", ip: "203.0.113.0",
+      },
+    }]);
+    expect(new Headers(sent[0]!.init?.headers).get("user-agent")).toBe("Mozilla/5.0 Safari");
+  });
+
+  test("ignores prefetches, prerenders, scripts, other methods, files and missing pages", async () => {
+    const { app, sent } = setup({ analytics: serverOnly });
+    await app.request("/blog/dictate-on-mac", { headers: { ...navigation, "sec-purpose": "prefetch;prerender" } });
+    await app.request("/blog/dictate-on-mac", { headers: { ...navigation, purpose: "prefetch" } });
+    await app.request("/blog/dictate-on-mac", { headers: { ...navigation, "sec-fetch-dest": "empty" } });
+    await app.request("/blog/dictate-on-mac", { headers: { "user-agent": "curl/8.7" } });
+    await app.request("/blog/dictate-on-mac", { method: "HEAD", headers: navigation });
+    await app.request("/feed.json", { headers: navigation });
+    await app.request("/missing", { headers: navigation });
+    await Bun.sleep(0);
+    expect(events(sent)).toEqual([]);
+  });
+
+  test("honours Do Not Track and Global Privacy Control, and counts one client at most 60 times a minute", async () => {
+    const { app, sent } = setup({ analytics: serverOnly });
+    await app.request("/blog/dictate-on-mac", { headers: { ...navigation, dnt: "1" } });
+    await app.request("/blog/dictate-on-mac", { headers: { ...navigation, "sec-gpc": "1" } });
+    await Bun.sleep(0);
+    expect(events(sent)).toEqual([]);
+    for (let view = 0; view < 65; view++) await app.request("/blog/dictate-on-mac", { headers: navigation });
+    await Bun.sleep(0);
+    expect(events(sent)).toHaveLength(60);
+  });
+
+  test("counts nothing while analytics is off", async () => {
+    const { app, sent } = setup({ analytics: undefined });
+    await app.request("/blog/dictate-on-mac", { headers: navigation });
+    await Bun.sleep(0);
+    expect(sent).toEqual([]);
+  });
+});
+
 describe("the visitor's address, shortened to its network", () => {
   test("keeps the network of an IPv4 or IPv6 address, never the device", () => {
     expect(coarseAddress("203.0.113.7")).toBe("203.0.113.0");
@@ -152,7 +207,7 @@ describe("Umami through this origin", () => {
   });
 
   test("counts downloads but has no tracker while page views are off", async () => {
-    const { app, sent } = setup({ analytics: downloadsOnly });
+    const { app, sent } = setup({ analytics: serverOnly });
     expect((await app.request("/stats/script.js")).status).toBe(404);
     expect((await app.request("/stats/api/send", { method: "POST", body: "{}" })).status).toBe(404);
     await app.request("/download?from=/", { headers: { "user-agent": "Mozilla/5.0" } });
@@ -171,8 +226,8 @@ describe("analytics configuration", () => {
     expect(loadConfig({ NODE_ENV: "test" }).analytics).toBeUndefined();
     expect(() => loadConfig({ NODE_ENV: "test", HUSH_UMAMI_URL: "https://umami.example" })).toThrow(/both/);
     expect(loadConfig({ NODE_ENV: "test", HUSH_UMAMI_URL: "https://umami.example/", HUSH_UMAMI_WEBSITE_ID: analytics.websiteId }).analytics)
-      .toEqual(downloadsOnly);
-    expect(loadConfig({ NODE_ENV: "test", HUSH_UMAMI_URL: "https://umami.example", HUSH_UMAMI_WEBSITE_ID: analytics.websiteId, HUSH_UMAMI_PAGE_VIEWS: "1" }).analytics)
+      .toEqual(serverOnly);
+    expect(loadConfig({ NODE_ENV: "test", HUSH_UMAMI_URL: "https://umami.example", HUSH_UMAMI_WEBSITE_ID: analytics.websiteId, HUSH_UMAMI_TRACKER: "1" }).analytics)
       .toEqual(analytics);
   });
 
