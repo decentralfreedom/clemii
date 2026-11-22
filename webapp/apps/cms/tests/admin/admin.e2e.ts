@@ -779,6 +779,31 @@ test("CMS-019 Analytics is one blog page, as Ghost's: the blog's funnel to downl
   await expect(signedIn.getByText(/web search, 24 Jul 2025 to 20 Nov 2026/)).toBeVisible();
 });
 
+test("CMS-024 before Umami counts Google's days, Analytics shows Google's numbers alone and page views and downloads as not counted yet, never zero", async ({ signedIn }, testInfo) => {
+  // As in production on 22 November 2026: Umami started on the 21st, Google's newest day was earlier.
+  await signedIn.route(/\/v1\/blog(\?|$)/, async (route) => {
+    const response = await route.fetch();
+    const body = await response.json() as Record<string, any>;
+    const unknown = (row: Record<string, unknown>) => ({ ...row, pageviews: null, downloads: null });
+    await route.fulfill({ response, json: { ...body, trafficCounted: false, trafficFrom: "2026-11-21", totals: unknown(body.totals), days: body.days.map(unknown), posts: body.posts.map(unknown) } });
+  });
+  await signedIn.goto("/analytics");
+  if (testInfo.project.name !== "mobile") {
+    const funnel = signedIn.getByRole("tablist", { name: "The blog's funnel" });
+    await expect(funnel.getByTestId("blog-clicks")).toContainText("6");
+    await expect(funnel.getByTestId("blog-pageviews")).toContainText("–");
+    await expect(funnel.getByTestId("blog-downloads")).toContainText("–");
+    // The chart opens on what there is.
+    await expect(funnel.getByRole("tab", { name: /Google clicks/ })).toHaveAttribute("aria-selected", "true");
+  }
+  await expect(signedIn.getByTestId("blog-step-note")).toContainText("Page views and downloads are not counted yet: Umami counts from 21 Nov 2026");
+  const row = signedIn.getByRole("table", { name: "Posts" }).getByRole("row").nth(1);
+  await expect(row).toContainText("–");
+  await expect(row).not.toContainText("too few views");
+  await expect(signedIn.getByText(/Umami's page views and downloads join once Google's numbers reach the days Umami counts/)).toBeVisible();
+  await signedIn.screenshot({ path: testInfo.outputPath("google-only.png"), fullPage: true });
+});
+
 test("CMS-021 a post's analytics shows where its readers came from, and a channel opens its sources in place", async ({ signedIn }, testInfo) => {
   const { posts } = await (await signedIn.request.get("/v1/posts?status=published")).json() as { posts: Array<Post & { slug: string }> };
   await signedIn.goto(`/posts/${posts.find((post) => post.slug === "dictate-without-cloud")!.id}/analytics`);

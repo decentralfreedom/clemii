@@ -15,7 +15,7 @@ export const integer = new Intl.NumberFormat("en");
 
 export function blogSeries(days: BlogAnalyticsDaysItem[], from: string, to: string, metric: BlogMetric): SearchPoint[] {
   const span = spanOf(from, to);
-  const byDay = new Map(days.map((day) => [day.date, day[metric]]));
+  const byDay = new Map(days.map((day) => [day.date, day[metric] ?? 0]));
   const groups = new Map<string, number>();
   for (let time = Date.parse(from); time <= Date.parse(to); time += dayMs) {
     const date = new Date(time).toISOString().slice(0, 10);

@@ -42,13 +42,15 @@ function Analytics() {
         ) : !blog ? (
           <p className="py-24 text-center text-sm text-destructive">The numbers could not be loaded.</p>
         ) : !blog.from || !blog.to ? (
-          <p className="py-24 text-center text-sm text-text-secondary">No days that both Google Search Console and Umami have yet; the CMS reads them once a day.</p>
+          <p className="py-24 text-center text-sm text-text-secondary">No Search Console numbers yet; the CMS reads them once a day.</p>
         ) : (
           <>
             <BlogFunnel blog={{ ...blog, from: blog.from, to: blog.to }} />
-            <BlogPostsCard posts={blog.posts} range={range} />
+            <BlogPostsCard posts={blog.posts} range={range} counted={blog.trafficCounted} />
             <DataSource from={blog.from} to={blog.to} importedAt={blog.searchImportedAt} preliminaryFrom={blog.preliminaryFrom}>
-              Posts only: impressions and clicks from Google Search Console, page views and downloads from Umami, over the same days. Home and download pages do not count here.
+              {blog.trafficCounted
+                ? "Posts only: impressions and clicks from Google Search Console, page views and downloads from Umami, over the same days. Home and download pages do not count here."
+                : "Posts only: impressions and clicks from Google Search Console. Umami's page views and downloads join once Google's numbers reach the days Umami counts. Home and download pages do not count here."}
             </DataSource>
           </>
         )}

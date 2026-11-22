@@ -5,7 +5,8 @@
 // clicks, its page views and the downloads that started on it, over the same
 // days as the funnel, most downloads first. Ten rows; the rest open in place.
 // A post opens its own analytics. Its downloads per page view show only once
-// it has enough page views to mean something.
+// it has enough page views to mean something. Before Umami counts these days,
+// page views and downloads read "–" and the posts rank by Google clicks.
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import type { BlogAnalyticsPostsItem } from "@/api/cms.generated";
@@ -18,7 +19,9 @@ import { defaultAnalyticsRange, type AnalyticsRangeKey } from "@/lib/analytics-r
 
 const shown = 10;
 
-export function BlogPostsCard({ posts, range }: { posts: BlogAnalyticsPostsItem[]; range: AnalyticsRangeKey }) {
+const count = (value: number | null) => (value === null ? "–" : integer.format(value));
+
+export function BlogPostsCard({ posts, range, counted }: { posts: BlogAnalyticsPostsItem[]; range: AnalyticsRangeKey; counted: boolean }) {
   const [all, setAll] = useState(false);
   const keep = range === defaultAnalyticsRange ? {} : { range };
   const visible = all ? posts : posts.slice(0, shown);
@@ -26,7 +29,7 @@ export function BlogPostsCard({ posts, range }: { posts: BlogAnalyticsPostsItem[
     <Card>
       <CardHeader>
         <CardTitle>Posts</CardTitle>
-        <CardDescription>Which posts bring readers who download hush, most downloads first.</CardDescription>
+        <CardDescription>{counted ? "Which posts bring readers who download hush, most downloads first." : "Which posts Google sends readers to, most clicks first; page views and downloads follow once Umami counts these days."}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {!posts.length ? (
@@ -50,10 +53,12 @@ export function BlogPostsCard({ posts, range }: { posts: BlogAnalyticsPostsItem[
                     {post.status !== "published" && <span className="ms-2 text-xs text-text-secondary">(no longer published)</span>}
                   </TableCell>
                   <TableCell className="hidden text-right tabular-nums md:table-cell">{integer.format(post.clicks)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{integer.format(post.pageviews)}</TableCell>
-                  <TableCell className="text-right font-medium tabular-nums">{integer.format(post.downloads)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{count(post.pageviews)}</TableCell>
+                  <TableCell className="text-right font-medium tabular-nums">{count(post.downloads)}</TableCell>
                   <TableCell className="hidden text-right text-text-secondary tabular-nums md:table-cell">
-                    {post.pageviews >= minimumViewsForRate ? `${((post.downloads / post.pageviews) * 100).toFixed(1)}%` : <span title={`Fewer than ${minimumViewsForRate} page views`}>too few views</span>}
+                    {post.pageviews === null || post.downloads === null ? "–"
+                      : post.pageviews >= minimumViewsForRate ? `${((post.downloads / post.pageviews) * 100).toFixed(1)}%`
+                      : <span title={`Fewer than ${minimumViewsForRate} page views`}>too few views</span>}
                   </TableCell>
                 </TableRow>
               ))}

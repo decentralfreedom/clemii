@@ -795,7 +795,7 @@
               "null"
             ],
             "format": "date",
-            "description": "The first day both Search Console and Umami have in the window; null when they share none"
+            "description": "The first day in the window: of the days both sources have, or of Search Console's alone before they share one; null without Search Console numbers"
           },
           "to": {
             "type": [
@@ -826,6 +826,18 @@
             ],
             "format": "date-time"
           },
+          "trafficCounted": {
+            "type": "boolean",
+            "description": "Whether page views and downloads count these days; false while Umami has none of them"
+          },
+          "trafficFrom": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "The first day Umami counts"
+          },
           "totals": {
             "type": "object",
             "properties": {
@@ -837,12 +849,18 @@
                 "description": "Clicks from Google Search"
               },
               "pageviews": {
-                "type": "integer",
-                "description": "From every source"
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "From every source; null before Umami counts these days"
               },
               "downloads": {
-                "type": "integer",
-                "description": "Downloads started on the post's pages"
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "description": "Downloads started on the post's pages; null before Umami counts these days"
               }
             },
             "required": [
@@ -869,12 +887,18 @@
                   "description": "Clicks from Google Search"
                 },
                 "pageviews": {
-                  "type": "integer",
-                  "description": "From every source"
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "description": "From every source; null before Umami counts these days"
                 },
                 "downloads": {
-                  "type": "integer",
-                  "description": "Downloads started on the post's pages"
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "description": "Downloads started on the post's pages; null before Umami counts these days"
                 }
               },
               "required": [
@@ -910,12 +934,18 @@
                   "description": "Clicks from Google Search"
                 },
                 "pageviews": {
-                  "type": "integer",
-                  "description": "From every source"
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "description": "From every source; null before Umami counts these days"
                 },
                 "downloads": {
-                  "type": "integer",
-                  "description": "Downloads started on the post's pages"
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "description": "Downloads started on the post's pages; null before Umami counts these days"
                 }
               },
               "required": [
@@ -937,6 +967,8 @@
           "preliminaryFrom",
           "searchImportedAt",
           "trafficImportedAt",
+          "trafficCounted",
+          "trafficFrom",
           "totals",
           "days",
           "posts"

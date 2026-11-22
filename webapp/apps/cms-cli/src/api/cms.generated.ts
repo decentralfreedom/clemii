@@ -372,10 +372,16 @@ export type BlogAnalyticsTotals = {
   impressions: number;
   /** Clicks from Google Search */
   clicks: number;
-  /** From every source */
-  pageviews: number;
-  /** Downloads started on the post's pages */
-  downloads: number;
+  /**
+     * From every source; null before Umami counts these days
+     * @nullable
+     */
+  pageviews: number | null;
+  /**
+     * Downloads started on the post's pages; null before Umami counts these days
+     * @nullable
+     */
+  downloads: number | null;
 };
 
 export type BlogAnalyticsDaysItem = {
@@ -383,10 +389,16 @@ export type BlogAnalyticsDaysItem = {
   impressions: number;
   /** Clicks from Google Search */
   clicks: number;
-  /** From every source */
-  pageviews: number;
-  /** Downloads started on the post's pages */
-  downloads: number;
+  /**
+     * From every source; null before Umami counts these days
+     * @nullable
+     */
+  pageviews: number | null;
+  /**
+     * Downloads started on the post's pages; null before Umami counts these days
+     * @nullable
+     */
+  downloads: number | null;
 };
 
 export type BlogAnalyticsPostsItem = {
@@ -396,15 +408,21 @@ export type BlogAnalyticsPostsItem = {
   impressions: number;
   /** Clicks from Google Search */
   clicks: number;
-  /** From every source */
-  pageviews: number;
-  /** Downloads started on the post's pages */
-  downloads: number;
+  /**
+     * From every source; null before Umami counts these days
+     * @nullable
+     */
+  pageviews: number | null;
+  /**
+     * Downloads started on the post's pages; null before Umami counts these days
+     * @nullable
+     */
+  downloads: number | null;
 };
 
 export interface BlogAnalytics {
   /**
-     * The first day both Search Console and Umami have in the window; null when they share none
+     * The first day in the window: of the days both sources have, or of Search Console's alone before they share one; null without Search Console numbers
      * @nullable
      */
   from: string | null;
@@ -419,6 +437,13 @@ export interface BlogAnalytics {
   searchImportedAt: string | null;
   /** @nullable */
   trafficImportedAt: string | null;
+  /** Whether page views and downloads count these days; false while Umami has none of them */
+  trafficCounted: boolean;
+  /**
+     * The first day Umami counts
+     * @nullable
+     */
+  trafficFrom: string | null;
   totals: BlogAnalyticsTotals;
   /** Only days with numbers; a day in the window without one had none */
   days: BlogAnalyticsDaysItem[];
