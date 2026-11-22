@@ -171,6 +171,14 @@ describe.skipIf(!serverUrl)("CMS Search Console import", () => {
     expect(await searchImportDue(database.db, new Date("2026-11-24T07:01:00.000Z"))).toBe(true);
   });
 
+  test("an import without the first day of its history (as #144 left it) is due again at once, not the next day", async () => {
+    const [before] = await database.db.select().from(searchConsoleState);
+    await database.db.update(searchConsoleState).set({ importedFrom: null, importedAt: new Date("2026-11-24T06:00:00.000Z"), attemptedAt: new Date("2026-11-24T06:00:00.000Z") });
+    expect(await searchImportDue(database.db, new Date("2026-11-24T06:30:00.000Z"))).toBe(false);
+    expect(await searchImportDue(database.db, new Date("2026-11-24T07:01:00.000Z"))).toBe(true);
+    await database.db.update(searchConsoleState).set({ importedFrom: before!.importedFrom, importedAt: before!.importedAt, attemptedAt: before!.attemptedAt });
+  });
+
   test("CMS-SEARCH-004 the admin and agents read a post's numbers over the days Search Console has", async () => {
     const reader = await createToken(database.db, { name: "hush-seo", scopes: ["posts:read"] }, systemActor("test"));
     const { status, body } = await call(`/v1/posts/${moved}/search?days=28`, reader);
