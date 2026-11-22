@@ -773,6 +773,55 @@ test("CMS-019 the Analytics dashboard, as Ghost's: from the sidebar, Google's si
   await expect(signedIn.getByText(/web search, 24 Jul 2025 to 20 Nov 2026/)).toBeVisible();
 });
 
+test("CMS-021 the dashboard shows where traffic comes from on every page, and a channel filters it, as a chip in the URL", async ({ signedIn }, testInfo) => {
+  await signedIn.goto("/analytics");
+  const sources = signedIn.getByRole("table", { name: "Sources by channel" });
+  // Every page counts, not only posts: 200 page views, most from direct (home and release notes).
+  const names = sources.getByRole("row").filter({ hasNot: signedIn.getByRole("columnheader") });
+  await expect(names).toHaveCount(5);
+  await expect(names.nth(0)).toContainText("Direct");
+  await expect(names.nth(0)).toContainText("130");
+  await expect(names.nth(1)).toContainText("Organic search");
+  await expect(names.nth(1)).toContainText("35");
+  const pages = signedIn.getByRole("table", { name: "Pages" });
+  await expect(pages.getByRole("row").nth(1)).toContainText("/");
+  await expect(pages.getByRole("row").nth(1)).toContainText("Home");
+  await expect(pages).toContainText("Release notes");
+  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
+  // The traffic section as it renders, after the scroll has painted.
+  const traffic = signedIn.locator("section", { has: signedIn.getByRole("heading", { name: "Traffic" }) });
+  await traffic.scrollIntoViewIfNeeded();
+  await signedIn.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await traffic.screenshot({ path: testInfo.outputPath("traffic.png") });
+
+  // A channel row filters the traffic cards; the filter is a removable chip in the URL.
+  await sources.getByRole("button", { name: "Show Organic social only" }).click();
+  await expect(signedIn).toHaveURL(/channel=organicSocial/);
+  const filtered = signedIn.getByRole("table", { name: "Sources by source" });
+  await expect(filtered.getByRole("row").nth(1)).toContainText("reddit");
+  await expect(filtered.getByRole("row").nth(1)).toContainText("10");
+  // Its tagged downloads are exact.
+  await expect(filtered.getByRole("row").nth(1)).toContainText("2");
+  await expect(pages.getByRole("row")).toHaveCount(2);
+  await expect(pages.getByRole("row").nth(1)).toContainText("/blog/dictate-without-cloud");
+  await signedIn.getByRole("button", { name: "Remove the Organic social filter" }).click();
+  await expect(signedIn).not.toHaveURL(/channel=/);
+
+  // Campaigns are our tagged links.
+  await signedIn.getByRole("tab", { name: "Campaigns" }).click();
+  const campaigns = signedIn.getByRole("table", { name: "Sources by campaign" });
+  await expect(campaigns).toContainText("december");
+  await expect(campaigns).toContainText("launch");
+
+  // A post's analytics has its own Sources card; the post opens from the Pages card.
+  await pages.getByRole("link", { name: "/blog/dictate-without-cloud" }).click();
+  await expect(signedIn).toHaveURL(/\/posts\/[0-9a-f-]+\/analytics$/);
+  const postSources = signedIn.getByRole("table", { name: "Sources by channel" });
+  await expect(postSources.getByRole("row").nth(1)).toContainText("Organic search");
+  await expect(postSources.getByRole("row").nth(1)).toContainText("35");
+  await expect(postSources.getByRole("row")).toHaveCount(4);
+});
+
 test("the admin runs under its Content Security Policy without violations", async ({ signedIn, draft }) => {
   const violations: string[] = [];
   signedIn.on("console", (message) => { if (/Content.Security.Policy|Refused to/i.test(message.text())) violations.push(message.text()); });
