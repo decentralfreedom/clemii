@@ -696,11 +696,13 @@ test("CMS-018 a published post's analytics page, as Ghost's: from the posts list
     await expect(metrics.getByRole("tab", { name: /Avg. position/ })).toHaveAttribute("aria-selected", "true");
   }
   // The funnel keeps to the days both sources have, 15 to 20 November: the 1 November impressions and the 21 November visits are left out.
-  const funnel = signedIn.getByRole("list", { name: "Funnel" });
-  await expect(funnel.getByTestId("funnel-impressions-value")).toHaveText("300");
-  await expect(funnel.getByTestId("funnel-clicks")).toContainText("2.0% CTR");
-  await expect(funnel.getByTestId("funnel-pageviews-value")).toHaveText("40");
-  await expect(funnel.getByTestId("funnel-downloads")).toContainText("7.5% of page views");
+  // Each source in its own group, side by side: Google's clicks never lead into the site's page views.
+  const google = signedIn.getByRole("region", { name: "Google Search" });
+  const site = signedIn.getByRole("region", { name: "On behu.sh" });
+  await expect(google.getByTestId("funnel-impressions-value")).toHaveText("300");
+  await expect(google.getByTestId("funnel-clicks")).toContainText("2.0% CTR");
+  await expect(site.getByTestId("funnel-pageviews-value")).toHaveText("40");
+  await expect(site.getByTestId("funnel-downloads")).toContainText("7.5% of page views");
   await expect(signedIn.getByText(/15 Nov 2026 to 20 Nov 2026: the days both Search Console and Umami have/)).toBeVisible();
   // Each day with a position is drawn, also between days without one.
   await expect(signedIn.locator(".recharts-area-dots circle")).toHaveCount(2);
@@ -749,7 +751,7 @@ test("CMS-019 Analytics is one blog page, as Ghost's: the blog's funnel to downl
   if (mobile) {
     await expect(signedIn.getByRole("button", { name: "Choose step" })).toContainText("3");
   } else {
-    const funnel = signedIn.getByRole("tablist", { name: "The blog's funnel" });
+    const funnel = signedIn.getByRole("tablist", { name: "The blog's numbers" });
     await expect(funnel.getByTestId("blog-impressions")).toContainText("300");
     await expect(funnel.getByTestId("blog-clicks")).toContainText("6");
     await expect(funnel.getByTestId("blog-pageviews")).toContainText("40");
@@ -777,6 +779,31 @@ test("CMS-019 Analytics is one blog page, as Ghost's: the blog's funnel to downl
   await posts.getByRole("link", { name: "How to dictate on a Mac without the cloud" }).click();
   await expect(signedIn).toHaveURL(/\/posts\/[0-9a-f-]+\/analytics\?range=all$/);
   await expect(signedIn.getByText(/web search, 24 Jul 2025 to 20 Nov 2026/)).toBeVisible();
+});
+
+test("CMS-024 before Umami counts Google's days, Analytics shows Google's numbers alone and page views and downloads as not counted yet, never zero", async ({ signedIn }, testInfo) => {
+  // As in production on 22 November 2026: Umami started on the 21st, Google's newest day was earlier.
+  await signedIn.route(/\/v1\/blog(\?|$)/, async (route) => {
+    const response = await route.fetch();
+    const body = await response.json() as Record<string, any>;
+    const unknown = (row: Record<string, unknown>) => ({ ...row, pageviews: null, downloads: null });
+    await route.fulfill({ response, json: { ...body, trafficCounted: false, trafficFrom: "2026-11-21", totals: unknown(body.totals), days: body.days.map(unknown), posts: body.posts.map(unknown) } });
+  });
+  await signedIn.goto("/analytics");
+  if (testInfo.project.name !== "mobile") {
+    const funnel = signedIn.getByRole("tablist", { name: "The blog's numbers" });
+    await expect(funnel.getByTestId("blog-clicks")).toContainText("6");
+    await expect(funnel.getByTestId("blog-pageviews")).toContainText("–");
+    await expect(funnel.getByTestId("blog-downloads")).toContainText("–");
+    // The chart opens on what there is.
+    await expect(funnel.getByRole("tab", { name: /Google clicks/ })).toHaveAttribute("aria-selected", "true");
+  }
+  await expect(signedIn.getByTestId("blog-step-note")).toContainText("Page views and downloads are not counted yet: Umami counts from 21 Nov 2026");
+  const row = signedIn.getByRole("table", { name: "Posts" }).getByRole("row").nth(1);
+  await expect(row).toContainText("–");
+  await expect(row).not.toContainText("too few views");
+  await expect(signedIn.getByText(/Umami's page views and downloads join once Google's numbers reach the days Umami counts/)).toBeVisible();
+  await signedIn.screenshot({ path: testInfo.outputPath("google-only.png"), fullPage: true });
 });
 
 test("CMS-021 a post's analytics shows where its readers came from, and a channel opens its sources in place", async ({ signedIn }, testInfo) => {
