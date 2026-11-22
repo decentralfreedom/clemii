@@ -9,6 +9,7 @@
 // to mean something; otherwise it is null, never a guess.
 import { and, asc, eq, inArray } from "drizzle-orm";
 import type { Database } from "../db/client";
+import { readSearchState } from "./import";
 import { auditLog, postRevisions } from "../db/schema";
 
 const dayMs = 86_400_000;
@@ -89,4 +90,22 @@ export async function searchMarkers(db: Database, postId: string, from: string, 
     if (changes.length) markers.push({ date, kind, changes, actor: entry.actor });
   }
   return markers;
+}
+
+/**
+ * The window ending on the last day Search Console has: from `since` when
+ * given (as Ghost's "Year to date" and "All time"), else the last `span` days,
+ * but never before the first day the CMS has numbers for. Inside it a day
+ * without a row had no impressions; before it there are no numbers at all.
+ */
+export async function searchWindow(db: Database, span: number, since?: string) {
+  const state = await readSearchState(db);
+  const to = state?.importedThrough ?? null;
+  const coverage = state?.importedFrom ?? to;
+  if (!to || !coverage) return { from: null, to: null, coverage: null, importedAt: state?.importedAt?.toISOString() ?? null };
+  const wanted = since ?? new Date(Date.parse(to) - (span - 1) * 86_400_000).toISOString().slice(0, 10);
+  // Never before the first day the CMS has numbers for, and never after the last.
+  const start = wanted > coverage ? wanted : coverage;
+  const from = start < to ? start : to;
+  return { from, to, coverage, importedAt: state?.importedAt?.toISOString() ?? null };
 }

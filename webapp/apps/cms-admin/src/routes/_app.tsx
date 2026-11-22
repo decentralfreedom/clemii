@@ -7,7 +7,7 @@
 // The editor (_editor) has no shell, as in Ghost.
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
-import { AppWindow, Check, ChevronRight, ChevronsUpDown, Ellipsis, ExternalLink, LogOut, Monitor, Moon, Palette, PenLine, Plus, Settings, Sun } from "lucide-react";
+import { AppWindow, ChartNoAxesColumn, Check, ChevronRight, ChevronsUpDown, Ellipsis, ExternalLink, LogOut, Monitor, Moon, Palette, PenLine, Plus, Settings, Sun } from "lucide-react";
 import { useMemo, useState, type CSSProperties } from "react";
 import { requireSession } from "@/api/require-session";
 import { sessionQuery, signOut } from "@/api/session";
@@ -53,6 +53,19 @@ function SiteIdentity() {
       <HushLogo withName={false} className="[&_svg]:size-8" />
       <span className="heading-font-features min-w-0 truncate text-lg font-semibold text-foreground">hush</span>
     </Link>
+  );
+}
+
+/** Analytics, as in Ghost's sidebar; active on the dashboard, not on a post's analytics (that belongs to Posts). */
+function AnalyticsNavItem() {
+  const close = useCloseMobileSidebar();
+  const active = useRouterState({ select: (state) => state.location.pathname === "/analytics" });
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={active}>
+        <Link to="/analytics" search={{}} onClick={close}><ChartNoAxesColumn /><span>Analytics</span></Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }
 
@@ -174,12 +187,16 @@ const mobileNavButton = "w-full max-w-16 min-w-9 rounded-full hover:bg-sidebar-a
 function MobileNavBar() {
   const { isMobile } = useSidebar();
   const onPosts = useRouterState({ select: (state) => state.location.pathname === "/" });
+  const onAnalytics = useRouterState({ select: (state) => state.location.pathname === "/analytics" });
   if (!isMobile) return null;
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 h-(--mobile-navbar-height) border-t border-sidebar-border bg-sidebar/80 pb-[env(safe-area-inset-bottom)] backdrop-blur-md sidebar:hidden">
-      <div className="mx-auto grid size-full max-w-[225px] grid-cols-3 items-center justify-items-center px-5">
+      <div className="mx-auto grid size-full max-w-[300px] grid-cols-4 items-center justify-items-center px-5">
         <Button asChild size="icon" variant="ghost" data-active={onPosts} className={cn(mobileNavButton, onPosts ? "bg-sidebar-accent text-sidebar-accent-foreground" : "bg-transparent")}>
           <Link to="/" search={{}}><PenLine strokeWidth={1.5} /><span className="sr-only">Posts</span></Link>
+        </Button>
+        <Button asChild size="icon" variant="ghost" data-active={onAnalytics} className={cn(mobileNavButton, onAnalytics ? "bg-sidebar-accent text-sidebar-accent-foreground" : "bg-transparent")}>
+          <Link to="/analytics" search={{}}><ChartNoAxesColumn strokeWidth={1.5} /><span className="sr-only">Analytics</span></Link>
         </Button>
         <Button asChild size="icon" variant="ghost" className={cn(mobileNavButton, "bg-transparent")}>
           <a href="https://behu.sh/blog" target="_blank" rel="noreferrer"><AppWindow strokeWidth={1.5} /><span className="sr-only">View site</span></a>
@@ -229,6 +246,8 @@ function AppLayout() {
                     <ExternalLink size={16} />
                   </a>
                 </SidebarMenuItem>
+                {/* Below View site, as Ghost's nav-content.tsx. */}
+                <AnalyticsNavItem />
               </SidebarMenu>
             </SidebarGroup>
             <SidebarGroup>

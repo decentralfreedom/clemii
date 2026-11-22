@@ -587,6 +587,176 @@
           "striking"
         ]
       },
+      "SiteSearch": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "importedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "totals": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SearchTotals"
+              },
+              {
+                "description": "The property's totals, as Google aggregates a site; not the sum of the posts"
+              }
+            ]
+          },
+          "previous": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "from": {
+                "type": "string",
+                "format": "date"
+              },
+              "to": {
+                "type": "string",
+                "format": "date"
+              },
+              "totals": {
+                "$ref": "#/components/schemas/SearchTotals"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "totals"
+            ]
+          },
+          "change": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "impressions": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "clicks": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "ctrPoints": {
+                "type": "number"
+              },
+              "position": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "impressions",
+              "clicks",
+              "ctrPoints",
+              "position"
+            ],
+            "description": "Against the earlier period; null without one, or when either period has fewer than 100 impressions"
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchDay"
+            }
+          },
+          "topPosts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchTopPost"
+            },
+            "description": "Posts with the most clicks, then impressions, in the window"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "importedAt",
+          "totals",
+          "previous",
+          "change",
+          "days",
+          "topPosts"
+        ]
+      },
+      "SearchTopPost": {
+        "type": "object",
+        "properties": {
+          "postId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "description": "The article's heading as published, else its title"
+          },
+          "lang": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "scheduled",
+              "published"
+            ]
+          },
+          "impressions": {
+            "type": "integer"
+          },
+          "clicks": {
+            "type": "integer"
+          },
+          "ctr": {
+            "type": "number"
+          },
+          "position": {
+            "type": "number",
+            "description": "Average position, weighted by impressions"
+          }
+        },
+        "required": [
+          "postId",
+          "title",
+          "lang",
+          "slug",
+          "status",
+          "impressions",
+          "clicks",
+          "ctr",
+          "position"
+        ]
+      },
       "Post": {
         "type": "object",
         "properties": {
@@ -1794,6 +1964,95 @@
           },
           "404": {
             "description": "No such post",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/search": {
+      "get": {
+        "operationId": "getSiteSearch",
+        "tags": [
+          "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "The site's Google Search Console numbers over the last `days` days Search Console has (28 by default), or since a day: Google's own site totals, the change from the period before, and the posts with the most search clicks.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3650,
+              "default": 28
+            },
+            "required": false,
+            "name": "days",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "required": false,
+            "name": "since",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The site's search numbers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteSearch"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The token lacks posts:read",
             "content": {
               "application/json": {
                 "schema": {

@@ -1,7 +1,8 @@
 // From Shade, Ghost Admin's design system (TryGhost/Ghost apps/shade/src, c2617d08),
 // MIT License, Copyright (c) 2013-2026 Ghost Foundation (see packages/theme/LICENSE.ghost).
+// Changed: the icon is passed as a component, not looked up by name, which
+// pulled every Lucide icon into the bundle.
 import * as React from 'react';
-import * as LucideIcons from 'lucide-react';
 import { type LucideIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -24,7 +25,7 @@ const KpiTabTrigger: React.FC<KpiTabTriggerProps> = ({ children, ...props }) => 
 
 interface KpiTabValueProps {
   color?: string;
-  icon?: keyof typeof LucideIcons;
+  icon?: LucideIcon;
   label: string;
   value: string | number;
   diffDirection?: 'up' | 'down' | 'same' | 'hidden';
@@ -35,7 +36,7 @@ interface KpiTabValueProps {
 
 const KpiTabValue: React.FC<KpiTabValueProps> = ({
   color,
-  icon: iconName,
+  icon: IconComponent,
   label,
   value,
   diffDirection,
@@ -43,8 +44,6 @@ const KpiTabValue: React.FC<KpiTabValueProps> = ({
   className,
   'data-testid': testId,
 }) => {
-  const IconComponent = iconName ? (LucideIcons[iconName] as LucideIcon) : null;
-
   const labelNode = (
     <span
       className="flex items-center gap-1.5 transition-all group-hover:text-foreground"

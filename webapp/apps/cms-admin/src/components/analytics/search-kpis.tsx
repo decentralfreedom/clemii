@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 //
-// A post's Google Search numbers as Ghost's KPI tabs over its area chart
+// A post's or the site's Google Search numbers as Ghost's KPI tabs over its area chart
 // (apps/admin/src/posts/analytics/web/components/kpis.tsx): each tab shows a
 // total and its change from the period before; the chosen one is charted.
 // Changes come from the CMS, which gives them only for valid comparisons
 // (search/analytics.ts); without one the badge stays hidden.
 import { useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import type { PostSearch } from "@/api/cms.generated";
+import type { PostSearch, SiteSearch } from "@/api/cms.generated";
 import { Card, CardContent } from "@/components/ui/card";
 import { GhAreaChart } from "@/components/ui/gh-chart";
 import { KpiDropdownButton, KpiTabTrigger, KpiTabValue } from "@/components/ui/kpi-tabs";
@@ -19,12 +19,15 @@ const colors: Record<SearchMetric, string> = {
   impressions: "var(--chart-blue)", clicks: "var(--chart-green)", ctr: "var(--chart-orange)", position: "var(--chart-darkblue)",
 };
 
+/** A post's or the whole site's numbers over a range the CMS has: totals, the valid change, and the days. */
+export type SearchNumbers = Pick<PostSearch | SiteSearch, "totals" | "previous" | "change" | "days"> & { from: string; to: string };
+
 type Diff = { direction: "up" | "down" | "same" | "hidden"; value?: string; tooltip?: string };
 
 const percent = (value: number) => `${value > 0 ? "+" : ""}${(value * 100).toFixed(0)}%`;
 
 /** The badge for a metric: up means better, so a lower position shows as an improvement. */
-function diffOf(metric: SearchMetric, search: PostSearch): Diff {
+function diffOf(metric: SearchMetric, search: SearchNumbers): Diff {
   const { change, previous } = search;
   if (!change || !previous) return { direction: "hidden" };
   const before = formatMetric(metric, metric === "ctr" ? previous.totals.ctr : metric === "position" ? previous.totals.position : previous.totals[metric]);
@@ -47,7 +50,7 @@ function diffOf(metric: SearchMetric, search: PostSearch): Diff {
   };
 }
 
-export function SearchKpis({ search }: { search: PostSearch & { from: string; to: string } }) {
+export function SearchKpis({ search, id }: { search: SearchNumbers; id: string }) {
   const [metric, setMetric] = useState<SearchMetric>("impressions");
   const totals: Record<SearchMetric, number | null> = {
     impressions: search.totals.impressions, clicks: search.totals.clicks, ctr: search.totals.ctr, position: search.totals.position,
@@ -89,7 +92,7 @@ export function SearchKpis({ search }: { search: PostSearch & { from: string; to
         </Tabs>
         <div className="my-4 [&_.recharts-cartesian-axis-tick-value]:fill-gray-500">
           <GhAreaChart
-            id={`search-${metric}`} data={series} range={spanOf(search.from, search.to)} color={colors[metric]}
+            id={`${id}-${metric}`} data={series} range={spanOf(search.from, search.to)} color={colors[metric]}
             yAxisReversed={metric === "position"}
             showDots={metric === "ctr" || metric === "position"}
             dataFormatter={(value) => formatMetric(metric, value)}

@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { createApp } from "../../src/app";
 import { createSession, setSessionCookie } from "../../src/auth/sessions";
 import { systemActor } from "../../src/auth/tokens";
-import { searchConsoleState, searchDaily, searchQueries } from "../../src/db/schema";
+import { searchConsoleState, searchDaily, searchQueries, searchSiteDaily } from "../../src/db/schema";
 import { Hono } from "hono";
 import { createDraft, publishPost } from "../../src/posts/service";
 import { LocalObjectStore } from "../../src/storage/object-store";
@@ -39,6 +39,13 @@ await cms.db.insert(searchConsoleState).values({ id: 1, importedAt: new Date(), 
 await cms.db.insert(searchDaily).values([
   { postId: live.id, date: "2026-11-01", impressions: 1200, clicks: 30, position: 8 },
   { postId: live.id, date: "2026-11-20", impressions: 300, clicks: 6, position: 6 },
+]);
+// Google's own site totals (aggregated by property): more than the post's, as the home page counts too.
+// The 30 days before 22 October hold enough impressions for a valid comparison.
+await cms.db.insert(searchSiteDaily).values([
+  { date: "2026-10-10", impressions: 900, clicks: 18, position: 9 },
+  { date: "2026-11-01", impressions: 2000, clicks: 60, position: 7 },
+  { date: "2026-11-20", impressions: 800, clicks: 20, position: 5 },
 ]);
 await cms.db.insert(searchQueries).values([
   { postId: live.id, date: "2026-11-20", query: "dictate without cloud", impressions: 200, clicks: 5, position: 5 },

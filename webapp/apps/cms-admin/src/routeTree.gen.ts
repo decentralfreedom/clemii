@@ -14,6 +14,7 @@ import { Route as EditorRouteImport } from './routes/_editor'
 import { Route as DeviceRouteImport } from './routes/device'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
 import { Route as AppSettingsChar123SectionChar125RouteImport } from './routes/_app/settings.{-$section}'
 import { Route as EditorPostsIdRouteImport } from './routes/_editor/posts/$id'
 import { Route as AppPostsIdAnalyticsRouteImport } from './routes/_app/posts.$id.analytics'
@@ -41,6 +42,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsChar123SectionChar125Route =
   AppSettingsChar123SectionChar125RouteImport.update({
     id: '/settings/{-$section}',
@@ -62,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/device': typeof DeviceRoute
   '/sign-in': typeof SignInRoute
+  '/analytics': typeof AppAnalyticsRoute
   '/settings/{-$section}': typeof AppSettingsChar123SectionChar125Route
   '/posts/$id': typeof EditorPostsIdRoute
   '/posts/$id/analytics': typeof AppPostsIdAnalyticsRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/device': typeof DeviceRoute
   '/sign-in': typeof SignInRoute
+  '/analytics': typeof AppAnalyticsRoute
   '/settings/{-$section}': typeof AppSettingsChar123SectionChar125Route
   '/posts/$id': typeof EditorPostsIdRoute
   '/posts/$id/analytics': typeof AppPostsIdAnalyticsRoute
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/_editor': typeof EditorRouteWithChildren
   '/device': typeof DeviceRoute
   '/sign-in': typeof SignInRoute
+  '/_app/analytics': typeof AppAnalyticsRoute
   '/_app/': typeof AppIndexRoute
   '/_app/settings/{-$section}': typeof AppSettingsChar123SectionChar125Route
   '/_editor/posts/$id': typeof EditorPostsIdRoute
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/'
     | '/device'
     | '/sign-in'
+    | '/analytics'
     | '/settings/{-$section}'
     | '/posts/$id'
     | '/posts/$id/analytics'
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/'
     | '/device'
     | '/sign-in'
+    | '/analytics'
     | '/settings/{-$section}'
     | '/posts/$id'
     | '/posts/$id/analytics'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/_editor'
     | '/device'
     | '/sign-in'
+    | '/_app/analytics'
     | '/_app/'
     | '/_app/settings/{-$section}'
     | '/_editor/posts/$id'
@@ -158,6 +170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/analytics': {
+      id: '/_app/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AppAnalyticsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/settings/{-$section}': {
       id: '/_app/settings/{-$section}'
       path: '/settings/{-$section}'
@@ -183,12 +202,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppIndexRoute: typeof AppIndexRoute
   AppSettingsChar123SectionChar125Route: typeof AppSettingsChar123SectionChar125Route
   AppPostsIdAnalyticsRoute: typeof AppPostsIdAnalyticsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAnalyticsRoute: AppAnalyticsRoute,
   AppIndexRoute: AppIndexRoute,
   AppSettingsChar123SectionChar125Route: AppSettingsChar123SectionChar125Route,
   AppPostsIdAnalyticsRoute: AppPostsIdAnalyticsRoute,

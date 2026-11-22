@@ -78,6 +78,20 @@
       "when": 1795345106225,
       "tag": "0010_search_queries",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1795350149992,
+      "tag": "0011_search_site_daily",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1795350150170,
+      "tag": "0012_search_site_history",
+      "breakpoints": true
     }
   ]
 }

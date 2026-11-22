@@ -12,7 +12,7 @@ import { join } from "node:path";
 import { createApp } from "../src/app";
 import { createToken, systemActor } from "../src/auth/tokens";
 import { loadConfig, type SearchConsoleConfig } from "../src/config";
-import { auditLog, postRevisions, searchDaily, searchConsoleState, searchQueries } from "../src/db/schema";
+import { auditLog, postRevisions, searchDaily, searchConsoleState, searchQueries, searchSiteDaily } from "../src/db/schema";
 import { pagePathOf } from "../src/posts/paths";
 import { createDraft, publishPost, updatePost } from "../src/posts/service";
 import { searchConsoleClient, type QueryRow, type SearchRow } from "../src/search/console";
@@ -29,7 +29,11 @@ const config: SearchConsoleConfig = {
 };
 
 /** Google, as far as the CMS uses it: the token endpoint, sites.list and searchanalytics.query. */
-function fakeGoogle(rows: (start: string, end: string) => SearchRow[], options: { fail?: boolean; queries?: (start: string, end: string) => QueryRow[] } = {}) {
+function fakeGoogle(rows: (start: string, end: string) => SearchRow[], options: {
+  fail?: boolean; queries?: (start: string, end: string) => QueryRow[];
+  /** The property's own totals per day, as Google aggregates a site. */
+  site?: Array<Omit<SearchRow, "page">>;
+} = {}) {
   const calls: Array<{ url: string; body: string }> = [];
   const fetcher = async (url: string, init?: RequestInit) => {
     const body = String(init?.body ?? "");
@@ -37,9 +41,14 @@ function fakeGoogle(rows: (start: string, end: string) => SearchRow[], options: 
     if (options.fail) return new Response("{}", { status: 503 });
     if (url === config.key.tokenUri) return Response.json({ access_token: "google-token", expires_in: 3600 });
     if (url.endsWith("/sites")) return Response.json({ siteEntry: [{ siteUrl: "sc-domain:behu.sh", permissionLevel: "siteRestrictedUser" }] });
-    const { startDate, endDate, startRow, rowLimit, dimensions } = JSON.parse(body) as { startDate: string; endDate: string; startRow: number; rowLimit: number; dimensions: string[] };
+    const { startDate, endDate, startRow, rowLimit, dimensions, aggregationType } = JSON.parse(body) as { startDate: string; endDate: string; startRow: number; rowLimit: number; dimensions: string[]; aggregationType?: string };
     // Google answers for the requested days only.
     const inRange = <Row extends SearchRow>(all: Row[]) => all.filter((row) => row.date >= startDate && row.date <= endDate);
+    if (!dimensions.includes("page")) {
+      expect(aggregationType).toBe("byProperty");
+      const page = inRange((options.site ?? []).map((row) => ({ ...row, page: "" }))).slice(startRow, startRow + rowLimit);
+      return Response.json({ rows: page.map(({ date, impressions, clicks, position }) => ({ keys: [date], impressions, clicks, position })) });
+    }
     if (dimensions.includes("query")) {
       const page = inRange(options.queries?.(startDate, endDate) ?? []).slice(startRow, startRow + rowLimit);
       return Response.json({ rows: page.map(({ page: address, query, date, impressions, clicks, position }) => ({ keys: [address, query, date], impressions, clicks, position })) });
@@ -70,7 +79,7 @@ describe("Search Console client", () => {
     const many = Array.from({ length: 25_003 }, (_, index) => ({ page: `https://behu.sh/blog/post-${index}`, date: "2026-11-01", impressions: 1, clicks: 0, position: 9 }));
     const { calls, client } = fakeGoogle(() => many);
     expect(await client.pageDays("2026-11-01", "2026-11-01")).toHaveLength(25_003);
-    expect(calls.filter((call) => call.url.includes("searchAnalytics")).map((call) => JSON.parse(call.body).startRow)).toEqual([0, 25_000]);
+    expect(calls.filter((call) => call.url.includes("searchAnalytics") && call.body.includes('"page"') && !call.body.includes('"query"')).map((call) => JSON.parse(call.body).startRow)).toEqual([0, 25_000]);
     // Queries come through the same paged reader, with the query as a dimension.
     expect((await client.pageQueryDays("2026-11-01", "2026-11-01"))).toEqual([]);
   });
@@ -157,7 +166,7 @@ describe.skipIf(!serverUrl)("CMS Search Console import", () => {
     ]);
     const result = await importSearchConsole(database.db, client, now);
     // One web-search day per request, as Google's guide advises, from 16 months back to today.
-    const pageDays = calls.filter((entry) => entry.url.includes("searchAnalytics") && !entry.body.includes('"query"')).map((entry) => JSON.parse(entry.body));
+    const pageDays = calls.filter((entry) => entry.url.includes("searchAnalytics") && entry.body.includes('"page"') && !entry.body.includes('"query"')).map((entry) => JSON.parse(entry.body));
     expect(pageDays.every((request) => request.startDate === request.endDate && request.type === "web" && request.dataState === "all")).toBe(true);
     expect(pageDays.map((request) => request.startDate).sort()).toEqual(expect.arrayContaining(["2025-07-24", "2026-11-22"]));
     expect(pageDays).toHaveLength(487);
@@ -177,7 +186,7 @@ describe.skipIf(!serverUrl)("CMS Search Console import", () => {
     const later = new Date("2026-11-23T06:00:00.000Z");
     expect(await searchImportDue(database.db, later)).toBe(true);
     await importSearchConsole(database.db, client, later);
-    const refreshed = calls.filter((entry) => entry.url.includes("searchAnalytics") && !entry.body.includes('"query"')).map((entry) => JSON.parse(entry.body).startDate).sort();
+    const refreshed = calls.filter((entry) => entry.url.includes("searchAnalytics") && entry.body.includes('"page"') && !entry.body.includes('"query"')).map((entry) => JSON.parse(entry.body).startDate).sort();
     expect([refreshed[0], refreshed.at(-1), refreshed.length]).toEqual(["2026-11-09", "2026-11-23", 15]);
     const day = (await database.db.select().from(searchDaily)).find((row) => row.postId === moved && row.date === "2026-11-19");
     expect(day).toMatchObject({ impressions: 80, clicks: 2, position: 7.5 });
@@ -279,5 +288,22 @@ describe.skipIf(!serverUrl)("CMS Search Console import", () => {
     const { body: searches } = await call(`/v1/posts/${moved}/search/queries?days=28`);
     expect(searches.queries.map((query: { query: string; striking: boolean }) => [query.query, query.striking]))
       .toEqual([["dictate on mac", false], ["mac dictation offline", true]]);
+  });
+
+  test("CMS-SEARCH-008 the dashboard's site totals are Google's own, by property, with the posts that brought the most search traffic", async () => {
+    // Google's site total for a day is not the sum of its pages: the home page counts, and pages share searches.
+    const google = fakeGoogle(() => [{ page: "https://behu.sh/blog/dictate-on-mac", date: "2026-11-21", impressions: 10, clicks: 0, position: 9 }], {
+      site: [{ date: "2026-11-21", impressions: 640, clicks: 21, position: 4.2 }],
+    });
+    await database.db.update(searchConsoleState).set({ importedFrom: null });
+    await importSearchConsole(database.db, google.client, new Date("2026-11-27T06:00:00.000Z"));
+    expect(await database.db.select().from(searchSiteDaily)).toEqual([{ date: "2026-11-21", impressions: 640, clicks: 21, position: 4.2 }]);
+    const reader = await createToken(database.db, { name: "dashboard-reader", scopes: ["posts:read"] }, systemActor("test"));
+    const { status, body } = await call("/v1/search?days=7", reader);
+    expect(status).toBe(200);
+    expect(body).toMatchObject({ to: "2026-11-21", totals: { impressions: 640, clicks: 21, position: 4.2 } });
+    expect(body.totals.ctr).toBeCloseTo(21 / 640, 6);
+    expect(body.topPosts[0]).toMatchObject({ postId: moved, slug: "dictate-on-mac", impressions: 10, status: "published" });
+    expect((await call("/v1/search", "none")).status).toBe(401);
   });
 });

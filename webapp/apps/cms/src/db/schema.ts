@@ -229,6 +229,19 @@ export const searchQueries = pgTable("search_queries", {
   position: doublePrecision("position").notNull(),
 }, (table) => [primaryKey({ columns: [table.postId, table.date, table.query] })]);
 
+/**
+ * The whole property's Search Console numbers per day (PRD R12, the
+ * dashboard), aggregated by property as Google totals a site: home, release
+ * and blog pages together, and not the sum of search_daily, which Google
+ * aggregates by page. Days as in search_daily (US Pacific).
+ */
+export const searchSiteDaily = pgTable("search_site_daily", {
+  date: date("date", { mode: "string" }).primaryKey(),
+  impressions: integer("impressions").notNull(),
+  clicks: integer("clicks").notNull(),
+  position: doublePrecision("position").notNull(),
+});
+
 /** The Search Console import's own state, one row: a failing import retries hourly, not every minute. */
 export const searchConsoleState = pgTable("search_console_state", {
   id: smallint("id").primaryKey().default(1),
