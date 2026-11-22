@@ -249,6 +249,37 @@ export const searchSiteDaily = pgTable("search_site_daily", {
   position: doublePrecision("position").notNull(),
 });
 
+/**
+ * Umami's page views and downloads per post and US Pacific day (PRD R11), a
+ * post's pages at every address it has had summed; downloads are counted on
+ * the page they started from. Unique visitors are not kept: summed over days
+ * they would count a person once a day.
+ */
+export const trafficDaily = pgTable("traffic_daily", {
+  postId: uuid("post_id").notNull().references(() => posts.id, { onDelete: "cascade" }),
+  date: date("date", { mode: "string" }).notNull(),
+  pageviews: integer("pageviews").notNull(),
+  downloads: integer("downloads").notNull(),
+}, (table) => [primaryKey({ columns: [table.postId, table.date] }), index("traffic_daily_date").on(table.date)]);
+
+/** The whole site's page views and downloads per day: every page, the home and release pages too. */
+export const trafficSiteDaily = pgTable("traffic_site_daily", {
+  date: date("date", { mode: "string" }).primaryKey(),
+  pageviews: integer("pageviews").notNull(),
+  downloads: integer("downloads").notNull(),
+});
+
+/** The Umami import's state, one row. */
+export const trafficState = pgTable("traffic_state", {
+  id: smallint("id").primaryKey().default(1),
+  attemptedAt: timestamp("attempted_at", { withTimezone: true }),
+  importedAt: timestamp("imported_at", { withTimezone: true }),
+  /** The first day Umami has, its website's creation: before it there are no numbers, which is not zero. */
+  importedFrom: date("imported_from", { mode: "string" }),
+  /** The last complete day imported. */
+  importedThrough: date("imported_through", { mode: "string" }),
+}, (table) => [check("traffic_state_single_row", sql`${table.id} = 1`)]);
+
 /** The Search Console import's own state, one row: a failing import retries hourly, not every minute. */
 export const searchConsoleState = pgTable("search_console_state", {
   id: smallint("id").primaryKey().default(1),

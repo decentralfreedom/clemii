@@ -21,6 +21,18 @@ export type CmsConfig = {
   admin?: AdminConfig;
   /** Search Console numbers per post (PRD R12), read by the scheduler; absent, nothing is imported. */
   searchConsole?: SearchConsoleConfig;
+  /** Page views and downloads per post from Umami (PRD R11, the funnel), read by the scheduler; absent, nothing is imported. */
+  umami?: UmamiConfig;
+};
+
+/** Read access to one Umami website, behind Cloudflare Access when a service token is given. */
+export type UmamiConfig = {
+  url: string;
+  websiteId: string;
+  /** An Umami API key (Settings > API keys), sent as a bearer token. */
+  apiKey: string;
+  /** A Cloudflare Access service token, for an Umami that Access protects. */
+  access?: { clientId: string; clientSecret: string };
 };
 
 /** A Google service account with read-only access to one Search Console property. */
@@ -65,6 +77,34 @@ export function loadConfig(env: Env = process.env): CmsConfig {
     site: siteConfig(env),
     admin: adminConfig(env),
     searchConsole: searchConsoleConfig(env),
+    umami: umamiConfig(env),
+  };
+}
+
+/**
+ * CMS_UMAMI_URL, CMS_UMAMI_WEBSITE_ID and CMS_UMAMI_API_KEY together turn the
+ * import on, set only where it runs (the scheduler); an Umami behind Cloudflare
+ * Access also needs CMS_UMAMI_ACCESS_CLIENT_ID and _SECRET. Errors name the
+ * setting, never its value.
+ */
+function umamiConfig(env: Env): UmamiConfig | undefined {
+  const url = env.CMS_UMAMI_URL;
+  if (!url) return undefined;
+  const required = (name: string) => {
+    const value = env[name];
+    if (!value) throw new Error(`${name} is required when CMS_UMAMI_URL is set`);
+    return value;
+  };
+  const parsed = new URL(url);
+  if (parsed.protocol !== "https:" && parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1") throw new Error("CMS_UMAMI_URL must use HTTPS");
+  const websiteId = required("CMS_UMAMI_WEBSITE_ID");
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(websiteId)) throw new Error("CMS_UMAMI_WEBSITE_ID must be the website's id (a UUID)");
+  const clientId = env.CMS_UMAMI_ACCESS_CLIENT_ID;
+  const clientSecret = env.CMS_UMAMI_ACCESS_CLIENT_SECRET;
+  if (Boolean(clientId) !== Boolean(clientSecret)) throw new Error("CMS_UMAMI_ACCESS_CLIENT_ID and CMS_UMAMI_ACCESS_CLIENT_SECRET go together");
+  return {
+    url: parsed.origin, websiteId, apiKey: required("CMS_UMAMI_API_KEY"),
+    ...(clientId && clientSecret ? { access: { clientId, clientSecret } } : {}),
   };
 }
 
