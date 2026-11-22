@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 //
-// The blog funnel's measurements (PRD R10): downloads counted here at
-// /download, where an ad blocker cannot hide them, and, only when page views
-// are switched on, page views and download clicks through Umami's tracker.
+// The blog funnel's measurements (PRD R10), counted on this server, where an
+// ad blocker cannot hide them and no script runs in the browser: page views of
+// real navigations, and downloads at /download. Umami's browser tracker (page
+// views with screen size, download clicks) stays off unless switched on.
 // Umami is reached through this origin (/stats), as Umami documents for
 // proxying, so the Content Security Policy stays 'self'. The proxy forwards the
 // request body and the browser's User-Agent (Umami ignores bots by it), never
@@ -76,6 +77,34 @@ export function registerAnalytics<E extends Env>(app: Hono<E>, input: {
   // The download always works; a client repeating it is counted a few times a minute at most.
   const counted = new RateLimitStore({ windowMs: 60_000, limit: 5 });
 
+  // A page view is a browser loading a page for a person: a top-level
+  // navigation (Fetch Metadata, sent by every browser since 2023), not a
+  // prefetch or prerender the person may never see, answered with a page.
+  // Umami drops known bots by their User-Agent.
+  const viewed = new RateLimitStore({ windowMs: 60_000, limit: 60 });
+  if (input.analytics) {
+    const views = input.analytics;
+    app.use("*", async (context, next) => {
+      await next();
+      const headers = context.req.raw.headers;
+      if (context.req.method !== "GET" || context.res.status !== 200) return;
+      if (!context.res.headers.get("content-type")?.startsWith("text/html")) return;
+      if (headers.get("sec-fetch-dest") !== "document" || headers.has("sec-purpose") || headers.has("purpose")) return;
+      if (declinesTracking(headers) || !viewed.consume(clientKey(context)).allowed) return;
+      void send(fetcher, views, {
+        type: "event",
+        payload: {
+          website: views.websiteId, hostname, url: context.req.path,
+          referrer: referrerOf(headers.get("referer")), language: languageOf(headers.get("accept-language")),
+          ip: coarseAddress(context.req.header("cf-connecting-ip")),
+        },
+      }, context.req.header("user-agent") ?? "").then(
+        (response) => { if (!response.ok) log(`Umami refused a page view: ${response.status}`); },
+        (error: unknown) => log(`Umami unreachable for a page view: ${String(error)}`),
+      );
+    });
+  }
+
   app.get("/download", (context) => {
     context.header("cache-control", "no-store");
     context.header("x-robots-tag", "noindex, nofollow");
@@ -100,7 +129,7 @@ export function registerAnalytics<E extends Env>(app: Hono<E>, input: {
   });
 
   const { analytics } = input;
-  if (!analytics?.pageViews) return;
+  if (!analytics?.tracker) return;
   let script: { body: string; expires: number } | undefined;
   app.get(`${proxyPath}/script.js`, async (context) => {
     if (!script || script.expires < Date.now()) {
@@ -130,6 +159,23 @@ export function registerAnalytics<E extends Env>(app: Hono<E>, input: {
     if (!response) return context.body(null, 502);
     return context.body(await response.text(), response.status as 200);
   });
+}
+
+/** Where the visitor came from, without its query or fragment; browsers send only the origin of another site. */
+function referrerOf(referer: string | null) {
+  if (!referer) return undefined;
+  try {
+    const url = new URL(referer);
+    return url.protocol === "https:" || url.protocol === "http:" ? `${url.origin}${url.pathname}` : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** The browser's first preferred language, as Umami's tracker reports it. */
+function languageOf(acceptLanguage: string | null) {
+  const first = acceptLanguage?.split(",")[0]?.split(";")[0]?.trim();
+  return first && /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(first) ? first : undefined;
 }
 
 function send(fetcher: Fetch, analytics: Analytics, event: object, userAgent: string) {

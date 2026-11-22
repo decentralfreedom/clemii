@@ -52,7 +52,7 @@ const app = createApp({
 
 const pageFile = Bun.file("./dist-pages/pages.json");
 const renderedPages: Record<string, string> = await pageFile.exists() ? await pageFile.json() : {};
-if (config.analytics?.pageViews) {
+if (config.analytics?.tracker) {
   const tag = analyticsTag(config.analytics, config.publicBaseUrl);
   for (const path of Object.keys(renderedPages)) renderedPages[path] = withAnalytics(renderedPages[path]!, tag);
 }
