@@ -5,7 +5,8 @@
 // on Kubernetes): every minute it publishes scheduled posts that are due,
 // deploys the website when it is behind the CMS and tells search engines about
 // changed pages (src/site/deploy.ts), and whenever the newest backup is a day
-// old it takes a new one. Both steps are
+// old it takes a new one, and likewise a Markdown export of every post
+// (backups/markdown-export.ts). Each step is
 // idempotent, so a restart or a second instance (during a rolling update) does
 // no harm. Like the API it answers health checks over HTTP on PORT (3100):
 // /health/live while it runs, /health/ready while its last tick without errors
@@ -19,6 +20,7 @@
 // as the API does at start (under one advisory lock), so neither depends on
 // the other having started.
 import { backupDatabase, backupTime, listBackups } from "../backups/backups";
+import { exportMarkdown, markdownExports } from "../backups/markdown-export";
 import { loadConfig } from "../config";
 import { storeCheck, watchConfiguration } from "../config-check";
 import { connectDatabase } from "../db/client";
@@ -86,6 +88,15 @@ async function tick() {
   } catch (error) {
     healthy = false;
     log("error", "Backing up the CMS database failed", { error: String(error) });
+  }
+  // The nightly Markdown export (PRD R15), on the same daily rhythm and in the same bucket.
+  try {
+    const newest = (await listBackups(backups, markdownExports))[0];
+    const age = newest ? Date.now() - backupTime(newest, markdownExports)!.getTime() : Infinity;
+    if (age >= 86_400_000) log("info", "Exported the posts as Markdown", await exportMarkdown(db, backups, config.backups.keepDays));
+  } catch (error) {
+    healthy = false;
+    log("error", "Exporting the posts as Markdown failed", { error: String(error) });
   }
   // Outside the health count: Search Console being unreachable is Google's, not the CMS's.
   if (searchConsole) {

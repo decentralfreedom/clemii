@@ -7,8 +7,14 @@
 // arguments, so the password does not show up in process listings.
 import type { ObjectStore } from "../storage/object-store";
 
-const prefix = "cms/";
+/** A kind of backup in the bucket: its key prefix and file extension. */
+export type BackupSeries = { prefix: string; extension: string };
+/** pg_dump archives of the database. */
+export const databaseBackups: BackupSeries = { prefix: "cms/", extension: ".dump" };
 const dayMs = 86_400_000;
+
+/** The key for a backup taken at a time. */
+export const backupKey = (series: BackupSeries, at: Date) => `${series.prefix}${at.toISOString().replace(/[:.]/g, "-")}${series.extension}`;
 
 /** libpq's standard variables for a postgresql:// URL. */
 function connection(url: string): Record<string, string> {
@@ -35,8 +41,9 @@ async function run(command: string[], databaseUrl: string, input?: Uint8Array) {
 }
 
 /** The time a backup was taken, read from its key. */
-export function backupTime(key: string) {
-  const stamp = /^cms\/(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z)\.dump$/.exec(key)?.[1];
+export function backupTime(key: string, series = databaseBackups) {
+  if (!key.startsWith(series.prefix) || !key.endsWith(series.extension)) return undefined;
+  const stamp = /^(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}-\d{3}Z)$/.exec(key.slice(series.prefix.length, -series.extension.length))?.[1];
   if (!stamp) return undefined;
   const [date, time] = stamp.split("T");
   const [hours, minutes, seconds, millis] = time!.replace("Z", "").split("-");
@@ -44,22 +51,22 @@ export function backupTime(key: string) {
 }
 
 /** Backups, newest first. */
-export async function listBackups(store: ObjectStore) {
-  const keys = (await store.list(prefix)).filter((key) => backupTime(key));
-  return keys.sort((a, b) => backupTime(b)!.getTime() - backupTime(a)!.getTime());
+export async function listBackups(store: ObjectStore, series = databaseBackups) {
+  const keys = (await store.list(series.prefix)).filter((key) => backupTime(key, series));
+  return keys.sort((a, b) => backupTime(b, series)!.getTime() - backupTime(a, series)!.getTime());
 }
 
 /** Removes backups older than keepDays, always keeping the newest. */
-export async function pruneBackups(store: ObjectStore, keepDays: number, now = new Date()) {
-  const [, ...older] = await listBackups(store);
-  const expired = older.filter((key) => now.getTime() - backupTime(key)!.getTime() > keepDays * dayMs);
+export async function pruneBackups(store: ObjectStore, keepDays: number, now = new Date(), series = databaseBackups) {
+  const [, ...older] = await listBackups(store, series);
+  const expired = older.filter((key) => now.getTime() - backupTime(key, series)!.getTime() > keepDays * dayMs);
   for (const key of expired) await store.delete(key);
   return expired;
 }
 
 export async function backupDatabase(databaseUrl: string, store: ObjectStore, keepDays: number, now = new Date()) {
   const archive = await run(["pg_dump", "--format=custom", "--no-owner", "--no-privileges"], databaseUrl);
-  const key = `${prefix}${now.toISOString().replace(/[:.]/g, "-")}.dump`;
+  const key = backupKey(databaseBackups, now);
   await store.put(key, archive, "application/octet-stream");
   return { key, bytes: archive.byteLength, removed: await pruneBackups(store, keepDays, now) };
 }
