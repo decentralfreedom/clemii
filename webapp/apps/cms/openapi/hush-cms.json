@@ -996,6 +996,192 @@
           "downloads"
         ]
       },
+      "TrafficPages": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "importedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "pageviews": {
+                "type": "integer"
+              },
+              "downloads": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "pageviews",
+              "downloads"
+            ]
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrafficPage"
+            }
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "importedAt",
+          "totals",
+          "rows"
+        ]
+      },
+      "TrafficPage": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "postId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "pageType": {
+            "type": "string",
+            "enum": [
+              "home",
+              "post",
+              "release",
+              "other"
+            ]
+          },
+          "pageviews": {
+            "type": "integer"
+          },
+          "downloads": {
+            "type": "integer",
+            "description": "Every download started from this page, tagged or not"
+          }
+        },
+        "required": [
+          "path",
+          "postId",
+          "pageType",
+          "pageviews",
+          "downloads"
+        ]
+      },
+      "TrafficFlow": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "channel": {
+                  "type": "string",
+                  "enum": [
+                    "direct",
+                    "ai",
+                    "organicSearch",
+                    "paidSearch",
+                    "organicSocial",
+                    "paidSocial",
+                    "email",
+                    "video",
+                    "referral",
+                    "paid",
+                    "other"
+                  ]
+                },
+                "pageType": {
+                  "type": "string",
+                  "enum": [
+                    "home",
+                    "post",
+                    "release",
+                    "other"
+                  ]
+                },
+                "pageviews": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "channel",
+                "pageType",
+                "pageviews"
+              ]
+            }
+          },
+          "pageTypes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "pageType": {
+                  "type": "string",
+                  "enum": [
+                    "home",
+                    "post",
+                    "release",
+                    "other"
+                  ]
+                },
+                "pageviews": {
+                  "type": "integer"
+                },
+                "downloads": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "pageType",
+                "pageviews",
+                "downloads"
+              ]
+            }
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "links",
+          "pageTypes"
+        ]
+      },
       "TrackedLinks": {
         "type": "object",
         "properties": {
@@ -3275,6 +3461,187 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TrafficSources"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The token lacks posts:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/traffic/pages": {
+      "get": {
+        "operationId": "getTrafficPages",
+        "tags": [
+          "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "Every page of the site with its page views and all its downloads, over complete US Pacific days, most viewed first; optionally one page type.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3650,
+              "default": 28
+            },
+            "required": false,
+            "name": "days",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "required": false,
+            "name": "since",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "home",
+                "post",
+                "release",
+                "other"
+              ]
+            },
+            "required": false,
+            "name": "pageType",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 50
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The pages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrafficPages"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The token lacks posts:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/traffic/flow": {
+      "get": {
+        "operationId": "getTrafficFlow",
+        "tags": [
+          "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "description": "From channel to page type to download, over complete US Pacific days: page views from each channel to each page type, and each page type's page views and downloads. Both come from the same daily reads, so a page type's page views equal the sum of its channels'.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3650,
+              "default": 28
+            },
+            "required": false,
+            "name": "days",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "required": false,
+            "name": "since",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The flow",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrafficFlow"
                 }
               }
             }

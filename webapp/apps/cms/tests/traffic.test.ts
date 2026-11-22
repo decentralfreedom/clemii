@@ -12,11 +12,11 @@ import { join } from "node:path";
 import { createApp } from "../src/app";
 import { createToken, systemActor } from "../src/auth/tokens";
 import { loadConfig, type UmamiConfig } from "../src/config";
-import { trafficDaily, trafficSiteDaily, trafficSourceDaily } from "../src/db/schema";
+import { trafficDaily, trafficPageDaily, trafficSiteDaily, trafficSourceDaily } from "../src/db/schema";
 import { channelOf, pageTypeOf } from "../src/traffic/channels";
 import { createDraft, publishPost, updatePost } from "../src/posts/service";
 import { LocalObjectStore } from "../src/storage/object-store";
-import { importTraffic, readTrafficState, trafficImportDue } from "../src/traffic/import";
+import { firstIncompleteDay, importTraffic, readTrafficState, trafficImportDue } from "../src/traffic/import";
 import { pacificDayRange, umamiClient } from "../src/traffic/umami";
 import { createTestDatabase, serverUrl } from "./database";
 import { credentials, ownerSession, validPost } from "./fixtures";
@@ -303,6 +303,43 @@ describe.skipIf(!serverUrl)("CMS Umami sources", () => {
     ]);
     expect((await call("/v1/traffic/sources?days=7&groupBy=page&pageType=home")).body.rows).toEqual([{ path: "/", postId: null, pageType: "home", pageviews: 2, downloads: 0 }]);
     expect((await call("/v1/traffic/sources?groupBy=nonsense")).status).toBe(400);
+  });
+
+  test("CMS-TRAFFIC-008 a day another version imported without all its numbers is read again, however the updates were ordered", async () => {
+    // As when the API's migration ran while the scheduler was still the previous version: the day's sources and pages are missing.
+    await database.db.delete(trafficSourceDaily);
+    await database.db.delete(trafficPageDaily);
+    expect(await firstIncompleteDay(database.db, "2026-11-20", "2026-11-20")).toBe("2026-11-20");
+    const now = new Date("2026-11-22T05:00:00.000Z");
+    expect(await trafficImportDue(database.db, new Date(now.getTime() + 2 * 3_600_000))).toBe(true);
+    await importTraffic(database.db, fakeUmami(events, { createdAt: "2026-11-20T10:00:00.000Z" }).client, new Date(now.getTime() + 2 * 3_600_000));
+    expect(await firstIncompleteDay(database.db, "2026-11-20", "2026-11-20")).toBeUndefined();
+    expect((await database.db.select().from(trafficSourceDaily)).length).toBe(6);
+  });
+
+  test("CMS-TRAFFIC-007 every page's downloads are exact, tagged or not, and the flow from channel to page type adds up", async () => {
+    const pages = (await database.db.select().from(trafficPageDaily)).map(({ date: _date, ...row }) => row);
+    expect(pages).toEqual(expect.arrayContaining([
+      // Both downloads count for the post: the tagged and the untagged one; its old address counts for it too.
+      { path: "/blog/dictate-on-mac", postId: post, pageType: "post", pageviews: 3, downloads: 2 },
+      { path: "/blog/dictate-on-mac-old", postId: post, pageType: "post", pageviews: 1, downloads: 0 },
+      { path: "/", postId: null, pageType: "home", pageviews: 2, downloads: 0 },
+      { path: "/releases/0.1.0-alpha.9", postId: null, pageType: "release", pageviews: 1, downloads: 0 },
+    ]));
+    const listed = await call("/v1/traffic/pages?days=7&pageType=post");
+    expect(listed.body).toMatchObject({ totals: { pageviews: 4, downloads: 2 }, rows: [{ path: "/blog/dictate-on-mac", pageviews: 3, downloads: 2 }, { path: "/blog/dictate-on-mac-old" }] });
+
+    const { body: flow } = await call("/v1/traffic/flow?days=7");
+    expect(flow.pageTypes).toEqual([
+      { pageType: "post", pageviews: 4, downloads: 2 },
+      { pageType: "home", pageviews: 2, downloads: 0 },
+      { pageType: "release", pageviews: 1, downloads: 0 },
+    ]);
+    for (const type of flow.pageTypes) {
+      const fromChannels = flow.links.filter((link: { pageType: string }) => link.pageType === type.pageType).reduce((sum: number, link: { pageviews: number }) => sum + link.pageviews, 0);
+      expect(fromChannels).toBe(type.pageviews);
+    }
+    expect(flow.links).toEqual(expect.arrayContaining([{ channel: "organicSearch", pageType: "post", pageviews: 2 }, { channel: "email", pageType: "home", pageviews: 1 }]));
   });
 });
 

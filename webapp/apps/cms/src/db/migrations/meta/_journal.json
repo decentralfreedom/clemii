@@ -141,6 +141,20 @@
       "when": 1795362600160,
       "tag": "0019_goals",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1795364191024,
+      "tag": "0020_traffic_pages",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1795364191237,
+      "tag": "0021_traffic_pages_history",
+      "breakpoints": true
     }
   ]
 }

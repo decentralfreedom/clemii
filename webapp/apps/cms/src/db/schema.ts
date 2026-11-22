@@ -264,6 +264,20 @@ export const trafficDaily = pgTable("traffic_daily", {
   downloads: integer("downloads").notNull(),
 }, (table) => [primaryKey({ columns: [table.postId, table.date] }), index("traffic_daily_date").on(table.date)]);
 
+/**
+ * Every page's page views and downloads per day, all of them: the home page,
+ * release notes and posts alike. Downloads count on the page they started
+ * from, tagged or not, so they are exact per page and page type.
+ */
+export const trafficPageDaily = pgTable("traffic_page_daily", {
+  date: date("date", { mode: "string" }).notNull(),
+  path: text("path").notNull(),
+  postId: uuid("post_id").references(() => posts.id, { onDelete: "set null" }),
+  pageType: text("page_type").notNull(),
+  pageviews: integer("pageviews").notNull(),
+  downloads: integer("downloads").notNull(),
+}, (table) => [primaryKey({ columns: [table.date, table.path] })]);
+
 /** The whole site's page views and downloads per day: every page, the home and release pages too. */
 export const trafficSiteDaily = pgTable("traffic_site_daily", {
   date: date("date", { mode: "string" }).primaryKey(),
