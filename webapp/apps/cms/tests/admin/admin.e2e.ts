@@ -641,6 +641,9 @@ test("CMS-017 a draft is deleted from its settings, as in Ghost, and a live post
   await expect(signedIn.getByRole("alertdialog")).toHaveCount(0);
   await expect(signedIn.getByText(title)).toHaveCount(0);
   expect((await signedIn.request.get(`/v1/posts/${post.id}`)).status()).toBe(404);
+  // Back does not return to the deleted post: the posts list took the editor's place in the history.
+  await signedIn.goBack();
+  await expect(signedIn).not.toHaveURL(new RegExp(`/posts/${post.id}`));
   // The deletion stays in the History.
   const history = await (await signedIn.request.get(`/v1/audit?postId=${post.id}`)).json() as { entries: Array<{ action: string; subject: string }> };
   expect(history.entries[0]).toMatchObject({ action: "post.deleted", subject: title });
