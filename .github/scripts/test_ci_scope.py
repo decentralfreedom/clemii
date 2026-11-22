@@ -44,6 +44,11 @@ class ScopeTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertEqual(classify([path]), dict(web=False, cms=True, native=False, integration=False))
 
+    def test_website_counting_also_runs_the_funnel_check(self):
+        self.assertTrue(classify(["webapp/apps/web/tests/funnel.spec.ts"])["cms"])
+        self.assertTrue(classify(["webapp/apps/web/server/analytics.ts"])["cms"])
+        self.assertFalse(classify(["webapp/apps/web/src/App.tsx"])["cms"])
+
     def test_shared_packages_run_the_apps_that_depend_on_them(self):
         dependents = {"article": {"web", "cms"}, "ui": {"cms"}}
         self.assertEqual(classify(["webapp/packages/article/src/article.ts"], dependents),

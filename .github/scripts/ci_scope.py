@@ -96,6 +96,9 @@ def classify(paths, dependents=None, workflow="ci"):
                 "webapp/apps/web/shared/contracts/", "webapp/apps/web/shared/provenance/",
             )) or path in {"webapp/apps/web/package.json", "webapp/apps/web/tsconfig.json"}:
                 scope["integration"] = True
+            # The funnel's end-to-end check (CMS job) runs on the website's counting too.
+            if path in {"webapp/apps/web/server/analytics.ts", "webapp/apps/web/tests/funnel.spec.ts"}:
+                scope["cms"] = True
         elif match := re.match(r"webapp/packages/([^/]+)/", path):
             dependents = workspace_dependents() if dependents is None else dependents
             users = dependents.get(match.group(1))
