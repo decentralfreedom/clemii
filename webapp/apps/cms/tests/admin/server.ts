@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { createApp } from "../../src/app";
 import { createSession, setSessionCookie } from "../../src/auth/sessions";
 import { systemActor } from "../../src/auth/tokens";
-import { searchConsoleState, searchDaily } from "../../src/db/schema";
+import { searchConsoleState, searchDaily, searchQueries } from "../../src/db/schema";
 import { Hono } from "hono";
 import { createDraft, publishPost } from "../../src/posts/service";
 import { LocalObjectStore } from "../../src/storage/object-store";
@@ -35,10 +35,14 @@ const e2e = systemActor("e2e");
 const live = await createDraft(cms.db, validPost({ slug: "dictate-without-cloud", keyword: "dictate without cloud" }), e2e);
 await publishPost(cms, live.id, e2e);
 // What the scheduler's Search Console import leaves for the live post (src/search/import.ts).
-await cms.db.insert(searchConsoleState).values({ id: 1, importedAt: new Date(), importedThrough: "2026-11-20" });
+await cms.db.insert(searchConsoleState).values({ id: 1, importedAt: new Date(), importedFrom: "2025-07-24", importedThrough: "2026-11-20" });
 await cms.db.insert(searchDaily).values([
   { postId: live.id, date: "2026-11-01", impressions: 1200, clicks: 30, position: 8 },
   { postId: live.id, date: "2026-11-20", impressions: 300, clicks: 6, position: 6 },
+]);
+await cms.db.insert(searchQueries).values([
+  { postId: live.id, date: "2026-11-20", query: "dictate without cloud", impressions: 200, clicks: 5, position: 5 },
+  { postId: live.id, date: "2026-11-20", query: "offline dictation mac", impressions: 60, clicks: 1, position: 8 },
 ]);
 await createDraft(cms.db, validPost({
   slug: "draft-in-progress", keyword: "draft in progress",

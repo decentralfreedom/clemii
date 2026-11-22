@@ -582,22 +582,40 @@ test("CMS-015 Settings > History, as Ghost's, lists who changed what and opens t
   await expect(signedIn).toHaveURL(new RegExp(`/posts/${post.id}$`));
 });
 
-test("CMS-016 a published post's settings show its Google Search numbers for the last 28 days", async ({ signedIn }, testInfo) => {
-  // The live post the test server seeds, with two days of Search Console numbers.
+test("CMS-016 a published post's settings show its Google Search numbers over Ghost's date ranges, and only days the CMS has", async ({ signedIn }, testInfo) => {
+  // The live post the test server seeds: numbers on two days, the history starting 2025-07-24.
   const { posts } = await (await signedIn.request.get("/v1/posts?status=published")).json() as { posts: Array<Post & { slug: string }> };
   const live = posts.find((post) => post.slug === "dictate-without-cloud")!;
   await signedIn.goto(`/posts/${live.id}`);
   await settingsToggle(signedIn).click();
-  const block = settings(signedIn).getByRole("definition").first().locator("xpath=ancestor::dl");
-  await expect(settings(signedIn).getByRole("heading", { name: /Google Search/ })).toBeVisible();
+  const panel = settings(signedIn);
+  await expect(panel.getByRole("heading", { name: /Google Search/ })).toBeVisible();
+  // Last 30 days by default, as Ghost: both days are in it.
+  const stats = panel.getByRole("definition").first().locator("xpath=ancestor::dl");
+  await expect(panel.getByText(/Web search, 22 Oct 2026 to 20 Nov 2026/)).toBeVisible();
+  await expect(stats).toContainText("1.5K");
+  const range = async (name: string) => {
+    await panel.getByRole("combobox", { name: "Date range" }).click();
+    await signedIn.getByRole("option", { name }).click();
+  };
+  // The last 7 days hold only the 20 November day.
+  await range("Last 7 days");
+  await expect(panel.getByText(/Web search, 14 Nov 2026 to 20 Nov 2026/)).toBeVisible();
+  await expect(stats).toContainText("300");
+  // All time starts where the numbers start, never before.
+  await range("All time");
   // 1,500 impressions and 36 clicks; the position weighted by impressions: (1200×8 + 300×6) / 1500.
-  await expect(block).toContainText("1.5K");
-  await expect(block).toContainText("36");
-  await expect(block).toContainText("2.4%");
-  await expect(block).toContainText("7.6");
-  await expect(settings(signedIn).getByText(/Through 20 Nov, updated/)).toBeVisible();
+  await expect(stats).toContainText("1.5K");
+  await expect(stats).toContainText("36");
+  await expect(stats).toContainText("2.4%");
+  await expect(stats).toContainText("7.6");
+  await expect(panel.getByText(/Web search, 24 Jul 2025 to 20 Nov 2026/)).toBeVisible();
+  await expect(panel.getByRole("img", { name: "Impressions per day" })).toBeVisible();
+  const searches = panel.getByRole("list", { name: "Top searches" });
+  await expect(searches.getByRole("listitem").first()).toContainText("dictate without cloud");
+  await expect(panel.getByText("Google leaves out rare searches")).toBeVisible();
   await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
-  await settings(signedIn).screenshot({ path: testInfo.outputPath("search.png") });
+  await panel.screenshot({ path: testInfo.outputPath("search.png") });
 });
 
 test("the admin runs under its Content Security Policy without violations", async ({ signedIn, draft }) => {

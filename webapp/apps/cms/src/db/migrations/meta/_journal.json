@@ -71,6 +71,13 @@
       "when": 1795344078649,
       "tag": "0009_search_console",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795345106225,
+      "tag": "0010_search_queries",
+      "breakpoints": true
     }
   ]
 }

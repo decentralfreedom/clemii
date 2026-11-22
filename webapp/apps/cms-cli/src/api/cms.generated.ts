@@ -184,6 +184,27 @@ export interface PostSearch {
   days: SearchDay[];
 }
 
+export interface SearchQuery {
+  query: string;
+  impressions: number;
+  clicks: number;
+  /** Clicks per impression, 0 to 1 */
+  ctr: number;
+  /** Average position, weighted by impressions */
+  position: number;
+}
+
+export interface PostSearchQueries {
+  /** @nullable */
+  from: string | null;
+  /** @nullable */
+  to: string | null;
+  /** @nullable */
+  importedAt: string | null;
+  /** Most impressions first. Google leaves out rare queries to protect searchers' privacy, so these add up to less than the post's totals. */
+  queries: SearchQuery[];
+}
+
 export type PostLang = typeof PostLang[keyof typeof PostLang];
 
 
@@ -479,9 +500,26 @@ export type ListAudit200 = {
 export type GetPostSearchParams = {
   /**
    * @minimum 1
-   * @maximum 486
+   * @maximum 3650
    */
   days?: number;
+  /** Start here instead of counting `days` back, such as the first of the year */
+  since?: string;
+};
+
+export type GetPostSearchQueriesParams = {
+  /**
+   * @minimum 1
+   * @maximum 3650
+   */
+  days?: number;
+  /** Start here instead of counting `days` back, such as the first of the year */
+  since?: string;
+  /**
+   * @minimum 1
+   * @maximum 500
+   */
+  limit?: number;
 };
 
 export type ListPostsParams = {
@@ -1223,12 +1261,79 @@ export const getGetPostSearchUrl = (id: string,
 }
 
 /**
- * The post's Google Search Console numbers: impressions, clicks and position per day and in total, over the last `days` days Search Console has (28 by default).
+ * The post's Google Search Console numbers: impressions, clicks and position per day and in total, over the last `days` days Search Console has (28 by default), or since a day. The CMS keeps every day it imported, also after Google drops it (16 months).
  */
 export const getPostSearch = async (id: string,
     params?: GetPostSearchParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getPostSearchResponse> => {
 
   return cmsFetch<getPostSearchResponse>(getGetPostSearchUrl(id,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type getPostSearchQueriesResponse200 = {
+  data: PostSearchQueries
+  status: 200
+}
+
+export type getPostSearchQueriesResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type getPostSearchQueriesResponse403 = {
+  data: Error
+  status: 403
+}
+
+export type getPostSearchQueriesResponse404 = {
+  data: Error
+  status: 404
+}
+
+export type getPostSearchQueriesResponse422 = {
+  data: Error
+  status: 422
+}
+
+export type getPostSearchQueriesResponseSuccess = (getPostSearchQueriesResponse200) & {
+  headers: Headers;
+};
+export type getPostSearchQueriesResponseError = (getPostSearchQueriesResponse401 | getPostSearchQueriesResponse403 | getPostSearchQueriesResponse404 | getPostSearchQueriesResponse422) & {
+  headers: Headers;
+};
+
+export type getPostSearchQueriesResponse = (getPostSearchQueriesResponseSuccess | getPostSearchQueriesResponseError)
+
+export const getGetPostSearchQueriesUrl = (id: string,
+    params?: GetPostSearchQueriesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/posts/${id}/search/queries?${stringifiedParams}` : `/v1/posts/${id}/search/queries`
+}
+
+/**
+ * The Google searches the post was found for over the last `days` days Search Console has (28 by default), most impressions first.
+ */
+export const getPostSearchQueries = async (id: string,
+    params?: GetPostSearchQueriesParams, options?: Parameters<typeof cmsFetch>[1]): Promise<getPostSearchQueriesResponse> => {
+
+  return cmsFetch<getPostSearchQueriesResponse>(getGetPostSearchQueriesUrl(id,params),
   {
     ...options,
     method: 'GET'

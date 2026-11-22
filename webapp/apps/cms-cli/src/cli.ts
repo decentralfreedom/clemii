@@ -13,7 +13,7 @@ import { hostname } from "node:os";
 import { basename, dirname, extname, join } from "node:path";
 import { parseArgs } from "node:util";
 import {
-  createDraft, deletePost, getCaller, getMediaOriginal, getPost, getPostSearch, listMedia, listPosts, listRevisions, pollDeviceSignIn, previewPost, publishPost,
+  createDraft, deletePost, getCaller, getMediaOriginal, getPost, getPostSearch, getPostSearchQueries, listMedia, listPosts, listRevisions, pollDeviceSignIn, previewPost, publishPost,
   restoreRevision, revokeCaller, schedulePost, startDeviceSignIn, unpublishPost, updatePost, uploadMedia,
   type CreateDraftBody, type ListPostsLang, type ListPostsStatus, type Post,
 } from "./api/cms.generated";
@@ -40,9 +40,12 @@ Posts
   posts delete <post>                Drafts only
   posts revisions <post>
   posts restore <post> <revision-id>
-  posts search <post> [--days <n>]   Google Search Console: impressions, clicks, CTR and average
-                                     position per day and in total, over the last n days Google
-                                     has (default 28; Google lags two to three days)
+  posts search <post> [--days <n> | --since <YYYY-MM-DD>] [--queries]
+                                     Google Search Console (web search): impressions, clicks, CTR
+                                     and average position per day and in total, over the last n
+                                     days (default 28) or since a day, never before the first day
+                                     the CMS has; --queries lists the searches instead (Google
+                                     leaves out rare ones). Google lags two to three days.
 
 Access
   auth login [--no-browser]          Signs in through the browser, as gh auth login: approve the
@@ -243,9 +246,18 @@ async function postsCommand(action: string | undefined, args: string[], values: 
     }
     case "search": {
       const days = values.days === undefined ? 28 : Number(values.days);
-      if (!Number.isInteger(days) || days < 1 || days > 486) throw usageError("--days is a whole number from 1 to 486.");
+      if (!Number.isInteger(days) || days < 1 || days > 3650) throw usageError("--days is a whole number from 1 to 3650.");
+      const since = values.since as string | undefined;
+      if (since && !/^\d{4}-\d{2}-\d{2}$/.test(since)) throw usageError("--since is a day, such as 2026-01-01.");
       const post = await findPost(args[0], lang);
-      const answer = ok(await getPostSearch(post.id, { days }));
+      if (values.queries) {
+        const answer = ok(await getPostSearchQueries(post.id, { days, since, limit: 50 }));
+        if (!answer.to) return { json: answer, text: "No Search Console numbers yet: the CMS has not imported them." };
+        const rows = answer.queries.map((query) => [query.query, String(query.impressions), String(query.clicks), `${(query.ctr * 100).toFixed(1)}%`, query.position.toFixed(1)]);
+        const header = `${post.lang}/${post.slug}, searches ${answer.from} to ${answer.to} (Search Console days; Google leaves out rare searches):`;
+        return { json: answer, text: rows.length ? `${header}\n\n${table([["SEARCH", "IMPRESSIONS", "CLICKS", "CTR", "POSITION"], ...rows])}` : `${header}\nNo searches in these days.` };
+      }
+      const answer = ok(await getPostSearch(post.id, { days, since }));
       if (!answer.to) return { json: answer, text: "No Search Console numbers yet: the CMS has not imported them." };
       const { totals } = answer;
       const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
@@ -333,7 +345,7 @@ export async function run(argv: string[]): Promise<number> {
           args: argv, allowPositionals: true, strict: true,
           options: {
             json: { type: "boolean" }, url: { type: "string" }, help: { type: "boolean", short: "h" },
-            lang: { type: "string" }, status: { type: "string" }, at: { type: "string" }, out: { type: "string" }, days: { type: "string" },
+            lang: { type: "string" }, status: { type: "string" }, at: { type: "string" }, out: { type: "string" }, days: { type: "string" }, since: { type: "string" }, queries: { type: "boolean" },
             "with-token": { type: "boolean" }, "no-browser": { type: "boolean" },
           },
         });

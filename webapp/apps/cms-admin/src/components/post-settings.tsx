@@ -314,7 +314,7 @@ export function PostSettingsSidebar({ fields, onChange, post, heading, markdownM
       key: "search",
       node: (
         <SettingsSection>
-          <Label asChild><h3>Google Search <span className="font-normal text-text-secondary">· last 28 days</span></h3></Label>
+          <Label asChild><h3>Google Search</h3></Label>
           <PostSearch postId={post.id} />
         </SettingsSection>
       ),
