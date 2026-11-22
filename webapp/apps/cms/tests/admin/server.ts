@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { createApp } from "../../src/app";
 import { createSession, setSessionCookie } from "../../src/auth/sessions";
 import { systemActor } from "../../src/auth/tokens";
-import { searchConsoleState, searchDaily, searchQueries, searchSiteDaily, trafficDaily, trafficSiteDaily, trafficSourceDaily, trafficState } from "../../src/db/schema";
+import { searchConsoleState, searchDaily, searchQueries, searchSiteDaily, trafficDaily, trafficPageDaily, trafficSiteDaily, trafficSourceDaily, trafficState } from "../../src/db/schema";
 import { Hono } from "hono";
 import { createDraft, publishPost } from "../../src/posts/service";
 import { proposeObjective } from "../../src/goals/service";
@@ -74,6 +74,16 @@ await cms.db.insert(trafficSourceDaily).values([
   { date: "2026-11-21", ...post, channel: "organicSearch", source: "google.com", ...none, pageviews: 10 },
   { date: "2026-11-21", path: "/", postId: null, pageType: "home", channel: "direct", source: "", ...none, pageviews: 30 },
   { date: "2026-11-21", path: "/releases/0.1.0-alpha.9", postId: null, pageType: "release", channel: "direct", source: "", ...none, pageviews: 10 },
+]);
+// Every page's own numbers, which add up to the site's: 200 page views, 15 downloads.
+await cms.db.insert(trafficPageDaily).values([
+  { date: "2026-11-19", path: "/", postId: null, pageType: "home", pageviews: 30, downloads: 2 },
+  { date: "2026-11-20", ...post, pageviews: 40, downloads: 3 },
+  { date: "2026-11-20", path: "/", postId: null, pageType: "home", pageviews: 60, downloads: 5 },
+  { date: "2026-11-20", path: "/releases/0.1.0-alpha.9", postId: null, pageType: "release", pageviews: 20, downloads: 1 },
+  { date: "2026-11-21", ...post, pageviews: 10, downloads: 1 },
+  { date: "2026-11-21", path: "/", postId: null, pageType: "home", pageviews: 30, downloads: 3 },
+  { date: "2026-11-21", path: "/releases/0.1.0-alpha.9", postId: null, pageType: "release", pageviews: 10, downloads: 0 },
 ]);
 await cms.db.insert(searchQueries).values([
   { postId: live.id, date: "2026-11-20", query: "dictate without cloud", impressions: 200, clicks: 5, position: 5 },

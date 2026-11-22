@@ -25,7 +25,8 @@ export function formatMetric(metric: SearchMetric, value: number | null) {
   return integer.format(value);
 }
 
-const bucketOf = (date: string, from: string, span: number) => {
+/** The point a day belongs to: the day itself, its week from 90 days, its month from 365. */
+export const bucketOf = (date: string, from: string, span: number) => {
   if (span >= 365) return `${date.slice(0, 7)}-01`;
   if (span >= 90) return new Date(Date.parse(from) + Math.floor((Date.parse(date) - Date.parse(from)) / (7 * dayMs)) * 7 * dayMs).toISOString().slice(0, 10);
   return date;

@@ -5,7 +5,7 @@
 // notes and the rest (PRD: page types and intent). A post opens its own
 // analytics, keeping the range.
 import { Link } from "@tanstack/react-router";
-import { useGetTrafficSources, type GetTrafficSourcesParams, type TrafficSourceRowChannel } from "@/api/cms.generated";
+import { useGetTrafficPages, useGetTrafficSources, type GetTrafficSourcesParams, type TrafficSourceRowChannel } from "@/api/cms.generated";
 import { BarList } from "@/components/analytics/bar-list";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { defaultAnalyticsRange, type AnalyticsRangeKey } from "@/lib/analytics-ranges";
@@ -18,7 +18,10 @@ export function PagesCard({ params, channel, range }: {
   channel?: TrafficSourceRowChannel;
   range: AnalyticsRangeKey;
 }) {
-  const pages = useGetTrafficSources({ ...params, groupBy: "page", channel, limit: 10 });
+  // Without a channel, every page's exact numbers; within a channel, its sources (downloads through tagged links).
+  const exact = useGetTrafficPages({ ...params, limit: 25 }, { query: { enabled: !channel } });
+  const sourced = useGetTrafficSources({ ...params, groupBy: "page", channel, limit: 25 }, { query: { enabled: Boolean(channel) } });
+  const pages = channel ? sourced : exact;
   const data = pages.data?.status === 200 ? pages.data.data : undefined;
   if (data && !data.from) return null;
   const rows = (data?.rows ?? []).map((row) => ({
@@ -36,7 +39,7 @@ export function PagesCard({ params, channel, range }: {
     <Card>
       <CardHeader>
         <CardTitle>Pages</CardTitle>
-        <CardDescription>Every page of the site{channel ? <> from <strong className="font-medium text-foreground">{channelLabels[channel]}</strong></> : ""}, most viewed first. Downloads through tagged links.</CardDescription>
+        <CardDescription>Every page of the site{channel ? <> from <strong className="font-medium text-foreground">{channelLabels[channel]}</strong></> : ""}, most viewed first. {channel ? "Downloads through tagged links." : "Every download that started on the page."}</CardDescription>
       </CardHeader>
       <CardContent>
         {pages.isPending ? (
