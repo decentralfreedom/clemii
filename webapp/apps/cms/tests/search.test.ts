@@ -4,6 +4,7 @@
 // Search Console journeys (docs/user-journeys/cms.md, PRD R12): the scheduler
 // imports Google's numbers per post and day; the admin and agents read them.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { asc, eq } from "drizzle-orm";
 import { generateKeyPairSync, createVerify } from "node:crypto";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -11,10 +12,11 @@ import { join } from "node:path";
 import { createApp } from "../src/app";
 import { createToken, systemActor } from "../src/auth/tokens";
 import { loadConfig, type SearchConsoleConfig } from "../src/config";
-import { searchDaily, searchConsoleState, searchQueries } from "../src/db/schema";
+import { auditLog, postRevisions, searchDaily, searchConsoleState, searchQueries } from "../src/db/schema";
 import { pagePathOf } from "../src/posts/paths";
 import { createDraft, publishPost, updatePost } from "../src/posts/service";
 import { searchConsoleClient, type QueryRow, type SearchRow } from "../src/search/console";
+import { changeFrom, pacificDay, previousPeriod, totalsOf } from "../src/search/analytics";
 import { importSearchConsole, searchImportDue } from "../src/search/import";
 import { LocalObjectStore } from "../src/storage/object-store";
 import { createTestDatabase, serverUrl } from "./database";
@@ -77,6 +79,28 @@ describe("Search Console client", () => {
     expect(pagePathOf("https://behu.sh/blog/dictate-on-mac/")).toBe("/blog/dictate-on-mac");
     expect(pagePathOf("https://clemii.com/de/blog/diktieren?utm=x#top")).toBe("/de/blog/diktieren");
     expect(pagePathOf("https://behu.sh/")).toBe("/");
+  });
+});
+
+describe("Search analytics rules", () => {
+  test("CMS-SEARCH-006 compares only valid periods, with enough impressions, on Search Console's days", () => {
+    // Summed, the position weighted by impressions, the CTR from the sums.
+    expect(totalsOf([{ impressions: 300, clicks: 6, position: 6 }, { impressions: 100, clicks: 4, position: 10 }]))
+      .toEqual({ impressions: 400, clicks: 10, ctr: 0.025, position: 7 });
+    expect(totalsOf([])).toEqual({ impressions: 0, clicks: 0, ctr: 0, position: null });
+    // The period before, of equal length, only when the CMS has numbers for all of it.
+    expect(previousPeriod("2026-11-01", "2026-11-28", "2025-07-24")).toEqual({ from: "2026-10-04", to: "2026-10-31" });
+    expect(previousPeriod("2025-07-24", "2026-11-20", "2025-07-24")).toBeUndefined();
+    // A change needs 100 impressions in both periods; CTR in percentage points, position in ranks.
+    const now = { impressions: 300, clicks: 9, ctr: 0.03, position: 6 };
+    const change = changeFrom(now, { impressions: 200, clicks: 2, ctr: 0.01, position: 9 })!;
+    expect(change).toMatchObject({ impressions: 0.5, clicks: 3.5, position: -3 });
+    expect(change.ctrPoints).toBeCloseTo(2, 10);
+    expect(changeFrom(now, { impressions: 99, clicks: 2, ctr: 0.02, position: 9 })).toBeNull();
+    expect(changeFrom(now, undefined)).toBeNull();
+    // A moment late on a UTC day is still the day before in US Pacific time.
+    expect(pacificDay(new Date("2026-11-15T07:30:00.000Z"))).toBe("2026-11-14");
+    expect(pacificDay(new Date("2026-11-15T09:00:00.000Z"))).toBe("2026-11-15");
   });
 });
 
@@ -231,5 +255,29 @@ describe.skipIf(!serverUrl)("CMS Search Console import", () => {
     expect(body).toMatchObject({ to: "2026-11-21", queries: [{ query: "dictate on mac", impressions: 100, clicks: 3 }] });
     expect(body.queries[0].position).toBeCloseTo(7, 6);
     expect(body.queries[0].ctr).toBeCloseTo(0.03, 6);
+  });
+
+  test("CMS-SEARCH-007 marks the days a post went live or changed its title, description or content, on Search Console's days", async () => {
+    const revisions = async () => database.db.select().from(postRevisions).where(eq(postRevisions.postId, moved)).orderBy(asc(postRevisions.createdAt));
+    const slugChange = (await revisions()).at(-1)!;
+    await updatePost(cms, moved, { title: "How to dictate on a Mac without the cloud, the 2026 guide" }, { name: "github:owner", githubUserId: 1 });
+    const titleChange = (await revisions()).at(-1)!;
+    // The audit entries as they would have been written on those days.
+    await database.db.insert(auditLog).values([
+      { action: "post.published", actor: "github:owner", postId: moved, subject: "x", at: new Date("2026-11-15T07:30:00.000Z") },
+      { action: "post.edited", actor: "github:owner", postId: moved, subject: "x", revisionId: slugChange.id, at: new Date("2026-11-17T12:00:00.000Z") },
+      { action: "post.edited", actor: "token:hush-seo", postId: moved, subject: "x", revisionId: titleChange.id, at: new Date("2026-11-18T12:00:00.000Z") },
+    ]);
+    const { body } = await call(`/v1/posts/${moved}/search?days=28`);
+    expect(body.markers).toEqual([
+      { date: "2026-11-14", kind: "published", changes: [], actor: "github:owner" },
+      { date: "2026-11-18", kind: "edited", changes: ["title"], actor: "token:hush-seo" },
+    ]);
+    // Too few impressions in the earlier period for a valid change.
+    expect(body.previous).toMatchObject({ from: "2026-09-27", to: "2026-10-24" });
+    expect(body.change).toBeNull();
+    const { body: searches } = await call(`/v1/posts/${moved}/search/queries?days=28`);
+    expect(searches.queries.map((query: { query: string; striking: boolean }) => [query.query, query.striking]))
+      .toEqual([["dictate on mac", false], ["mac dictation offline", true]]);
   });
 });

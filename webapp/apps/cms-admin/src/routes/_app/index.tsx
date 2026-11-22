@@ -9,7 +9,7 @@
 import { blogAuthors, type BlogAuthorId } from "@hush/article/authors";
 import { blogClusters, type BlogClusterId } from "@hush/article/taxonomy";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowUpDown, ImageIcon, Pen, PenLine, Plus, SearchX } from "lucide-react";
+import { ArrowUpDown, ChartNoAxesColumn, ImageIcon, Pen, PenLine, Plus, SearchX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useGetPost, useListPosts, type ListPostsStatus, type Post } from "@/api/cms.generated";
 import { PostCelebrationModal } from "@/components/post-celebration-modal";
@@ -82,7 +82,13 @@ function PostRow({ post }: { post: Post }) {
             <span className="text-sm"><Status post={post} /></span>
           </span>
         </Link>
-        <Button asChild size="icon" variant="ghost" className="my-4 ms-8 shrink-0 text-muted-foreground group-hover:border group-hover:border-border hover:bg-background hover:text-foreground">
+        {/* As Ghost's posts list: a published post opens its analytics beside Edit. */}
+        {post.status === "published" && (
+          <Button asChild size="icon" variant="ghost" className="my-4 ms-8 shrink-0 text-muted-foreground group-hover:border group-hover:border-border hover:bg-background hover:text-foreground">
+            <Link to="/posts/$id/analytics" params={{ id: post.id }} aria-label={`Analytics of ${post.title}`}><ChartNoAxesColumn /></Link>
+          </Button>
+        )}
+        <Button asChild size="icon" variant="ghost" className={cn("my-4 shrink-0 text-muted-foreground group-hover:border group-hover:border-border hover:bg-background hover:text-foreground", post.status === "published" ? "ms-1" : "ms-8")}>
           <Link to="/posts/$id" params={{ id: post.id }} aria-label={`Edit ${post.title}`}><Pen /></Link>
         </Button>
       </div>

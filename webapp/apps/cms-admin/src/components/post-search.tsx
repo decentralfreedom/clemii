@@ -9,21 +9,16 @@
 // impressions, and the searches say that Google leaves out rare ones.
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { useState } from "react";
-import { useGetPostSearch, useGetPostSearchQueries, type GetPostSearchParams, type SearchDay } from "@/api/cms.generated";
+import { Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
+import { useGetPostSearch, useGetPostSearchQueries, type SearchDay } from "@/api/cms.generated";
+import { Button } from "@/components/ui/button";
+import { analyticsRanges, defaultAnalyticsRange, rangeParams, type AnalyticsRangeKey } from "@/lib/analytics-ranges";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const number = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
 
-// Ghost's presets; "Year to date" and "All time" start on a day instead of counting days back.
-const ranges = [
-  { key: "7", label: "Last 7 days", params: (): GetPostSearchParams => ({ days: 7 }) },
-  { key: "30", label: "Last 30 days", params: (): GetPostSearchParams => ({ days: 30 }) },
-  { key: "90", label: "Last 90 days", params: (): GetPostSearchParams => ({ days: 90 }) },
-  { key: "ytd", label: "Year to date", params: (): GetPostSearchParams => ({ since: `${new Date().getFullYear()}-01-01` }) },
-  { key: "365", label: "Last 12 months", params: (): GetPostSearchParams => ({ days: 365 }) },
-  { key: "all", label: "All time", params: (): GetPostSearchParams => ({ since: "2000-01-01" }) },
-] as const;
-type RangeKey = (typeof ranges)[number]["key"];
+
 
 const day = (iso: string) => format(new Date(`${iso}T12:00:00Z`), "d MMM yyyy");
 
@@ -55,8 +50,8 @@ function Trend({ days, from, to }: { days: SearchDay[]; from: string; to: string
 }
 
 export function PostSearch({ postId }: { postId: string }) {
-  const [range, setRange] = useState<RangeKey>("30");
-  const params = ranges.find((item) => item.key === range)!.params();
+  const [range, setRange] = useState<AnalyticsRangeKey>(defaultAnalyticsRange);
+  const params = rangeParams(range);
   const search = useGetPostSearch(postId, params);
   const queries = useGetPostSearchQueries(postId, { ...params, limit: 5 });
   const data = search.data?.status === 200 ? search.data.data : undefined;
@@ -64,9 +59,9 @@ export function PostSearch({ postId }: { postId: string }) {
 
   return (
     <>
-      <Select value={range} onValueChange={(value) => setRange(value as RangeKey)}>
+      <Select value={range} onValueChange={(value) => setRange(value as AnalyticsRangeKey)}>
         <SelectTrigger aria-label="Date range" className="w-full"><SelectValue /></SelectTrigger>
-        <SelectContent>{ranges.map((item) => <SelectItem key={item.key} value={item.key}>{item.label}</SelectItem>)}</SelectContent>
+        <SelectContent>{analyticsRanges.map((item) => <SelectItem key={item.key} value={item.key}>{item.label}</SelectItem>)}</SelectContent>
       </Select>
       {search.isPending ? (
         <p className="text-sm text-text-secondary">Loading Search Console numbers…</p>
@@ -97,6 +92,9 @@ export function PostSearch({ postId }: { postId: string }) {
               <p className="text-xs text-text-secondary">Google leaves out rare searches, so these add up to less than the totals.</p>
             </div>
           )}
+          <Button asChild variant="outline" size="sm" className="w-full">
+            <Link to="/posts/$id/analytics" search={range === defaultAnalyticsRange ? {} : { range }} params={{ id: postId }}>Open analytics<ArrowRight /></Link>
+          </Button>
           <p className="text-sm text-text-secondary">
             Web search, {day(data.from)} to {day(data.to)} (Search Console days, US Pacific)
             {data.importedAt && <>; updated {formatDistanceToNowStrict(new Date(data.importedAt), { addSuffix: true })}</>}

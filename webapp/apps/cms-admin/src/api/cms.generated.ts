@@ -165,7 +165,7 @@ export interface AuditEntry {
   subject: string;
 }
 
-export type PostSearchTotals = {
+export interface SearchTotals {
   impressions: number;
   clicks: number;
   /** Clicks per impression, 0 to 1 */
@@ -175,6 +175,65 @@ export type PostSearchTotals = {
      * @nullable
      */
   position: number | null;
+}
+
+/**
+ * The period of equal length just before; null when it reaches before the first day the CMS has numbers for
+ * @nullable
+ */
+export type PostSearchPrevious = {
+  from: string;
+  to: string;
+  totals: SearchTotals;
+} | null;
+
+/**
+ * Against the earlier period; null without one, or when either period has fewer than 100 impressions
+ * @nullable
+ */
+export type PostSearchChange = {
+  /**
+     * Relative change, -1 to …; null when the earlier period had none
+     * @nullable
+     */
+  impressions: number | null;
+  /** @nullable */
+  clicks: number | null;
+  /** Change in CTR, in percentage points */
+  ctrPoints: number;
+  /**
+     * Change in average position, in ranks; negative is better
+     * @nullable
+     */
+  position: number | null;
+} | null;
+
+export type PostSearchMarkersItemKind = typeof PostSearchMarkersItemKind[keyof typeof PostSearchMarkersItemKind];
+
+
+export const PostSearchMarkersItemKind = {
+  published: 'published',
+  scheduled: 'scheduled',
+  unpublished: 'unpublished',
+  edited: 'edited',
+} as const;
+
+export type PostSearchMarkersItemChangesItem = typeof PostSearchMarkersItemChangesItem[keyof typeof PostSearchMarkersItemChangesItem];
+
+
+export const PostSearchMarkersItemChangesItem = {
+  title: 'title',
+  description: 'description',
+  content: 'content',
+} as const;
+
+export type PostSearchMarkersItem = {
+  /** The Search Console day (US Pacific) it happened on */
+  date: string;
+  kind: PostSearchMarkersItemKind;
+  /** For an edit: what it changed */
+  changes: PostSearchMarkersItemChangesItem[];
+  actor: string;
 };
 
 export interface SearchDay {
@@ -202,8 +261,20 @@ export interface PostSearch {
      * @nullable
      */
   importedAt: string | null;
-  totals: PostSearchTotals;
+  totals: SearchTotals;
+  /**
+     * The period of equal length just before; null when it reaches before the first day the CMS has numbers for
+     * @nullable
+     */
+  previous: PostSearchPrevious;
+  /**
+     * Against the earlier period; null without one, or when either period has fewer than 100 impressions
+     * @nullable
+     */
+  change: PostSearchChange;
   days: SearchDay[];
+  /** When the post went live or changed in the window, to read its numbers against */
+  markers: PostSearchMarkersItem[];
 }
 
 export interface SearchQuery {
@@ -214,6 +285,8 @@ export interface SearchQuery {
   ctr: number;
   /** Average position, weighted by impressions */
   position: number;
+  /** Within striking distance of the first page: average position 8 to 20 */
+  striking: boolean;
 }
 
 export interface PostSearchQueries {

@@ -656,6 +656,66 @@ test("CMS-017 a draft is deleted from its settings, as in Ghost, and a live post
   await expect(settings(signedIn).getByText("Unpublish this post to delete it")).toBeVisible();
 });
 
+test("CMS-018 a published post's analytics page, as Ghost's: from the posts list, KPI tabs over the chart, searches and changes, only days the CMS has", async ({ signedIn }, testInfo) => {
+  // The live post the test server seeds: impressions on 1 and 20 November, history from 24 July 2025.
+  // Other journeys publish posts with the same heading, so it is found by its id.
+  const { posts: published } = await (await signedIn.request.get("/v1/posts?status=published")).json() as { posts: Array<Post & { slug: string }> };
+  const seeded = published.find((post) => post.slug === "dictate-without-cloud")!;
+  await signedIn.goto("/?status=published");
+  const analytics = signedIn.locator(`a[href="/posts/${seeded.id}/analytics"]`);
+  await analytics.locator("xpath=ancestor::li").hover();
+  await expect(analytics).toHaveAccessibleName(/^Analytics of /);
+  await analytics.click();
+  await expect(signedIn).toHaveURL(/\/posts\/[0-9a-f-]+\/analytics$/);
+  await expect(signedIn.getByRole("heading", { level: 1 })).toContainText("How to dictate on a Mac without the cloud");
+  // Last 30 days, as Ghost: both days are in it; the 30 days before have no impressions, so no change is claimed.
+  if (testInfo.project.name === "mobile") {
+    // On a phone, as Ghost, the metrics are a menu over the chart.
+    const choose = signedIn.getByRole("button", { name: "Choose metric" });
+    await expect(choose).toContainText("1,500");
+    await choose.click();
+    await signedIn.getByRole("menuitem", { name: /Avg. position: 7.6/ }).click();
+    await expect(choose).toContainText("7.6");
+  } else {
+    const metrics = signedIn.getByRole("tablist", { name: "Search metrics" });
+    await expect(metrics.getByTestId("kpi-impressions")).toHaveText("1,500");
+    await expect(metrics.getByTestId("kpi-clicks")).toHaveText("36");
+    await expect(metrics.getByTestId("kpi-ctr")).toHaveText("2.4%");
+    await expect(metrics.getByTestId("kpi-position")).toHaveText("7.6");
+    await expect(signedIn.getByTestId("kpi-impressions-diff")).toHaveCount(0);
+    await metrics.getByRole("tab", { name: /Avg. position/ }).click();
+    await expect(metrics.getByRole("tab", { name: /Avg. position/ })).toHaveAttribute("aria-selected", "true");
+  }
+  // Each day with a position is drawn, also between days without one.
+  await expect(signedIn.locator(".recharts-area-dots circle")).toHaveCount(2);
+  await expect(signedIn.getByRole("table", { name: "Top searches" }).getByRole("row").nth(1)).toContainText("dictate without cloud");
+  await expect(signedIn.getByText("Changes in this period", { exact: true })).toBeVisible();
+  await expect(signedIn.getByText(/Google Search Console, web search, 22 Oct 2026 to 20 Nov 2026/)).toBeVisible();
+  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
+  await signedIn.screenshot({ path: testInfo.outputPath("analytics-overview.png"), fullPage: true });
+
+  // All time starts where the numbers start.
+  await signedIn.getByRole("combobox", { name: "Date range" }).click();
+  await signedIn.getByRole("option", { name: "All time" }).click();
+  await expect(signedIn).toHaveURL(/range=all/);
+  await expect(signedIn.getByText(/web search, 24 Jul 2025 to 20 Nov 2026/)).toBeVisible();
+
+  // The Search tab lists every search, the ones close to the first page marked.
+  await signedIn.getByRole("tab", { name: "Search", exact: true }).click();
+  await expect(signedIn).toHaveURL(/tab=search/);
+  const offline = signedIn.getByRole("row").filter({ hasText: "offline dictation mac" });
+  await expect(offline).toContainText("Striking distance");
+  await signedIn.screenshot({ path: testInfo.outputPath("analytics-search.png"), fullPage: true });
+
+  // Back to the posts; and from the editor's Google Search block in.
+  await signedIn.getByRole("link", { name: "Posts", exact: true }).first().click();
+  await expect(signedIn).toHaveURL(/\/(\?.*)?$/);
+  await signedIn.goto(`/posts/${seeded.id}`);
+  await settingsToggle(signedIn).click();
+  await settings(signedIn).getByRole("link", { name: "Open analytics" }).click();
+  await expect(signedIn).toHaveURL(new RegExp(`/posts/${seeded.id}/analytics$`));
+});
+
 test("the admin runs under its Content Security Policy without violations", async ({ signedIn, draft }) => {
   const violations: string[] = [];
   signedIn.on("console", (message) => { if (/Content.Security.Policy|Refused to/i.test(message.text())) violations.push(message.text()); });
@@ -665,6 +725,10 @@ test("the admin runs under its Content Security Policy without violations", asyn
   await expect(article(signedIn)).toBeVisible();
   await signedIn.getByRole("button", { name: "Preview" }).click();
   await expect(signedIn.frameLocator("iframe[title=Preview]").getByRole("heading", { level: 1 })).toBeVisible();
+  // The analytics page draws its charts (Recharts) under the same policy.
+  const { posts } = await (await signedIn.request.get("/v1/posts?status=published")).json() as { posts: Array<Post & { slug: string }> };
+  await signedIn.goto(`/posts/${posts.find((live) => live.slug === "dictate-without-cloud")!.id}/analytics`);
+  await expect(signedIn.getByRole("img", { name: /chart/i }).or(signedIn.locator(".recharts-surface")).first()).toBeVisible();
   expect(violations).toEqual([]);
 });
 

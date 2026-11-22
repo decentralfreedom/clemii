@@ -11,6 +11,7 @@ import { requireScope, type AuthVariables } from "../auth/tokens";
 import type { Database } from "../db/client";
 import { searchDaily, searchQueries } from "../db/schema";
 import { getPost } from "../posts/service";
+import { changeFrom, minimumImpressions, previousPeriod, searchMarkers, totalsOf } from "../search/analytics";
 import { readSearchState } from "../search/import";
 import { errorSchema, validationHook } from "./errors";
 
@@ -21,17 +22,33 @@ const daySchema = z.object({
   position: z.number().describe("Average position, weighted by impressions"),
 }).openapi("SearchDay");
 
+const totalsSchema = z.object({
+  impressions: z.number().int(),
+  clicks: z.number().int(),
+  ctr: z.number().describe("Clicks per impression, 0 to 1"),
+  position: z.number().nullable().describe("Average position over the window, weighted by impressions; null without impressions"),
+}).openapi("SearchTotals");
+
 const searchSchema = z.object({
   from: z.iso.date().nullable().describe("The first day counted: the requested start, or the first day the CMS has numbers for if that is later"),
   to: z.iso.date().nullable().describe("The last day Search Console has numbers for"),
   importedAt: z.iso.datetime().nullable().describe("When the CMS last read Search Console; null until the first import"),
-  totals: z.object({
-    impressions: z.number().int(),
-    clicks: z.number().int(),
-    ctr: z.number().describe("Clicks per impression, 0 to 1"),
-    position: z.number().nullable().describe("Average position over the window, weighted by impressions; null without impressions"),
-  }),
+  totals: totalsSchema,
+  previous: z.object({ from: z.iso.date(), to: z.iso.date(), totals: totalsSchema }).nullable()
+    .describe("The period of equal length just before; null when it reaches before the first day the CMS has numbers for"),
+  change: z.object({
+    impressions: z.number().nullable().describe("Relative change, -1 to …; null when the earlier period had none"),
+    clicks: z.number().nullable(),
+    ctrPoints: z.number().describe("Change in CTR, in percentage points"),
+    position: z.number().nullable().describe("Change in average position, in ranks; negative is better"),
+  }).nullable().describe(`Against the earlier period; null without one, or when either period has fewer than ${minimumImpressions} impressions`),
   days: z.array(daySchema),
+  markers: z.array(z.object({
+    date: z.iso.date().describe("The Search Console day (US Pacific) it happened on"),
+    kind: z.enum(["published", "scheduled", "unpublished", "edited"]),
+    changes: z.array(z.enum(["title", "description", "content"])).describe("For an edit: what it changed"),
+    actor: z.string(),
+  })).describe("When the post went live or changed in the window, to read its numbers against"),
 }).openapi("PostSearch");
 
 const querySchema = z.object({
@@ -40,6 +57,7 @@ const querySchema = z.object({
   clicks: z.number().int(),
   ctr: z.number().describe("Clicks per impression, 0 to 1"),
   position: z.number().describe("Average position, weighted by impressions"),
+  striking: z.boolean().describe("Within striking distance of the first page: average position 8 to 20"),
 }).openapi("SearchQuery");
 
 const queriesSchema = z.object({
@@ -59,12 +77,20 @@ async function searchWindow(db: Database, span: number, since?: string) {
   const state = await readSearchState(db);
   const to = state?.importedThrough ?? null;
   const coverage = state?.importedFrom ?? to;
-  if (!to || !coverage) return { from: null, to: null, importedAt: state?.importedAt?.toISOString() ?? null };
+  if (!to || !coverage) return { from: null, to: null, coverage: null, importedAt: state?.importedAt?.toISOString() ?? null };
   const wanted = since ?? new Date(Date.parse(to) - (span - 1) * 86_400_000).toISOString().slice(0, 10);
   // Never before the first day the CMS has numbers for, and never after the last.
   const start = wanted > coverage ? wanted : coverage;
   const from = start < to ? start : to;
-  return { from, to, importedAt: state?.importedAt?.toISOString() ?? null };
+  return { from, to, coverage, importedAt: state?.importedAt?.toISOString() ?? null };
+}
+
+/** A post's days in from..to, oldest first. */
+function postDays(db: Database, id: string, from: string, to: string) {
+  return db.select({ date: searchDaily.date, impressions: searchDaily.impressions, clicks: searchDaily.clicks, position: searchDaily.position })
+    .from(searchDaily)
+    .where(and(eq(searchDaily.postId, id), gte(searchDaily.date, from), lte(searchDaily.date, to)))
+    .orderBy(asc(searchDaily.date));
 }
 
 const sinceSchema = z.iso.date().optional().describe("Start here instead of counting `days` back, such as the first of the year");
@@ -94,21 +120,19 @@ export function searchRoutes(db: Database) {
     const { id } = context.req.valid("param");
     const { days: span, since } = context.req.valid("query");
     await getPost(db, id);
-    const { from, to, importedAt } = await searchWindow(db, span, since);
-    const days = to && from
-      ? await db.select({ date: searchDaily.date, impressions: searchDaily.impressions, clicks: searchDaily.clicks, position: searchDaily.position })
-        .from(searchDaily)
-        .where(and(eq(searchDaily.postId, id), gte(searchDaily.date, from), lte(searchDaily.date, to)))
-        .orderBy(asc(searchDaily.date))
-      : [];
-    const impressions = days.reduce((sum, day) => sum + day.impressions, 0);
-    const clicks = days.reduce((sum, day) => sum + day.clicks, 0);
-    const weighted = days.reduce((sum, day) => sum + day.position * day.impressions, 0);
+    const { from, to, coverage, importedAt } = await searchWindow(db, span, since);
+    if (!from || !to || !coverage) {
+      return context.json({ from, to, importedAt, totals: totalsOf([]), previous: null, change: null, days: [], markers: [] }, 200);
+    }
+    const days = await postDays(db, id, from, to);
+    const totals = totalsOf(days);
+    const earlier = previousPeriod(from, to, coverage);
+    const previous = earlier ? { ...earlier, totals: totalsOf(await postDays(db, id, earlier.from, earlier.to)) } : null;
     return context.json({
-      from, to,
-      importedAt,
-      totals: { impressions, clicks, ctr: impressions ? clicks / impressions : 0, position: impressions ? weighted / impressions : null },
+      from, to, importedAt, totals, previous,
+      change: changeFrom(totals, previous?.totals),
       days,
+      markers: await searchMarkers(db, id, from, to),
     }, 200);
   });
 
@@ -135,7 +159,7 @@ export function searchRoutes(db: Database) {
     const { days: span, since, limit } = context.req.valid("query");
     await getPost(db, id);
     const window = await searchWindow(db, span, since);
-    if (!window.from || !window.to) return context.json({ ...window, queries: [] }, 200);
+    if (!window.from || !window.to) return context.json({ from: window.from, to: window.to, importedAt: window.importedAt, queries: [] }, 200);
     const impressions = sql<number>`sum(${searchQueries.impressions})::int`;
     const rows = await db.select({
       query: searchQueries.query,
@@ -148,8 +172,11 @@ export function searchRoutes(db: Database) {
       .orderBy(desc(impressions), asc(searchQueries.query))
       .limit(limit);
     return context.json({
-      ...window,
-      queries: rows.map((row) => ({ ...row, position: Number(row.position ?? 0), ctr: row.impressions ? row.clicks / row.impressions : 0 })),
+      from: window.from, to: window.to, importedAt: window.importedAt,
+      queries: rows.map((row) => {
+        const position = Number(row.position ?? 0);
+        return { ...row, position, ctr: row.impressions ? row.clicks / row.impressions : 0, striking: position >= 8 && position <= 20 };
+      }),
     }, 200);
   });
 
