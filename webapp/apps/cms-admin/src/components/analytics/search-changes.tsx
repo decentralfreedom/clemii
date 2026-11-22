@@ -29,7 +29,7 @@ export function SearchChanges({ markers }: { markers: PostSearch["markers"] }) {
                 <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground [&_svg]:size-3.5">{icons[marker.kind]}</span>
                 <span className="flex flex-col">
                   <span className="font-medium">{labels[marker.kind]}{marker.changes.length ? `: ${marker.changes.join(", ")}` : ""}</span>
-                  <span className="text-text-secondary">{day(marker.date)} by {actorName(marker.actor)}</span>
+                  <span className="text-text-secondary">{day(marker.date)}{marker.actor && <> by {actorName(marker.actor)}</>}</span>
                 </span>
               </li>
             ))}

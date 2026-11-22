@@ -214,7 +214,11 @@ export type PostSearchMarkersItem = {
   kind: PostSearchMarkersItemKind;
   /** For an edit: what it changed */
   changes: PostSearchMarkersItemChangesItem[];
-  actor: string;
+  /**
+     * Who did it; null for a publication from before the audit log, whose time the post records but not who
+     * @nullable
+     */
+  actor: string | null;
 };
 
 export interface SearchDay {

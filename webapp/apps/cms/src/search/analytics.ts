@@ -10,7 +10,7 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import type { Database } from "../db/client";
 import { readSearchState } from "./import";
-import { auditLog, postRevisions } from "../db/schema";
+import { auditLog, postRevisions, posts } from "../db/schema";
 
 const dayMs = 86_400_000;
 /** Below this many impressions in either period, a change is noise and is not reported. */
@@ -64,7 +64,9 @@ const changeNames: Record<(typeof watched)[number], "title" | "description" | "c
 /**
  * The days a post went live, was scheduled or taken down, or had its title,
  * description or content changed, from the audit log; an edit counts only
- * when its revision changed one of those against the revision before it.
+ * when its revision changed one of those against the revision before it. A
+ * publication older than the audit log still shows, from the post's own
+ * publication time, with no actor: the CMS knows when, not who.
  */
 export async function searchMarkers(db: Database, postId: string, from: string, to: string) {
   const entries = await db.select({ action: auditLog.action, at: auditLog.at, revisionId: auditLog.revisionId, actor: auditLog.actor })
@@ -76,7 +78,7 @@ export async function searchMarkers(db: Database, postId: string, from: string, 
     .orderBy(asc(postRevisions.createdAt), asc(postRevisions.id));
   const position = new Map(revisions.map((revision, index) => [revision.id, index]));
 
-  const markers: Array<{ date: string; kind: "published" | "scheduled" | "unpublished" | "edited"; changes: Array<"title" | "description" | "content">; actor: string }> = [];
+  const markers: Array<{ date: string; kind: "published" | "scheduled" | "unpublished" | "edited"; changes: Array<"title" | "description" | "content">; actor: string | null }> = [];
   for (const entry of entries) {
     const date = pacificDay(entry.at);
     if (date < from || date > to) continue;
@@ -88,6 +90,12 @@ export async function searchMarkers(db: Database, postId: string, from: string, 
     const before = revisions[index - 1]!.snapshot as Record<string, unknown>;
     const changes = watched.filter((field) => now[field] !== before[field]).map((field) => changeNames[field]);
     if (changes.length) markers.push({ date, kind, changes, actor: entry.actor });
+  }
+  const [post] = await db.select({ publishedAt: posts.publishedAt, status: posts.status }).from(posts).where(eq(posts.id, postId));
+  const published = post?.status === "published" && post.publishedAt ? pacificDay(post.publishedAt) : undefined;
+  if (published && published >= from && published <= to && !markers.some((marker) => marker.kind === "published" && marker.date === published)) {
+    markers.push({ date: published, kind: "published", changes: [], actor: null });
+    markers.sort((a, b) => a.date.localeCompare(b.date));
   }
   return markers;
 }
