@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 //
-// The blog funnel's measurements (PRD R10): page views and download clicks
-// through Umami's tracker, and downloads counted here at /download, where an
-// ad blocker cannot hide them. Umami is reached through this origin (/stats),
-// as Umami documents for proxying, so the Content Security Policy stays
-// 'self'. The proxy forwards the request body and the browser's User-Agent
-// (Umami ignores bots by it), never the visitor's IP address.
+// The blog funnel's measurements (PRD R10): downloads counted here at
+// /download, where an ad blocker cannot hide them, and, only when page views
+// are switched on, page views and download clicks through Umami's tracker.
+// Umami is reached through this origin (/stats), as Umami documents for
+// proxying, so the Content Security Policy stays 'self'. The proxy forwards the
+// request body and the browser's User-Agent (Umami ignores bots by it), never
+// the visitor's IP address. A download event carries the address shortened to
+// its network (coarseAddress), so Umami can tell the country, region or city,
+// and the full address never leaves this server.
+import { isIPv4, isIPv6 } from "node:net";
 import type { Env, Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import type { ServerConfig } from "./config";
@@ -41,6 +45,23 @@ export function withAnalytics(html: string, tag: string) {
 /** Whether the browser asks not to be tracked (Do Not Track or Global Privacy Control). */
 const declinesTracking = (headers: Headers) => headers.get("dnt") === "1" || headers.get("sec-gpc") === "1";
 
+/**
+ * An IP address without its host part: the last octet of an IPv4 address, all
+ * but the first 48 bits of an IPv6 one. Enough for a location no finer than a
+ * city, as the CNIL's audience measurement exemption allows, never the device.
+ */
+export function coarseAddress(address: string | undefined) {
+  if (!address) return undefined;
+  const mapped = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/i.exec(address)?.[1];
+  if (isIPv4(mapped ?? address)) return (mapped ?? address).replace(/\.\d+$/, ".0");
+  if (!isIPv6(address)) return undefined;
+  const [head = "", tail = ""] = address.split("::");
+  const front = head ? head.split(":") : [];
+  const back = tail ? tail.split(":") : [];
+  const groups = address.includes("::") ? [...front, ...Array(8 - front.length - back.length).fill("0"), ...back] : front;
+  return `${groups.slice(0, 3).map((group) => group.toLowerCase().replace(/^0+(?=.)/, "")).join(":")}::`;
+}
+
 export function registerAnalytics<E extends Env>(app: Hono<E>, input: {
   analytics?: Analytics;
   publicBaseUrl: string;
@@ -65,7 +86,11 @@ export function registerAnalytics<E extends Env>(app: Hono<E>, input: {
       // Never delays the download: the event is sent after the redirect, and a failure is only logged.
       void send(fetcher, analytics, {
         type: "event",
-        payload: { website: analytics.websiteId, hostname, url: from && pagePath.test(from) ? from : "/download", name: "download" },
+        payload: {
+          website: analytics.websiteId, hostname, url: from && pagePath.test(from) ? from : "/download", name: "download",
+          // Set by Cloudflare in front of this server; a client cannot choose it.
+          ip: coarseAddress(context.req.header("cf-connecting-ip")),
+        },
       }, context.req.header("user-agent") ?? "").then(
         (response) => { if (!response.ok) log(`Umami refused a download event: ${response.status}`); },
         (error: unknown) => log(`Umami unreachable for a download event: ${String(error)}`),
@@ -75,7 +100,7 @@ export function registerAnalytics<E extends Env>(app: Hono<E>, input: {
   });
 
   const { analytics } = input;
-  if (!analytics) return;
+  if (!analytics?.pageViews) return;
   let script: { body: string; expires: number } | undefined;
   app.get(`${proxyPath}/script.js`, async (context) => {
     if (!script || script.expires < Date.now()) {
@@ -93,6 +118,8 @@ export function registerAnalytics<E extends Env>(app: Hono<E>, input: {
   app.use(`${proxyPath}/api/send`, rateLimiter({ windowMs: 60_000, limit: 120 }));
   app.post(`${proxyPath}/api/send`, bodyLimit({ maxSize: 8_192 }), async (context) => {
     context.header("cache-control", "no-store");
+    // The tracker honours Do Not Track itself; Global Privacy Control is honoured here.
+    if (declinesTracking(context.req.raw.headers)) return context.body(null, 204);
     const body = await context.req.text();
     const response = await fetcher(`${analytics.umamiUrl}/api/send`, {
       method: "POST",

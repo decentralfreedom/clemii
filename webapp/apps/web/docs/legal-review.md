@@ -68,14 +68,33 @@ Noindex is an indexing choice, not a substitute for legal obligations.
    removal date, and confirm the Cloudflare processing terms cover R2 storage
    of these backups. Live-object cleanup and authenticated revocation are
    implemented separately; neither establishes GDPR compliance alone.
-6. Analytics (PRD R10, November 2026): the code for cookieless Umami page
-   views, download clicks and counted downloads exists but stays off until
-   `HUSH_UMAMI_URL` and `HUSH_UMAMI_WEBSITE_ID` are set. Before setting them,
-   the privacy policy (section 8, which today says the site uses no audience
-   analytics) must describe it and be reviewed: which Umami instance and host
-   processes the data, that the visitor's IP address is not forwarded, Do Not
-   Track and Global Privacy Control are honoured, and the legal basis. Turning
-   it on without that review is not allowed.
+6. Analytics (PRD R10, November 2026):
+   - **Download counting is on, by the operator's decision of 21 November
+     2026, ahead of the lawyer review.** The privacy policy (section 9)
+     describes it.
+     - It runs server-side at `/download`, on the operator's own Umami
+       instance (Hetzner, Germany, behind Cloudflare Access with only
+       `/script.js` and `/api/send` public).
+     - It sends the page path, the User-Agent and the IP address shortened on
+       the server (IPv4 /24, IPv6 /48). Umami derives country, region and city
+       and stores neither address.
+     - No script runs in the browser and nothing is stored on the device.
+       Do Not Track and Global Privacy Control are honoured.
+     - The legal basis given is Article 6(1)(f) GDPR. The basis for this
+       choice is the CNIL's audience-measurement criteria: location no finer
+       than a city, address shortened.
+   - **Page views through the browser tracker stay off**
+     (`HUSH_UMAMI_PAGE_VIEWS`). The tracker reads screen size and language in
+     the browser. Whether that needs consent under section 25 TDDDG must be
+     reviewed before it is switched on.
+   - **Open for review:**
+     - Whether shortened IPs plus city-level location keep the events outside
+       personal data or within Article 6(1)(f).
+     - A retention period: Umami deletes nothing automatically, and the policy
+       says so honestly. The CNIL recommends at most 25 months.
+     - Whether the landing page's "No third-party analytics" promise holds
+       for an operator-run instance. The policy says it is not a third
+       party.
 7. Confirm the dispute-resolution statement and whether editorial activities
    or other business circumstances trigger additional disclosure duties.
 
