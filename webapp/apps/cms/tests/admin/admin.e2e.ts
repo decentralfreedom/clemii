@@ -558,7 +558,8 @@ test("CMS-015 Settings > History, as Ghost's, lists who changed what and opens t
   await expect(entries.nth(1)).toContainText(`Post added: ${title} by @owner`);
   await expect(entries.first()).toContainText(/\d{1,2} \w{3} \d{4} \| \d{2}:\d{2}:\d{2}/);
   // The dialog has finished opening before it is looked at.
-  await signedIn.evaluate(() => Promise.all(document.getAnimations().map((animation) => animation.finished)));
+  // A cancelled animation rejects its finished promise (WebKit does this); it has stopped all the same.
+  await signedIn.evaluate(() => Promise.allSettled(document.getAnimations().map((animation) => animation.finished)));
   await signedIn.screenshot({ path: testInfo.outputPath("history.png") });
 
   // The filter narrows the log; tokens and sign-ins hold no post entries.
