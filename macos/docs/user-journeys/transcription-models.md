@@ -11,7 +11,7 @@ The active model is always the first thing on the page. Engines come second, and
 - Two engines are offered: **Parakeet** (NVIDIA Parakeet via FluidAudio) and **Whisper** (OpenAI Whisper via WhisperKit).
 - Parakeet offers only the newest generation: Parakeet Ultra and Parakeet Redux.
 - Every model shows its name, a one-line purpose, its download size, language coverage and the month its weights were first published. An info button next to the name opens a popover with what sets the model apart (Most accurate, Smallest, Fast, Built in), size, release month, engine, license and the full language list. Whisper dates are the original OpenAI or Hugging Face release, not the catalog upload date.
-- All model files live under `~/Library/Application Support/Hush/Models/`. Parakeet uses `fluidaudio/<repository>/`.
+- All model files live under `~/Library/Application Support/Clemii/Models/`. Parakeet uses `fluidaudio/<repository>/`.
 - A download never changes the active model. A finished download shows **Use**.
 - One download runs at a time. Cancel stops the download and removes its partial files.
 - A download is refused up front when the volume has less free space than the model plus 15% for the compiled cache.

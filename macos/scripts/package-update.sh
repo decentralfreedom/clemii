@@ -21,7 +21,7 @@ INFO_PLIST="${APP_PATH}/Contents/Info.plist"
 BUNDLE_IDENTIFIER="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "${INFO_PLIST}")"
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "${INFO_PLIST}")"
 BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "${INFO_PLIST}")"
-RELEASE_SLUG="$(/usr/libexec/PlistBuddy -c 'Print :HushReleaseSlug' "${INFO_PLIST}" 2>/dev/null || true)"
+RELEASE_SLUG="$(/usr/libexec/PlistBuddy -c 'Print :ClemiiReleaseSlug' "${INFO_PLIST}" 2>/dev/null || true)"
 
 if [[ "${BUNDLE_IDENTIFIER}" != "com.decentralfreedom.clemii" ]]; then
   echo "Refusing to publish unexpected bundle identifier: ${BUNDLE_IDENTIFIER}" >&2
@@ -32,7 +32,7 @@ if ! [[ "${BUILD}" =~ ^[0-9]+$ ]]; then
   exit 1
 fi
 if [[ -n "${RELEASE_SLUG}" ]] && ! [[ "${RELEASE_SLUG}" =~ ^(alpha|beta|rc)\.[1-9][0-9]*$ ]]; then
-  echo "HushReleaseSlug must be alpha.N, beta.N, rc.N, or empty for stable releases; found: ${RELEASE_SLUG}" >&2
+  echo "ClemiiReleaseSlug must be alpha.N, beta.N, rc.N, or empty for stable releases; found: ${RELEASE_SLUG}" >&2
   exit 1
 fi
 

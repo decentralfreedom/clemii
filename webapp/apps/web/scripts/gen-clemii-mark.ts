@@ -4,7 +4,7 @@
 // Draws the clemii mark from the brothers' geometry: the header's mark, the favicon and the hero's
 // flat stand-in; and its one-colour glyph, as the macOS menu bar's four states. Run: bun scripts/gen-clemii-mark.ts, then bun scripts/generate-favicons.ts
 import { writeFileSync } from "node:fs";
-import { mkdirSync, rmSync, readdirSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, readdirSync } from "node:fs";
 import { along, big, globe, glyph, mix, polar, ribbonEdge, small, smooth, type Brother, type Point } from "../src/landing/hero/brothers";
 
 const web = new URL("..", import.meta.url).pathname;
@@ -76,7 +76,7 @@ function glyphPaths(centreX: number, centreY: number, radius: number, fills: [st
   return shape.ribbons.map((points, index) => `<path d="M${points.map(spot).join(" L")} Z" fill="${fills[index]}"/>`).join("")
     + `<circle cx="${centreX}" cy="${centreY}" r="${fine(radius * shape.dot)}" fill="${fills[2]}"/>`;
 }
-const assets = `${web}../../../macos/Hush/Hush/Assets.xcassets/`;
+const assets = `${web}../../../macos/Clemii/Clemii/Assets.xcassets/`;
 const states: Record<string, { template: boolean; fills: [string, string, string]; extra?: string; defs?: string }> = {
   idle: { template: true, fills: ["#000", "#000", "#000"] },
   processing: { template: true, fills: ["#000", "#000", "#000"] },
@@ -98,12 +98,13 @@ for (const [state, { template, fills, extra = "", defs = "" }] of Object.entries
   }, null, 2)}\n`);
 }
 
-// The macOS app icon, as an Icon Composer document, the format Apple asks for: square, unmasked
-// vector layers on a 1024 canvas with the content centred; the system masks the corners and lays
-// Liquid Glass over the layers, so the globe carries no painted gloss of its own here. The
-// background is the document's fill, not a layer.
-const icon = `${web}../../../macos/Hush/Hush/AppIcon.icon/`;
-rmSync(icon, { recursive: true, force: true });
+// The macOS app icon is an Icon Composer document, the format Apple asks for. This script draws
+// only its layers: square, unmasked vector images on a 1024 canvas with the content centred. The
+// system masks the corners and lays Liquid Glass over them, so the globe carries no painted gloss
+// here. The document itself (icon.json: the background fill, the groups, glass, shadow and the
+// appearances) belongs to Icon Composer; it is written once, when there is none, and never again,
+// so what is tuned there survives a new drawing of the layers.
+const icon = `${web}../../../macos/Clemii/Clemii/AppIcon.icon/`;
 mkdirSync(`${icon}Assets`, { recursive: true });
 // The ring is 620 points across on the 1024 canvas.
 const layer = (content: string) => `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024"><g transform="translate(512 512) scale(${310 / R}) translate(${-cx} ${-cy})">${content}</g></svg>\n`;
@@ -116,7 +117,7 @@ const group = (names: string[]) => ({
   shadow: { kind: "neutral", opacity: 0.5 },
   translucency: { enabled: false, value: 0.5 },
 });
-writeFileSync(`${icon}icon.json`, `${JSON.stringify({
+if (!existsSync(`${icon}icon.json`)) writeFileSync(`${icon}icon.json`, `${JSON.stringify({
   fill: { "automatic-gradient": "extended-srgb:0.96000,0.95500,1.00000,1.00000" },
   groups: [group(["globe"]), group(["ribbon-warm-end", "ribbon-cool", "ribbon-warm"])],
   "supported-platforms": { squares: ["macOS"] },

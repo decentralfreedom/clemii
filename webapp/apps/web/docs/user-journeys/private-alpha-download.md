@@ -57,7 +57,7 @@ Given a visitor selects a download action on any page, the button leads through 
 | DOWNLOAD-001 | `tests/landing.spec.ts` checks the immutable alpha.9 download, download event in Chromium, matching release popup in all browsers, retained alpha.4 milestone, and the future open-source intention on desktop, mobile, and WebKit. |
 | DOWNLOAD-002 | `tests/landing.spec.ts` verifies removed release URLs return 404, retain no-index/no-store headers, contain no bypass command or download link, and allow returning to the release index. |
 | DOWNLOAD-004 | `server/analytics.test.ts` checks the redirect, its headers, the recorded event and its fields, the shortened address, Do Not Track and Global Privacy Control (also in the page-view proxy), page views off by default, the per-client limit, an unreachable Umami and the empty catalog. `tests/landing.spec.ts`, `tests/blog.spec.ts`, `tests/proof.spec.ts` and `tests/verified-story.spec.ts` check that buttons lead through `/download?from=<page>`. |
-| DOWNLOAD-003 | `macos/scripts/verify-update-feed.sh` checks public feed metadata and archive availability. The release's public-download verification report records byte equality, Gatekeeper, layout and Sparkle EdDSA signature checks. `macos/Hush/HushUITests/AppUpdateJourneyTests.swift` verifies the in-app update entry point. |
+| DOWNLOAD-003 | `macos/scripts/verify-update-feed.sh` checks public feed metadata and archive availability. The release's public-download verification report records byte equality, Gatekeeper, layout and Sparkle EdDSA signature checks. `macos/Clemii/ClemiiUITests/AppUpdateJourneyTests.swift` verifies the in-app update entry point. |
 
 ## Change rule
 

@@ -27,7 +27,7 @@ def check_volume(volume: Path, background: Path, expected_app: Path | None = Non
     if expected_app is not None:
         with (expected_app / "Contents/Info.plist").open("rb") as source:
             expected = plistlib.load(source)
-        for key in ("CFBundleIdentifier", "CFBundleShortVersionString", "CFBundleVersion", "HushReleaseSlug"):
+        for key in ("CFBundleIdentifier", "CFBundleShortVersionString", "CFBundleVersion", "ClemiiReleaseSlug"):
             if not metadata.get(key) or metadata[key] != expected.get(key):
                 raise ValueError(f"DMG app does not match the exported app: {key}")
 

@@ -47,7 +47,7 @@ let pixelWidth  = Int(windowWidth  * scale)
 let pixelHeight = Int(windowHeight * scale)
 
 // ---------------------------------------------------------------------
-// Colours — match the app's DesignTokens (Hush/Design/DesignTokens.swift)
+// Colours — match the app's DesignTokens (Clemii/Design/DesignTokens.swift)
 // and the landing page: warm off-white, ink, peach + lilac.
 // ---------------------------------------------------------------------
 

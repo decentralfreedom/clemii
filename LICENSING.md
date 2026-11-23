@@ -46,7 +46,7 @@ MIT material with AGPL contributions.
 | Imported native baseline | [Original MIT grant](macos/LICENSE) and the revision identified above. |
 | Dependencies and bundled libraries | Their own licenses, copyright notices and any exceptions. Resolve the checked-in Swift and Bun lockfiles and retain required upstream notices. |
 | AI model weights and conversions | Each exact model distribution's license and attribution. A runtime library's license does not license its model weights. |
-| Bundled Whisper base model | [Model provenance](macos/Hush/BundledModels/openai_whisper-base/NOTICE.md) and [OpenAI MIT license](macos/Hush/BundledModels/openai_whisper-base/LICENSE.OpenAI). |
+| Bundled Whisper base model | [Model provenance](macos/Clemii/BundledModels/openai_whisper-base/NOTICE.md) and [OpenAI MIT license](macos/Clemii/BundledModels/openai_whisper-base/LICENSE.OpenAI). |
 | Editorial photographs, artwork, adaptations and rose geometry | [Artwork credits](webapp/apps/web/public/art/CREDITS.md), including public-domain, CC0 and CC BY-SA material. Those terms remain in force for the listed adaptations. |
 | Third-party app icons, names and logos | Their owners' applicable rights and notices. The hush license grants no rights on their behalf. |
 

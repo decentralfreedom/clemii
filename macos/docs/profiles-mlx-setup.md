@@ -4,7 +4,7 @@ clemii provides on-device LLM post-processing through **MLX Swift**, including Q
 
 ## Step 1 — Add `mlx-swift-lm`
 
-1. Open `Hush/Hush.xcodeproj`.
+1. Open `Clemii/Clemii.xcodeproj`.
 2. **File → Add Package Dependencies…**
 3. Paste: `https://github.com/ml-explore/mlx-swift-lm`
 4. Dependency Rule: **Up to Next Minor Version** from `3.31.3` (or the latest tag at the time of install).
@@ -31,8 +31,8 @@ That's it.
 
 ```bash
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
-  xcodebuild -project Hush/Hush.xcodeproj \
-             -scheme Hush -configuration Debug build
+  xcodebuild -project Clemii/Clemii.xcodeproj \
+             -scheme Clemii -configuration Debug build
 ```
 
 Each model is an explicit one-time download from Hugging Face using the standard MLX downloader. clemii combines the upstream snapshot total with the standard `URLSessionTask` byte counts to display a real percentage and smoothed time estimate without replacing the library's download, cache, or resume behavior. After the transfer reaches 100%, the state changes to local preparation until MLX finishes loading the model. The model is cached on this Mac and subsequent runs load it locally.

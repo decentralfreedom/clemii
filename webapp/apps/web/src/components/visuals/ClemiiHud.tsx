@@ -11,7 +11,7 @@ const defaultCopy: Record<ClemiiHudState, ClemiiHudCopy> = {
 };
 
 /**
- * Web replica of the macOS recording HUD (macos/Hush/Hush/HUD/HushHUD.swift):
+ * Web replica of the macOS recording HUD (macos/Clemii/Clemii/HUD/ClemiiHUD.swift):
  * 72pt tall, the 42pt stateful badge, two stacked labels and the waveform.
  * The caller positions it through className.
  */

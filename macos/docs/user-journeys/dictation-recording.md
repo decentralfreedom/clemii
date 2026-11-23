@@ -7,7 +7,7 @@ This document defines the user-visible contract for recording a dictation. See P
 - One dictation records for at most 2 minutes, so a stuck key or a lost key release cannot record forever.
 - Reaching the limit never throws audio away. clemii stops listening, transcribes everything said until then and inserts it, exactly as if the key had been released.
 - A key release that arrives after the limit does nothing more.
-- While recording, the audio is written to `~/Library/Application Support/Hush/Recordings/` as it arrives. It stays there only until the text is inserted, handed to the editor or Assistant, or found to hold no speech; a failed transcription keeps it. At most ten recordings are kept.
+- While recording, the audio is written to `~/Library/Application Support/Clemii/Recordings/` as it arrives. It stays there only until the text is inserted, handed to the editor or Assistant, or found to hold no speech; a failed transcription keeps it. At most ten recordings are kept.
 
 ## Journeys
 

@@ -1,6 +1,6 @@
 # Private proof short links
 
-Hush short links are first-party aliases for completed encrypted proofs. They are not a general URL shortener.
+clemii short links are first-party aliases for completed encrypted proofs. They are not a general URL shortener.
 
 ## Production shape
 
@@ -29,7 +29,7 @@ The redirect `Location` must not contain a fragment. Standards-compliant browser
 
 ## Availability
 
-The alias row is created idempotently after proof completion. A unique code index and unique proof index ensure one immutable alias per proof. Collision retries occur before a short URL is returned. If alias allocation is unavailable, publication fails closed and Hush does not claim that a verified link was added.
+The alias row is created idempotently after proof completion. A unique code index and unique proof index ensure one immutable alias per proof. Collision retries occur before a short URL is returned. If alias allocation is unavailable, publication fails closed and clemii does not claim that a verified link was added.
 
 Six Base64URL characters provide a 36-bit public locator space. The code is not an authorization secret: proof contents remain encrypted and require the independent fragment key. Rate limits reduce enumeration, while the database uniqueness constraint and allocation retries resolve collisions without overwriting an existing alias.
 

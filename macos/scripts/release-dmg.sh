@@ -37,7 +37,7 @@ if [[ "${LOCAL}" == "0" ]]; then
   python3 "${SCRIPT_DIR}/check_distribution.py" "${APP}" --phase preflight
 fi
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "${INFO_PLIST}")"
-SLUG="$(/usr/libexec/PlistBuddy -c 'Print :HushReleaseSlug' "${INFO_PLIST}" 2>/dev/null || true)"
+SLUG="$(/usr/libexec/PlistBuddy -c 'Print :ClemiiReleaseSlug' "${INFO_PLIST}" 2>/dev/null || true)"
 BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "${INFO_PLIST}")"
 if [[ -z "${OUTPUT}" ]]; then
   OUTPUT="${RELEASE_DIRECTORY}/dist/clemii-${VERSION}${SLUG:+-${SLUG}}-build.${BUILD}.dmg"

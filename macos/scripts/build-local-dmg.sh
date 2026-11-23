@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DERIVED_DATA_DIRECTORY="${HUSH_DERIVED_DATA_PATH:-/tmp/hush-local-release}"
 cd "${SCRIPT_DIRECTORY}/.."
-xcodebuild -project Hush/Hush.xcodeproj -scheme Hush -configuration Release \
+xcodebuild -project Clemii/Clemii.xcodeproj -scheme Clemii -configuration Release \
   -destination 'generic/platform=macOS' -derivedDataPath "${DERIVED_DATA_DIRECTORY}" \
   -onlyUsePackageVersionsFromResolvedFile -skipPackagePluginValidation -skipMacroValidation \
   ARCHS=arm64 ONLY_ACTIVE_ARCH=NO \

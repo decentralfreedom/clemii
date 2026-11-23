@@ -6,7 +6,7 @@ the Xcode project, speech models, Swift packages, tests and release tools togeth
 From the repository root:
 
 ```sh
-open macos/Hush/Hush.xcodeproj
+open macos/Clemii/Clemii.xcodeproj
 ```
 
 Use an Apple silicon Mac and Xcode 26.6. Select the **clemii** scheme and your own

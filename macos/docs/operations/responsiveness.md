@@ -31,16 +31,16 @@ reviewing those pinned dependencies.
 
 ```sh
 env HUSH_TEST_HOST=1 TEST_RUNNER_HUSH_TEST_HOST=1 xcodebuild \
-  -project Hush/Hush.xcodeproj -scheme Hush -configuration Debug \
+  -project Clemii/Clemii.xcodeproj -scheme Clemii -configuration Debug \
   -destination 'platform=macOS,arch=arm64' \
-  -onlyUsePackageVersionsFromResolvedFile -only-testing:HushTests test
+  -onlyUsePackageVersionsFromResolvedFile -only-testing:ClemiiTests test
 ```
 
 `HUSH_TEST_HOST` suppresses model warming, global hotkeys and background services
 in the Debug test host. Unlike `HUSH_OPERATION_AB`, it does not enable a model
 benchmark. Do not set it for UI journeys, which need app startup.
 
-- Run `HushUITests/HUDNativeGlassJourneyTests` for real AppKit listening HUD,
+- Run `ClemiiUITests/HUDNativeGlassJourneyTests` for real AppKit listening HUD,
   native full-screen entry/exit and moving-background material tests.
 - Repeat the focused `TypingActivityMonitorTests` and `RecordingHUDLifecycleTests`
   with `-enableThreadSanitizer YES`. Sanitizer overhead is not a production latency

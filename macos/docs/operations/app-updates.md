@@ -115,7 +115,7 @@ new Mac:
 
 ```sh
 SPARKLE_BIN=/tmp/hush-release/SourcePackages/artifacts/sparkle/Sparkle/bin
-"$SPARKLE_BIN/generate_keys" --account behu.sh -x /secure/offline/Hush-Sparkle.key
+"$SPARKLE_BIN/generate_keys" --account behu.sh -x /secure/offline/Clemii-Sparkle.key
 ```
 
 The exported file is equivalent to a release-signing password. Never commit or
@@ -131,7 +131,7 @@ labels and Sparkle ordering:
 | Purpose | Source | Example |
 | --- | --- | --- |
 | Product milestone | `MARKETING_VERSION` / `CFBundleShortVersionString` | `0.1.0` |
-| Tester maturity | `HUSH_RELEASE_SLUG` / `HushReleaseSlug` | `alpha.1` |
+| Tester maturity | `HUSH_RELEASE_SLUG` / `ClemiiReleaseSlug` | `alpha.1` |
 | Update order | `CURRENT_PROJECT_VERSION` / `CFBundleVersion` | `10` |
 
 Together these identify the release as `0.1.0-alpha.1 (10)`. Artifacts use the
@@ -264,7 +264,7 @@ The updater itself does not change. Configure Xcode signing and store notary
 credentials once:
 
 ```sh
-xcrun notarytool store-credentials HushNotary --team-id 3A22UK7C9L
+xcrun notarytool store-credentials ClemiiNotary --team-id 3A22UK7C9L
 ```
 
 Only after reviewing the candidate, opt in to submission. Submit the final DMG
@@ -273,7 +273,7 @@ candidate remains available:
 
 ```sh
 export HUSH_NOTARIZE=1
-export HUSH_NOTARY_KEYCHAIN_PROFILE=HushNotary
+export HUSH_NOTARY_KEYCHAIN_PROFILE=ClemiiNotary
 ./scripts/release-dmg.sh --app artifacts/release/export/clemii.app \
   --output artifacts/release/final/hush-0.1.0-alpha.4-build.13.dmg
 ```
@@ -283,7 +283,7 @@ developer team, set `HUSH_DEVELOPMENT_TEAM` before building; the default is clem
 team. Signing follows Xcode's direct distribution: the archive and the Developer ID
 export use automatic signing with `-allowProvisioningUpdates`, so Xcode picks the
 Developer ID Application certificate and creates or renews the provisioning profile
-that authorises the keychain access group (`Hush/Hush-Team.entitlements`). This needs
+that authorises the keychain access group (`Clemii/Clemii-Team.entitlements`). This needs
 the team's Apple Account signed in under Xcode > Settings > Accounts on the release
 Mac.
 

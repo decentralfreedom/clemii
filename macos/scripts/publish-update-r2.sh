@@ -64,7 +64,7 @@ fi
 
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "${INFO_PLIST}")"
 BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "${INFO_PLIST}")"
-RELEASE_SLUG="$(/usr/libexec/PlistBuddy -c 'Print :HushReleaseSlug' "${INFO_PLIST}" 2>/dev/null || true)"
+RELEASE_SLUG="$(/usr/libexec/PlistBuddy -c 'Print :ClemiiReleaseSlug' "${INFO_PLIST}" 2>/dev/null || true)"
 APPCAST_PATH="${UPDATE_DIRECTORY}/appcast.xml"
 
 if [[ -f "${APPCAST_PATH}" ]]; then

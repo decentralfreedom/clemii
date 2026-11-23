@@ -2,7 +2,7 @@
 """
 Recursively fetches a single model folder from `argmaxinc/whisperkit-coreml`
 on HuggingFace and writes it into the project under
-`Hush/Hush/Resources/BundledModels/<MODEL>/`.
+`Clemii/Clemii/Resources/BundledModels/<MODEL>/`.
 
 We don't ship the analytics/ subdirectories (they're profiling data, not
 needed for inference) — that trims the bundle a bit.
@@ -50,7 +50,7 @@ def download(rel_path: str, target: Path):
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists():
         return False  # already present
-    req = urllib.request.Request(url, headers={"User-Agent": "Hush-bundler"})
+    req = urllib.request.Request(url, headers={"User-Agent": "Clemii-bundler"})
     try:
         with urllib.request.urlopen(req, timeout=120) as r, open(target, "wb") as f:
             while True:
@@ -83,7 +83,7 @@ def download_tokenizer(model_id: str, out_root: Path):
             print(f"  {filename}: already present, skipped")
             continue
         req = urllib.request.Request(
-            f"{raw}/{filename}", headers={"User-Agent": "Hush-bundler"}
+            f"{raw}/{filename}", headers={"User-Agent": "Clemii-bundler"}
         )
         try:
             with urllib.request.urlopen(req, timeout=120) as response, open(target, "wb") as output:
@@ -102,10 +102,10 @@ def main():
     model_id = sys.argv[1]
     folder = f"openai_whisper-{model_id}"
     project_root = Path(__file__).resolve().parent.parent
-    # BundledModels lives at the Xcode project root (alongside Hush.xcodeproj).
+    # BundledModels lives at the Xcode project root (alongside Clemii.xcodeproj).
     # The "Copy bundled models" Run Script build phase rsyncs from there into
     # clemii.app/Contents/Resources/BundledModels at build time.
-    out_root = project_root / "Hush" / "BundledModels" / folder
+    out_root = project_root / "Clemii" / "BundledModels" / folder
     out_root.mkdir(parents=True, exist_ok=True)
 
     print(f"Fetching {folder} → {out_root.relative_to(project_root)}")

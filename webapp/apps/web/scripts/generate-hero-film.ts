@@ -6,15 +6,15 @@
 // which AVFoundation plays over any background. Also saves one still for visitors who ask for less
 // motion. The outputs are committed; run again after changing the hero:
 //   bun scripts/generate-hero-film.ts        (needs ffmpeg with VideoToolbox, as Homebrew's has)
-//   macos/Hush/Hush/Resources/Onboarding/clemii-hero.mov   the greeting and two rounds of the loop, 19 seconds
-//   macos/Hush/Hush/Resources/Onboarding/clemii-hero.png   the brothers in calm flight
+//   macos/Clemii/Clemii/Resources/Onboarding/clemii-hero.mov   the greeting and two rounds of the loop, 19 seconds
+//   macos/Clemii/Clemii/Resources/Onboarding/clemii-hero.png   the brothers in calm flight
 import { chromium } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const port = 4697, rate = 30, seconds = 19;
-const resources = new URL("../../../../macos/Hush/Hush/Resources/Onboarding/", import.meta.url).pathname;
+const resources = new URL("../../../../macos/Clemii/Clemii/Resources/Onboarding/", import.meta.url).pathname;
 const frames = await mkdtemp(join(tmpdir(), "clemii-hero-film-"));
 const server = Bun.spawn(["bunx", "vite", "--port", String(port), "--strictPort"], { stdout: "ignore", stderr: "inherit" });
 const browser = await chromium.launch();
@@ -32,7 +32,7 @@ try {
   const encode = Bun.spawnSync(["ffmpeg", "-y", "-loglevel", "error", "-framerate", String(rate), "-i", join(frames, "%04d.png"),
     "-c:v", "hevc_videotoolbox", "-alpha_quality", "0.8", "-q:v", "62", "-tag:v", "hvc1", "-pix_fmt", "bgra", `${resources}clemii-hero.mov`], { stderr: "inherit" });
   if (encode.exitCode !== 0) throw new Error("ffmpeg could not encode the film");
-  console.info(`Wrote clemii-hero.mov (${seconds} s) and clemii-hero.png to macos/Hush/Hush/Resources/Onboarding`);
+  console.info(`Wrote clemii-hero.mov (${seconds} s) and clemii-hero.png to macos/Clemii/Clemii/Resources/Onboarding`);
 } finally {
   await browser.close();
   server.kill();

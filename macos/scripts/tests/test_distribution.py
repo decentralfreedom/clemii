@@ -32,7 +32,7 @@ class InstallerLayoutChecks(unittest.TestCase):
             app = root / "export/clemii.app"
             metadata = {"CFBundleIdentifier": "com.decentralfreedom.clemii",
                         "CFBundleShortVersionString": "0.1.0",
-                        "CFBundleVersion": "14", "HushReleaseSlug": "alpha.5"}
+                        "CFBundleVersion": "14", "ClemiiReleaseSlug": "alpha.5"}
             for target in (volume / "clemii.app", app):
                 (target / "Contents").mkdir(parents=True)
                 (target / "Contents/Info.plist").write_bytes(plistlib.dumps(metadata))
@@ -129,7 +129,7 @@ class NotaryChecks(unittest.TestCase):
                 (app / "Contents/Info.plist").write_bytes(plistlib.dumps({
                     "CFBundleShortVersionString": "0.1.0",
                     "CFBundleVersion": "13",
-                    "HushReleaseSlug": "alpha.4",
+                    "ClemiiReleaseSlug": "alpha.4",
                 }))
                 commands_path = root / "commands.jsonl"
                 binaries = root / "bin"

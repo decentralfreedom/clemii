@@ -91,10 +91,10 @@ uses macOS Accessibility and ScreenCaptureKit, with Kokoro for local speech.
 ```sh
 git clone https://github.com/decentralfreedom/hush.git
 cd hush
-open macos/Hush/Hush.xcodeproj
+open macos/Clemii/Clemii.xcodeproj
 ```
 
-Choose the **Hush** scheme and your signing team, then run with **⌘R**. The project
+Choose the **Clemii** scheme and your signing team, then run with **⌘R**. The project
 uses pinned Swift packages. See the [development guide](macos/docs/development.md) for
 toolchain requirements, testing, local proof-service setup, and packaging.
 
