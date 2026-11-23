@@ -1,6 +1,6 @@
 # Blog content
 
-Published articles live in the hush CMS (`webapp/apps/cms`), not in this
+Published articles live in the clemii CMS (`webapp/apps/cms`), not in this
 repository. Production builds the blog from the CMS at deploy time. This
 directory only holds articles for local previews; Git ignores everything in it
 except this file, so a draft never lands in the public repository.

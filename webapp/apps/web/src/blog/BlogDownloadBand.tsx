@@ -5,11 +5,11 @@ import { type BlogLanguage } from "@hush/article/taxonomy";
 import { blogCopy } from "../../shared/blog";
 import { AppleIcon } from "../components/AppleIcon";
 import { DownloadLink } from "../components/DownloadExperience";
-import { HushHud, type HushHudState } from "../components/visuals/HushHud";
+import { ClemiiHud, type ClemiiHudState } from "../components/visuals/ClemiiHud";
 import { latestEntry } from "../components/latest-entry";
 
 // One dictation, as the app shows it: listen, process on the Mac, insert.
-const sequence: Array<{ state: HushHudState; ms: number }> = [
+const sequence: Array<{ state: ClemiiHudState; ms: number }> = [
   { state: "listening", ms: 2600 },
   { state: "processing", ms: 700 },
   { state: "drafted", ms: 3200 },
@@ -124,7 +124,7 @@ export function BlogDownloadBand({ lang }: { lang: BlogLanguage }) {
         </div>
         <div className="blog-cta-stage" ref={stage} aria-hidden="true">
           <DemoWindow demo={demo} typed={typed} />
-          <HushHud
+          <ClemiiHud
             state={state}
             className="blog-cta-hud"
             copy={{

@@ -25,11 +25,11 @@ function historySteps(manifest: ProofManifest): HistoryStep[] {
   const firstStep: HistoryStep = manifest.capture.source === "microphone"
     ? { kind: "voice", title: "Voice captured locally", detail: `${formatDuration(manifest.capture.durationMs!)} of microphone audio.` }
     : manifest.capture.source === "keyboard"
-      ? { kind: "text", title: "Typed inside hush", detail: "Created in the private editor on the author's Mac." }
-      : { kind: "revision", title: "Edited in hush", detail: "Reopened from the author's local hush history." };
+      ? { kind: "text", title: "Typed inside clemii", detail: "Created in the private editor on the author's Mac." }
+      : { kind: "revision", title: "Edited in clemii", detail: "Reopened from the author's local clemii history." };
   const legacySteps: HistoryStep[] = [
     firstStep,
-    ...(manifest.revision ? [{ kind: "revision" as const, title: "Prior proof matched", detail: "Linked to the previous signed hush record." }] : []),
+    ...(manifest.revision ? [{ kind: "revision" as const, title: "Prior proof matched", detail: "Linked to the previous signed clemii record." }] : []),
     ...(manifest.voiceSegments ?? []).map((section, index): HistoryStep => ({
       kind: "voice", title: `Voice section ${index + 1} added`, timestamp: section.capturedAt,
       detail: `${formatDuration(section.durationMs)} transcribed locally with ${section.modelDisplayName}.`,
@@ -52,7 +52,7 @@ function describeEvent(
   const timestamp = event.occurredAt;
   switch (event.kind) {
     case "message_started":
-      return { kind: "text", title: "Message started in hush", detail: "Created in the private composer.", timestamp };
+      return { kind: "text", title: "Message started in clemii", detail: "Created in the private composer.", timestamp };
     case "voice_capture":
       return { kind: "voice", title: "Voice recorded", detail: `${formatDuration(event.durationMs)} captured and transcribed locally with ${event.modelDisplayName}.`, timestamp };
     case "voice_section_added": {
@@ -64,9 +64,9 @@ function describeEvent(
     case "cleanup_applied":
       return { kind: "cleanup", title: "Cleaned up locally", detail: "Automatic spacing and punctuation cleanup. No AI refinement in this step.", timestamp };
     case "manual_edit":
-      return { kind: "manual", title: "Edited inside hush", detail: "Manual text changes were included in the signed message.", timestamp };
+      return { kind: "manual", title: "Edited inside clemii", detail: "Manual text changes were included in the signed message.", timestamp };
     case "revision_created":
-      return { kind: "revision", title: "Edited and re-signed", detail: "This version is linked to the previous hush proof.", timestamp };
+      return { kind: "revision", title: "Edited and re-signed", detail: "This version is linked to the previous clemii proof.", timestamp };
   }
 }
 
@@ -77,7 +77,7 @@ function describeTransformation(transformation: ProofManifest["transformations"]
     case "local_ai":
       return { kind: "ai", title: "Refined by local AI", detail: [transformation.persona, transformation.provider, transformation.model].filter(Boolean).join(" · ") || "A local model refined the wording." };
     case "manual_hush_edit":
-      return { kind: "manual", title: "Edited inside hush", detail: "Manual text changes included in the signature." };
+      return { kind: "manual", title: "Edited inside clemii", detail: "Manual text changes included in the signature." };
   }
 }
 

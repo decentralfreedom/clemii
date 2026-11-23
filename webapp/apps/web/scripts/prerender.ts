@@ -11,7 +11,7 @@ const template = await Bun.file("dist/index.html").text();
 const head = template.match(/<head>([\s\S]*?)<\/head>/)?.[1];
 if (!head) throw new Error("Missing Vite document head");
 const pageHead = (metadata: typeof privatePageMetadata) => head.replace(
-  /<!--hush-head-start-->[\s\S]*?<!--hush-head-end-->/,
+  /<!--clemii-head-start-->[\s\S]*?<!--clemii-head-end-->/,
   () => renderPageHead(metadata),
 );
 // The landing scene is imported only after the application starts, and its
@@ -21,7 +21,7 @@ const pageHead = (metadata: typeof privatePageMetadata) => head.replace(
 // the application.
 type ManifestChunk = { file: string; isEntry?: boolean; imports?: string[]; assets?: string[]; css?: string[] };
 const manifest: Record<string, ManifestChunk> = await Bun.file("dist/.vite/manifest.json").json();
-const sceneKey = Object.keys(manifest).find((key) => key.endsWith("src/landing/HushScene.ts"));
+const sceneKey = Object.keys(manifest).find((key) => key.endsWith("src/landing/ClemiiScene.ts"));
 if (!sceneKey) throw new Error("Missing the landing scene in the build manifest");
 const sceneFiles = new Set<string>(), sceneAssets = new Set<string>();
 (function collect(key: string) {

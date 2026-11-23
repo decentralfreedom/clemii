@@ -21,7 +21,7 @@ export function VerifiedStory() {
           <article className="press-proof" aria-label="Illustrative Verified Message">
             <div className="press-proof-top"><span>Example proof</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="6" y="10" width="12" height="10" rx="2" /><path d="M8 10V7A4 4 0 0 1 16 7V10" /></svg></div>
             <p className="press-proof-message">What if we tried<br />something different?</p>
-            <p className="press-proof-signature">-typed with hush</p>
+            <p className="press-proof-signature">-typed with clemii</p>
             <details>
               <summary>View the signed history <span aria-hidden="true">+</span></summary>
               <ol>
@@ -32,7 +32,7 @@ export function VerifiedStory() {
               <p className="press-example-note">Illustration only. This is not a live proof.</p>
             </details>
           </article>
-            <figcaption className="art-credit"><a href={pressSource} target="_blank" rel="noreferrer">The Printer</a><span>Jost Amman, 1568. Public domain.<br />Recoloured with digital overlays for hush.</span></figcaption>
+            <figcaption className="art-credit"><a href={pressSource} target="_blank" rel="noreferrer">The Printer</a><span>Jost Amman, 1568. Public domain.<br />Recoloured with digital overlays for clemii.</span></figcaption>
           </figure>
         </div>
         <div className="verified-story-copy">
@@ -42,7 +42,7 @@ export function VerifiedStory() {
           <p>With optional Verified Messages, share how your words were captured, edited and signed. Voice, typing and local AI edits stay distinct.</p>
           <ul className="verified-story-facts">
             <li><strong>Encrypted on your Mac before upload.</strong> Original audio stays local.</li>
-            <li><strong>Verified in their browser.</strong> No account needed. hush never receives the key in your private link.</li>
+            <li><strong>Verified in their browser.</strong> No account needed. clemii never receives the key in your private link.</li>
           </ul>
           <a href="/verified-messages" className="verified-story-link">Explore Verified Messages <span aria-hidden="true">↗</span></a>
           <p className="verified-story-limit">Verifies signed capture and edit history. It does not prove identity, human presence or the truth of a claim.</p>

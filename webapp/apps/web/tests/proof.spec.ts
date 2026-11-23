@@ -28,7 +28,7 @@ test("verifies and decrypts a complete signed message proof", async ({ page, isM
 
   await page.goto(`/p/${fixture.slug}#k=${fixture.key}`);
 
-  await expect(page.getByText("Verified hush message")).toBeVisible();
+  await expect(page.getByText("Verified clemii message")).toBeVisible();
   await expect(page.getByText("Perfect, let's lock in Thursday at 10.")).toBeVisible();
   await expect(page.getByText("Created from voice")).toBeVisible();
   await expect(page.getByText(/Alex.*self-declared/)).toBeVisible();
@@ -76,7 +76,7 @@ test("verifies and decrypts a complete signed message proof", async ({ page, isM
   expect(outbound.some(value => value.includes(fixture.key) || value.includes(fixture.manifest.finalText) || value.includes("A different message."))).toBe(false);
 
   await page.reload();
-  await expect(page.getByText("Verified hush message")).toBeVisible();
+  await expect(page.getByText("Verified clemii message")).toBeVisible();
   await expect(page.getByText("Perfect, let's lock in Thursday at 10.")).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -96,13 +96,13 @@ test("keeps a signed version 1 proof verifiable without inventing history", asyn
 
   await page.goto(`/p/${fixture.slug}#k=${fixture.key}`);
 
-  await expect(page.getByText("Verified hush message")).toBeVisible();
+  await expect(page.getByText("Verified clemii message")).toBeVisible();
   await expect(page.getByText("Voice captured locally")).toBeVisible();
   await expect(page.getByText("Voice recorded")).toHaveCount(0);
   await expect(page.locator(".proof-timeline time")).toHaveCount(1);
 });
 
-test("explains a message typed inside hush without claiming voice origin", async ({ page }, testInfo) => {
+test("explains a message typed inside clemii without claiming voice origin", async ({ page }, testInfo) => {
   const fixture = await makeProofFixture(undefined, undefined, "keyboard");
 
   await page.route(`**/v1/proofs/${fixture.slug}`, async (route) => {
@@ -117,9 +117,9 @@ test("explains a message typed inside hush without claiming voice origin", async
 
   await page.goto(`/p/${fixture.slug}#k=${fixture.key}`);
 
-  await expect(page.getByText("Verified hush message")).toBeVisible();
-  await expect(page.getByText("Typed in hush")).toBeVisible();
-  await expect(page.getByText("Message started in hush")).toBeVisible();
+  await expect(page.getByText("Verified clemii message")).toBeVisible();
+  await expect(page.getByText("Typed in clemii")).toBeVisible();
+  await expect(page.getByText("Message started in clemii")).toBeVisible();
   await expect(page.getByText("Original text and changes")).toBeVisible();
   await expect(page.getByText("Created from voice")).toHaveCount(0);
   await expect(page.getByText("Original audio was not shared", { exact: false })).toHaveCount(0);
@@ -147,11 +147,11 @@ test("shows immutable revision lineage and composer voice sections", async ({ pa
   await expect(page.getByText("Cleaned up locally")).toBeVisible();
   await expect(page.getByText("Voice section 1 added")).toBeVisible();
   await expect(page.getByText("Voice section 2 added")).toBeVisible();
-  await expect(page.getByText("Edited inside hush")).toBeVisible();
+  await expect(page.getByText("Edited inside clemii")).toBeVisible();
   await expect(page.getByText("Edited and re-signed")).toBeVisible();
   await expect(page.getByText("Signed edited message")).toBeVisible();
   await expect(page.getByText("Local AI disclosed", { exact: true })).toHaveCount(0);
-  await expect(page.locator(".proof-timeline li h3")).toHaveText(["Voice recorded", "Cleaned up locally", "Voice section 1 added", "Voice section 2 added", "Edited inside hush", "Edited and re-signed", "Signed and encrypted"]);
+  await expect(page.locator(".proof-timeline li h3")).toHaveText(["Voice recorded", "Cleaned up locally", "Voice section 1 added", "Voice section 2 added", "Edited inside clemii", "Edited and re-signed", "Signed and encrypted"]);
   await expect(page.locator('.proof-timeline li[data-kind="voice"] time')).toHaveCount(3);
   await page.screenshot({ path: testInfo.outputPath("recipient-revision.png"), fullPage: true });
   await expect(page.getByText("Signed refinement")).toHaveCount(0);
@@ -181,13 +181,13 @@ test("fails closed when signed expiry instants differ", async ({ page }) => {
 
   await expect(page.getByText("This message could not be verified")).toBeVisible();
   await expect(page.getByText("The proof expiry does not match.")).toBeVisible();
-  await expect(page.getByText("Verified hush message")).toHaveCount(0);
+  await expect(page.getByText("Verified clemii message")).toHaveCount(0);
 });
 
 test("fails closed when the private key fragment is missing", async ({ page }) => {
   await page.goto("/p/nondiscoverable-proof-slug");
   await expect(page.getByText("This private proof link is incomplete")).toBeVisible();
-  await expect(page.getByText("Verified hush message")).toHaveCount(0);
+  await expect(page.getByText("Verified clemii message")).toHaveCount(0);
 });
 
 for (const status of ["expired", "revoked"] as const) {
@@ -223,7 +223,7 @@ test("distinguishes automatic cleanup from AI and keeps long messages readable",
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
 });
 
-test("downloads hush from the recipient invitation without losing the private link", async ({ page, context, browserName, isMobile }) => {
+test("downloads clemii from the recipient invitation without losing the private link", async ({ page, context, browserName, isMobile }) => {
   const fixture = await makeProofFixture();
   const release = latestRelease!;
   await page.route(`**/v1/proofs/${fixture.slug}`, route => route.fulfill({ json: fixture.metadata }));
@@ -233,11 +233,11 @@ test("downloads hush from the recipient invitation without losing the private li
     headers: { "content-type": "application/x-apple-diskimage", "content-disposition": `attachment; filename="${release.downloadName}"` },
   }));
   await page.goto(`/p/${fixture.slug}#k=${fixture.key}`);
-  await expect(page.getByRole("heading", { name: "Verified hush message", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Verified clemii message", exact: true })).toBeVisible();
   if (isMobile) {
     await page.locator(".proof-download").click();
     const sheet = page.getByRole("dialog", { name: "Meet you on your Mac." });
-    await expect(sheet.getByRole("textbox", { name: "hush download page" })).toHaveValue("https://behu.sh/");
+    await expect(sheet.getByRole("textbox", { name: "clemii download page" })).toHaveValue("https://behu.sh/");
     const email = await sheet.getByRole("link", { name: "Email myself the link" }).getAttribute("href");
     expect(email).not.toContain(fixture.key);
     expect(decodeURIComponent(email!)).not.toContain(fixture.manifest.finalText);
@@ -280,7 +280,7 @@ test("preserves the private key through a real short proof redirect", async ({
   const code = shortProofUrl.pathname.split("/").at(-1);
   await page.goto(`${e2eBaseUrl}/${code}#k=${fixture.key}`);
 
-  await expect(page.getByText("Verified hush message")).toBeVisible();
+  await expect(page.getByText("Verified clemii message")).toBeVisible();
   await expect(page.getByText("Perfect, let's lock in Thursday at 10.")).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.location.hash)).toBe(
     `#k=${fixture.key}`,
@@ -289,7 +289,7 @@ test("preserves the private key through a real short proof redirect", async ({
 
   const forwardedPage = await page.context().newPage();
   await forwardedPage.goto(page.url());
-  await expect(forwardedPage.getByText("Verified hush message")).toBeVisible();
+  await expect(forwardedPage.getByText("Verified clemii message")).toBeVisible();
   await expect(
     forwardedPage.getByText("Perfect, let's lock in Thursday at 10."),
   ).toBeVisible();

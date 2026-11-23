@@ -25,7 +25,7 @@ export function VerifiedMessagePreview({ className = "" }: { className?: string 
             ✓
           </span>
           <div>
-            <p className="text-sm font-bold">Verified hush message</p>
+            <p className="text-sm font-bold">Verified clemii message</p>
             <p className="mt-1 text-xs leading-5 text-muted">
               The signed voice capture and edit record matches.
             </p>
@@ -99,7 +99,7 @@ export function VerifiedMessagePreview({ className = "" }: { className?: string 
 
       <div className="flex items-center gap-2 border-t border-black/8 px-5 py-4 text-[11px] leading-5 text-muted sm:px-8">
         <LockIcon />
-        Proof contents decrypt in this browser. hush never receives the message key.
+        Proof contents decrypt in this browser. clemii never receives the message key.
       </div>
     </article>
   );

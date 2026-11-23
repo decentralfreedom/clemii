@@ -8,7 +8,7 @@ export type ReleaseSection = {
   }[];
 };
 
-export type HushRelease = {
+export type ClemiiRelease = {
   slug: string;
   version: string;
   displayVersion: string;
@@ -28,7 +28,7 @@ export type HushRelease = {
 
 // Add a release only after its immutable download is published and verified.
 // Older unnotarized builds have been withdrawn from the website.
-export const releases: readonly HushRelease[] = [
+export const releases: readonly ClemiiRelease[] = [
   {
     slug: "0.1.0-alpha.9",
     version: "0.1.0-alpha.9",
@@ -50,7 +50,7 @@ export const releases: readonly HushRelease[] = [
         label: "Improved",
         items: [
           {
-            title: "hush uses less memory",
+            title: "clemii uses less memory",
             detail:
               "A local AI model stays loaded only while Live Write or the assistant uses it, and the assistant's voice is released when you switch the assistant off.",
           },
@@ -65,8 +65,8 @@ export const releases: readonly HushRelease[] = [
               "With the assistant switched off, ⌃ Fn shows that it is off instead of starting it, and switching it off ends a conversation that is still running.",
           },
           {
-            title: "hush in lowercase",
-            detail: "The app writes its name as hush everywhere.",
+            title: "clemii in lowercase",
+            detail: "The app writes its name as clemii everywhere.",
           },
         ],
       },
@@ -100,7 +100,7 @@ export const releases: readonly HushRelease[] = [
           {
             title: "The assistant says it is an AI",
             detail:
-              "An AI label sits next to its status, VoiceOver names it as hush's AI assistant, and the first spoken reply of each conversation says so.",
+              "An AI label sits next to its status, VoiceOver names it as clemii's AI assistant, and the first spoken reply of each conversation says so.",
           },
           {
             title: "Download progress for the recognition boost",
@@ -147,7 +147,7 @@ export const releases: readonly HushRelease[] = [
     visibility: "private",
     title: "Your words, written your way.",
     summary:
-      "Teach hush the names and terms it gets wrong, keep Live Write out of the apps where your words should go in as spoken, and never lose a long dictation again.",
+      "Teach clemii the names and terms it gets wrong, keep Live Write out of the apps where your words should go in as spoken, and never lose a long dictation again.",
     downloadURL:
       "https://updates.behu.sh/downloads/hush-0.1.0-alpha.7-build.16.dmg",
     downloadName: "hush-0.1.0-alpha.7-build.16.dmg",
@@ -159,7 +159,7 @@ export const releases: readonly HushRelease[] = [
           {
             title: "Vocabulary you teach by voice",
             detail:
-              "Type a name or term the way you write it, then say it a few times. hush learns what it hears and writes your word from then on, with or without Live Write. With Parakeet you can add an optional recognition boost (97.5 MB) that helps it hear your words in new ways.",
+              "Type a name or term the way you write it, then say it a few times. clemii learns what it hears and writes your word from then on, with or without Live Write. With Parakeet you can add an optional recognition boost (97.5 MB) that helps it hear your words in new ways.",
           },
           {
             title: "Live Write stays out of the way where it should",
@@ -169,7 +169,7 @@ export const releases: readonly HushRelease[] = [
           {
             title: "Your own ChatGPT plan, if you want it",
             detail:
-              "Live Write and the assistant write on your Mac by default. You can instead sign in with ChatGPT and turn it on per feature; hush says what is sent before anything leaves your Mac.",
+              "Live Write and the assistant write on your Mac by default. You can instead sign in with ChatGPT and turn it on per feature; clemii says what is sent before anything leaves your Mac.",
           },
         ],
       },
@@ -179,12 +179,12 @@ export const releases: readonly HushRelease[] = [
           {
             title: "Text appears sooner",
             detail:
-              "With Parakeet, hush recognises speech while you talk, so less is left to do when you release the key.",
+              "With Parakeet, clemii recognises speech while you talk, so less is left to do when you release the key.",
           },
           {
             title: "No more keychain prompts",
             detail:
-              "Sign-ins and keys now live in the Mac's data protection keychain, so hush no longer asks for your password to use them.",
+              "Sign-ins and keys now live in the Mac's data protection keychain, so clemii no longer asks for your password to use them.",
           },
         ],
       },
@@ -194,7 +194,7 @@ export const releases: readonly HushRelease[] = [
           {
             title: "Long dictations are kept",
             detail:
-              "A dictation that reaches the two-minute limit is kept and inserted. If your Mac sleeps or hush quits while you talk, the recording is recovered into History at the next launch.",
+              "A dictation that reaches the two-minute limit is kept and inserted. If your Mac sleeps or clemii quits while you talk, the recording is recovered into History at the next launch.",
           },
         ],
       },
@@ -228,7 +228,7 @@ export const releases: readonly HushRelease[] = [
           {
             title: "Your instructions stay readable",
             detail:
-              "Switching between Light and Dark while hush was open could leave the persona editor in the old colors, so its instructions looked empty and typing seemed not to work until hush was reopened. The editor and the shortcut fields now redraw as soon as you switch.",
+              "Switching between Light and Dark while clemii was open could leave the persona editor in the old colors, so its instructions looked empty and typing seemed not to work until clemii was reopened. The editor and the shortcut fields now redraw as soon as you switch.",
           },
         ],
       },
@@ -250,7 +250,7 @@ export const releases: readonly HushRelease[] = [
     visibility: "private",
     title: "A clearer first step.",
     summary:
-      "A small update to the way hush arrives on your Mac: a clear drag-and-drop installer, with Developer ID signing and Apple notarization.",
+      "A small update to the way clemii arrives on your Mac: a clear drag-and-drop installer, with Developer ID signing and Apple notarization.",
     downloadURL:
       "https://updates.behu.sh/downloads/hush-0.1.0-alpha.5-build.14.dmg",
     downloadName: "hush-0.1.0-alpha.5-build.14.dmg",
@@ -262,7 +262,7 @@ export const releases: readonly HushRelease[] = [
           {
             title: "Drag, drop, and you're home",
             detail:
-              "The installer now opens at the right size, with hush, an arrow, and your Applications folder in place. Drag hush across, then open it from Applications.",
+              "The installer now opens at the right size, with clemii, an arrow, and your Applications folder in place. Drag clemii across, then open it from Applications.",
           },
         ],
       },
@@ -284,7 +284,7 @@ export const releases: readonly HushRelease[] = [
     visibility: "private",
     title: "Our first notarized alpha.",
     summary:
-      "A small milestone for hush: the first alpha notarized by Apple. I'm working toward a full public release, and I'd like to open-source the app in the future.",
+      "A small milestone for clemii: the first alpha notarized by Apple. I'm working toward a full public release, and I'd like to open-source the app in the future.",
     downloadURL:
       "https://updates.behu.sh/downloads/hush-0.1.0-alpha.4-build.13.dmg",
     downloadName: "hush-0.1.0-alpha.4-build.13.dmg",
@@ -296,7 +296,7 @@ export const releases: readonly HushRelease[] = [
           {
             title: "A simpler installation",
             detail:
-              "The app and download are signed with Developer ID and notarized by Apple. Open the DMG, move hush to Applications, and launch it normally. No Terminal workaround is needed.",
+              "The app and download are signed with Developer ID and notarized by Apple. Open the DMG, move clemii to Applications, and launch it normally. No Terminal workaround is needed.",
           },
           {
             title: "Ready for offline checks",
@@ -311,7 +311,7 @@ export const releases: readonly HushRelease[] = [
           {
             title: "Typing measurement freeze",
             detail:
-              "Fixed a loop that could make hush unresponsive when everyday typing measurement was turned off or Accessibility permission was revoked.",
+              "Fixed a loop that could make clemii unresponsive when everyday typing measurement was turned off or Accessibility permission was revoked.",
           },
           {
             title: "Listening across desktops",
@@ -329,9 +329,9 @@ export const releases: readonly HushRelease[] = [
   },
 ];
 
-export const latestRelease: HushRelease | undefined = releases.at(0);
+export const latestRelease: ClemiiRelease | undefined = releases.at(0);
 
-export function releasePath(release: HushRelease) {
+export function releasePath(release: ClemiiRelease) {
   return `/releases/${release.slug}`;
 }
 

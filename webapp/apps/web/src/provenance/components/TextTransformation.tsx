@@ -21,7 +21,7 @@ export function TextTransformation({ manifest }: { manifest: ProofManifest }) {
     ? "Original transcript"
     : manifest.capture.source === "keyboard"
       ? "First draft"
-      : "Previous hush message";
+      : "Previous clemii message";
   return (
     <details className="proof-transformation" open>
       <summary>

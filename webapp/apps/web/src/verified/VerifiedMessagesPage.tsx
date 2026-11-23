@@ -9,7 +9,7 @@ import "./verified-editorial.css";
 
 export function VerifiedMessagesPage() {
   return <div className="verified-editorial">
-    <DocumentMetadata title="Give your words a verifiable history - hush" description="Record in hush. Keep the recorded time and edits. Share a private link so someone else can verify the signed message history." canonicalPath="/verified-messages" />
+    <DocumentMetadata title="Give your words a verifiable history - clemii" description="Record in clemii. Keep the recorded time and edits. Share a private link so someone else can verify the signed message history." canonicalPath="/verified-messages" />
     <a className="vm-skip" href="#vm-main">Skip to content</a>
     <Header currentPage="verified-messages" navigationLabel="Verified Messages navigation" />
 
@@ -37,7 +37,7 @@ export function VerifiedMessagesPage() {
 
       <section className="vm-finale" aria-labelledby="vm-finale-title">
         <h2 id="vm-finale-title">Your voice can<br />change the story.</h2>
-        <DownloadLink variant="custom" className="vm-download"><DownloadIcon />Download hush</DownloadLink>
+        <DownloadLink variant="custom" className="vm-download"><DownloadIcon />Download clemii</DownloadLink>
         <p>Verified Messages are optional.</p>
       </section>
     </main>

@@ -4,7 +4,7 @@
 /** CSS independently reveals the universe if graphics or hydration arrive too late. */
 export function canStartLandingEntrance(entry: HTMLElement) {
   if (entry.dataset.opening !== "pending") return false;
-  const fallback = entry.querySelector(".hush-core")?.getAnimations().find(animation =>
+  const fallback = entry.querySelector(".clemii-core")?.getAnimations().find(animation =>
     animation instanceof CSSAnimation && animation.animationName === "entrance-fallback");
   const delay = fallback?.effect?.getTiming().delay ?? 0;
   return Boolean(fallback && Number(fallback.currentTime) < delay);

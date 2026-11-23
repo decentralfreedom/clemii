@@ -1,13 +1,13 @@
-export type HushHudState = "ready" | "listening" | "processing" | "signing" | "drafted" | "inserted";
-export type HushHudCopy = { label: string; detail: string };
+export type ClemiiHudState = "ready" | "listening" | "processing" | "signing" | "drafted" | "inserted";
+export type ClemiiHudCopy = { label: string; detail: string };
 
-const defaultCopy: Record<HushHudState, HushHudCopy> = {
+const defaultCopy: Record<ClemiiHudState, ClemiiHudCopy> = {
   ready: { label: "Ready when you are", detail: "hold fn to talk" },
   listening: { label: "Listening", detail: "0:02" },
   processing: { label: "Processing", detail: "on-device" },
   signing: { label: "Securing proof", detail: "on this Mac" },
   drafted: { label: "24 words", detail: "inserted into composer" },
-  inserted: { label: "Sent", detail: "verified by hush" },
+  inserted: { label: "Sent", detail: "verified by clemii" },
 };
 
 /**
@@ -15,9 +15,9 @@ const defaultCopy: Record<HushHudState, HushHudCopy> = {
  * 72pt tall, the 42pt stateful badge, two stacked labels and the waveform.
  * The caller positions it through className.
  */
-export function HushHud({ state, copy, className = "" }: {
-  state: HushHudState;
-  copy?: Partial<Record<HushHudState, HushHudCopy>>;
+export function ClemiiHud({ state, copy, className = "" }: {
+  state: ClemiiHudState;
+  copy?: Partial<Record<ClemiiHudState, ClemiiHudCopy>>;
   className?: string;
 }) {
   const { label, detail } = copy?.[state] ?? defaultCopy[state];
@@ -31,7 +31,7 @@ export function HushHud({ state, copy, className = "" }: {
         key={state}
         className="workflow-hud-content-enter flex w-full items-center gap-3.5"
       >
-        <HushBadge state={state} />
+        <ClemiiBadge state={state} />
         <div className="w-[132px] shrink-0">
           <p className="text-[14px] font-semibold leading-5 text-ink">{label}</p>
           <p className="whitespace-nowrap text-[10px] leading-4 text-muted">{detail}</p>
@@ -43,7 +43,7 @@ export function HushHud({ state, copy, className = "" }: {
             <div className="flex items-center gap-2 text-[10px] font-semibold text-muted">
               <span className="h-7 w-px bg-gradient-to-b from-transparent via-[#c9b8ff] to-transparent" />
               <span className="whitespace-nowrap">
-                powered by <strong className="text-ink">hush.</strong>
+                powered by <strong className="text-ink">clemii.</strong>
               </span>
             </div>
           ) : (
@@ -55,7 +55,7 @@ export function HushHud({ state, copy, className = "" }: {
   );
 }
 
-function HushBadge({ state }: { state: HushHudState }) {
+function ClemiiBadge({ state }: { state: ClemiiHudState }) {
   const complete = state === "drafted" || state === "inserted";
   return (
     <div
@@ -81,13 +81,13 @@ function HushBadge({ state }: { state: HushHudState }) {
       ) : state === "signing" ? (
         <LockIcon compact />
       ) : (
-        <HushMark />
+        <ClemiiMark />
       )}
     </div>
   );
 }
 
-function HushMark() {
+function ClemiiMark() {
   const heights = [13, 23, 31, 21, 12];
   return (
     <span className="flex items-center gap-[2.5px]" aria-hidden="true">

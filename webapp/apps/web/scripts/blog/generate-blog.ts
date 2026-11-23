@@ -108,7 +108,7 @@ function feed(lang: BlogLanguage) {
   return [
     '<?xml version="1.0" encoding="utf-8"?>',
     `<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="${lang}">`,
-    `  <title>${lang === "de" ? "hush Blog" : "hush blog"}</title>`,
+    `  <title>${lang === "de" ? "clemii Blog" : "clemii blog"}</title>`,
     `  <id>${home}</id>`,
     `  <link rel="alternate" type="text/html" href="${home}"/>`,
     `  <link rel="self" type="application/atom+xml" href="${home}/feed.xml"/>`,

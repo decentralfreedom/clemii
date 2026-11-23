@@ -5,7 +5,7 @@ import { blogPosts } from "../../shared/blog-posts.generated";
 import { notFoundPages, type SiteLanguage } from "../../shared/site";
 import { ButtonLink } from "../components/ButtonLink";
 import { DocumentMetadata } from "../components/DocumentMetadata";
-import { HushMascot } from "../landing/HushMascot";
+import { ClemiiMascot } from "../landing/ClemiiMascot";
 import { Footer } from "../layout/Footer";
 import { Header } from "../layout/Header";
 import { m } from "../paraglide/messages";
@@ -21,7 +21,7 @@ export function NotFoundPage() {
       <DocumentMetadata {...notFoundPages[language]} />
       <Header />
       <main className="not-found-main" aria-labelledby="not-found-title">
-        <div className="not-found-mascot"><HushMascot state="sad" /></div>
+        <div className="not-found-mascot"><ClemiiMascot state="sad" /></div>
         <p className="not-found-code">{m.not_found_code()}</p>
         <h1 id="not-found-title">{m.not_found_title()}</h1>
         <p className="not-found-body">{m.not_found_body()}</p>

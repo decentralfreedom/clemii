@@ -7,8 +7,8 @@ test("public pages provide readable content and unique previews without JavaScri
   const page = await context.newPage();
   try {
     for (const [path, title, heading, image] of [
-      ["/", "hush - Free Dictation App for Mac, Speech to Text", "The voice layer for your Mac.", "hush"],
-      ["/verified-messages", "Verified Messages - Signed message history with hush", "Make your voice more than a post.", "verified-messages"],
+      ["/", "clemii - Free Dictation App for Mac, Speech to Text", "The voice layer for your Mac.", "clemii"],
+      ["/verified-messages", "Verified Messages - Signed message history with clemii", "Make your voice more than a post.", "verified-messages"],
     ]) {
       const response = await page.goto(`${test.info().project.use.baseURL}${path}`);
       expect(response?.status()).toBe(200);
@@ -32,7 +32,7 @@ test("public pages provide readable content and unique previews without JavaScri
     await page.goto(`${test.info().project.use.baseURL}/`);
     const homeData = (await page.locator('script[type="application/ld+json"]').allInnerTexts()).map((text) => JSON.parse(text));
     const application = homeData.find((data) => data["@type"] === "SoftwareApplication");
-    expect(application).toMatchObject({ "@type": "SoftwareApplication", name: "hush", operatingSystem: "macOS 15 or later" });
+    expect(application).toMatchObject({ "@type": "SoftwareApplication", name: "clemii", operatingSystem: "macOS 15 or later" });
     expect(application).not.toHaveProperty("aggregateRating");
     for (const [path, language, alternate] of [["/impressum", "en", "/de/impressum"], ["/de/impressum", "de", "/impressum"]]) {
       await page.goto(`${test.info().project.use.baseURL}${path}`);
@@ -63,7 +63,7 @@ test("keeps discovery public, preserves private no-store and returns genuine 404
   expect(sitemap).toContain("https://behu.sh/verified-messages");
   expect(sitemap).not.toMatch(/\/p\/|\/s\/|\/v1\/|alpha|datenschutz/);
   const llms = await (await request.get("/llms.txt")).text();
-  expect(llms).toMatch(/^# hush\n/);
+  expect(llms).toMatch(/^# clemii\n/);
   expect(llms).toContain("https://github.com/decentralfreedom/hush");
   expect(llms).not.toMatch(/https:\/\/behu.sh\/(p|s|v1)\//);
   for (const path of ["/p/unknown", "/releases/0.1.0-alpha.5", "/impressum"]) {
@@ -95,8 +95,8 @@ test("SEARCH-004 names the site and shows its icon and logo wherever search engi
     if (size) expect((await response.body()).readUInt32BE(16), path).toBe(size);
   }
   const data = (await page.locator('script[type="application/ld+json"]').allInnerTexts()).map((text) => JSON.parse(text));
-  expect(data.find((item) => item["@type"] === "WebSite")).toMatchObject({ name: "hush", url: "https://behu.sh/" });
+  expect(data.find((item) => item["@type"] === "WebSite")).toMatchObject({ name: "clemii", url: "https://behu.sh/" });
   expect(data.find((item) => item["@type"] === "Organization")).toMatchObject({
-    name: "hush", logo: { url: "https://behu.sh/logo.png", width: 512, height: 512 },
+    name: "clemii", logo: { url: "https://behu.sh/logo.png", width: 512, height: 512 },
   });
 });

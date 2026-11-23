@@ -41,7 +41,7 @@ export function Footer() {
           </nav>
         </div>
         <div className="mt-12 border-t border-black/8 pt-6 text-xs text-soft">
-          <span>© {new Date().getFullYear()} hush</span>
+          <span>© {new Date().getFullYear()} clemii</span>
         </div>
       </div>
     </footer>

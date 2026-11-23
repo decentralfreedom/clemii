@@ -156,7 +156,7 @@ export const proofManifestSchema = z.object({
     context.addIssue({
       code: "custom",
       path: ["revision"],
-      message: "Only a reopened hush message can declare a prior proof revision.",
+      message: "Only a reopened clemii message can declare a prior proof revision.",
     });
   }
   if (manifest.capture.source === "microphone" && manifest.sourceText !== undefined) {
@@ -216,7 +216,7 @@ export const proofManifestSchema = z.object({
     context.addIssue({
       code: "custom",
       path: ["provenanceEvents"],
-      message: "Manual hush edits require a matching chronology event.",
+      message: "Manual clemii edits require a matching chronology event.",
     });
   }
   if (manifest.revision) {

@@ -1,6 +1,6 @@
 ---
 title: "Fixture: Diktierfunktion auf dem Mac ohne Cloud im Test"
-description: "Testartikel für die hush Blog-Pipeline. Er prüft Darstellung, Inhaltsverzeichnis, interne Links und die Download-Karte auf Handy und Desktop."
+description: "Testartikel für die clemii Blog-Pipeline. Er prüft Darstellung, Inhaltsverzeichnis, interne Links und die Download-Karte auf Handy und Desktop."
 slug: fixture-diktieren-ohne-cloud
 lang: de
 keyword: fixture diktieren ohne cloud

@@ -1,5 +1,5 @@
 @import "@hush/article/article.css";
-/* hush blog. Reading-first layout; no CSS filters (LANDING-PAINT-001). */
+/* clemii blog. Reading-first layout; no CSS filters (LANDING-PAINT-001). */
 .blog-article-main,
 .blog-index-main { padding: 48px 20px 96px; }
 
@@ -75,7 +75,7 @@ a:hover .blog-arrow-forward .blog-arrow-head, a:focus-visible .blog-arrow-forwar
 .blog-share-end { max-width: 680px; margin: 40px auto 0; }
 @media (max-width: 1023px) { .blog-author-card { margin-top: 28px; } .blog-share-status:empty { display: none; } }
 
-/* Download band: full width above the footer, in a lavender tint of the hush aurora,
+/* Download band: full width above the footer, in a lavender tint of the clemii aurora,
    with text on the left and a replayed dictation on the right. */
 .blog-download-band {
   padding: 80px 20px;

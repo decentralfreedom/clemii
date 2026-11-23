@@ -25,8 +25,8 @@ test("BLOG-001 reads a prerendered article without JavaScript", async ({ browser
   expect(JSON.parse(scripts.at(-1)!)).toMatchObject({
     "@type": "BreadcrumbList",
     itemListElement: [
-      { position: 1, name: "hush", item: "https://behu.sh/" },
-      { position: 2, name: "The hush blog", item: "https://behu.sh/blog" },
+      { position: 1, name: "clemii", item: "https://behu.sh/" },
+      { position: 2, name: "The clemii blog", item: "https://behu.sh/blog" },
       { position: 3, name: "Fixture article body heading" },
     ],
   });
@@ -53,7 +53,7 @@ test("BLOG-003 offers the right download action for the device", async ({ page, 
   const cta = page.locator(".blog-download-band");
   if (isMobile) {
     // Phones get the send-to-Mac handoff, never a disk image.
-    await expect(cta.getByRole("button", { name: "Get hush for Mac" })).toBeVisible();
+    await expect(cta.getByRole("button", { name: "Get clemii for Mac" })).toBeVisible();
     await expect(cta.locator('a[href$=".dmg"]')).toHaveCount(0);
   } else {
     // Each article's downloads are counted for it (PRD R10).
@@ -72,10 +72,10 @@ test("BLOG-004 links section headings and continues to related articles", async 
 
 test("BLOG-005 lists articles per language and keeps drafts and unknown slugs out", async ({ page, request }) => {
   await page.goto("/blog");
-  await expect(page.getByRole("heading", { level: 1, name: "The hush blog" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "The clemii blog" })).toBeVisible();
   await expect(page.locator(".blog-card-grid .blog-card")).toHaveCount(2);
   await page.goto("/de/blog");
-  await expect(page.getByRole("heading", { level: 1, name: "Der hush Blog" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Der clemii Blog" })).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("lang", "de");
   for (const path of ["/blog/fixture-draft", "/blog/does-not-exist"]) {
     expect((await request.get(path)).status()).toBe(404);
@@ -156,8 +156,8 @@ test("BLOG-009 serves the article artwork as the social preview and on cards, ne
   expect(JSON.parse(scripts.at(-1)!)).toMatchObject({
     "@type": "BreadcrumbList",
     itemListElement: [
-      { position: 1, name: "hush", item: "https://behu.sh/" },
-      { position: 2, name: "The hush blog", item: "https://behu.sh/blog" },
+      { position: 1, name: "clemii", item: "https://behu.sh/" },
+      { position: 2, name: "The clemii blog", item: "https://behu.sh/blog" },
       { position: 3, name: "Fixture article body heading" },
     ],
   });

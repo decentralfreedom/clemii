@@ -5,12 +5,14 @@
 // run again after changing the SVG:  bun scripts/generate-favicons.ts
 //   public/favicon.ico           16, 32 and 48 px (browsers, Google's /favicon.ico lookup)
 //   public/favicon-96x96.png     a multiple of 48 px, as Google Search asks
-//   public/apple-touch-icon.png  180 px, full bleed: iOS rounds the corners itself
+//   public/apple-touch-icon.png  180 px, the mark on white: iOS rounds the corners itself
 //   public/logo.png              512 px, the publisher logo in structured data
 import sharp from "sharp";
 
 const svg = await Bun.file("public/favicon.svg").text();
-const fullBleed = svg.replace(/ rx="[^"]*" ry="[^"]*"/, "");
+// The mark is a ring on nothing; iOS paints nothing as black, so the touch icon stands on white with a margin.
+const onWhite = async (size: number) => sharp({ create: { width: size, height: size, channels: 4, background: "#ffffff" } })
+  .composite([{ input: await png(svg, Math.round(size * 0.76)) }]).png({ compressionLevel: 9 }).toBuffer();
 const png = (source: string, size: number) =>
   sharp(Buffer.from(source), { density: 72 * size / 64 }).resize(size, size).png({ compressionLevel: 9 }).toBuffer();
 
@@ -36,6 +38,6 @@ function ico(images: Array<{ size: number; data: Buffer }>) {
 const icoSizes = [16, 32, 48];
 await Bun.write("public/favicon.ico", ico(await Promise.all(icoSizes.map(async (size) => ({ size, data: await png(svg, size) })))));
 await Bun.write("public/favicon-96x96.png", await png(svg, 96));
-await Bun.write("public/apple-touch-icon.png", await png(fullBleed, 180));
+await Bun.write("public/apple-touch-icon.png", await onWhite(180));
 await Bun.write("public/logo.png", await png(svg, 512));
 console.info("Wrote favicon.ico, favicon-96x96.png, apple-touch-icon.png and logo.png");

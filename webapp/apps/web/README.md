@@ -1,8 +1,8 @@
-# hush website and proof service
+# clemii website and proof service
 
 This directory contains the Vite/React website, browser proof verification and
 the Bun/Hono service. It is the `@hush/web` app in the [web workspace](../../README.md) of the
-[hush monorepo](../../../README.md).
+[clemii monorepo](../../../README.md).
 
 Use Bun 1.3.9 and the checked-in lockfile:
 

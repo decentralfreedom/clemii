@@ -10,7 +10,7 @@
 .press-art > img { display: block; width: 100%; height: auto; filter: grayscale(1) invert(1); mix-blend-mode: screen; opacity: .66; }
 .press-at { position: absolute; top: -28px; right: 8px; font-family: ui-monospace, SFMono-Regular, monospace; font-size: 112px; line-height: 1; color: #ef9c90; transform: rotate(9deg); text-shadow: 6px 3px #192d39; }
 .press-signal { position: absolute; inset: 0; width: 100%; height: 100%; stroke: #bce9e3; stroke-width: 1.5; }
-.press-signal circle { fill: #ef9c90; stroke: #192d39; stroke-width: 3; }
+.press-signal circle { fill: #ff8f47; stroke: #192d39; stroke-width: 3; }
 .press-figure .art-credit { margin-top: 26px; color: #b5c7ce; }
 .press-proof { position: relative; width: min(310px, 82%); margin: -155px -22px 0 auto; padding: 20px 23px 0; background: #f5f9f7; color: #20343c; box-shadow: 9px 10px 0 #a1d9d340, 0 20px 44px #07172350; transform: rotate(-3deg); }
 .press-proof-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-family: ui-monospace, SFMono-Regular, monospace; font-size: 10px; color: #45646c; }

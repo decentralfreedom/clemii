@@ -8,7 +8,7 @@ A visitor understands that a Verified Message is an optional, encrypted record o
 
 - Verification is optional.
 - The proof package is encrypted on the Mac before upload.
-- The key stays in the complete private link and is not sent to the hush service.
+- The key stays in the complete private link and is not sent to the clemii service.
 - Anyone with that complete link can read the proof while available.
 - Original audio is not uploaded with the proof.
 - Recipients check the signed record in a browser without an account.
@@ -36,7 +36,7 @@ The page shares the landing page's light header, deep blue typography and contin
 
 This treatment adds no WebGL context, external asset or continuous animation. The existing portrait renders only when needed; the finite story, reduced-motion mode, WebGL fallback, mobile download handoff and signed-history boundaries stay intact.
 
-The post uses familiar social typography, author details, metadata and engagement icons. Its “- verified by hush” link is part of the message body, in the same paragraph and type size with no blank line, before the post timestamp and engagement footer. Activating it opens the illustrative proof and moves keyboard focus there. The proof shows three UTC events without a recorded-edit disclosure. There is no “About this illustration & your privacy” dropdown.
+The post uses familiar social typography, author details, metadata and engagement icons. Its “- verified by clemii” link is part of the message body, in the same paragraph and type size with no blank line, before the post timestamp and engagement footer. Activating it opens the illustrative proof and moves keyboard focus there. The proof shows three UTC events without a recorded-edit disclosure. There is no “About this illustration & your privacy” dropdown.
 
 A short visible line explains that audio stays on the Mac and only text and signed history travel encrypted. The persistent Illustration label distinguishes the mockup from a real verification result. The detailed privacy policy remains in the footer. Source and license links stay with each artwork. No external image requests, horizontal scrolling or console errors occur. No home-page imagery or political portrait is reused. The final download and optionality note remain.
 

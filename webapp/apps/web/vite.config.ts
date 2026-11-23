@@ -11,7 +11,7 @@ export default defineConfig({
     name: "hush-page-metadata",
     transformIndexHtml(html, context) {
       const page = sitePages[context.path === "/index.html" ? "/" : context.path] ?? privatePageMetadata;
-      return html.replace("<!--hush-head-start--><!--hush-head-end-->", `<!--hush-head-start-->${renderPageHead(page)}<!--hush-head-end-->`);
+      return html.replace("<!--clemii-head-start--><!--clemii-head-end-->", `<!--clemii-head-start-->${renderPageHead(page)}<!--clemii-head-end-->`);
     },
   }],
   // Dev server only: pre-bundle three.js with the add-ons the scenes use, so they

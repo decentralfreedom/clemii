@@ -35,25 +35,25 @@ export type PageMetadata = {
 
 export const sitePages: Record<string, PageMetadata> = {
   "/": {
-    title: "hush - Free Dictation App for Mac, Speech to Text",
+    title: "clemii - Free Dictation App for Mac, Speech to Text",
     description: "Free, open-source voice dictation for Mac. Write across your apps with local AI, personal writing styles and a beta assistant. Built for Apple silicon.",
     canonicalPath: "/", indexable: true, language: "en",
     alternatePaths: { en: "/", de: "/de" },
   },
   "/de": {
-    title: "hush - Kostenlose Diktier-App für den Mac mit lokaler KI",
+    title: "clemii - Kostenlose Diktier-App für den Mac mit lokaler KI",
     description: "Kostenlose Open-Source-Diktier-App für den Mac: Sprache zu Text in allen Apps, mit lokaler KI, eigenen Schreibstilen und Beta-Assistent. Für Apple Silicon.",
     canonicalPath: "/de", indexable: true, language: "de",
     alternatePaths: { en: "/", de: "/de" },
   },
   "/verified-messages": {
-    title: "Verified Messages - Signed message history with hush",
-    description: "Record in hush. Keep the recorded time and edits. Share a private encrypted link so readers can verify the signed message history in their browser.",
+    title: "Verified Messages - Signed message history with clemii",
+    description: "Record in clemii. Keep the recorded time and edits. Share a private encrypted link so readers can verify the signed message history in their browser.",
     canonicalPath: "/verified-messages", indexable: true, language: "en",
   },
   "/releases": {
-    title: "hush release notes",
-    description: "See what is new, improved, and fixed in every hush release.",
+    title: "clemii release notes",
+    description: "See what is new, improved, and fixed in every clemii release.",
     canonicalPath: "/releases", indexable: releases.some(r => r.visibility === "public"), language: "en",
   },
 };
@@ -63,10 +63,10 @@ for (const language of ["en", "de"] as const) {
     const path = `${language === "de" ? "/de" : ""}/${page}`;
     const privacy = page === "datenschutz";
     sitePages[path] = {
-      title: `${language === "de" ? privacy ? "Datenschutzerklärung" : "Impressum" : privacy ? "Privacy policy" : "Legal notice"} - hush`,
+      title: `${language === "de" ? privacy ? "Datenschutzerklärung" : "Impressum" : privacy ? "Privacy policy" : "Legal notice"} - clemii`,
       description: language === "de"
-        ? privacy ? "Wie hush auf der Website, beim Download und bei optionalen Verified Messages mit Daten umgeht." : "Anbieterkennzeichnung und Kontakt für hush."
-        : privacy ? "How hush handles data on the website, during downloads and for optional Verified Messages." : "Provider identification and contact information for hush.",
+        ? privacy ? "Wie clemii auf der Website, beim Download und bei optionalen Verified Messages mit Daten umgeht." : "Anbieterkennzeichnung und Kontakt für clemii."
+        : privacy ? "How clemii handles data on the website, during downloads and for optional Verified Messages." : "Provider identification and contact information for clemii.",
       canonicalPath: path, language, indexable: !legalConfig.isPlaceholder,
       alternatePaths: { en: `/${page}`, de: `/de/${page}` },
     };
@@ -75,22 +75,22 @@ for (const language of ["en", "de"] as const) {
 for (const release of releases) {
   const path = releasePath(release);
   sitePages[path] = {
-    title: `hush ${release.displayVersion} release notes`,
+    title: `clemii ${release.displayVersion} release notes`,
     description: release.summary, canonicalPath: path,
     indexable: release.visibility === "public", language: "en", modified: release.releasedAt,
   };
 }
 
 export const privatePageMetadata: PageMetadata = {
-  title: "Private message proof - hush",
-  description: "Open a private hush link to verify its signed message history in your browser.",
+  title: "Private message proof - clemii",
+  description: "Open a private clemii link to verify its signed message history in your browser.",
   canonicalPath: "/", indexable: false, language: "en",
 };
 
 /** The not-found page, prerendered once per language and served with status 404. */
 export const notFoundPages: Record<SiteLanguage, PageMetadata> = {
-  en: { title: "Page not found - hush", description: "This page does not exist on behu.sh.", canonicalPath: "/", indexable: false, language: "en" },
-  de: { title: "Seite nicht gefunden - hush", description: "Diese Seite gibt es auf behu.sh nicht.", canonicalPath: "/de", indexable: false, language: "de" },
+  en: { title: "Page not found - clemii", description: "This page does not exist on behu.sh.", canonicalPath: "/", indexable: false, language: "en" },
+  de: { title: "Seite nicht gefunden - clemii", description: "Diese Seite gibt es auf behu.sh nicht.", canonicalPath: "/de", indexable: false, language: "de" },
 };
 /** Prerendered documents for unknown addresses, keyed in pages.json by language. */
 export const notFoundDocumentKey = (language: SiteLanguage) => `404:${language}`;
@@ -99,7 +99,7 @@ export const notFoundDocumentKey = (language: SiteLanguage) => `404:${language}`
 export const organizationData = {
   "@type": "Organization",
   "@id": `${siteOrigin}/#organization`,
-  name: "hush",
+  name: "clemii",
   url: `${siteOrigin}/`,
   logo: { "@type": "ImageObject", url: `${siteOrigin}/logo.png`, width: 512, height: 512 },
   sameAs: ["https://github.com/decentralfreedom/hush"],
@@ -110,8 +110,8 @@ export const websiteData = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "@id": `${siteOrigin}/#website`,
-  name: "hush",
-  alternateName: ["hush for Mac", "behu.sh"],
+  name: "clemii",
+  alternateName: ["clemii for Mac", "behu.sh"],
   url: `${siteOrigin}/`,
   publisher: { "@id": organizationData["@id"] },
 };
@@ -120,7 +120,7 @@ export const websiteData = {
 export const softwareDescription = (page: PageMetadata) => ({
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "hush",
+  name: "clemii",
   url: `${siteOrigin}${page.canonicalPath}`,
   description: page.description,
   inLanguage: page.language,

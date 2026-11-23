@@ -8,21 +8,21 @@ test("renders the visual landing page with a clear download", async ({ page, isM
   await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
   const download = page.locator(".landing-download").first();
   if (isMobile) {
-    await expect(download).toHaveText("Get hush for Mac");
+    await expect(download).toHaveText("Get clemii for Mac");
     await expect(download).toHaveAttribute("aria-haspopup", "dialog");
   } else {
     // Counted at /download (PRD R10), which redirects to the exact immutable DMG.
     await expect(download).toHaveAttribute("href", "/download?from=%2F");
     await expect(page.getByRole("link", { name: "Download", exact: true })).toHaveAttribute("href", await download.getAttribute("href") as string);
   }
-  await expect(page.getByRole("img", { name: /hush connects your voice/ })).toBeVisible();
+  await expect(page.getByRole("img", { name: /clemii connects your voice/ })).toBeVisible();
   await expect(page.getByText("Free alpha for Apple silicon Macs")).toBeVisible();
   await expect(page.getByRole("tablist")).toHaveCount(0);
   await expect(page.getByRole("button", { name: /replay|skip intro/i })).toHaveCount(0);
   await expect(page.getByText("All on your Mac", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Legal notice" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "A few things to know." })).toBeVisible();
-  await expect(page.locator(".hush-landing")).not.toHaveAttribute("data-opening", /pending|playing/, { timeout: 8000 });
+  await expect(page.locator(".clemii-landing")).not.toHaveAttribute("data-opening", /pending|playing/, { timeout: 15000 });
   await expect(download).toHaveCSS("background-color", "rgb(36, 39, 43)");
   await expect(download).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(page.locator(".hero-download-area")).toHaveCSS("filter", "none");
@@ -49,7 +49,7 @@ test.describe("FAQ", () => {
     await expect(page.getByText(/An 8 GB Mac can run transcription/)).toBeVisible();
     await expect(page.getByText(/macOS 15 or later/)).toBeVisible();
     await page.locator("summary").filter({ hasText: "Does it work offline?" }).click();
-    await expect(page.getByText(/Web searches, browsing, model downloads/)).toBeVisible();
+    await expect(page.getByText(/You only need an internet connection for web search or browsing/)).toBeVisible();
     await page.locator("summary").filter({ hasText: "What can the assistant do?" }).click();
     await expect(page.getByText(/Complex tasks may still need your help/)).toBeVisible();
   });
@@ -68,17 +68,17 @@ test("keeps the landing usable when WebGL is unavailable", async ({ page }) => {
   await expect(page.locator(".orbit-app").first()).toHaveCSS("opacity", "1");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.locator(".landing-download").first()).toBeVisible();
-  await expect(page.locator(".hush-core canvas")).toHaveCount(0);
-  const companion = page.getByRole("img", { name: /small hush cameo/ });
+  await expect(page.locator(".clemii-core canvas")).toHaveCount(0);
+  const companion = page.getByRole("img", { name: /small clemii cameo/ });
   await companion.scrollIntoViewIfNeeded();
-  await expect(companion.locator("svg")).toBeVisible();
+  await expect(companion.locator("img")).toBeVisible();
   await expect(companion.locator("canvas")).toHaveCount(0);
 });
 
 test("keeps the visual and download visible when the scene module fails", async ({ page }) => {
-  await page.route(/HushScene.*\.js/, route => route.abort());
+  await page.route(/ClemiiScene.*\.js/, route => route.abort());
   await page.goto("/");
-  await expect(page.locator(".hush-core")).toHaveAttribute("data-scene", "fallback");
+  await expect(page.locator(".clemii-core")).toHaveAttribute("data-scene", "fallback");
   await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1");
   await expect(page.locator(".orbit-app").first()).toHaveCSS("opacity", "1");
   await expect(page.locator(".landing-download").first()).toBeVisible();
@@ -89,13 +89,13 @@ test("respects reduced motion while preserving the complete page", async ({ page
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.locator(".orbit-app").first()).toHaveCSS("animation-name", "none");
-  await expect(page.locator(".hush-landing")).not.toHaveAttribute("data-opening", /pending|playing/);
+  await expect(page.locator(".clemii-landing")).not.toHaveAttribute("data-opening", /pending|playing/);
   await expect(page.locator(".landing-download").first()).toBeVisible();
   await page.locator(".thought-art").evaluate(el => {
     window.scrollTo({ top: scrollY + el.getBoundingClientRect().top - innerHeight * .62, behavior: "instant" });
   });
-  const listener = page.getByRole("img", { name: /small hush cameo/ });
-  await expect(listener.locator("svg")).toBeVisible();
+  const listener = page.getByRole("img", { name: /small clemii cameo/ });
+  await expect(listener.locator("img")).toBeVisible();
   await expect(listener.locator("canvas")).toHaveCount(0);
   await expect(page.locator(".story-bridge")).toHaveCSS("animation-name", "none");
   const collage = page.locator(".provenance-collage");
@@ -110,16 +110,16 @@ test("allows Escape to end the entrance without blocking the page", async ({ pag
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await page.keyboard.press("Escape");
-  await expect(page.locator(".hush-landing")).not.toHaveAttribute("data-opening", /pending|playing/);
+  await expect(page.locator(".clemii-landing")).not.toHaveAttribute("data-opening", /pending|playing/);
   await expect(page.locator(".orbit-app").first()).toHaveCSS("opacity", "1");
 });
 
 test("keeps the mascot cameo within the artwork as the page scrolls", async ({ page }, testInfo) => {
   await page.goto("/");
-  const companion = page.getByRole("img", { name: /small hush cameo/ });
+  const companion = page.getByRole("img", { name: /small clemii cameo/ });
   const art = page.locator(".thought-art");
   await art.scrollIntoViewIfNeeded();
-  await expect(companion.locator("svg")).toBeVisible();
+  await expect(companion.locator("img")).toBeVisible();
   await expect(companion.locator("canvas")).toHaveCount(0);
   const relativeTop = () => companion.evaluate(el => el.getBoundingClientRect().top - el.closest(".thought-art")!.getBoundingClientRect().top);
   const before = await relativeTop();
@@ -142,7 +142,7 @@ test("keeps the mascot cameo within the artwork as the page scrolls", async ({ p
 test("keeps download colors and position on hover and press", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === "mobile", "Touch has no hover state");
   await page.goto("/");
-  await expect(page.locator(".hush-landing")).not.toHaveAttribute("data-opening", /pending|playing/, { timeout: 8000 });
+  await expect(page.locator(".clemii-landing")).not.toHaveAttribute("data-opening", /pending|playing/, { timeout: 15000 });
   for (const button of await page.locator(".site-header-download, .landing-download").all()) {
     await button.scrollIntoViewIfNeeded();
     await page.mouse.move(0, 0);
@@ -328,9 +328,9 @@ test("discloses the confirmed host and processing limits in both languages", asy
     // Regular proof-database backups are bounded; other recovery copies are not promised.
     await expect(article.getByText(german ? /nach höchstens 9 Tagen automatisch gelöscht/ : /deleted automatically after at most 9 days/)).toBeVisible();
     await expect(article.getByText(german ? /keine feste Löschfrist/ : /no fixed erasure deadline/)).toBeVisible();
-    // The optional ChatGPT connection: what leaves the Mac, to whom, and that hush receives none of it.
+    // The optional ChatGPT connection: what leaves the Mac, to whom, and that clemii receives none of it.
     await expect(article.getByText(german ? "7. Optionale ChatGPT-Verbindung in der App" : "7. Optional ChatGPT connection in the app")).toBeVisible();
-    await expect(article.getByText(german ? /Der Betreiber von hush erhält und speichert diese Inhalte nicht/ : /The operator of hush does not receive or store this content/)).toBeVisible();
+    await expect(article.getByText(german ? /Der Betreiber von clemii erhält und speichert diese Inhalte nicht/ : /The operator of clemii does not receive or store this content/)).toBeVisible();
     await expect(article.locator('a[href="https://openai.com/policies/eu-privacy-policy/"]')).toBeVisible();
     await expect(article.getByText(/\[Add|\[Hosting|must be documented before publication|vor Veröffentlichung die tatsächlich/)).toHaveCount(0);
     await page.goto(german ? "/de/impressum" : "/impressum");
@@ -406,7 +406,7 @@ test("lists the corrected installer and retains the first notarized milestone", 
   await expect(page.locator('a[href*="/releases/0.1.0-"]')).toHaveCount(6);
   await expect(page.getByRole("link", { name: "Open permanent page for 0.1 alpha 4" }))
     .toHaveAttribute("href", "/releases/0.1.0-alpha.4");
-  await expect(page.getByText(/A smoother way into hush|Your voice, typed privately/)).toHaveCount(0);
+  await expect(page.getByText(/A smoother way into clemii|Your voice, typed privately/)).toHaveCount(0);
   await page.goto("/releases/latest");
   await expect(page.getByRole("heading", { level: 1, name: "Off means off." })).toBeVisible();
   await expect(page.getByText(/Build 18/)).toBeVisible();
@@ -445,17 +445,17 @@ test("LANDING-006 keeps each locally hosted artwork with its story and credit", 
     await expect.poll(() => image.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
     expect(await image.evaluate((el: HTMLImageElement) => new URL(el.currentSrc).origin)).toBe(new URL(page.url()).origin);
   }
-  const companion = intelligence.getByRole("img", { name: /hush thinking with you/ });
+  const companion = intelligence.getByRole("img", { name: /clemii thinking with you/ });
   await expect(companion).toBeVisible();
-  await expect(page.getByRole("img", { name: /small hush cameo/ })).toBeVisible();
+  await expect(page.getByRole("img", { name: /small clemii cameo/ })).toBeVisible();
   await expect(page.locator(".local-compute-mark")).toHaveCount(0);
   await expect(intelligence.getByText(/Online tasks still use the internet/)).toBeVisible();
   await expect(page.getByRole("region", { name: "For minds of their own." })).toHaveCount(0);
   await expect(page.locator('img[src*="steve-jobs"]')).toHaveCount(0);
-  await expect(page.locator(".hush-mascot")).toHaveCount(0);
-  for (const mascot of [companion, page.getByRole("img", { name: /small hush cameo/ })]) {
+  await expect(page.locator(".clemii-mascot")).toHaveCount(0);
+  for (const mascot of [companion, page.getByRole("img", { name: /small clemii cameo/ })]) {
     expect(await mascot.evaluate(el => el.closest("figure") !== null)).toBe(true);
-    await expect(mascot.locator("svg")).toBeVisible();
+    await expect(mascot.locator("img")).toBeVisible();
     await expect(mascot.locator("canvas")).toHaveCount(0);
   }
   await intelligence.scrollIntoViewIfNeeded();

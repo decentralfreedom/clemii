@@ -46,7 +46,7 @@ function LegalShell({
   return (
     <div className="min-h-screen bg-canvas text-ink">
       <DocumentMetadata
-        title={`${title} - hush`}
+        title={`${title} - clemii`}
         description={description}
         canonicalPath={canonicalPath}
         indexable={!legalConfig.isPlaceholder}
@@ -133,8 +133,8 @@ export function ImprintPage({ language = "en" }: { language?: LegalLanguage }) {
       title={english ? "Legal notice" : "Impressum"}
       description={
         english
-          ? "Provider identification and contact information for hush."
-          : "Anbieterkennzeichnung und Kontakt für hush."
+          ? "Provider identification and contact information for clemii."
+          : "Anbieterkennzeichnung und Kontakt für clemii."
       }
       updatedAt={english ? "11 November 2026" : "11. November 2026"}
     >
@@ -199,8 +199,8 @@ export function PrivacyPolicyPage({
       title={english ? "Privacy policy" : "Datenschutzerklärung"}
       description={
         english
-          ? "How hush handles data on the website, during downloads and for optional Verified Messages."
-          : "Wie hush auf der Website, beim Download und bei optionalen Verified Messages mit Daten umgeht."
+          ? "How clemii handles data on the website, during downloads and for optional Verified Messages."
+          : "Wie clemii auf der Website, beim Download und bei optionalen Verified Messages mit Daten umgeht."
       }
       updatedAt={english ? "22 November 2026" : "22. November 2026"}
     >
@@ -211,13 +211,13 @@ export function PrivacyPolicyPage({
       <Section title={english ? "2. Principle: local processing" : "2. Grundsatz: lokale Verarbeitung"}>
         <p>
           {english
-            ? "The core Mac app processes speech, transcripts, personal vocabulary and local AI refinements on the Mac. Using dictation or writing features alone does not transmit these contents to hush."
-            : "Die Kernfunktionen der Mac-App verarbeiten Sprache, Transkripte, persönliche Wörterbücher und lokale KI-Verfeinerungen grundsätzlich auf dem Mac. Diese Inhalte werden nicht allein durch die Nutzung der Diktier- oder Schreibfunktionen an hush übertragen."}
+            ? "The core Mac app processes speech, transcripts, personal vocabulary and local AI refinements on the Mac. Using dictation or writing features alone does not transmit these contents to clemii."
+            : "Die Kernfunktionen der Mac-App verarbeiten Sprache, Transkripte, persönliche Wörterbücher und lokale KI-Verfeinerungen grundsätzlich auf dem Mac. Diese Inhalte werden nicht allein durch die Nutzung der Diktier- oder Schreibfunktionen an clemii übertragen."}
         </p>
         <p>
           {english
-            ? "Data is transmitted to the hush service only for features that explicitly require a network connection, particularly downloads, update checks and optional published Verified Messages."
-            : "Eine Übertragung an den hush-Dienst erfolgt nur für Funktionen, die eine Netzwerkverbindung ausdrücklich benötigen, insbesondere Downloads, Update-Prüfungen und optional veröffentlichte Verified Messages."}
+            ? "Data is transmitted to the clemii service only for features that explicitly require a network connection, particularly downloads, update checks and optional published Verified Messages."
+            : "Eine Übertragung an den clemii-Dienst erfolgt nur für Funktionen, die eine Netzwerkverbindung ausdrücklich benötigen, insbesondere Downloads, Update-Prüfungen und optional veröffentlichte Verified Messages."}
         </p>
       </Section>
 
@@ -276,8 +276,8 @@ export function PrivacyPolicyPage({
         </p>
         <p>
           {english
-            ? "The message content is encrypted on the Mac before transmission. The decryption key remains in the private fragment of the shared link and is not sent to the hush service. Original audio is not uploaded as part of the public proof content. Anyone with the complete link can decrypt the encrypted content in their browser until it expires or is revoked."
-            : "Der Nachrichteninhalt wird vor der Übertragung auf dem Mac verschlüsselt. Der Entschlüsselungsschlüssel steht im privaten Fragment des geteilten Links und wird nicht an den hush-Dienst gesendet. Originalaudio wird nicht als Teil des öffentlichen Proof-Inhalts hochgeladen. Wer den vollständigen Link besitzt, kann den verschlüsselten Inhalt bis zum Ablauf oder Widerruf im eigenen Browser entschlüsseln."}
+            ? "The message content is encrypted on the Mac before transmission. The decryption key remains in the private fragment of the shared link and is not sent to the clemii service. Original audio is not uploaded as part of the public proof content. Anyone with the complete link can decrypt the encrypted content in their browser until it expires or is revoked."
+            : "Der Nachrichteninhalt wird vor der Übertragung auf dem Mac verschlüsselt. Der Entschlüsselungsschlüssel steht im privaten Fragment des geteilten Links und wird nicht an den clemii-Dienst gesendet. Originalaudio wird nicht als Teil des öffentlichen Proof-Inhalts hochgeladen. Wer den vollständigen Link besitzt, kann den verschlüsselten Inhalt bis zum Ablauf oder Widerruf im eigenen Browser entschlüsseln."}
         </p>
         <p>
           {english
@@ -313,8 +313,8 @@ export function PrivacyPolicyPage({
         </p>
         <p>
           {english
-            ? "When it is on, the app sends requests directly from your Mac to OpenAI under your own account, not through a hush server. For Live Write this is the text you dictated; your screen is not sent. For the assistant it is your request, text the assistant reads from the app you are working in and, when it helps, a screenshot of that window. The app asks OpenAI not to keep them as stored API responses (store: false). Because you use your own account, your ChatGPT account settings and OpenAI's privacy policy apply: depending on your ChatGPT data controls, OpenAI may keep your requests and use them to improve its models. You can turn model improvement off in ChatGPT's data controls. Requests count toward your plan's limits. The operator of hush does not receive or store this content. Insofar as the operator of hush is responsible for sending it to OpenAI at all, the legal basis is your consent under Article 6(1)(a) GDPR, which you give separately for each feature in the app and can withdraw at any time by turning that feature off or disconnecting."
-            : "Ist die Verbindung eingeschaltet, sendet die App Anfragen direkt von deinem Mac an OpenAI, unter deinem eigenen Konto und nicht über einen hush-Server. Bei Live Write ist das der diktierte Text; dein Bildschirm wird nicht gesendet. Beim Assistenten sind es deine Anfrage, Text, den der Assistent aus der App liest, in der du arbeitest, und, wenn es hilft, ein Bildschirmfoto dieses Fensters. Die App bittet OpenAI, sie nicht als gespeicherte API-Antworten aufzubewahren (store: false). Da du dein eigenes Konto nutzt, gelten die Einstellungen deines ChatGPT-Kontos und die Datenschutzerklärung von OpenAI: Je nach deinen ChatGPT-Datenkontrollen kann OpenAI deine Anfragen aufbewahren und zur Verbesserung seiner Modelle nutzen. Die Modellverbesserung kannst du in den Datenkontrollen von ChatGPT ausschalten. Anfragen zählen zu den Limits deines Tarifs. Der Betreiber von hush erhält und speichert diese Inhalte nicht. Soweit der Betreiber von hush für die Übermittlung an OpenAI überhaupt verantwortlich ist, ist Rechtsgrundlage deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO, die du in der App für jede Funktion einzeln erteilst und jederzeit widerrufen kannst, indem du die Funktion ausschaltest oder die Verbindung trennst."}
+            ? "When it is on, the app sends requests directly from your Mac to OpenAI under your own account, not through a clemii server. For Live Write this is the text you dictated; your screen is not sent. For the assistant it is your request, text the assistant reads from the app you are working in and, when it helps, a screenshot of that window. The app asks OpenAI not to keep them as stored API responses (store: false). Because you use your own account, your ChatGPT account settings and OpenAI's privacy policy apply: depending on your ChatGPT data controls, OpenAI may keep your requests and use them to improve its models. You can turn model improvement off in ChatGPT's data controls. Requests count toward your plan's limits. The operator of clemii does not receive or store this content. Insofar as the operator of clemii is responsible for sending it to OpenAI at all, the legal basis is your consent under Article 6(1)(a) GDPR, which you give separately for each feature in the app and can withdraw at any time by turning that feature off or disconnecting."
+            : "Ist die Verbindung eingeschaltet, sendet die App Anfragen direkt von deinem Mac an OpenAI, unter deinem eigenen Konto und nicht über einen clemii-Server. Bei Live Write ist das der diktierte Text; dein Bildschirm wird nicht gesendet. Beim Assistenten sind es deine Anfrage, Text, den der Assistent aus der App liest, in der du arbeitest, und, wenn es hilft, ein Bildschirmfoto dieses Fensters. Die App bittet OpenAI, sie nicht als gespeicherte API-Antworten aufzubewahren (store: false). Da du dein eigenes Konto nutzt, gelten die Einstellungen deines ChatGPT-Kontos und die Datenschutzerklärung von OpenAI: Je nach deinen ChatGPT-Datenkontrollen kann OpenAI deine Anfragen aufbewahren und zur Verbesserung seiner Modelle nutzen. Die Modellverbesserung kannst du in den Datenkontrollen von ChatGPT ausschalten. Anfragen zählen zu den Limits deines Tarifs. Der Betreiber von clemii erhält und speichert diese Inhalte nicht. Soweit der Betreiber von clemii für die Übermittlung an OpenAI überhaupt verantwortlich ist, ist Rechtsgrundlage deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO, die du in der App für jede Funktion einzeln erteilst und jederzeit widerrufen kannst, indem du die Funktion ausschaltest oder die Verbindung trennst."}
         </p>
         <p>
           {english
@@ -377,8 +377,8 @@ export function PrivacyPolicyPage({
         </p>
         <p>
           {english
-            ? "Where processing is based on legitimate interests, you can object on grounds relating to your particular situation (Article 21 GDPR). hush does not use these data for automated decisions with legal or similarly significant effects under Article 22 GDPR."
-            : "Beruht eine Verarbeitung auf berechtigten Interessen, kannst du aus Gründen deiner besonderen Situation widersprechen (Art. 21 DSGVO). hush verwendet diese Daten nicht für automatisierte Entscheidungen mit rechtlicher oder ähnlich erheblicher Wirkung nach Art. 22 DSGVO."}
+            ? "Where processing is based on legitimate interests, you can object on grounds relating to your particular situation (Article 21 GDPR). clemii does not use these data for automated decisions with legal or similarly significant effects under Article 22 GDPR."
+            : "Beruht eine Verarbeitung auf berechtigten Interessen, kannst du aus Gründen deiner besonderen Situation widersprechen (Art. 21 DSGVO). clemii verwendet diese Daten nicht für automatisierte Entscheidungen mit rechtlicher oder ähnlich erheblicher Wirkung nach Art. 22 DSGVO."}
         </p>
         <p>
           {english

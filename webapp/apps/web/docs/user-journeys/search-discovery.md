@@ -1,6 +1,6 @@
 # Public discovery journey
 
-A search crawler or social preview fetcher can read public hush pages without
+A search crawler or social preview fetcher can read public clemii pages without
 running JavaScript. Human visitors hydrate the same content and retain the
 existing entrance, WebGL, reduced-motion and mobile-download experiences.
 

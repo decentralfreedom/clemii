@@ -30,7 +30,7 @@ export async function verifyAndDecryptProof(input: {
     decodeBase64Url(input.metadata.receiptSignature),
     utf8(canonicalReceipt(input.metadata.receipt)),
   );
-  if (!receiptValid) throw new Error("The hush service receipt is invalid.");
+  if (!receiptValid) throw new Error("The clemii service receipt is invalid.");
 
   const ciphertextDigest = await sha256(input.ciphertext);
   if (ciphertextDigest !== input.metadata.receipt.ciphertextSha256) {
@@ -60,7 +60,7 @@ export async function verifyAndDecryptProof(input: {
   const manifestBytes = decodeBase64Url(proofPackage.manifest);
   const manifestCommitment = await sha256(manifestBytes);
   if (manifestCommitment !== input.metadata.receipt.commitment) {
-    throw new Error("The signed message does not match the hush receipt.");
+    throw new Error("The signed message does not match the clemii receipt.");
   }
   const installationKey = await crypto.subtle.importKey(
     "raw",

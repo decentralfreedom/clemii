@@ -5,13 +5,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { HushHud, type HushHudState } from "./HushHud";
+import { ClemiiHud, type ClemiiHudState } from "./ClemiiHud";
 import { ReactionPills } from "./workflow/ReactionPills";
 
-type WorkflowState = HushHudState;
+type WorkflowState = ClemiiHudState;
 
 const polishedText =
-  "quick update: the new onboarding flow is ready for review ✨ if you spot anything, send feedback my way today\n\n-typed with hush: behu.sh/s/clemoji";
+  "quick update: the new onboarding flow is ready for review ✨ if you spot anything, send feedback my way today\n\n-typed with clemii: behu.sh/s/clemoji";
 
 const stages: Array<{
   id: Exclude<WorkflowState, "ready" | "drafted">;
@@ -170,7 +170,7 @@ export function LocalWorkflowDemo() {
             Tue 10:42
           </span>
           <div className="ml-auto flex items-center gap-2.5 text-muted">
-            <HushMenuIcon />
+            <ClemiiMenuIcon />
             <WifiIcon />
             <BatteryIcon />
             <span className="hidden sm:inline">Wed 5. Aug 20:06</span>
@@ -194,7 +194,7 @@ export function LocalWorkflowDemo() {
 
             <div className="grid min-h-[390px] sm:grid-cols-[145px_minmax(0,1fr)]">
               <aside className="hidden bg-[#241327] px-3 py-4 text-white sm:block">
-                <div className="px-2 text-[12px] font-bold">hush team</div>
+                <div className="px-2 text-[12px] font-bold">clemii team</div>
                 <div className="mt-1 px-2 text-[9px] text-white/40">clemoji</div>
                 <p className="mt-7 px-2 text-[9px] font-bold uppercase tracking-[0.12em] text-white/35">
                   Channels
@@ -319,7 +319,7 @@ export function LocalWorkflowDemo() {
           </div>
 
           <ShortcutHint state={state} />
-          {state !== "ready" && <HushHud state={state} className="absolute bottom-7 left-1/2 z-[4] w-[calc(100%-3rem)] -translate-x-1/2 sm:bottom-9" />}
+          {state !== "ready" && <ClemiiHud state={state} className="absolute bottom-7 left-1/2 z-[4] w-[calc(100%-3rem)] -translate-x-1/2 sm:bottom-9" />}
         </div>
       </div>
 
@@ -413,7 +413,7 @@ function ChatMessage({
   );
 }
 
-function HushMenuIcon() {
+function ClemiiMenuIcon() {
   const heights = [5, 10, 14, 9, 5];
   return (
     <span className="flex h-3 items-center gap-px" aria-hidden="true">

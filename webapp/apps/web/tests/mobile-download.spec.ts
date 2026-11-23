@@ -16,12 +16,12 @@ test("phone visitors can share or copy the Mac link without downloading an insta
   await button.click();
   const sheet = page.getByRole("dialog", { name: "Meet you on your Mac." });
   await expect(sheet).toBeVisible();
-  await expect(sheet.getByText("hush runs on your Mac. Save the link for when you’re there.")).toBeVisible();
+  await expect(sheet.getByText("clemii runs on your Mac. Save the link for when you’re there.")).toBeVisible();
   const emailURL = await sheet.getByRole("link", { name: "Email myself the link" }).getAttribute("href");
   expect(emailURL).toMatch(/^mailto:\?/);
   expect(decodeURIComponent(emailURL!)).toContain("https://behu.sh/");
   await sheet.getByRole("button", { name: "Share link", exact: true }).click();
-  await expect(page.locator("html")).toHaveAttribute("data-shared", JSON.stringify({ title: "hush for Mac", text: "The voice layer for your Mac.", url: "https://behu.sh/" }));
+  await expect(page.locator("html")).toHaveAttribute("data-shared", JSON.stringify({ title: "clemii for Mac", text: "The voice layer for your Mac.", url: "https://behu.sh/" }));
   await sheet.getByRole("button", { name: "Copy link" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-copied", "https://behu.sh/");
   await expect(sheet.getByRole("status")).toHaveText("Link copied. Open it on your Mac.");
@@ -52,7 +52,7 @@ test("mobile handoff handles unavailable sharing and denied clipboard access", a
   await expect(sheet.getByRole("button", { name: "Share link" })).toHaveCount(0);
   await expect(sheet.getByRole("link", { name: "Email myself the link" })).toBeVisible();
   await sheet.getByRole("button", { name: "Copy link" }).click();
-  await expect(sheet.getByRole("textbox", { name: "hush download page" })).toBeFocused();
+  await expect(sheet.getByRole("textbox", { name: "clemii download page" })).toBeFocused();
   await expect(sheet.getByRole("status")).toHaveText("Select and copy the link below.");
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
   await page.keyboard.press("Escape");
@@ -85,5 +85,5 @@ test("iPad desktop browsing offers handoff while narrow Mac windows keep the dow
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload();
   await expect(page.getByRole("link", { name: "Download for Mac" }).first()).toHaveAttribute("href", /^\/download\?from=/);
-  await expect(page.getByRole("button", { name: "Get hush for Mac" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Get clemii for Mac" })).toHaveCount(0);
 });

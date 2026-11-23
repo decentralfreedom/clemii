@@ -1,6 +1,6 @@
 import { AppleIcon } from "../components/AppleIcon";
 import { DownloadLink } from "../components/DownloadExperience";
-import { HushMascotArtwork } from "../landing/HushMascot";
+import { ClemiiMascotArtwork } from "../landing/ClemiiMascot";
 import { Header } from "../layout/Header";
 import { AudioCapture } from "./components/AudioCapture";
 import { MessageComparison } from "./components/MessageComparison";
@@ -22,12 +22,12 @@ export function ProofPage({ slug }: { slug: string }) {
         {state.status === "loading" && <LoadingState />}
         {state.status === "valid" && <ValidProof proof={state.proof} />}
         {state.status === "expired" && <UnavailableState tone="warning" title="This proof expired" detail="The author chose a limited lifetime and the encrypted message is no longer available." />}
-        {state.status === "revoked" && <UnavailableState tone="warning" title="The author revoked this proof" detail="hush no longer serves this encrypted message." />}
-        {state.status === "missing_key" && <UnavailableState tone="neutral" title="This private proof link is incomplete" detail="Ask the sender to copy the complete private hush link, including everything after the # symbol." />}
+        {state.status === "revoked" && <UnavailableState tone="warning" title="The author revoked this proof" detail="clemii no longer serves this encrypted message." />}
+        {state.status === "missing_key" && <UnavailableState tone="neutral" title="This private proof link is incomplete" detail="Ask the sender to copy the complete private clemii link, including everything after the # symbol." />}
         {state.status === "invalid" && <UnavailableState tone="invalid" title="This message could not be verified" detail={state.message} />}
       </main>
       <footer className="proof-footer">
-        <p>Proof contents decrypt in this browser. hush does not receive the message key.</p>
+        <p>Proof contents decrypt in this browser. clemii does not receive the message key.</p>
         <a href="/datenschutz">Privacy</a>
       </footer>
     </div>
@@ -40,12 +40,12 @@ function ValidProof({ proof }: { proof: VerifiedProof }) {
   const hasAI = manifest.transformations.some(item => item.kind === "local_ai") || manifest.provenanceEvents?.some(event => event.kind === "local_ai_refined");
   const hasManualEdit = manifest.transformations.some(item => item.kind === "manual_hush_edit") || manifest.provenanceEvents?.some(event => event.kind === "manual_edit");
   const hasVoice = source === "microphone" || Boolean(manifest.voiceSegments?.length) || manifest.provenanceEvents?.some(event => event.kind === "voice_capture" || event.kind === "voice_section_added");
-  const sourceLabel = source === "microphone" ? "Created from voice" : source === "keyboard" ? "Typed in hush" : "Edited in hush";
+  const sourceLabel = source === "microphone" ? "Created from voice" : source === "keyboard" ? "Typed in clemii" : "Edited in clemii";
   return (
     <>
       <section className="proof-message" aria-label="Verified message">
         <div className="proof-message-top">
-          <VerificationBadge tone="valid" title="Verified hush message" detail="The signed capture and edit record matches." />
+          <VerificationBadge tone="valid" title="Verified clemii message" detail="The signed capture and edit record matches." />
           <span className="proof-private-label"><ProofIcon kind="lock" />Private proof</span>
         </div>
         <div className="proof-author-row">
@@ -86,7 +86,7 @@ function ValidProof({ proof }: { proof: VerifiedProof }) {
       </div>
 
       <section className="proof-invitation" aria-labelledby="invitation-title">
-        <div className="proof-hushy" aria-hidden="true"><HushMascotArtwork state="listening" /></div>
+        <div className="proof-clemii" aria-hidden="true"><ClemiiMascotArtwork state="listening" /></div>
         <div className="proof-invitation-copy">
           <h2 id="invitation-title">Give your words<br />a story, too.</h2>
           <p>Speak on your Mac. Share your words with a private record of how they came to be.</p>
@@ -99,7 +99,7 @@ function ValidProof({ proof }: { proof: VerifiedProof }) {
       </section>
 
       {manifest.activitySnapshot && <details className="proof-profile">
-        <summary>Author's signed hush activity</summary>
+        <summary>Author's signed clemii activity</summary>
         <p>{manifest.activitySnapshot.totalWordsSpoken.toLocaleString()} words spoken. {formatSavedTime(manifest.activitySnapshot.estimatedTimeSavedSeconds)} saved.</p>
         <p>This optional snapshot was signed when the message was created.</p>
       </details>}
@@ -132,7 +132,7 @@ function UnavailableState({ tone, title, detail }: { tone: "warning" | "invalid"
       <VerificationBadge tone={tone} title={title} detail={detail} />
       <div className="proof-unavailable-help">
         <p>Only a complete, valid signed record receives a verified status.</p>
-        <a href="/verified-messages">Learn how hush verification works</a>
+        <a href="/verified-messages">Learn how clemii verification works</a>
       </div>
     </section>
   );

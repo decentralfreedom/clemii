@@ -12,9 +12,9 @@ test("LANDING-NAV-001 shares clear navigation across public pages", async ({ pag
     }
     await expect(header.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", "https://github.com/decentralfreedom/hush");
     await expect(header.getByRole("link", { name: "GitHub" })).toHaveAttribute("rel", "noopener noreferrer");
-    await expect(header.getByRole("button", { name: "Community, coming soon" })).toBeDisabled();
+    await expect(header.getByRole("button", { name: "Community coming soon" })).toBeDisabled();
     await expect(header.getByRole("link", { name: "Verified Messages", exact: true })).toBeVisible();
-    await expect(header.getByRole(isMobile ? "button" : "link", { name: isMobile ? "Get hush for Mac" : "Download", exact: true })).toBeVisible();
+    await expect(header.getByRole(isMobile ? "button" : "link", { name: isMobile ? "Get clemii for Mac" : "Download", exact: true })).toBeVisible();
     await expect(header.getByRole("link", { name: /Privacy|What’s new/ })).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
     await header.screenshot({ path: testInfo.outputPath(`header-${path.replaceAll("/", "") || "home"}.png`) });

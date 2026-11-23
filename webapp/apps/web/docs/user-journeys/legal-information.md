@@ -1,6 +1,6 @@
 # Legal information journey
 
-This document defines how visitors find and read hush's legal information.
+This document defines how visitors find and read clemii's legal information.
 
 ## Goal
 
@@ -13,7 +13,7 @@ Footer legal link selected
   -> English legal document opens
   -> optional EN or DE language selection
   -> equivalent document opens at a stable language-specific URL
-  -> visitor returns through the shared hush header or footer
+  -> visitor returns through the shared clemii header or footer
 ```
 
 ## Content invariants
@@ -35,7 +35,7 @@ Footer legal link selected
 
 ### LEGAL-001 - Open the English legal information
 
-Given a visitor is on a public hush page, when they choose Legal notice or Privacy in the footer, then the English document opens with a matching title, language declaration, and canonical URL.
+Given a visitor is on a public clemii page, when they choose Legal notice or Privacy in the footer, then the English document opens with a matching title, language declaration, and canonical URL.
 
 ### LEGAL-002 - Read the German version
 
