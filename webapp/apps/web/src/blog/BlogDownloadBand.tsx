@@ -86,7 +86,7 @@ function DemoWindow({ demo, typed }: { demo: Demo; typed: boolean }) {
       <div className="blog-cta-window" data-kind="terminal">
         <div className="blog-cta-window-bar"><i /><i /><i /><span>{demo.title}</span></div>
         <div className="blog-terminal">
-          <p className="blog-terminal-line"><span className="blog-terminal-path">~/hush</span> % {demo.prompt}</p>
+          <p className="blog-terminal-line"><span className="blog-terminal-path">~/clemii</span> % {demo.prompt}</p>
           <div className="blog-terminal-box"><span className="blog-terminal-prompt">&gt;</span><Typed text={demo.text} typed={typed} className="blog-cta-window-text" /></div>
         </div>
       </div>
