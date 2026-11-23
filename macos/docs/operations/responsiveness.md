@@ -61,8 +61,8 @@ For the HUD, test multiple ordinary desktops, another app's full-screen Space,
 Stage Manager, and an external monitor with separate Spaces. The automated
 full-screen journey uses a controlled window; it does not certify every layout.
 
-If Hush hangs, Activity Monitor > hush > Sample Process captures thread stacks
-while the issue is live. Record Hush build, macOS version, selected models and
+If clemii hangs, Activity Monitor > clemii > Sample Process captures thread stacks
+while the issue is live. Record clemii build, macOS version, selected models and
 whether Accessibility or the audio device just changed. Share that sample only
 after reviewing it. Do not enable screen/audio/transcript recording for this check.
 

@@ -5,7 +5,7 @@ This document defines the user-visible contract for recording a dictation. See P
 ## Invariants
 
 - One dictation records for at most 2 minutes, so a stuck key or a lost key release cannot record forever.
-- Reaching the limit never throws audio away. hush stops listening, transcribes everything said until then and inserts it, exactly as if the key had been released.
+- Reaching the limit never throws audio away. clemii stops listening, transcribes everything said until then and inserts it, exactly as if the key had been released.
 - A key release that arrives after the limit does nothing more.
 - While recording, the audio is written to `~/Library/Application Support/Hush/Recordings/` as it arrives. It stays there only until the text is inserted, handed to the editor or Assistant, or found to hold no speech; a failed transcription keeps it. At most ten recordings are kept.
 
@@ -17,7 +17,7 @@ Given the user holds the hotkey and keeps talking for more than 2 minutes, when 
 
 ### DR-002 - Get back a dictation interrupted by a crash or sleep
 
-Given hush stopped while a dictation was recorded or transcribed (a crash, a force quit, a sleep), when hush starts again and its speech model is ready, then the recording is transcribed and kept in History as "Recovered", and the HUD says "Recovered an interrupted dictation. It is in History." With History off, the text is copied to the clipboard instead. Recovered text is never inserted, because the app it was meant for is unknown.
+Given clemii stopped while a dictation was recorded or transcribed (a crash, a force quit, a sleep), when clemii starts again and its speech model is ready, then the recording is transcribed and kept in History as "Recovered", and the HUD says "Recovered an interrupted dictation. It is in History." With History off, the text is copied to the clipboard instead. Recovered text is never inserted, because the app it was meant for is unknown.
 
 ## Test ownership
 

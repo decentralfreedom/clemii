@@ -23,13 +23,13 @@ final class OnboardingJourneyTests: XCTestCase {
         XCTAssertTrue(voiceTitle.waitForExistence(timeout: 3))
         XCTAssertTrue((voiceTitle.value as? String)?.contains("Test your") == true)
         XCTAssertTrue((voiceTitle.value as? String)?.contains("voice.") == true)
-        XCTAssertTrue(app.staticTexts["Say “Hello hush, this is my voice.”"].exists)
+        XCTAssertTrue(app.staticTexts["Say “Hello clemii, this is my voice.”"].exists)
         XCTAssertTrue(app.staticTexts["2 of 4"].exists)
-        XCTAssertFalse(app.staticTexts["Allow hush to listen and type."].exists)
+        XCTAssertFalse(app.staticTexts["Allow clemii to listen and type."].exists)
         keepScreenshot(named: "Onboarding 02 Voice ready")
 
         app.buttons["hush.onboarding.voice"].click()
-        XCTAssertTrue(app.staticTexts["Allow hush to listen and type."].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Allow clemii to listen and type."].waitForExistence(timeout: 3))
         XCTAssertFalse(app.buttons["hush.onboarding.permissions.continue"].isEnabled)
         keepScreenshot(named: "Onboarding 03 Contextual permissions")
 
@@ -50,7 +50,7 @@ final class OnboardingJourneyTests: XCTestCase {
 
         let transcript = app.staticTexts["hush.onboarding.transcript"]
         XCTAssertTrue(transcript.waitForExistence(timeout: 4))
-        XCTAssertTrue((transcript.value as? String)?.contains("Hello hush, this is my voice.") == true)
+        XCTAssertTrue((transcript.value as? String)?.contains("Hello clemii, this is my voice.") == true)
         XCTAssertTrue(app.buttons["hush.onboarding.primary"].isEnabled)
         keepScreenshot(named: "Onboarding 07 Voice result")
 
@@ -85,9 +85,9 @@ final class OnboardingJourneyTests: XCTestCase {
 
         app.buttons["hush.onboarding.primary"].click()
         XCTAssertTrue(app.staticTexts["Setting things up."].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["hush stays in your menu bar"].exists)
+        XCTAssertTrue(app.staticTexts["clemii stays in your menu bar"].exists)
         XCTAssertTrue(app.staticTexts["You’re ready."].waitForExistence(timeout: 3))
-        keepScreenshot(named: "Onboarding 10 Hush ready")
+        keepScreenshot(named: "Onboarding 10 clemii ready")
         XCTAssertTrue(app.staticTexts["Dashboard"].waitForExistence(timeout: 4))
         XCTAssertFalse(app.staticTexts["Proof it’s"].exists)
         keepScreenshot(named: "Onboarding 11 Dashboard handoff")
@@ -115,7 +115,7 @@ final class OnboardingJourneyTests: XCTestCase {
 
         app.buttons["hush.onboarding.primary"].click()
         XCTAssertTrue(app.checkBoxes["hush.onboarding.verified"].waitForExistence(timeout: 3))
-        XCTAssertEqual(app.buttons["hush.onboarding.primary"].label, "Set up hush")
+        XCTAssertEqual(app.buttons["hush.onboarding.primary"].label, "Set up clemii")
         XCTAssertTrue(app.staticTexts["Draft · not signed yet"].exists)
         keepScreenshot(named: "Onboarding 11 Proof optional")
 

@@ -24,7 +24,7 @@ enum OnboardingPracticeError: LocalizedError {
 @MainActor
 final class DictationCoordinator {
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "Coordinator")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "Coordinator")
 
     enum Phase: Equatable {
         case idle
@@ -254,7 +254,7 @@ final class DictationCoordinator {
     /// The model that hears the next vocabulary sample, once it is ready.
     var vocabularySampleModelID: String? { isModelReady ? loadedModelID : nil }
 
-    /// Records a clip for teaching hush a word (PRD R13): the same recorder and speech model
+    /// Records a clip for teaching clemii a word (PRD R13): the same recorder and speech model
     /// as dictation, but no HUD, history, journal or inserted text. Dictation waits meanwhile.
     func beginVocabularySample(onLevel: @escaping (Float) -> Void) throws {
         guard transcribeTask == nil, recorder.state != .recording, !onboardingPracticeActive, !vocabularySampleActive else {
@@ -342,7 +342,7 @@ final class DictationCoordinator {
             finalText: edit.finalText,
             language: Settings.shared.language,
             modelID: "hush-editor",
-            modelName: "hush Editor",
+            modelName: "clemii Editor",
             personaName: edit.personaName,
             providerName: edit.providerName,
             destinationBundleIdentifier: context.bundleIdentifier,
@@ -690,7 +690,7 @@ final class DictationCoordinator {
             return
         }
         guard !vocabularySampleActive else {
-            hud.flash(message: "hush is learning a word")
+            hud.flash(message: "clemii is learning a word")
             return
         }
         guard transcribeTask == nil else {
@@ -708,7 +708,7 @@ final class DictationCoordinator {
             Task {
                 let ok = await PermissionsChecker.requestMicrophone()
                 if ok { self.beginRecording(assistantID: assistantID) }
-                else if let assistantTarget { self.onAssistantCaptureState?(assistantTarget, "Allow microphone access in System Settings to talk to hush.") }
+                else if let assistantTarget { self.onAssistantCaptureState?(assistantTarget, "Allow microphone access in System Settings to talk to clemii.") }
                 else if editorTarget != nil { self.showComposerVoiceError("Microphone access is required") }
                 else { self.hud.flash(message: "Microphone access denied") }
             }

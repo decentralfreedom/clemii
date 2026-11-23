@@ -7,7 +7,7 @@ import OSLog
 @MainActor
 enum PermissionsChecker {
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "Permissions")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "Permissions")
 
     // MARK: Microphone
 

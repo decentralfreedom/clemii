@@ -66,7 +66,7 @@ final class MenuBarPanelView: NSView {
         action: { [weak self] in self?.onSettings() }
     )
     private lazy var quitRow = MenuActionRow(
-        title: "Quit hush",
+        title: "Quit clemii",
         trailing: "⌘Q",
         action: { [weak self] in self?.onQuit() }
     )

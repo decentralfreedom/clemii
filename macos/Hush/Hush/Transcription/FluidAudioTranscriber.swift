@@ -17,7 +17,7 @@ import FluidAudio
 nonisolated
 final class FluidAudioTranscriber: Transcriber, @unchecked Sendable {
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "FluidAudio")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "FluidAudio")
 
     /// 16 kHz mono, as required by the `Transcriber` protocol and Parakeet.
     static let sampleRate = 16_000

@@ -62,12 +62,12 @@ struct HushSelectionContext: Sendable {
 @MainActor
 final class SelectionCapture {
     private static let log = Logger(
-        subsystem: "com.decentralfreedom.hush",
+        subsystem: "com.decentralfreedom.clemii",
         category: "SelectionCapture"
     )
 
     /// Resolves the most useful editor context without retaining the surrounding
-    /// contents of the focused field. A retained Hush message enclosing the
+    /// contents of the focused field. A retained clemii message enclosing the
     /// selection or caret wins. Otherwise the editor opens blank and never
     /// treats arbitrary selected text as Hush-authored source.
     func resolveEditorContext(
@@ -183,7 +183,7 @@ final class SelectionCapture {
     }
 
     /// Revalidates an exact target after the editor closes. If the source changed
-    /// while Hush was open, this fails closed instead of replacing unrelated text.
+    /// while clemii was open, this fails closed instead of replacing unrelated text.
     func prepareDestination(_ context: HushSelectionContext) async -> Bool {
         switch context.destination {
         case .clipboard:

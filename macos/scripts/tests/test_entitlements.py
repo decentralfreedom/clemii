@@ -11,7 +11,7 @@ class EntitlementsTests(unittest.TestCase):
     def test_team_file_adds_only_the_keychain_group(self):
         base = plistlib.loads((APP / "Hush.entitlements").read_bytes())
         team = plistlib.loads((APP / "Hush-Team.entitlements").read_bytes())
-        self.assertEqual(team.pop("keychain-access-groups"), ["$(AppIdentifierPrefix)com.decentralfreedom.hush"])
+        self.assertEqual(team.pop("keychain-access-groups"), ["$(AppIdentifierPrefix)com.decentralfreedom.clemii"])
         self.assertEqual(team, base)
 
 

@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPOSITORY_DIRECTORY="$(cd "${SCRIPT_DIR}/.." && pwd)"
 RELEASE_DIRECTORY="${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}"
-APP="${RELEASE_DIRECTORY}/export/hush.app"
+APP="${RELEASE_DIRECTORY}/export/clemii.app"
 OUTPUT=""
 LOCAL=0
 while [[ $# -gt 0 ]]; do
@@ -13,7 +13,7 @@ while [[ $# -gt 0 ]]; do
     --output) OUTPUT="$2"; shift 2 ;;
     --local) LOCAL=1; shift ;;
     -h|--help)
-      echo "Usage: $0 [--app exported/hush.app] [--output file.dmg] [--local]"
+      echo "Usage: $0 [--app exported/clemii.app] [--output file.dmg] [--local]"
       echo "Default: signed local candidate. HUSH_NOTARIZE=1 submits to Apple."
       exit 0 ;;
     *) echo "Unknown argument: $1" >&2; exit 1 ;;
@@ -40,7 +40,7 @@ VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "${INF
 SLUG="$(/usr/libexec/PlistBuddy -c 'Print :HushReleaseSlug' "${INFO_PLIST}" 2>/dev/null || true)"
 BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "${INFO_PLIST}")"
 if [[ -z "${OUTPUT}" ]]; then
-  OUTPUT="${RELEASE_DIRECTORY}/dist/hush-${VERSION}${SLUG:+-${SLUG}}-build.${BUILD}.dmg"
+  OUTPUT="${RELEASE_DIRECTORY}/dist/clemii-${VERSION}${SLUG:+-${SLUG}}-build.${BUILD}.dmg"
 fi
 if [[ -e "${OUTPUT}" ]]; then
   echo "Output already exists; choose another path or resume its notarization: ${OUTPUT}" >&2
@@ -52,9 +52,9 @@ ASSET_ARGS=()
 ASSET_ARGS+=(--background "${SCRIPT_DIR}/dmg-background.png")
 # Headless images are only useful for local development, never distribution.
 [[ "${HUSH_DMG_HEADLESS:-0}" != "1" ]] || ASSET_ARGS+=(--skip-jenkins)
-create-dmg --volname hush --window-pos 200 120 --window-size 540 380 \
-  --icon-size 110 --text-size 13 --icon hush.app 140 180 --app-drop-link 400 180 \
-  --hide-extension hush.app ${ASSET_ARGS[@]+"${ASSET_ARGS[@]}"} --no-internet-enable --format UDZO \
+create-dmg --volname clemii --window-pos 200 120 --window-size 540 380 \
+  --icon-size 110 --text-size 13 --icon clemii.app 140 180 --app-drop-link 400 180 \
+  --hide-extension clemii.app ${ASSET_ARGS[@]+"${ASSET_ARGS[@]}"} --no-internet-enable --format UDZO \
   "${OUTPUT}" "${APP}"
 if [[ "${LOCAL}" == "0" ]]; then
   python3 "${SCRIPT_DIR}/check_dmg_layout.py" "${OUTPUT}" --app "${APP}"

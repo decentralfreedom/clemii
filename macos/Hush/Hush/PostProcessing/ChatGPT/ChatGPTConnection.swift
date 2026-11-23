@@ -9,7 +9,7 @@ import os
 actor ChatGPTConnection {
     static let shared = ChatGPTConnection()
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "ChatGPT")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "ChatGPT")
     private let store: ChatGPTCredentialStore
     private let urlSession: URLSession
     private let openBrowser: @Sendable (URL) async -> Void
@@ -290,7 +290,7 @@ nonisolated final class ChatGPTLoopbackServer: @unchecked Sendable {
             let target = request.split(separator: "\r\n").first?.split(separator: " ").dropFirst().first.map(String.init) ?? ""
             let isCallback = target.hasPrefix(ChatGPTOAuth.callbackPath)
             let body = isCallback
-                ? "<html><body style=\"font: 15px -apple-system; padding: 48px; text-align: center\"><h2>You can return to hush.</h2><p>This tab can be closed.</p></body></html>"
+                ? "<html><body style=\"font: 15px -apple-system; padding: 48px; text-align: center\"><h2>You can return to clemii.</h2><p>This tab can be closed.</p></body></html>"
                 : "Not found"
             let head = "HTTP/1.1 \(isCallback ? "200 OK" : "404 Not Found")\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n"
             connection.send(content: Data((head + body).utf8), completion: .contentProcessed { _ in connection.cancel() })

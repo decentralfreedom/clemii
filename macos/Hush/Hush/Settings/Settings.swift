@@ -36,11 +36,12 @@ struct EverydayTypingSample: Codable, Equatable, Identifiable {
 final class Settings {
     static let shared = Settings(defaults: sharedDefaults)
 
-    /// The user's preferences, except while hush hosts tests: then a throwaway domain, so no
+    /// The user's preferences, except while clemii hosts tests: then a throwaway domain, so no
     /// test reads or writes what the user set (as the timing store and recording journal do).
     private static var sharedDefaults: UserDefaults {
         let environment = ProcessInfo.processInfo.environment
         guard environment["HUSH_TEST_HOST"] == "1" || environment["XCTestConfigurationFilePath"] != nil else {
+            FormerIdentity.adoptPreferences(into: .standard)
             return .standard
         }
         let suite = "hush.tests.shared"
@@ -108,7 +109,7 @@ final class Settings {
     enum HUDPosition: String, Sendable {
         /// Bottom-centre of the active screen, ~40 pt above the Dock.
         case bottom
-        /// Top of the screen, anchored under the Hush menu-bar icon. Useful if the
+        /// Top of the screen, anchored under the clemii menu-bar icon. Useful if the
         /// user dictates into apps that have their own bottom controls (Slack, Notes).
         case top
     }
@@ -682,6 +683,25 @@ final class Settings {
         if let data = try? JSONEncoder().encode(results) {
             defaults.set(data, forKey: Keys.typingTestResults)
             didChange.send()
+        }
+    }
+}
+
+
+/// clemii was called hush, under another bundle identifier, and macOS keeps an app's preferences
+/// under its identifier. On the first launch under the new one, bring the old preferences over, so
+/// nobody sets the app up twice. What the app keeps in Application Support stays where it is.
+enum FormerIdentity {
+    static let bundleIdentifier = "com.decentralfreedom." + "hush"
+    private static let adoptedKey = "clemii.adoptedFormerPreferences"
+
+    /// Copies every former preference that has no value here yet. Safe to call more than once.
+    static func adoptPreferences(into defaults: UserDefaults, from former: [String: Any]? = nil) {
+        guard !defaults.bool(forKey: adoptedKey) else { return }
+        defaults.set(true, forKey: adoptedKey)
+        guard let former = former ?? defaults.persistentDomain(forName: bundleIdentifier) else { return }
+        for (key, value) in former where defaults.object(forKey: key) == nil {
+            defaults.set(value, forKey: key)
         }
     }
 }

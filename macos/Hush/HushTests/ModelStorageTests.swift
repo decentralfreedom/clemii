@@ -21,7 +21,7 @@ struct ModelStorageTests {
         }
     }
 
-    @Test("Every downloadable AI model lives in Hush application data")
+    @Test("Every downloadable AI model lives in clemii application data")
     func usesApplicationSupport() {
         let root = AIModelStorage.root.standardizedFileURL.path
         let applicationSupport = FileManager.default
@@ -44,7 +44,7 @@ struct ModelStorageTests {
     }
 
     #if canImport(HuggingFace)
-    @Test("Qwen downloader uses the private Hush Hub cache")
+    @Test("Qwen downloader uses the private clemii Hub cache")
     func qwenDownloaderUsesExplicitCache() {
         let session = URLSession(configuration: .ephemeral)
         defer { session.invalidateAndCancel() }
@@ -71,7 +71,7 @@ struct ModelStorageTests {
         ))
     }
 
-    @Test("Whisper model and tokenizer clients use Hush application data")
+    @Test("Whisper model and tokenizer clients use clemii application data")
     func whisperConfigurationHasNoImplicitDocumentsFallback() {
         let configuration = WhisperKitTranscriber.makeConfiguration(
             modelID: "base",
@@ -90,7 +90,7 @@ struct ModelStorageTests {
     }
     #endif
 
-    @Test("Legacy migration moves only Hush Qwen repositories")
+    @Test("Legacy migration moves only clemii Qwen repositories")
     func migratesOnlySupportedRepositories() throws {
         let temporary = FileManager.default.temporaryDirectory
             .appendingPathComponent("HushModelStorageTests-\(UUID().uuidString)", isDirectory: true)

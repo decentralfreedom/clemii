@@ -39,13 +39,13 @@ final class AssistantCompanionController: NSObject, ObservableObject {
     private var followTask: Task<Void, Never>?
     private var operationID = UUID()
     private var conversationID = UUID()
-    /// The conversation whose first spoken reply already said that hush is an AI assistant.
+    /// The conversation whose first spoken reply already said that clemii is an AI assistant.
     private var disclosedConversation: UUID?
 
     /// EU AI Act Art. 50(1): a voice assistant says it is AI when a conversation starts
     /// (Commission guidelines C(2026) 5054, para. 36: "a voice assistant that says at the
     /// beginning of a session that it is powered by AI"). The cursor's AI label covers sight.
-    static let spokenDisclosure = "This is hush\u{2019}s AI assistant."
+    static let spokenDisclosure = "This is clemii\u{2019}s AI assistant."
     private var lastInteraction = Date.distantPast
     private var panel: CompanionPanel?
     private var pointer: NSPanel?
@@ -91,8 +91,8 @@ final class AssistantCompanionController: NSObject, ObservableObject {
     var canRecordRequest: Bool { !mutationInFlight }
     var isWorking: Bool { [.listening, .transcribing, .thinking, .speaking, .acting].contains(phase) }
     func progressCaption(at now: Date) -> String {
-        guard isWorking else { return "hush · hold ⌃ Fn to talk" }
-        var parts = ["hush", sourceName]
+        guard isWorking else { return "clemii · hold ⌃ Fn to talk" }
+        var parts = ["clemii", sourceName]
         if [.thinking, .acting].contains(phase), let progress, !progress.checkpoints.isEmpty {
             parts.append("Step \(progress.checkpoints.count + 1)")
         }
@@ -768,7 +768,7 @@ final class AssistantCompanionController: NSObject, ObservableObject {
         cue.setFrame(rect.insetBy(dx: -3, dy: -3), display: true)
         cue.orderFrontRegardless()
         highlight = cue
-        // Keep Hush attached to the user's pointer; the outline identifies the real
+        // Keep clemii attached to the user's pointer; the outline identifies the real
         // destination without moving or hiding the user's cursor.
     }
 
@@ -857,7 +857,7 @@ private struct CompanionEscapeButton: NSViewRepresentable {
         button.refusesFirstResponder = true
         button.sendAction(on: .leftMouseDown)
         button.setAccessibilityIdentifier("hush.companion.stop")
-        button.setAccessibilityLabel("Stop Hush")
+        button.setAccessibilityLabel("Stop clemii")
         return button
     }
     func updateNSView(_ view: FirstClickButton, context: Context) { context.coordinator.action = action }
@@ -887,8 +887,8 @@ private struct CompanionCursorView: View {
                     .frame(width: 33, height: 37)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain).help("Talk to hush\u{2019}s AI assistant · Control + Fn")
-            .accessibilityLabel("Talk to hush\u{2019}s AI assistant").accessibilityIdentifier("hush.companion.microphone")
+            .buttonStyle(.plain).help("Talk to clemii\u{2019}s AI assistant · Control + Fn")
+            .accessibilityLabel("Talk to clemii\u{2019}s AI assistant").accessibilityIdentifier("hush.companion.microphone")
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
@@ -912,7 +912,7 @@ private struct CompanionCursorView: View {
                                 .foregroundStyle(.secondary)
                                 .padding(.horizontal, 4).padding(.vertical, 1)
                                 .overlay(RoundedRectangle(cornerRadius: 3).stroke(.secondary.opacity(0.6), lineWidth: 0.75))
-                                .help("hush\u{2019}s assistant is AI and can make mistakes.")
+                                .help("clemii\u{2019}s assistant is AI and can make mistakes.")
                                 .accessibilityLabel("AI assistant")
                                 .accessibilityIdentifier("hush.companion.ai-label")
                     }
@@ -920,7 +920,7 @@ private struct CompanionCursorView: View {
                     CompanionEscapeButton { controller.stop() }
                         .frame(width: 27, height: 20)
                         .background(.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 4))
-                        .help("Stop Hush; press again to dismiss")
+                        .help("Stop clemii; press again to dismiss")
                 }
                 .padding(.horizontal, 10).padding(.vertical, 8)
                 .background(.regularMaterial, in: Capsule())
@@ -947,8 +947,8 @@ private struct CompanionCursorView: View {
             Button(controller.voiceEnabled ? "Mute spoken replies" : "Enable spoken replies") { controller.toggleVoice() }
             Button("New conversation") { controller.newConversation() }
             Divider()
-            Button("hush settings") { controller.onSettings?() }
-            Button("Dismiss Hush") { controller.dismiss() }
+            Button("clemii settings") { controller.onSettings?() }
+            Button("Dismiss clemii") { controller.dismiss() }
         }
     }
 }
@@ -1012,7 +1012,7 @@ enum CoworkerCalendarDraft {
         return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Hush//Calendar Draft//EN", "BEGIN:VEVENT",
                 "UID:\(id.uuidString)@hush.local", "DTSTAMP:\(formatter.string(from: now))",
                 "DTSTART:\(formatter.string(from: start))", "DTEND:\(formatter.string(from: start.addingTimeInterval(Double(reply.minutes * 60))))",
-                "SUMMARY:\(title)", "DESCRIPTION:Prepared by hush. Review before adding. No invitations sent.",
+                "SUMMARY:\(title)", "DESCRIPTION:Prepared by clemii. Review before adding. No invitations sent.",
                 "END:VEVENT", "END:VCALENDAR", ""].joined(separator: "\r\n")
     }
 

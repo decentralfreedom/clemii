@@ -4,7 +4,7 @@ import OSLog
 
 /// Side-channel knowledge of each speech engine's on-disk model layout.
 ///
-/// Hush downloads models into its Application Support directory:
+/// clemii downloads models into its Application Support directory:
 ///   WhisperKit: `~/Library/Application Support/Hush/Models/huggingface/models/argmaxinc/whisperkit-coreml/openai_whisper-<id>/`
 ///   FluidAudio: `~/Library/Application Support/Hush/Models/fluidaudio/<repository folder>/`
 /// WhisperKit has no public API to query "is X downloaded" or to delete it, so we
@@ -12,7 +12,7 @@ import OSLog
 @MainActor
 enum ModelManager {
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "ModelManager")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "ModelManager")
 
     /// Hub root passed to WhisperKit. Models are application data, not user documents.
     /// Keeping them in Application Support avoids an unrelated Documents-folder privacy
@@ -75,7 +75,7 @@ enum ModelManager {
     /// Backwards-compat alias used by older call sites.
     static func isDownloaded(_ modelID: String) -> Bool { isAvailable(modelID) }
 
-    /// True specifically if the user has a complete copy in Hush's Application Support
+    /// True specifically if the user has a complete copy in clemii's Application Support
     /// cache. We check for the small `coremldata.bin` metadata file in all three of
     /// WhisperKit's CoreML containers — they're the last things written when an
     /// `.mlmodelc` is finalised, so seeing all three means the download finished and the

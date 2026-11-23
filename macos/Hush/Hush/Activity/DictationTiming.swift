@@ -40,13 +40,13 @@ struct DictationWaitSummary: Equatable, Sendable {
     }
 }
 
-/// The last dictation timings on this Mac, in a small JSON file beside hush's models.
+/// The last dictation timings on this Mac, in a small JSON file beside clemii's models.
 @MainActor
 final class DictationTimingStore {
     static let shared = DictationTimingStore()
     static let capacity = 500
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "Timing")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "Timing")
     private let url: URL
     private(set) var timings: [DictationTiming]
 

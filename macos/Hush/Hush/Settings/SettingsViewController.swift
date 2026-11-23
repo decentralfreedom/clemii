@@ -43,7 +43,7 @@ final class SettingsViewController: NSViewController {
     /// when on, the provider cards appear and the user picks a backend.
     /// Brand-tinted switch (not NSSwitch — see `BrandSwitch.swift` for
     /// why). Uses `DesignTokens.brand500` for the "on" track so the
-    /// control matches the rest of Hush's chrome instead of the
+    /// control matches the rest of clemii's chrome instead of the
     /// system-wide accent colour.
     private let enableSwitch = BrandSwitch()
     private let enableTitle = NSTextField(labelWithString: "Enable AI post-processing")
@@ -769,7 +769,7 @@ final class SettingsViewController: NSViewController {
         hudPositionButton.removeAllItems()
         hudPositionButton.addItem(withTitle: "Bottom of screen")
         hudPositionButton.lastItem?.representedObject = Settings.HUDPosition.bottom.rawValue
-        hudPositionButton.addItem(withTitle: "Top - under hush icon")
+        hudPositionButton.addItem(withTitle: "Top - under clemii icon")
         hudPositionButton.lastItem?.representedObject = Settings.HUDPosition.top.rawValue
         hudPositionButton.target = self
         hudPositionButton.action = #selector(hudPositionChanged(_:))
@@ -1207,7 +1207,7 @@ final class SettingsViewController: NSViewController {
         autoInsertCheck.state = .off
         storeNoticeLabel.stringValue = "The Mac App Store version doesn't auto-paste — text goes to the clipboard, press ⌘V to paste. The full version with auto-paste is available from the website."
         #else
-        storeNoticeLabel.stringValue = "Auto-paste needs Universal Access. Grant hush access in System Settings → Privacy & Security → Accessibility."
+        storeNoticeLabel.stringValue = "Auto-paste needs Universal Access. Grant clemii access in System Settings → Privacy & Security → Accessibility."
         #endif
     }
 

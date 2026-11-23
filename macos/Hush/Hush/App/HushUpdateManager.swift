@@ -1,7 +1,7 @@
 import AppKit
 import Sparkle
 
-/// Owns Hush's native macOS update lifecycle.
+/// Owns clemii's native macOS update lifecycle.
 ///
 /// Sparkle validates every archive with the public EdDSA key embedded in the
 /// app. Apple code signing and notarization remain release-pipeline concerns,
@@ -27,7 +27,7 @@ final class HushUpdateManager {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("--update-ui-test") {
             let alert = NSAlert()
-            alert.messageText = "hush updates are ready"
+            alert.messageText = "clemii updates are ready"
             alert.informativeText = "Release builds check updates.behu.sh and verify every update before installation."
             alert.addButton(withTitle: "OK")
             alert.runModal()

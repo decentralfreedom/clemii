@@ -15,7 +15,7 @@ struct TextInsertionContent {
 /// Inserts the recognized text into whatever app is currently focused.
 ///
 /// MVP path: clipboard + simulated ⌘V via `CGEvent`.
-/// Posting `CGEvent`s into other apps requires the user to grant **Accessibility** to Hush
+/// Posting `CGEvent`s into other apps requires the user to grant **Accessibility** to clemii
 /// in System Settings → Privacy & Security → Accessibility. Without it, we still copy to the
 /// clipboard and let the user paste manually (or surface the text in the HUD).
 ///
@@ -24,7 +24,7 @@ struct TextInsertionContent {
 @MainActor
 final class TextInserter {
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "TextInsert")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "TextInsert")
 
     enum Outcome: Equatable {
         case insertedAutomatically

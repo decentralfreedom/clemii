@@ -50,7 +50,7 @@ final class GeneralSettingsPageViewController: ControlCenterPageViewController {
         rows.spacing = 0
         rows.addArrangedSubview(ControlCenterKeyValueRow(
             title: "Dictation shortcut",
-            subtitle: "Press anywhere to start hush.",
+            subtitle: "Press anywhere to start clemii.",
             trailing: hotkeyControl
         ))
         rows.addArrangedSubview(ControlCenterKeyValueRow(
@@ -60,7 +60,7 @@ final class GeneralSettingsPageViewController: ControlCenterPageViewController {
         ))
         rows.addArrangedSubview(ControlCenterKeyValueRow(
             title: "Compose shortcut",
-            subtitle: "Edit a selection, reopen a hush message, or start fresh.",
+            subtitle: "Edit a selection, reopen a clemii message, or start fresh.",
             trailing: composeHotkeyControl
         ))
         rows.addArrangedSubview(ControlCenterKeyValueRow(
@@ -128,7 +128,7 @@ final class GeneralSettingsPageViewController: ControlCenterPageViewController {
         let store = DictationTimingStore.shared
         let entries: [(String, String, DictationWaitSummary?)] = [
             ("Dictation", "From releasing the key to text in your app.", store.summary(writing: false)),
-            ("With hush AI", "When Live Write or a persona writes the text.", store.summary(writing: true)),
+            ("With clemii AI", "When Live Write or a persona writes the text.", store.summary(writing: true)),
         ]
         for (index, entry) in entries.enumerated() {
             let value = NSTextField(labelWithString: Self.speedText(entry.2))
@@ -142,7 +142,7 @@ final class GeneralSettingsPageViewController: ControlCenterPageViewController {
         for row in rows.arrangedSubviews { row.widthAnchor.constraint(equalTo: rows.widthAnchor).isActive = true }
         addFullWidth(sectionTitle("Speed on this Mac"))
         addFullWidth(makeCard(content: rows))
-        addFullWidth(subtitle("Measured over your last 50 dictations and stored only on this Mac. hush keeps only the times, never what you said, and never sends them anywhere."))
+        addFullWidth(subtitle("Measured over your last 50 dictations and stored only on this Mac. clemii keeps only the times, never what you said, and never sends them anywhere."))
     }
 
     static func speedText(_ summary: DictationWaitSummary?) -> String {
@@ -473,7 +473,7 @@ private struct HUDSettingsPreviewBackground: View {
         }
         .clipped()
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Preview background for the hush HUD")
+        .accessibilityLabel("Preview background for the clemii HUD")
     }
 }
 
@@ -495,11 +495,11 @@ final class PermissionsSettingsPageViewController: ControlCenterPageViewControll
         super.loadView()
         addFullWidth(pageIntroduction(
             title: "Permissions",
-            detail: "See exactly which macOS permissions hush can use and why."
+            detail: "See exactly which macOS permissions clemii can use and why."
         ))
         overallStatus.font = .systemFont(ofSize: 22, weight: .semibold)
         overallStatus.textColor = .labelColor
-        let overallDetail = subtitle("Your microphone captures dictation. Accessibility lets hush insert it into other apps. Screen access for Assistant Beta is managed in hush AI > Assistant.")
+        let overallDetail = subtitle("Your microphone captures dictation. Accessibility lets clemii insert it into other apps. Screen access for Assistant Beta is managed in clemii AI > Assistant.")
         let overallStack = NSStackView(views: [overallStatus, overallDetail])
         overallStack.orientation = .vertical
         overallStack.alignment = .leading
@@ -589,7 +589,7 @@ final class AboutSettingsPageViewController: ControlCenterPageViewController {
     override func loadView() {
         super.loadView()
         addFullWidth(pageIntroduction(
-            title: "About hush",
+            title: "About clemii",
             detail: "Version, processing, and privacy details at a glance."
         ))
         let icon = NSImageView()
@@ -598,7 +598,7 @@ final class AboutSettingsPageViewController: ControlCenterPageViewController {
         icon.widthAnchor.constraint(equalToConstant: 74).isActive = true
         icon.heightAnchor.constraint(equalToConstant: 74).isActive = true
 
-        let name = NSTextField(labelWithString: "hush")
+        let name = NSTextField(labelWithString: "clemii")
         name.font = .systemFont(ofSize: 26, weight: .bold)
         name.textColor = .labelColor
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Development"

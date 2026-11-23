@@ -26,7 +26,7 @@ enum HushDestination: Hashable {
         case .transcription: return "Transcription"
         case .transcriptionEngine(let engine): return engine.familyName
         case .liveWrite: return "Live Write"
-        case .ai: return "hush AI"
+        case .ai: return "clemii AI"
         case .assistant: return "Assistant"
         case .interface: return "HUD & Menu"
         case .verifiedMessages: return "Verified Messages"
@@ -166,7 +166,7 @@ final class HushControlCenterViewController: NSViewController {
     }
 
     private func buildSidebar() {
-        searchField.placeholderString = "Search hush"
+        searchField.placeholderString = "Search clemii"
         searchField.font = .systemFont(ofSize: 12.5)
         searchField.translatesAutoresizingMaskIntoConstraints = false
         searchField.target = self
@@ -385,7 +385,7 @@ private final class SidebarRowView: NSView {
     private var isHovered = false { didSet { updateBackground() } }
 
     init(title: String, symbol: String, badge: String? = nil) {
-        searchText = (title + " " + (badge ?? "") + (title == "hush AI" ? " live write personas assistant beta screen recording models voice" : "")).lowercased()
+        searchText = (title + " " + (badge ?? "") + (title == "clemii AI" ? " live write personas assistant beta screen recording models voice" : "")).lowercased()
         super.init(frame: .zero)
         translatesAutoresizingMaskIntoConstraints = false
         wantsLayer = true

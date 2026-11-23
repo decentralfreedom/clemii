@@ -30,7 +30,7 @@ struct VoicePreparationProgressTests {
         }
         #expect(!labels(panel).contains("Hey Hush"))
         #expect(labels(panel).contains("Settings..."))
-        #expect(labels(panel).contains("Quit hush"))
+        #expect(labels(panel).contains("Quit clemii"))
         #expect(panel.subviews.allSatisfy { $0.frame.maxY <= panel.bounds.height })
     }
 

@@ -60,7 +60,7 @@ public enum TextContextMatcher {
     public static let minimumSimilarity = 0.95
     public static let minimumAutomaticMatchLength = 20
 
-    /// Finds the newest exact Hush output in the focused field. A directly
+    /// Finds the newest exact clemii output in the focused field. A directly
     /// adjacent proof signature is included so editing cannot leave a stale
     /// verification link behind.
     public static func match(
@@ -256,7 +256,7 @@ public enum TextContextMatcher {
         guard suffixLocation < field.length else { return result }
         let suffix = field.substring(from: suffixLocation) as NSString
         let signatureRange = suffix.range(
-            of: #"^(?:\n\n-typed with hush(?::[^\n]*)?)+"#,
+            of: #"^(?:\n\n-typed with clemii(?::[^\n]*)?)+"#,
             options: .regularExpression
         )
         if signatureRange.location == 0 { result.length += signatureRange.length }

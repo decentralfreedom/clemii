@@ -1,6 +1,6 @@
 //
 //  HushHUD.swift
-//  hush. - floating dictation HUD (SwiftUI)
+//  clemii. - floating dictation HUD (SwiftUI)
 //
 //  One shape, four states: listening, processing, signing, and inserted, plus a
 //  neutral notice slot for messages and errors ("Loading model...", "Copied",
@@ -18,7 +18,7 @@
 //    HushLabel        - two stacked lines, one slot per state
 //    HushWaveform     - live voice or local processing activity
 //    HushProofStatus  - a visually distinct encrypted-signing state
-//    HushSignature    - the inserted Hush attribution
+//    HushSignature    - the inserted clemii attribution
 //    HUDModel         - ObservableObject the AppKit controller drives
 //    HushHUDRoot      - binds the model to the view
 //
@@ -510,7 +510,7 @@ struct HushSignature: View {
             HStack(spacing: 0) {
                 Text("powered by ")
                     .foregroundColor(HUDPalette.secondary)
-                Text("hush.").foregroundColor(HUDPalette.primary).fontWeight(.bold)
+                Text("clemii.").foregroundColor(HUDPalette.primary).fontWeight(.bold)
             }
             .font(.system(size: 11.5, weight: .medium))
         }

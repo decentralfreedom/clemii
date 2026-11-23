@@ -1,6 +1,6 @@
-# hush for macOS
+# clemii for macOS
 
-The native app is part of the [hush monorepo](../README.md). This directory keeps
+The native app is part of the [clemii monorepo](../README.md). This directory keeps
 the Xcode project, speech models, Swift packages, tests and release tools together.
 
 From the repository root:
@@ -9,7 +9,7 @@ From the repository root:
 open macos/Hush/Hush.xcodeproj
 ```
 
-Use an Apple silicon Mac and Xcode 26.6. Select the **Hush** scheme and your own
+Use an Apple silicon Mac and Xcode 26.6. Select the **clemii** scheme and your own
 signing team. The app targets macOS 15 and later.
 
 Read the [development guide](docs/development.md) for pinned dependencies,

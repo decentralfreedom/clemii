@@ -6,7 +6,7 @@ final class LiveWritePageViewController: ControlCenterPageViewController {
     private let focusEnableAI: Bool
     private let feature = AIFeatureSwitchCard(
         title: "Live Write",
-        description: "Talk naturally. Ask for a text and hush writes it; anything else is cleaned up in your words.",
+        description: "Talk naturally. Ask for a text and clemii writes it; anything else is cleaned up in your words.",
         symbol: "text.bubble.fill",
         colors: AIFeatureIcon.liveWrite,
         identifier: "hush.livewrite"
@@ -106,7 +106,7 @@ final class LiveWritePageViewController: ControlCenterPageViewController {
         addFullWidth(sectionHeading("Writing engine"))
         engineModels.setAccessibilityIdentifier("hush.livewrite.engines")
         addFullWidth(makeCard(content: engineModels))
-        addFullWidth(subtitle("Qwen 3.5 4B wrote best in hush\u{2019}s tests. Engines on this Mac keep your words here and are shared with Assistant; with ChatGPT, what you dictate is sent to OpenAI."))
+        addFullWidth(subtitle("Qwen 3.5 4B wrote best in clemii\u{2019}s tests. Engines on this Mac keep your words here and are shared with Assistant; with ChatGPT, what you dictate is sent to OpenAI."))
     }
 
     /// Where Live Write steps aside (PRD R4): a standard list the user can change.
@@ -721,7 +721,7 @@ final class PersonaEditorSheetController: NSViewController, NSTextViewDelegate {
     }
 }
 
-/// Where Live Write stands, in one line, for the Live Write page and the hush AI page.
+/// Where Live Write stands, in one line, for the Live Write page and the clemii AI page.
 @MainActor
 struct LiveWriteStatus {
     let isOn: Bool
@@ -731,7 +731,7 @@ struct LiveWriteStatus {
     let progress: Double?
 
     /// The best engine that can write right now. Qwen 3.5 4B first: it wrote best in
-    /// hush's live persona benchmark (33/36 against Apple Intelligence's 28/36).
+    /// clemii's live persona benchmark (33/36 against Apple Intelligence's 28/36).
     static func bestReadyEngine() -> LLMProvider? {
         LLMRuntime.shared.refreshAppleAvailability()
         return [LLMProvider.qwen35_4b, .appleIntelligence, .qwen35_2b].first { LLMRuntime.shared.isReady(provider: $0) }

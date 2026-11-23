@@ -21,7 +21,7 @@ struct ChatGPTConnectionTests {
         Dictionary(uniqueKeysWithValues: (URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []).map { ($0.name, $0.value ?? "") })
     }
 
-    @Test("A first registration uses dynamic_agent_client, names hush and asks for plan usage")
+    @Test("A first registration uses dynamic_agent_client, names clemii and asks for plan usage")
     func registrationRequest() {
         let attempt = ChatGPTOAuth.Attempt.fresh(redirectURI: ChatGPTOAuth.redirectURI(port: 1455), clientID: nil)
         let url = ChatGPTOAuth.authorizationURL(for: attempt, hostID: "urn:uuid:host")
@@ -226,7 +226,7 @@ struct ChatGPTConnectionTests {
         }
     }
 
-    @Test("Errors before the stream map to what hush does next")
+    @Test("Errors before the stream map to what clemii does next")
     func admissionErrors() {
         func error(_ status: Int, _ code: String?, _ param: String? = nil) -> ChatGPTError {
             var object: [String: Any] = [:]

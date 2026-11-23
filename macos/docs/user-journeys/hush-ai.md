@@ -1,6 +1,6 @@
-# hush AI journey
+# clemii AI journey
 
-This document defines the user-visible contract for the hush AI area: Live Write, the AI writing feature, and Assistant, the voice coworker. See the Live Write PRD for the reasoning.
+This document defines the user-visible contract for the clemii AI area: Live Write, the AI writing feature, and Assistant, the voice coworker. See the Live Write PRD for the reasoning.
 
 ## Product intent
 
@@ -8,11 +8,11 @@ Each AI feature is one product with one switch. Its status says, in one line, wh
 
 ## Invariants
 
-- hush AI lists Live Write and Assistant as cards with an app-style icon, a one-line description, a status line, a switch and a chevron into the feature's page. The switches work in place.
-- Live Write is off for new installs. Turning it on picks the best ready engine (Qwen 3.5 4B, then Apple Intelligence, then Qwen 3.5 2B, ranked by hush's live persona benchmark). With no engine ready it stays on, says that dictation works as usual meanwhile, and offers `Download Qwen 3.5 4B`.
+- clemii AI lists Live Write and Assistant as cards with an app-style icon, a one-line description, a status line, a switch and a chevron into the feature's page. The switches work in place.
+- Live Write is off for new installs. Turning it on picks the best ready engine (Qwen 3.5 4B, then Apple Intelligence, then Qwen 3.5 2B, ranked by clemii's live persona benchmark). With no engine ready it stays on, says that dictation works as usual meanwhile, and offers `Download Qwen 3.5 4B`.
 - With Live Write on and no persona, a request becomes the requested text and anything else is cleaned up. A chosen persona applies on top. Turning Live Write off leaves the engine loaded for Assistant.
 - Settings from before Live Write keep their behaviour once: AI on with a persona becomes Live Write on with that persona; AI on with `No persona` stays plain dictation (Live Write off).
-- Assistant is on unless the user turns it off. Turning it on starts setup when something is missing. Turning it off keeps models and permissions, and its shortcut shows `Assistant is off. Turn it on in hush AI.` instead of opening.
+- Assistant is on unless the user turns it off. Turning it on starts setup when something is missing. Turning it off keeps models and permissions, and its shortcut shows `Assistant is off. Turn it on in clemii AI.` instead of opening.
 - During Assistant setup the card shows the current step; at a permission step it offers `Open System Settings` and `Cancel`.
 - Live Write's Writing engine is one always-visible list, recommended first: Qwen 3.5 4B, Apple Intelligence, Qwen 3.5 2B, then ChatGPT. Each row has its status and one action (Use, Download, Continue with ChatGPT); the engine in use says Active.
 - ChatGPT is the user's own plan through Sign in with ChatGPT. `Continue with ChatGPT` first says what leaves the Mac (what is dictated, sent to OpenAI; no screen, no password, no chats) and that the user's ChatGPT settings and OpenAI's privacy policy apply, so OpenAI may keep requests and use them to improve its models unless the user turns that off in ChatGPT's data controls (as Apple's ChatGPT extension discloses). Its help button (?) opens OpenAI's privacy policy. Then it opens the browser. Connected, the row shows the model and `Using ChatGPT plan`; its More menu holds the model, `Manage Usage…` and `Disconnect ChatGPT…`. Disconnecting revokes the session and says when OpenAI did not confirm it.
@@ -23,7 +23,7 @@ Each AI feature is one product with one switch. Its status says, in one line, wh
 
 ### AI-001 - See and switch the AI features
 
-Given the user opens hush AI, then Live Write and Assistant each show their status and a switch. Turning a switch changes the feature in place; the chevron or the card opens its page.
+Given the user opens clemii AI, then Live Write and Assistant each show their status and a switch. Turning a switch changes the feature in place; the chevron or the card opens its page.
 
 ### AI-002 - Turn on Live Write
 
@@ -31,7 +31,7 @@ Given Live Write is off, when the user turns it on, then it uses the best ready 
 
 ### AI-003 - Write without a persona
 
-Given Live Write is on with `None` selected, when the user dictates "write Tom that I'm running ten minutes late", then hush inserts the finished message; a plain dictation is inserted cleaned up.
+Given Live Write is on with `None` selected, when the user dictates "write Tom that I'm running ten minutes late", then clemii inserts the finished message; a plain dictation is inserted cleaned up.
 
 ### AI-004 - Turn Assistant on and off
 
@@ -39,7 +39,7 @@ Given Assistant is on but not set up, when the user turns it on or chooses `Set 
 
 ### AI-005 - Write with a ChatGPT plan
 
-Given Live Write's engine list, when the user chooses `Continue with ChatGPT`, then hush explains what is sent, the browser handles sign-in and consent, and the ChatGPT row offers `Use`. With ChatGPT in use, dictations are written on the plan and the HUD shows the cloud mark; at a limit the dictation is written on this Mac and a note says so.
+Given Live Write's engine list, when the user chooses `Continue with ChatGPT`, then clemii explains what is sent, the browser handles sign-in and consent, and the ChatGPT row offers `Use`. With ChatGPT in use, dictations are written on the plan and the HUD shows the cloud mark; at a limit the dictation is written on this Mac and a note says so.
 
 ### AI-006 - Assistant with a ChatGPT plan
 
@@ -51,7 +51,7 @@ Given Live Write is on, when the user dictates into a terminal, a code editor, a
 
 ### AI-008 - The assistant says it is AI
 
-Given the assistant's companion is on screen, its status shows a persistent `AI` label, and its microphone control reads "Talk to hush's AI assistant" to sight and VoiceOver. When spoken replies are on, the first spoken reply of each conversation starts with "This is hush's AI assistant." New conversations, and conversations resumed after 15 idle minutes, say it again. The draft window's subtitle reads "hush's AI assistant, right here." This meets EU AI Act Art. 50(1); see `docs/operations/ai-act.md`.
+Given the assistant's companion is on screen, its status shows a persistent `AI` label, and its microphone control reads "Talk to clemii's AI assistant" to sight and VoiceOver. When spoken replies are on, the first spoken reply of each conversation starts with "This is clemii's AI assistant." New conversations, and conversations resumed after 15 idle minutes, say it again. The draft window's subtitle reads "clemii's AI assistant, right here." This meets EU AI Act Art. 50(1); see `docs/operations/ai-act.md`.
 
 ## Test ownership
 

@@ -6,7 +6,7 @@ import Tokenizers
 import Testing
 @testable import Hush
 
-/// Opt-in evaluation with the installed models: a persona decides what hush does
+/// Opt-in evaluation with the installed models: a persona decides what clemii does
 /// with a dictation. Run with HUSH_PERSONA_LIVE=1 (and TEST_RUNNER_HUSH_PERSONA_LIVE=1).
 /// Sampling varies, so each case runs several times and reports how many runs pass.
 @Suite("Personas on the installed models", .serialized,
@@ -136,7 +136,7 @@ struct PersonaLiveTests {
             problems += has(output, #"\b(um|uh)\b"#, "kept filler words")
             return problems
         },
-        // Languages hush has no special code for: the model decides and writes in them.
+        // Languages clemii has no special code for: the model decides and writes in them.
         Case(name: "writes the described email in French", profile: writer,
              dictation: "écris un mail à Paul pour lui dire que je serai en retard demain matin et que la réunion peut commencer sans moi") { output in
             var problems = clean(output) + lacks(output, ["Paul", "demain", "retard", "réunion"])
@@ -215,7 +215,7 @@ struct PersonaLiveTests {
 
     /// The prompt Qwen actually receives: with thinking off, Qwen 3.5's chat template opens the
     /// reply with an empty think block, so the model answers instead of reasoning in plain text.
-    @Test("hush's Qwen prompt reaches the model with thinking switched off")
+    @Test("clemii's Qwen prompt reaches the model with thinking switched off")
     func qwenPromptHasThinkingOff() async throws {
         let snapshot = try #require(LLMRuntime.cachedQwenSnapshotURL(for: .qwen35_4b))
         let container = try await VLMModelFactory.shared.loadContainer(from: snapshot, using: #huggingFaceTokenizerLoader())
@@ -231,6 +231,6 @@ struct PersonaLiveTests {
         }
         print("[persona-live] rendered Qwen prompt:\n\(rendered)")
         #expect(rendered.hasSuffix("<|im_start|>assistant\n<think>\n\n</think>\n\n"))
-        #expect(rendered.contains("<|im_start|>system\nYou are the writing step of hush"))
+        #expect(rendered.contains("<|im_start|>system\nYou are the writing step of clemii"))
     }
 }

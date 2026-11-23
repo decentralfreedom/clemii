@@ -55,11 +55,11 @@ struct OnboardingComponentTests {
         flow.goForward()
         #expect(flow.page == .proof)
         #expect(flow.proofState == .off)
-        #expect(flow.primaryTitle == "Set up hush")
+        #expect(flow.primaryTitle == "Set up clemii")
         #expect(flow.primaryEnabled)
     }
 
-    @Test("Finishing gathers the local setup before opening Hush")
+    @Test("Finishing gathers the local setup before opening clemii")
     func completionHandoff() {
         let flow = makeFlow()
         flow.page = .proof
@@ -81,7 +81,7 @@ struct OnboardingComponentTests {
         #expect(controller.window?.contentView?.frame.size == NSSize(width: 1280, height: 860))
         #expect(controller.window?.minSize == NSSize(width: 980, height: 700))
         #expect(controller.window?.maxSize == NSSize(width: 1440, height: 960))
-        #expect(controller.window?.title == "Welcome to hush")
+        #expect(controller.window?.title == "Welcome to clemii")
     }
 
     private func makeFlow() -> OnboardingFlowModel {

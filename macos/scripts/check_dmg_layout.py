@@ -21,7 +21,7 @@ def check_volume(volume: Path, background: Path, expected_app: Path | None = Non
     applications = volume / "Applications"
     if not applications.is_symlink() or applications.readlink() != Path("/Applications"):
         raise ValueError("Applications must be a link to /Applications")
-    app_plist = volume / "hush.app/Contents/Info.plist"
+    app_plist = volume / "clemii.app/Contents/Info.plist"
     with app_plist.open("rb") as source:
         metadata = plistlib.load(source)
     if expected_app is not None:

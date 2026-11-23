@@ -94,24 +94,24 @@ enum CoworkerMailDebugCheck {
                     guard destination.capturedBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
                         throw CoworkerError.changedContext
                     }
-                    let first = AssistantCompanionController.draft("Hush development check 🧪\n\nGuten Morgen, Grüße aus München.\n\nThis is an unsent editor test.")
-                    let result = try await destination.insert(first, subject: "Hush editor validation")
+                    let first = AssistantCompanionController.draft("clemii development check 🧪\n\nGuten Morgen, Grüße aus München.\n\nThis is an unsent editor test.")
+                    let result = try await destination.insert(first, subject: "clemii editor validation")
                     report["insert_result"] = String(describing: result)
                     guard result == .verified else { throw CoworkerError.changedContext }
                     let current = try CoworkerMailDraftTarget(application: mail)
                     let revision = try destination.revisionTarget(current: current) as! CoworkerMailDraftTarget
-                    let revised = AssistantCompanionController.draft("Hush development check 🧪\n\nThe follow-up edit is verified. Grüße!\n\nThis is an unsent editor test.")
-                    report["revision_result"] = String(describing: try await revision.insert(revised, subject: "Hush follow-up verified"))
+                    let revised = AssistantCompanionController.draft("clemii development check 🧪\n\nThe follow-up edit is verified. Grüße!\n\nThis is an unsent editor test.")
+                    report["revision_result"] = String(describing: try await revision.insert(revised, subject: "clemii follow-up verified"))
                     let after = try CoworkerMailDraftTarget(application: mail)
-                    report["subject_verified"] = after.capturedSubject == "Hush follow-up verified"
-                    report["no_duplicate"] = after.capturedBody.components(separatedBy: "Hush development check").count == 2
+                    report["subject_verified"] = after.capturedSubject == "clemii follow-up verified"
+                    report["no_duplicate"] = after.capturedBody.components(separatedBy: "clemii development check").count == 2
                     report["body_verified"] = after.capturedBody.trimmingCharacters(in: .whitespacesAndNewlines) == revised.plainText
                     do { try current.validate(); report["stale_snapshot_rejected"] = false }
                     catch { report["stale_snapshot_rejected"] = true }
                     // A second write (the original model's mistaken action) must still replace the document.
-                    report["repeat_write_result"] = String(describing: try await after.insert(revised, subject: "Hush follow-up verified"))
+                    report["repeat_write_result"] = String(describing: try await after.insert(revised, subject: "clemii follow-up verified"))
                     let final = try CoworkerMailDraftTarget(application: mail)
-                    report["repeat_write_no_duplicate"] = final.capturedBody.components(separatedBy: "Hush development check").count == 2
+                    report["repeat_write_no_duplicate"] = final.capturedBody.components(separatedBy: "clemii development check").count == 2
                 }
             } catch { report["error"] = String(describing: error); report["description"] = error.localizedDescription }
             let path = ProcessInfo.processInfo.environment["HUSH_MAIL_PROBE_PATH"] ?? "/private/tmp/hush-mail-editor-check.json"

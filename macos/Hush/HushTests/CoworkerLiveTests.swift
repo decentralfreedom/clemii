@@ -6,7 +6,7 @@ import NaturalLanguage
 import Testing
 @testable import Hush
 
-/// Opt-in integration evidence using installed Qwen/Parakeet and Hush's permanent
+/// Opt-in integration evidence using installed Qwen/Parakeet and clemii's permanent
 /// Kokoro cache. Synthetic fixtures do not establish real-user speech accuracy.
 @Suite("Coworker local stack", .serialized,
        .enabled(if: ProcessInfo.processInfo.environment["HUSH_COWORKER_LIVE"] == "1"))

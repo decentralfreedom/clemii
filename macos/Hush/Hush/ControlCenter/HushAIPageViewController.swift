@@ -1,7 +1,7 @@
 import AppKit
 import Combine
 
-/// hush AI: the two AI features side by side as rows you can switch on right here, with
+/// clemii AI: the two AI features side by side as rows you can switch on right here, with
 /// where each stands and the one next step, the way System Settings lists features.
 @MainActor
 final class HushAIPageViewController: ControlCenterPageViewController {
@@ -10,7 +10,7 @@ final class HushAIPageViewController: ControlCenterPageViewController {
     private var timer: Timer?
     private let liveWrite = AIFeatureSwitchCard(
         title: "Live Write",
-        description: "Talk naturally. Ask for a text and hush writes it; anything else is cleaned up in your words.",
+        description: "Talk naturally. Ask for a text and clemii writes it; anything else is cleaned up in your words.",
         symbol: "text.bubble.fill",
         colors: AIFeatureIcon.liveWrite,
         identifier: "hush.ai.livewrite"
@@ -34,7 +34,7 @@ final class HushAIPageViewController: ControlCenterPageViewController {
     override func loadView() {
         super.loadView()
         stack.spacing = 12
-        addFullWidth(aiPageHeader(title: "hush AI", detail: "Private AI that runs on this Mac. Turn on what you need."))
+        addFullWidth(aiPageHeader(title: "clemii AI", detail: "Private AI that runs on this Mac. Turn on what you need."))
         stack.setCustomSpacing(22, after: stack.arrangedSubviews.last!)
         for card in [liveWrite, assistant] {
             card.toggle.controlSize = .small

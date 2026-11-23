@@ -26,7 +26,7 @@ final class RingedIcon: NSView {
         layer?.masksToBounds = false
 
         // Behind everything: ripple rings (drawn first so they sit under the icon).
-        // Two-tone rose and lilac halo from the Hush aurora family.
+        // Two-tone rose and lilac halo from the clemii aurora family.
         let ringTints = [DesignTokens.auroraRose, DesignTokens.lilac]
         for (i, ring) in rings.enumerated() {
             ring.fillColor = NSColor.clear.cgColor

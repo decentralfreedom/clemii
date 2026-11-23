@@ -1,6 +1,6 @@
 # Developer ID distribution
 
-Hush distributes directly from its website using Developer ID. An App Store
+clemii distributes directly from its website using Developer ID. An App Store
 Connect app record is not required. Notarization is Apple's automated security
 check, not App Review and not a guarantee of application correctness.
 
@@ -43,18 +43,18 @@ human review or peer-reviewed experimental results. Checked 2026-11-04.
 | Source | Practice used | Boundary |
 | --- | --- | --- |
 | [Apple notarization](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution) and [custom workflow](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow) | Developer ID, hardened runtime, secure timestamps, notarytool, stapling | Only Apple's service can accept a submission |
-| [Apple packaging workflow](https://developer.apple.com/documentation/xcode/packaging-mac-software-for-distribution) | Sign nested code, submit only the outermost distribution container, staple it | Hush's drag-and-drop DMG is not a custom installer requiring two submissions |
+| [Apple packaging workflow](https://developer.apple.com/documentation/xcode/packaging-mac-software-for-distribution) | Sign nested code, submit only the outermost distribution container, staple it | clemii's drag-and-drop DMG is not a custom installer requiring two submissions |
 | [Apple distribution testing](https://developer.apple.com/forums/thread/706442) | `syspolicy_check distribution`, clean-machine download test | Local checks cannot reproduce every recipient machine |
 | [Sparkle signing guidance](https://sparkle-project.github.io/documentation/sandboxing/#code-signing) | Archive/export re-signs helpers; preserve nested entitlements | Do not use `codesign --deep` to sign; it is appropriate for verification |
-| [UTM packaging source](https://github.com/utmapp/UTM/blob/main/scripts/package_mac.sh) | Explicit export method and separate exported artifact | UTM's QEMU signing exceptions and provisioning are not needed by Hush |
-| [CodexBar release source](https://github.com/steipete/CodexBar/blob/main/Scripts/sign-and-notarize.sh) | Staple before final ZIP; distribution assessment after notarization | Hush uses Xcode export instead of copying a SwiftPM-specific signing implementation |
+| [UTM packaging source](https://github.com/utmapp/UTM/blob/main/scripts/package_mac.sh) | Explicit export method and separate exported artifact | UTM's QEMU signing exceptions and provisioning are not needed by clemii |
+| [CodexBar release source](https://github.com/steipete/CodexBar/blob/main/Scripts/sign-and-notarize.sh) | Staple before final ZIP; distribution assessment after notarization | clemii uses Xcode export instead of copying a SwiftPM-specific signing implementation |
 | [Apple Swift package CI](https://developer.apple.com/documentation/xcode/building-swift-packages-or-apps-that-use-them-in-continuous-integration-workflows) | Check in resolved dependencies; reject silent resolution updates | Pinned dependencies improve repeatability, not byte-identical signed output |
 | [MLX platform requirements](https://ml-explore.github.io/mlx/build/html/install.html) and [FluidAudio](https://github.com/FluidInference/FluidAudio) | Support Apple Silicon for the current local AI stack | A successful Intel compile is not inference compatibility evidence |
 | [Sparkle publishing](https://sparkle-project.org/documentation/publishing/) | Generated arm64 hardware requirement, checked before upload | Older updater clients require migration review |
 
 ## One submission or two
 
-Rechecked against Apple's documentation on 2026-11-04: submit Hush's signed
+Rechecked against Apple's documentation on 2026-11-04: submit clemii's signed
 drag-and-drop DMG once. Apple's packaging guidance explicitly recommends the
 outermost container, and its custom workflow explains that nested signed code
 receives tickets from that submission. Finder styling from `create-dmg` does not
@@ -72,7 +72,7 @@ add another upload and completion dependency, so retain the single submission.
 that some submissions need additional analysis. Its
 [workflow guidance](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow)
 recommends reducing file count, keeping large non-executable data out of uploads,
-avoiding heavily compressed images, and checking image integrity. Hush downloads
+avoiding heavily compressed images, and checking image integrity. clemii downloads
 models separately, uses UDZO, verifies the image on mount, and retains submission
 IDs instead of retrying uploads. These reduce avoidable work, but do not guarantee
 Apple's processing time or acceptance.
@@ -116,13 +116,13 @@ team `3A22UK7C9L`, and signing fails if the matching private key is unavailable.
 - Swift package tests, Hono integration and the full Release archive pass.
 - Smoke-test MLX, WhisperKit, FluidAudio/Parakeet, Kokoro and Sparkle on the
   exported app before removing a hardened-runtime exception permanently.
-- Hush supports Apple Silicon only. Do not produce or advertise an Intel build:
+- clemii supports Apple Silicon only. Do not produce or advertise an Intel build:
   the MLX inference path requires Apple Silicon on macOS. Prebuilt nested
   frameworks may retain additional signed slices; the app executable is arm64 only.
 - Record clean-Mac offline installation as unverified unless actually tested.
   A local signature check does not prove that installation journey.
 
-Apple's queue and first-submission checks are outside Hush's control. Keep model
+Apple's queue and first-submission checks are outside clemii's control. Keep model
 downloads outside the app bundle, use the default accelerated upload, avoid
 unnecessary resubmissions and retain the submission ID. Do not promise a fixed
 notarization time or bypass notarytool's preflight with `--force`.
@@ -138,7 +138,7 @@ xcrun notarytool info SUBMISSION_ID --keychain-profile HushNotary
 the saved Apple log even on success, then validate the distribution with
 `check_distribution.py --phase postflight`. Do not submit again just to query
 status. If the packaging command timed out, resume the saved DMG submission
-with `notarize-artifact.sh --resume SUBMISSION_ID path/to/hush.dmg`, then staple
+with `notarize-artifact.sh --resume SUBMISSION_ID path/to/clemii.dmg`, then staple
 and check the exported app before building its Sparkle ZIP.
 
 ## Alpha.4 distribution record
@@ -230,7 +230,7 @@ ChatGPT plan (#100, #101, #122), speech rounds (#105), recording safety (#102,
   in version and revision, so the build reran with `HUSH_TRUST_PINNED_BUILD_TOOLS=1`
   into a fresh `artifacts/release-alpha7-b`.
 - Preflight: Developer ID Application (team `3A22UK7C9L`), secure timestamp, hardened
-  runtime, `keychain-access-groups` = `3A22UK7C9L.com.decentralfreedom.hush`, no
+  runtime, `keychain-access-groups` = `3A22UK7C9L.com.decentralfreedom.clemii`, no
   `get-task-allow`; `syspolicy_check` reported only the expected missing ticket.
 - Only submission: DMG `2b082548-f1cd-4bdb-8e1a-9fe1995fcab9`, Accepted, "Ready for
   distribution", no issues, 39 files in the ticket. The exported app was stapled
@@ -282,7 +282,7 @@ Published 2026-11-20 (UTC) as `0.1.0-alpha.9 (18)` from clean source revision
 `1c567d57725dcda71c852ff07a23789a4319f92b` (main after #136, no local changes),
 built with Xcode 26.6. The assistant switch stops ⌃ Fn and ends a running
 conversation, local models leave memory while unused (#133), and the app writes
-hush in lowercase (#134).
+clemii in lowercase (#134).
 
 - `Package.resolved` is unchanged since alpha.8, so the build used
   `HUSH_TRUST_PINNED_BUILD_TOOLS=1` into `artifacts/release-alpha9`.

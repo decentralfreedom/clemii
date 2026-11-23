@@ -3,7 +3,7 @@ import Testing
 @testable import Hush
 
 @MainActor
-@Suite("Hush selection editor state")
+@Suite("clemii selection editor state")
 struct HushSelectionEditorStateTests {
     @Test("Safe progress stages follow observable generation state")
     func safeProgressStages() {

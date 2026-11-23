@@ -1,4 +1,4 @@
-# Developing hush
+# Developing clemii
 
 ## Toolchain
 
@@ -18,7 +18,7 @@ Run these commands from `macos/` in the monorepo:
 open Hush/Hush.xcodeproj
 ```
 
-Select the **Hush** scheme. Under **Signing & Capabilities**, select your own team
+Select the **clemii** scheme. Under **Signing & Capabilities**, select your own team
 for the targets you build. Review the pinned package plugins and macros before
 trusting them in Xcode. Run with **⌘R**.
 
@@ -47,7 +47,7 @@ or environment:
 ```sh
 HUSH_PROOF_SERVICE_URL=http://127.0.0.1:4000 \
 HUSH_PROOF_SHORT_URL=http://127.0.0.1:4000/s/ \
-  /path/to/hush.app/Contents/MacOS/hush
+  /path/to/clemii.app/Contents/MacOS/clemii
 ```
 
 Remote endpoints must use HTTPS. HTTP is accepted only for loopback addresses.
@@ -96,7 +96,7 @@ operation works.
 
 ## Releases
 
-hush is in alpha. The numeric bundle version and increasing build number are
+clemii is in alpha. The numeric bundle version and increasing build number are
 separate from prerelease tags such as `v0.1.0-alpha.5`. Release assets must match
 the committed source revision. Beta requires the core journeys to be
 feature-complete without known critical issues; 1.0 also requires a stable data

@@ -76,12 +76,12 @@ def check(artifact, team, phase):
         "--all-architectures", str(artifact))
     if artifact.suffix == ".app":
         info = plistlib.loads((artifact / "Contents/Info.plist").read_bytes())
-        if info["CFBundleIdentifier"] != "com.decentralfreedom.hush":
+        if info["CFBundleIdentifier"] != "com.decentralfreedom.clemii":
             raise ValueError("Unexpected bundle identifier")
         main_binary = artifact / "Contents/MacOS" / info["CFBundleExecutable"]
         main_arches = run("/usr/bin/lipo", "-archs", str(main_binary)).stdout.split()
         if main_arches != ["arm64"]:
-            raise ValueError("Hush releases must be Apple Silicon-only (arm64)")
+            raise ValueError("clemii releases must be Apple Silicon-only (arm64)")
         # Do not follow framework symlinks and inspect the same executable twice.
         for path in sorted(artifact.rglob("*")):
             if path.is_symlink() or not path.is_file():

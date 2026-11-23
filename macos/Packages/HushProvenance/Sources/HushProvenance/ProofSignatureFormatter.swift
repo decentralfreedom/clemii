@@ -19,10 +19,10 @@ public enum ProofSignatureFormatter {
     }
 
     public static func content(for text: String, proofURL: URL) -> ProofSignatureContent {
-        let plainText = "\(text)\n\n-typed with hush: \(proofURL.absoluteString)"
+        let plainText = "\(text)\n\n-typed with clemii: \(proofURL.absoluteString)"
         let richText = NSMutableAttributedString(string: "\(text)\n\n-")
         richText.append(NSAttributedString(
-            string: "typed with hush",
+            string: "typed with clemii",
             attributes: [.link: proofURL]
         ))
         return ProofSignatureContent(plainText: plainText, richText: richText)

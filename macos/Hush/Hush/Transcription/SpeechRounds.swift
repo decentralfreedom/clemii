@@ -89,7 +89,7 @@ struct SpeechRounds: Sendable {
     }
 
     /// What release still has to transcribe. With a usable round, only the last stretch;
-    /// otherwise everything uncommitted, as hush did before rounds.
+    /// otherwise everything uncommitted, as clemii did before rounds.
     func releaseWindow(end: TimeInterval) -> Window {
         if let cut = cut {
             return Window(start: max(0, cut - plan.releaseBefore), end: end)

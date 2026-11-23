@@ -1,4 +1,4 @@
-# hush macOS agent guidance
+# clemii macOS agent guidance
 
 Read `docs/user-journeys/verified-messages.md` before changing Verified Messages, transcription insertion, or the HUD. Preserve its journey IDs and trust invariants in code and tests.
 

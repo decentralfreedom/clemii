@@ -5,15 +5,15 @@ This document defines the user-visible contract for measuring a local typing pac
 ## Journey
 
 1. The user opens Time Saved from Dashboard and starts the typing benchmark.
-2. Hush opens a focused 30-second sheet and places keyboard focus in the passage automatically.
+2. clemii opens a focused 30-second sheet and places keyboard focus in the passage automatically.
 3. Before the first keystroke, the active word is shown as the immediate target and highlighted inside the passage. The timer does not start early.
 4. While the user types, the full active word remains quietly highlighted for context. The exact next character receives the stronger marker, including a visible marker when Space is next.
 5. Correctness remains character-based: correct characters, incorrect characters, and spacing are tracked independently. Mistakes remain visibly marked without turning the whole word into an error state.
 6. Time remaining is the primary live metric. WPM and accuracy stay visible as supporting feedback without competing with the passage.
-7. After 30 seconds or completion of the passage, Hush stores the result locally and updates the personalized time-saved estimate.
+7. After 30 seconds or completion of the passage, clemii stores the result locally and updates the personalized time-saved estimate.
 8. The user can close the sheet or run another fresh passage.
 
-The passage is the dominant surface. It uses a comfortable macOS reading size, generous line spacing, and enough horizontal room to maintain the user's place. Hush does not add game modes, leaderboards, sound effects, or decorative controls to this calibration task.
+The passage is the dominant surface. It uses a comfortable macOS reading size, generous line spacing, and enough horizontal room to maintain the user's place. clemii does not add game modes, leaderboards, sound effects, or decorative controls to this calibration task.
 
 Optional everyday typing measurement uses a listen-only event tap and stores only daily counts and active seconds. Turning measurement off, losing Accessibility permission, or quitting must stop monitoring without repeatedly saving an unchanged aggregate. Changes after shutdown must not restart the monitor.
 

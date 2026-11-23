@@ -148,7 +148,7 @@ struct ModelInfo: Identifiable, Hashable, Sendable, Codable {
                 multilingual: true,
                 tier: .large,
                 lastModified: ISO8601DateFormatter().date(from: "2024-09-30T00:00:00Z"),
-                notes: "Bundled with hush - works offline."
+                notes: "Bundled with clemii - works offline."
             ))
         }
         if hasPhysicalBundle(id: "base") {
@@ -159,7 +159,7 @@ struct ModelInfo: Identifiable, Hashable, Sendable, Codable {
                 multilingual: true,
                 tier: .small,
                 lastModified: nil,
-                notes: "Bundled with hush - works offline."
+                notes: "Bundled with clemii - works offline."
             ))
         }
         return entries

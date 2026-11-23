@@ -62,7 +62,7 @@ struct KeyCombo: Codable, Equatable, Sendable {
     ///   Plain `⌘D` was rejected (conflicts with Safari/Finder/Mail),
     ///   `⌘⌥D` was rejected (three keys = awkward), `⌃Space` was rejected
     ///   (conflicts with input-source cycling on multilingual setups, and
-    ///   Hush is by definition multilingual). Alfred power-users who have
+    ///   clemii is by definition multilingual). Alfred power-users who have
     ///   already claimed `⌥Space` can rebind in Settings → Hotkey.
     static let defaultHotkey: KeyCombo = {
         #if APP_STORE
@@ -77,7 +77,7 @@ struct KeyCombo: Codable, Equatable, Sendable {
         #endif
     }()
 
-    /// Opens the contextual Hush editor without changing the dictation gesture.
+    /// Opens the contextual clemii editor without changing the dictation gesture.
     /// Option-Shift-Space is consistent across keyboard layouts and avoids the
     /// standard macOS shortcuts that use Command-Space or Control-Space.
     static let defaultComposeHotkey = KeyCombo.combo(

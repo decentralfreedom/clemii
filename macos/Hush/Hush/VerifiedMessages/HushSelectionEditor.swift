@@ -290,7 +290,7 @@ final class HushSelectionEditorViewController: NSViewController, NSWindowDelegat
     private let chatStack = NSStackView()
     private let instructionTextView = HushPromptTextView()
     private let instructionScroll = NSScrollView()
-    private let instructionPlaceholder = NSTextField(labelWithString: "Tell hush what should change…")
+    private let instructionPlaceholder = NSTextField(labelWithString: "Tell clemii what should change…")
     private let conversationModelPicker = NSButton()
     private let conversationModelMenu = NSMenu()
     private let microphoneButton = NSButton()
@@ -620,7 +620,7 @@ final class HushSelectionEditorViewController: NSViewController, NSWindowDelegat
         instructionTextView.onSubmit = { [weak self] in self?.sendInstruction() }
         instructionTextView.setAccessibilityIdentifier("hush.editor.ai.prompt")
         instructionScroll.documentView = instructionTextView
-        instructionPlaceholder.stringValue = "Message hush…"
+        instructionPlaceholder.stringValue = "Message clemii…"
         instructionPlaceholder.font = .systemFont(ofSize: 14)
         instructionPlaceholder.textColor = .placeholderTextColor
         instructionPlaceholder.translatesAutoresizingMaskIntoConstraints = false
@@ -1126,7 +1126,7 @@ final class HushSelectionEditorViewController: NSViewController, NSWindowDelegat
         header.translatesAutoresizingMaskIntoConstraints = false
         card.addSubview(header)
 
-        let body = NSTextField(wrappingLabelWithString: text.isEmpty ? "Start in Compose, then ask hush to shape it." : text)
+        let body = NSTextField(wrappingLabelWithString: text.isEmpty ? "Start in Compose, then ask clemii to shape it." : text)
         body.font = .systemFont(ofSize: 14)
         body.textColor = text.isEmpty ? .tertiaryLabelColor : .labelColor
         body.isSelectable = !text.isEmpty

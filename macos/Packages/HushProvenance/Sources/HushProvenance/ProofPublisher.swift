@@ -316,18 +316,18 @@ public enum ProofPublisherError: LocalizedError, Sendable, Equatable {
     public var errorDescription: String? {
         switch self {
         case .registrationUnavailable:
-            "The Hush verification service is currently unavailable. Try again later."
+            "The clemii verification service is currently unavailable. Try again later."
         case let .registrationRejected(_, message):
-            "Hush could not register this Mac. \(message)"
+            "clemii could not register this Mac. \(message)"
         case .installationNotFound:
-            "This Mac is not registered with the Hush verification service."
+            "This Mac is not registered with the clemii verification service."
         case .publicationUnavailable:
-            "The Hush verification service is currently unavailable. Try again later."
+            "The clemii verification service is currently unavailable. Try again later."
         case let .publicationRejected(_, message):
-            "Hush could not secure this message. \(message)"
+            "clemii could not secure this message. \(message)"
         case .invalidExpiry: "The proof expiry is invalid."
         case .invalidReservation: "The proof reservation did not match the signed message."
-        case .invalidReceipt: "The Hush receipt did not match the encrypted proof."
+        case .invalidReceipt: "The clemii receipt did not match the encrypted proof."
         case .uploadFailed: "The encrypted proof could not be uploaded."
         }
     }

@@ -28,7 +28,7 @@ struct DictationActivity: Equatable, Identifiable {
     var sourceText: String? = nil
 
     var isHushEditorOutput: Bool {
-        duration == 0 && modelName == "hush Editor"
+        duration == 0 && modelName == "clemii Editor"
     }
 }
 
@@ -282,7 +282,7 @@ final class ActivityStore: ObservableObject {
         saveAndReload()
     }
 
-    /// Retains text created or edited inside Hush so the contextual shortcut can
+    /// Retains text created or edited inside clemii so the contextual shortcut can
     /// reopen it later. Editor output is deliberately excluded from voice activity
     /// and time-saved metrics.
     func recordEditorOutput(
@@ -307,7 +307,7 @@ final class ActivityStore: ObservableObject {
             duration: 0,
             wordCount: trimmed.split { $0.isWhitespace }.count,
             modelID: "hush-editor",
-            modelName: "hush Editor",
+            modelName: "clemii Editor",
             personaName: personaName,
             providerName: providerName,
             copiedToClipboard: copiedToClipboard,

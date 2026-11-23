@@ -17,7 +17,7 @@ final class VerifiedMessageDestinationJourneyTests: XCTestCase {
 
         XCTAssertTrue(
             app.staticTexts["Where signatures appear"].waitForExistence(timeout: 5),
-            "Typed with hush should expose destination controls in its existing settings page"
+            "Typed with clemii should expose destination controls in its existing settings page"
         )
         XCTAssertTrue(app.staticTexts["Signature destinations"].exists)
         XCTAssertTrue(app.popUpButtons["hush.verified.destinationMode"].exists)

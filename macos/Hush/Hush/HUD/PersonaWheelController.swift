@@ -750,7 +750,7 @@ final class PersonaWheelDebugJourneyController {
             backing: .buffered,
             defer: false
         )
-        window.title = "hush Persona Wheel"
+        window.title = "clemii Persona Wheel"
         window.isRestorable = false
         window.contentView = content
 

@@ -41,15 +41,23 @@ function ribbon(name: string, me: Brother, other: Brother, from: number, to: num
 }
 const sphere = R * globe;
 // Each ribbon's end lies over the other's start, so the big one's end is drawn again on top.
-const inside = `<defs>
+const globeDefs = `<defs>
 <linearGradient id="globe" x1=".15" y1=".1" x2=".85" y2=".9"><stop offset="0" stop-color="#b874ff"/><stop offset=".45" stop-color="#6a4afd"/><stop offset="1" stop-color="#1f3bdc"/></linearGradient>
 <radialGradient id="globe-shade" cx=".7" cy=".76" r=".75"><stop offset="0" stop-color="#1a1a9c" stop-opacity=".55"/><stop offset="1" stop-color="#1a1a9c" stop-opacity="0"/></radialGradient>
-</defs>
-<g id="globe-ball"><circle cx="${cx}" cy="${cy}" r="${n(sphere)}" fill="url(#globe)"/><circle cx="${cx}" cy="${cy}" r="${n(sphere)}" fill="url(#globe-shade)"/>
-<ellipse cx="${n(cx - sphere * 0.36)}" cy="${n(cy - sphere * 0.52)}" rx="${n(sphere * 0.36)}" ry="${n(sphere * 0.15)}" fill="#fff" fill-opacity=".38" transform="rotate(-32 ${n(cx - sphere * 0.36)} ${n(cy - sphere * 0.52)})"/></g>
-${ribbon("big-brother-cape", big, small, big.head, big.tip)}
-${ribbon("clemii-cape", small, big, small.head, small.tip)}
-${ribbon("big-brother-cape-end", big, small, small.head, big.tip)}`;
+</defs>`;
+const globeBall = `<circle cx="${cx}" cy="${cy}" r="${n(sphere)}" fill="url(#globe)"/><circle cx="${cx}" cy="${cy}" r="${n(sphere)}" fill="url(#globe-shade)"/>`;
+const globeGloss = `<ellipse cx="${n(cx - sphere * 0.36)}" cy="${n(cy - sphere * 0.52)}" rx="${n(sphere * 0.36)}" ry="${n(sphere * 0.15)}" fill="#fff" fill-opacity=".38" transform="rotate(-32 ${n(cx - sphere * 0.36)} ${n(cy - sphere * 0.52)})"/>`;
+const ribbons = {
+  warm: ribbon("big-brother-cape", big, small, big.head, big.tip),
+  cool: ribbon("clemii-cape", small, big, small.head, small.tip),
+  warmEnd: ribbon("big-brother-cape-end", big, small, small.head, big.tip),
+};
+const inside = `${globeDefs}
+<g id="globe-ball">${globeBall}
+${globeGloss}</g>
+${ribbons.warm}
+${ribbons.cool}
+${ribbons.warmEnd}`;
 // A square box about the ring, with a hair of room.
 const reach = R * 1.02;
 const box = `${n(cx - reach)} ${n(cy - reach)} ${n(reach * 2)} ${n(reach * 2)}`;
@@ -89,3 +97,27 @@ for (const [state, { template, fills, extra = "", defs = "" }] of Object.entries
     properties: { "preserves-vector-representation": true, ...(template ? { "template-rendering-intent": "template" } : {}) },
   }, null, 2)}\n`);
 }
+
+// The macOS app icon, as an Icon Composer document, the format Apple asks for: square, unmasked
+// vector layers on a 1024 canvas with the content centred; the system masks the corners and lays
+// Liquid Glass over the layers, so the globe carries no painted gloss of its own here. The
+// background is the document's fill, not a layer.
+const icon = `${web}../../../macos/Hush/Hush/AppIcon.icon/`;
+rmSync(icon, { recursive: true, force: true });
+mkdirSync(`${icon}Assets`, { recursive: true });
+// The ring is 620 points across on the 1024 canvas.
+const layer = (content: string) => `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024"><g transform="translate(512 512) scale(${310 / R}) translate(${-cx} ${-cy})">${content}</g></svg>\n`;
+writeFileSync(`${icon}Assets/globe.svg`, layer(`${globeDefs}${globeBall}`));
+writeFileSync(`${icon}Assets/ribbon-warm.svg`, layer(ribbons.warm));
+writeFileSync(`${icon}Assets/ribbon-cool.svg`, layer(ribbons.cool));
+writeFileSync(`${icon}Assets/ribbon-warm-end.svg`, layer(ribbons.warmEnd));
+const group = (names: string[]) => ({
+  layers: names.map((name) => ({ "image-name": `${name}.svg`, name })),
+  shadow: { kind: "neutral", opacity: 0.5 },
+  translucency: { enabled: false, value: 0.5 },
+});
+writeFileSync(`${icon}icon.json`, `${JSON.stringify({
+  fill: { "automatic-gradient": "extended-srgb:0.96000,0.95500,1.00000,1.00000" },
+  groups: [group(["globe"]), group(["ribbon-warm-end", "ribbon-cool", "ribbon-warm"])],
+  "supported-platforms": { squares: ["macOS"] },
+}, null, 2)}\n`);

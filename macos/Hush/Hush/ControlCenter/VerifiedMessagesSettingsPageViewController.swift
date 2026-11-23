@@ -27,7 +27,7 @@ final class VerifiedMessagesSettingsPageViewController: ControlCenterPageViewCon
     override func loadView() {
         super.loadView()
         addFullWidth(pageIntroduction(
-            title: "Typed with hush",
+            title: "Typed with clemii",
             detail: "Add a private proof link that shows how a message was captured and refined."
         ))
         buildEnableCard()
@@ -82,7 +82,7 @@ final class VerifiedMessagesSettingsPageViewController: ControlCenterPageViewCon
 
         rows.addArrangedSubview(ControlCenterKeyValueRow(
             title: "Verified Messages",
-            subtitle: "Append a link only after hush receives a matching cryptographic receipt.",
+            subtitle: "Append a link only after clemii receives a matching cryptographic receipt.",
             trailing: enabledSwitch
         ))
 
@@ -216,11 +216,11 @@ final class VerifiedMessagesSettingsPageViewController: ControlCenterPageViewCon
             : "\(exceptionCount) rules"
         destinationExceptionsButton.isEnabled = enabled && destinationMode == .smart
         signaturePreview.stringValue = presentation == .visibleURL
-            ? "-typed with hush: behu.sh/A7k2Qx#k=private-key"
-            : "-typed with hush"
+            ? "-typed with clemii: behu.sh/A7k2Qx#k=private-key"
+            : "-typed with clemii"
         statusLabel.stringValue = enabled
             ? "Message contents are encrypted on this Mac. The private key exists only in the link."
-            : "Off by default. Normal hush messages never contain a signature or upload a proof."
+            : "Off by default. Normal clemii messages never contain a signature or upload a proof."
     }
 
     @objc private func enabledChanged(_ sender: NSSwitch) {
@@ -230,8 +230,8 @@ final class VerifiedMessagesSettingsPageViewController: ControlCenterPageViewCon
             return
         }
         let alert = NSAlert()
-        alert.messageText = "Enable Typed with hush links?"
-        alert.informativeText = "hush will upload an end-to-end encrypted message proof after dictation. The decryption key stays in the link, and original audio is not shared."
+        alert.messageText = "Enable Typed with clemii links?"
+        alert.informativeText = "clemii will upload an end-to-end encrypted message proof after dictation. The decryption key stays in the link, and original audio is not shared."
         alert.addButton(withTitle: "Enable")
         alert.addButton(withTitle: "Cancel")
         guard alert.runModal() == .alertFirstButtonReturn else {
@@ -255,11 +255,11 @@ final class VerifiedMessagesSettingsPageViewController: ControlCenterPageViewCon
                 Settings.shared.verifiedMessagesEnabled = false
                 let errorAlert = NSAlert()
                 errorAlert.alertStyle = .warning
-                errorAlert.messageText = "Typed with hush could not be enabled"
+                errorAlert.messageText = "Typed with clemii could not be enabled"
                 errorAlert.informativeText = if let publisherError = error as? ProofPublisherError {
                     publisherError.localizedDescription
                 } else {
-                    "hush could not create a private signing identity on this Mac. Try again."
+                    "clemii could not create a private signing identity on this Mac. Try again."
                 }
                 errorAlert.addButton(withTitle: "OK")
                 errorAlert.runModal()
@@ -329,7 +329,7 @@ private final class VerifiedMessageDestinationExceptionsViewController: NSViewCo
         let title = NSTextField(labelWithString: "Destination Exceptions")
         title.font = .systemFont(ofSize: 20, weight: .bold)
         let detail = NSTextField(wrappingLabelWithString:
-            "hush never publishes or appends a proof in these apps or websites. Your message still inserts normally."
+            "clemii never publishes or appends a proof in these apps or websites. Your message still inserts normally."
         )
         detail.font = .systemFont(ofSize: 11.5)
         detail.textColor = .secondaryLabelColor

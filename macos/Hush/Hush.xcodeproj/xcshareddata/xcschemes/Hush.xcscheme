@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1AF6C48F2FAC951000E7E55B"
-               BuildableName = "hush.app"
+               BuildableName = "clemii.app"
                BlueprintName = "Hush"
                ReferencedContainer = "container:Hush.xcodeproj">
             </BuildableReference>
@@ -96,7 +96,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1AF6C48F2FAC951000E7E55B"
-            BuildableName = "hush.app"
+            BuildableName = "clemii.app"
             BlueprintName = "Hush"
             ReferencedContainer = "container:Hush.xcodeproj">
          </BuildableReference>
@@ -113,7 +113,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1AF6C48F2FAC951000E7E55B"
-            BuildableName = "hush.app"
+            BuildableName = "clemii.app"
             BlueprintName = "Hush"
             ReferencedContainer = "container:Hush.xcodeproj">
          </BuildableReference>

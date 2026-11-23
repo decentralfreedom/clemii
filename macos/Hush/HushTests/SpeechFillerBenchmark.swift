@@ -9,7 +9,7 @@ import FluidAudio
 /// How each speech engine handles hesitation sounds, on the corpus in
 /// Fixtures/Speech/filler-clips.json: fillers left, reference words lost, word error
 /// rate against the clean reference and time per clip, per engine and language.
-/// The engines run as hush runs them; Bark 3.0 Clean runs through FluidAudio directly.
+/// The engines run as clemii runs them; Bark 3.0 Clean runs through FluidAudio directly.
 ///
 /// Opt-in, because it needs clips and downloaded models:
 ///   scripts/speech-benchmark-clips.sh /tmp/clips

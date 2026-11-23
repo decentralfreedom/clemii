@@ -52,7 +52,7 @@ struct VerifiedMessageText {
 @MainActor
 final class VerifiedMessageCoordinator {
     private static let log = Logger(
-        subsystem: "com.decentralfreedom.hush",
+        subsystem: "com.decentralfreedom.clemii",
         category: "VerifiedMessages"
     )
     private static let configuration = ProofServiceConfiguration.current
@@ -115,7 +115,7 @@ final class VerifiedMessageCoordinator {
                 text: draft.finalText,
                 richText: nil,
                 isVerified: false,
-                publicationWarning: "Inserted without Typed with hush link"
+                publicationWarning: "Inserted without Typed with clemii link"
             )
         }
     }

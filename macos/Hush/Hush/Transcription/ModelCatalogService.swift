@@ -19,7 +19,7 @@ final class ModelCatalogService {
 
     static let shared = ModelCatalogService()
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "ModelCatalog")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "ModelCatalog")
 
     /// Live published model list. Bundled model(s) and the curated Parakeet models
     /// are always present, even before the first network refresh.

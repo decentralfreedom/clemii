@@ -51,7 +51,7 @@ final class MenuBarController: NSObject {
     func install() {
         applyAsset(named: "MenuBar-idle", template: true)
         statusItem.button?.setAccessibilityIdentifier("hush.menuBar")
-        statusItem.button?.setAccessibilityLabel("hush menu")
+        statusItem.button?.setAccessibilityLabel("clemii menu")
         menu.delegate = self
         menu.minimumWidth = MenuBarPanelView.panelWidth
         let panelItem = NSMenuItem()
@@ -235,9 +235,9 @@ final class MenuBarController: NSObject {
         guard let button = statusItem.button else { return }
         let provider = Settings.shared.llmProvider
         button.toolTip = if provider == .off || Settings.shared.activeDictationProfile == nil {
-            "hush · No persona"
+            "clemii · No persona"
         } else {
-            "hush · \(Settings.shared.activeProfile.name)"
+            "clemii · \(Settings.shared.activeProfile.name)"
         }
     }
 

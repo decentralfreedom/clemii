@@ -967,7 +967,7 @@ private struct ActivityBreakdownRootView: View {
                     DashboardCompactEmpty(
                         symbol: "arrow.up.right.square",
                         title: "No destinations yet",
-                        detail: "Apps appear here after hush inserts your text."
+                        detail: "Apps appear here after clemii inserts your text."
                     )
                     .padding(.horizontal, 18)
                     .padding(.bottom, 18)
@@ -1136,7 +1136,7 @@ private struct TypingSpeedTestView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Typing benchmark")
                         .font(.system(size: 22, weight: .bold, design: .rounded))
-                    Text("Type naturally for 30 seconds. hush uses your pace to estimate the time you save.")
+                    Text("Type naturally for 30 seconds. clemii uses your pace to estimate the time you save.")
                         .font(.system(size: 12.5))
                         .foregroundStyle(.secondary)
                 }
@@ -1627,7 +1627,7 @@ private struct DashboardDestinations: View {
                     DashboardCompactEmpty(
                         symbol: "arrow.up.right.square",
                         title: "No destinations yet",
-                        detail: "Apps appear here after hush inserts your text."
+                        detail: "Apps appear here after clemii inserts your text."
                     )
                     .padding(.horizontal, 18)
                     .padding(.bottom, 18)
@@ -1824,7 +1824,7 @@ private struct DashboardRecent: View {
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Recent dictations")
                             .font(.system(size: 15, weight: .semibold))
-                        Text("Open or copy text without leaving hush")
+                        Text("Open or copy text without leaving clemii")
                             .font(.system(size: 11))
                             .foregroundStyle(.secondary)
                     }

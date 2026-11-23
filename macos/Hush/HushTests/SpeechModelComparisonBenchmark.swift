@@ -6,7 +6,7 @@ import Testing
 import FluidAudio
 
 /// Compares a candidate Parakeet-family model with Parakeet Ultra on real speech, through
-/// hush's own FluidAudio path. Opt-in: `HUSH_VOCAB_BENCH_DIR` holds the earnings22 clips
+/// clemii's own FluidAudio path. Opt-in: `HUSH_VOCAB_BENCH_DIR` holds the earnings22 clips
 /// (see `VocabularyBoostBenchmark`), `HUSH_MODEL_BENCH_DIR` a Core ML package in a folder
 /// named `parakeet-ultra` (FluidAudio's folder name for `.ultra`), with the joint model as
 /// `JointDecisionv3.mlmodelc`. Under any other name FluidAudio silently downloads Ultra next
@@ -14,7 +14,7 @@ import FluidAudio
 ///
 /// 2026-11-18, Fluid Speech Pro (FluidVoice-Labs/fluid-speech-pro-coreml) through the official
 /// FluidAudio 0.18.0: WER 73.1% against Ultra's 16.9%, with transcripts cut off. Its card's
-/// Swift path needs FluidVoice's FluidAudio fork, so hush stays on Ultra until FluidAudio
+/// Swift path needs FluidVoice's FluidAudio fork, so clemii stays on Ultra until FluidAudio
 /// supports it.
 @Suite("Speech model comparison", .serialized,
        .enabled(if: ProcessInfo.processInfo.environment["HUSH_MODEL_BENCH_DIR"] != nil

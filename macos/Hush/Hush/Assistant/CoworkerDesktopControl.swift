@@ -21,7 +21,7 @@ enum CoworkerDirectCommand {
     static func reply(to request: String) -> CoworkerReply? {
         // Only an explicit web provider is an unambiguous shortcut. Generic
         // 'search for ... on this tab' needs the current page and conversation.
-        let pattern = #"(?i)^\s*(?:hey\s+hush[,!]?\s*)?(?:(?:please|can you|could you)\s+)?(?:search\s+(?:google|the web|the internet)\s+for|google)\s+(.+?)\s*[.!?]?\s*$"#
+        let pattern = #"(?i)^\s*(?:hey\s+clemii[,!]?\s*)?(?:(?:please|can you|could you)\s+)?(?:search\s+(?:google|the web|the internet)\s+for|google)\s+(.+?)\s*[.!?]?\s*$"#
         if let regex = try? NSRegularExpression(pattern: pattern),
            let match = regex.firstMatch(in: request, range: NSRange(request.startIndex..., in: request)),
            let range = Range(match.range(at: 1), in: request) {

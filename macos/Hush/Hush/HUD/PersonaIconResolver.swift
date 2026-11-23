@@ -6,7 +6,7 @@ struct PersonaIconChoice: Sendable, Equatable {
 }
 
 /// Keeps persona icons useful without turning profile creation into setup work.
-/// A user override wins; otherwise Hush infers a stable SF Symbol locally from
+/// A user override wins; otherwise clemii infers a stable SF Symbol locally from
 /// the profile name and instructions.
 enum PersonaIconResolver {
     static let choices: [PersonaIconChoice] = [

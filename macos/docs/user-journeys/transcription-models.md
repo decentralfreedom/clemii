@@ -4,7 +4,7 @@ This document defines the user-visible contract for choosing, downloading and ac
 
 ## Product intent
 
-The active model is always the first thing on the page. Engines come second, and individual models live one level deeper, so the common question ("what is hush using right now, and is it ready?") never requires reading a list. Downloading and activating are separate steps: the active model keeps working while another one downloads.
+The active model is always the first thing on the page. Engines come second, and individual models live one level deeper, so the common question ("what is clemii using right now, and is it ready?") never requires reading a list. Downloading and activating are separate steps: the active model keeps working while another one downloads.
 
 ## Invariants
 
@@ -46,7 +46,7 @@ Given the Whisper page, then models are grouped into Fast (under 300 MB), Balanc
 
 ### TM-007 - Language support
 
-Given a Parakeet model is active and the spoken language is one Parakeet does not support (for example Japanese), then **General > Spoken language** says so in red and offers **Switch to Whisper**, which activates the most capable Whisper model already on this Mac without downloading. On engine pages, a downloaded model that does not support the selected language shows why and its **Use** button is disabled. Hush never switches engines silently.
+Given a Parakeet model is active and the spoken language is one Parakeet does not support (for example Japanese), then **General > Spoken language** says so in red and offers **Switch to Whisper**, which activates the most capable Whisper model already on this Mac without downloading. On engine pages, a downloaded model that does not support the selected language shows why and its **Use** button is disabled. clemii never switches engines silently.
 
 ### TM-008 - Recognition quality
 
@@ -60,16 +60,16 @@ Given a downloaded model that is neither active nor bundled, when the user choos
 
 Given **About**, then the Speech recognition section credits Parakeet Ultra and Redux (Moondream, from NVIDIA Parakeet TDT v3, CC-BY-4.0), FluidAudio (Apache-2.0), Whisper (MIT) and WhisperKit (MIT) with links.
 
-### TM-011 - Teach hush a word by saying it
+### TM-011 - Teach clemii a word by saying it
 
 Given the speech model is ready, the user opens Settings > Transcription > Vocabulary (`Add Words…` or `Manage…`) and chooses `Add Word`. The flow follows FluidVoice's design:
 
 1. **Type the word** exactly as it should be written, then `Continue`.
-2. **Say it.** hush listens through dictation's own microphone and model, with no HUD, history, recording file or inserted text, and stops by itself when the user pauses. Three tries show what was heard: `Recognised` (green) or `Heard "hash"` (orange). Silence gives a hint and up to three retries; dictation waits meanwhile, and the hotkey shows "hush is learning a word".
+2. **Say it.** clemii listens through dictation's own microphone and model, with no HUD, history, recording file or inserted text, and stops by itself when the user pauses. Three tries show what was heard: `Recognised` (green) or `Heard "hash"` (orange). Silence gives a hint and up to three retries; dictation waits meanwhile, and the hotkey shows "clemii is learning a word".
 3. **Review** the heard spellings as chips, remove or type more, then `Add to Vocabulary`.
-4. **Try it:** `Try It` records a sentence and shows what hush would write, with the word highlighted, or offers `Teach It More`.
+4. **Try it:** `Try It` records a sentence and shows what clemii would write, with the word highlighted, or offers `Teach It More`.
 
-`Type What hush Writes Instead…` skips the recording. From then on every dictation, with or without Live Write, writes the word wherever a learned spelling appears, as a whole word in any case. Live Write also receives the words. Each list row offers `Say it again`, `Edit` and `Remove`. A word learned with another speech model is flagged with "Say it again".
+`Type What clemii Writes Instead…` skips the recording. From then on every dictation, with or without Live Write, writes the word wherever a learned spelling appears, as a whole word in any case. Live Write also receives the words. Each list row offers `Say it again`, `Edit` and `Remove`. A word learned with another speech model is flagged with "Say it again".
 
 ### TM-012 - The speech engine listens for the user's words
 
@@ -77,10 +77,10 @@ Given the user has words in Vocabulary:
 
 - **WhisperKit:** the learned spellings apply, and the Vocabulary screen says the recognition boost works with Parakeet. There is no WhisperKit prompt: on real speech it emptied most transcripts.
 - **Parakeet, without the boost:** the Vocabulary screen shows "Recognition boost is off", and the Transcription row says the same in orange. The learned spellings still apply.
-- **Download:** `Download…` asks first and names the size (97.5 MB from Hugging Face). While it downloads, the card shows the percentage and the megabytes received ("42% · 41 MB of 97.5 MB") with the same progress ring as the speech models; the ring's stop button cancels and removes the partial download. The model lands in hush's own model folder. `Remove…` asks first and deletes it.
+- **Download:** `Download…` asks first and names the size (97.5 MB from Hugging Face). While it downloads, the card shows the percentage and the megabytes received ("42% · 41 MB of 97.5 MB") with the same progress ring as the speech models; the ring's stop button cancels and removes the partial download. The model lands in clemii's own model folder. `Remove…` asks first and deletes it.
 - **Parakeet, with the boost:** after recognition, FluidAudio's CTC keyword spotter checks the audio where a written word resembles one of the user's words. With speech rounds, this happens once over the whole recording. When nothing resembles one of the user's words, it is skipped (about 3 ms).
 - **Protection:** the boost never replaces an ordinary word of English or the user's languages (Natural Language word lists), never drops letters ("XJava" stays), and never moves other words.
-- **Teaching:** samples are always transcribed without the boost or the prompt, so hush learns what it really hears.
+- **Teaching:** samples are always transcribed without the boost or the prompt, so clemii learns what it really hears.
 
 ## Test ownership
 

@@ -9,11 +9,11 @@ final class PermissionJourneyTests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Model library"].exists)
         XCTAssertFalse(app.staticTexts["Kokoro"].exists)
         XCTAssertFalse(app.scrollViews.firstMatch.buttons["Live Write"].exists) // No duplicate sidebar entry.
-        attach(app, "hush AI - light")
+        attach(app, "clemii AI - light")
         app.buttons["Permissions"].click()
         XCTAssertTrue(app.staticTexts["Microphone"].waitForExistence(timeout: 3))
         XCTAssertFalse(app.staticTexts["Screen Recording"].exists)
-        app.buttons["hush AI"].click()
+        app.buttons["clemii AI"].click()
         app.buttons["Open Assistant"].click()
         XCTAssertTrue(app.switches["hush.assistant.enabled"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.staticTexts["Screen Recording"].exists)
@@ -66,7 +66,7 @@ final class PermissionJourneyTests: XCTestCase {
         let app = launch("--preview-hush-ai", "--preview-dark-appearance")
         defer { app.terminate() }
         XCTAssertTrue(app.buttons["Open Live Write"].waitForExistence(timeout: 5))
-        attach(app, "hush AI - dark")
+        attach(app, "clemii AI - dark")
         app.buttons["Open Live Write"].click()
         XCTAssertTrue(app.radioButtons["Polish"].waitForExistence(timeout: 3))
         attach(app, "Live Write - dark")
@@ -83,7 +83,7 @@ final class PermissionJourneyTests: XCTestCase {
         defer { app.terminate() }
         XCTAssertTrue(app.buttons["Open Assistant"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Open Live Write"].isHittable)
-        attach(app, "hush AI - compact")
+        attach(app, "clemii AI - compact")
         XCTAssertTrue(app.staticTexts["hush.ai.assistant.status"].exists)
         app.buttons["Open Assistant"].click()
         let voice = modelControl("kokoro", in: app)

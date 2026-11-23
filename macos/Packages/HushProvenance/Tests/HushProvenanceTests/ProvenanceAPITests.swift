@@ -7,11 +7,11 @@ import OpenAPIRuntime
 private let integrationServiceURL = ProcessInfo.processInfo.environment["HUSH_PROVENANCE_E2E_BASE_URL"]
     .flatMap(URL.init(string:))
 
-@Suite("Hush provenance API")
+@Suite("clemii provenance API")
 struct ProvenanceAPITests {
     @Test("constructs the generated client for HTTPS origins")
     func constructsClient() throws {
-        let origin = try #require(URL(string: "https://proof.hush.app"))
+        let origin = try #require(URL(string: "https://proof.clemii.app"))
 
         _ = ProvenanceAPI.client(baseURL: origin)
     }
@@ -106,7 +106,7 @@ struct ProvenanceAPITests {
                 audioSha256: nil
             ),
             transcription: nil,
-            sourceText: "Original Hush message.",
+            sourceText: "Original clemii message.",
             voiceSegments: [segment],
             revision: .init(
                 parentProofId: "018f47a6-84d2-7a10-9c2d-2f2c29ba7b34",
@@ -136,7 +136,7 @@ struct ProvenanceAPITests {
                 ),
             ],
             transformations: [.init(kind: .cleanup, algorithmVersion: "basic-v1")],
-            finalText: "Original Hush message. Add this section here.",
+            finalText: "Original clemii message. Add this section here.",
             aiEditShare: nil,
             activitySnapshot: nil
         )
@@ -204,7 +204,7 @@ struct ProvenanceAPITests {
     @Test("appends the private proof link after the message")
     func appendsSignatureLink() throws {
         let url = try #require(URL(
-            string: "https://hush.app/p/example#k=private-decryption-key"
+            string: "https://clemii.com/p/example#k=private-decryption-key"
         ))
 
         let signed = ProofSignatureFormatter.append(
@@ -215,7 +215,7 @@ struct ProvenanceAPITests {
         #expect(signed == """
         Perfect, let's lock in Thursday at 10.
 
-        -typed with hush: https://hush.app/p/example#k=private-decryption-key
+        -typed with clemii: https://clemii.com/p/example#k=private-decryption-key
         """)
     }
 
@@ -228,16 +228,16 @@ struct ProvenanceAPITests {
             for: "Perfect, let's lock in Thursday at 10.",
             proofURL: url
         )
-        let linkRange = (content.richText.string as NSString).range(of: "typed with hush")
+        let linkRange = (content.richText.string as NSString).range(of: "typed with clemii")
 
         #expect(content.richText.string == """
         Perfect, let's lock in Thursday at 10.
 
-        -typed with hush
+        -typed with clemii
         """)
         #expect(content.richText.attribute(.link, at: linkRange.location - 1, effectiveRange: nil) == nil)
         #expect(content.richText.attribute(.link, at: linkRange.location, effectiveRange: nil) as? URL == url)
-        #expect(content.plainText.hasSuffix("-typed with hush: \(url.absoluteString)"))
+        #expect(content.plainText.hasSuffix("-typed with clemii: \(url.absoluteString)"))
 
         let fullRange = NSRange(location: 0, length: content.richText.length)
         let htmlData = try content.richText.data(
@@ -324,7 +324,7 @@ struct ProvenanceAPITests {
         let uploader = MockProofUploader()
         let publisher = ProofPublisher(
             api: api,
-            proofURLBaseURL: URL(string: "https://hush.app/s/")!,
+            proofURLBaseURL: URL(string: "https://clemii.com/s/")!,
             uploader: uploader
         )
 
@@ -356,7 +356,7 @@ struct ProvenanceAPITests {
                 proof: proof,
                 proofURL: "https://lookalike.example/s/Ab3dE7"
             ),
-            proofURLBaseURL: URL(string: "https://hush.app/s/")!,
+            proofURLBaseURL: URL(string: "https://clemii.com/s/")!,
             uploader: MockProofUploader()
         )
 
@@ -380,9 +380,9 @@ struct ProvenanceAPITests {
         let publisher = ProofPublisher(
             api: MockProofAPI(
                 proof: proof,
-                proofURL: "https://hush.app/s/Ab3dE7x"
+                proofURL: "https://clemii.com/s/Ab3dE7x"
             ),
-            proofURLBaseURL: URL(string: "https://hush.app/s/")!,
+            proofURLBaseURL: URL(string: "https://clemii.com/s/")!,
             uploader: MockProofUploader()
         )
 
@@ -400,7 +400,7 @@ struct ProvenanceAPITests {
         let signer = try SoftwareP256Signer(rawRepresentation: Data(repeating: 1, count: 32))
         let publisher = ProofPublisher(
             api: UnavailableEnrollmentAPI(),
-            proofURLBaseURL: URL(string: "https://hush.app/s/")!
+            proofURLBaseURL: URL(string: "https://clemii.com/s/")!
         )
 
         await #expect(throws: ProofPublisherError.self) {
@@ -426,7 +426,7 @@ struct ProvenanceAPITests {
                 proof: proof,
                 publicationChallengeErrorCode: "installation_not_found"
             ),
-            proofURLBaseURL: URL(string: "https://hush.app/s/")!,
+            proofURLBaseURL: URL(string: "https://clemii.com/s/")!,
             uploader: MockProofUploader()
         )
 
@@ -512,7 +512,7 @@ struct ProvenanceAPITests {
         #expect(published.privateURL.lastPathComponent.count == 6)
         #expect(published.privateURL.fragment == "k=\(proof.decryptionKey)")
         #expect(signedText.hasSuffix(published.privateURL.absoluteString))
-        #expect(signedText.contains("\n\n-typed with hush: "))
+        #expect(signedText.contains("\n\n-typed with clemii: "))
     }
 
     private func fixtureManifest() -> ProofManifest {
@@ -589,7 +589,7 @@ private actor MockProofAPI: APIProtocol {
 
     init(
         proof: PreparedProof,
-        proofURL: String = "https://hush.app/s/Ab3dE7",
+        proofURL: String = "https://clemii.com/s/Ab3dE7",
         publicationChallengeErrorCode: String? = nil
     ) {
         self.proof = proof
@@ -622,7 +622,7 @@ private actor MockProofAPI: APIProtocol {
         return .created(.init(body: .json(.init(
             id: proof.proofId,
             slug: Self.slug,
-            uploadUrl: "https://upload.hush.app/proof",
+            uploadUrl: "https://upload.clemii.app/proof",
             uploadHeaders: .init(additionalProperties: [
                 "content-type": "application/vnd.hush.proof+encrypted",
             ]),

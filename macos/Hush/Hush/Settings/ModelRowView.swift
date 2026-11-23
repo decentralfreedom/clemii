@@ -185,7 +185,7 @@ final class ModelRowView: NSView {
         info.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     }
 
-    /// "547 MB · multilingual · Updated Sep 30, 2024 · Bundled with Hush"
+    /// "547 MB · multilingual · Updated Sep 30, 2024 · Bundled with clemii"
     /// Anything optional gracefully drops out.
     private static func formatSubtitle(for model: ModelInfo) -> String {
         var parts: [String] = []

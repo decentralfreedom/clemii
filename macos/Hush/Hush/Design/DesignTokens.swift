@@ -1,12 +1,12 @@
 import AppKit
 import QuartzCore
 
-/// Hush's native macOS color system.
+/// clemii's native macOS color system.
 ///
 /// Neutral graphite surfaces carry the interface. A restrained cool aurora identifies
 /// the brand and communicates active selection without competing with content.
 ///
-/// Hush uses a cool aurora family for branded interaction. Graphite and semantic
+/// clemii uses a cool aurora family for branded interaction. Graphite and semantic
 /// system colors carry most of the interface; lilac, blue, rose, and mint appear
 /// only where they communicate activity, selection, or product identity.
 @MainActor

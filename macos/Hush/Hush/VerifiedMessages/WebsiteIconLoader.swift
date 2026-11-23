@@ -139,7 +139,7 @@ actor WebsiteIconLoader {
             CharacterSet.alphanumerics.contains($0) ? String($0) : "_"
         }.joined()
         return caches
-            .appending(path: "com.decentralfreedom.hush/WebsiteIcons", directoryHint: .isDirectory)
+            .appending(path: "com.decentralfreedom.clemii/WebsiteIcons", directoryHint: .isDirectory)
             .appending(path: safeHost)
     }
 

@@ -9,7 +9,7 @@ import SwiftUI
 @MainActor
 final class RecordingHUDController {
     private static let log = Logger(
-        subsystem: "com.decentralfreedom.hush",
+        subsystem: "com.decentralfreedom.clemii",
         category: "HUD"
     )
 

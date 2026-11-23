@@ -104,7 +104,7 @@ def main():
     project_root = Path(__file__).resolve().parent.parent
     # BundledModels lives at the Xcode project root (alongside Hush.xcodeproj).
     # The "Copy bundled models" Run Script build phase rsyncs from there into
-    # Hush.app/Contents/Resources/BundledModels at build time.
+    # clemii.app/Contents/Resources/BundledModels at build time.
     out_root = project_root / "Hush" / "BundledModels" / folder
     out_root.mkdir(parents=True, exist_ok=True)
 

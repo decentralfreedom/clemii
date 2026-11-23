@@ -13,7 +13,7 @@ if [[ -f "${UPDATE_ENV_FILE}" ]]; then
   set +a
 fi
 
-APP_PATH="${HUSH_APP_PATH:-${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}/export/hush.app}"
+APP_PATH="${HUSH_APP_PATH:-${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}/export/clemii.app}"
 UPDATE_CHANNEL="${HUSH_UPDATE_CHANNEL:-alpha}"
 RELEASE_DIRECTORY="${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}"
 # Each publish stages a fresh mirror of the published channel inside its release
@@ -80,7 +80,7 @@ if [[ -f "${APPCAST_PATH}" ]]; then
   fi
 fi
 
-EXPECTED_DMG_NAME="hush-${VERSION}${RELEASE_SLUG:+-${RELEASE_SLUG}}-build.${BUILD}.dmg"
+EXPECTED_DMG_NAME="clemii-${VERSION}${RELEASE_SLUG:+-${RELEASE_SLUG}}-build.${BUILD}.dmg"
 if [[ -n "${DMG_PATH}" && "$(basename "${DMG_PATH}")" != "${EXPECTED_DMG_NAME}" ]]; then
   echo "DMG name does not match its embedded release identity." >&2
   echo "Expected: ${EXPECTED_DMG_NAME}" >&2

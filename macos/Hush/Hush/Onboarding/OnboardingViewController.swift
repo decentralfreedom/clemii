@@ -111,7 +111,7 @@ final class OnboardingFlowModel: ObservableObject {
         switch page {
         case .welcome, .voice: return "Continue"
         case .personas: return personasEnabled ? "Continue" : "Skip"
-        case .proof: return "Set up hush"
+        case .proof: return "Set up clemii"
         }
     }
 
@@ -134,7 +134,7 @@ final class OnboardingFlowModel: ObservableObject {
             case .preparing: return "Preparing the private on-device speech model."
             case .listening: return "Speak naturally. Tap the microphone again to finish."
             case .processing: return "Transcribing locally on this Mac."
-            case .complete: return "That’s it. hush is hearing you perfectly."
+            case .complete: return "That’s it. clemii is hearing you perfectly."
             case .failed: return "Nothing was inserted or saved. Try the phrase again."
             }
         case .personas:
@@ -427,7 +427,7 @@ final class OnboardingFlowModel: ObservableObject {
             Task { [weak self] in
                 try? await Task.sleep(for: .milliseconds(3_000))
                 guard let self else { return }
-                transcript = "Hello hush, this is my voice."
+                transcript = "Hello clemii, this is my voice."
                 voiceState = .complete
                 coordinator?.hud.hide()
             }
@@ -539,7 +539,7 @@ private struct ImmersiveOnboardingView: View {
 
     private var header: some View {
         ZStack {
-            Text("hush")
+            Text("clemii")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(OnboardingPalette.muted.opacity(0.72))
             HStack(spacing: 18) {
@@ -654,10 +654,10 @@ private struct OnboardingCompletionOverlay: View {
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(OnboardingPalette.purple)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("hush stays in your menu bar")
+                        Text("clemii stays in your menu bar")
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(OnboardingPalette.ink)
-                        Text("Open hush and its settings from there anytime.")
+                        Text("Open clemii and its settings from there anytime.")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(OnboardingPalette.muted)
                     }
@@ -971,7 +971,7 @@ private struct VoiceOnboardingStep: View {
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("hush.onboarding.voice.title")
 
-            Text("Say “Hello hush, this is my voice.”")
+            Text("Say “Hello clemii, this is my voice.”")
                 .font(.system(size: 19, weight: .medium))
                 .foregroundStyle(OnboardingPalette.muted)
                 .padding(.top, 14)
@@ -1110,7 +1110,7 @@ private struct PermissionSetupOverlay: View {
             VStack(spacing: 0) {
                 HStack(alignment: .top, spacing: 16) {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Allow hush to listen and type.")
+                        Text("Allow clemii to listen and type.")
                             .font(.system(size: 30, weight: .bold))
                             .tracking(-1.1)
                         Text("Grant both to continue. Accessibility opens System Settings - switch it on, then come back.")
@@ -1137,7 +1137,7 @@ private struct PermissionSetupOverlay: View {
                     PermissionRow(
                         symbol: "mic",
                         title: "Microphone",
-                        detail: "So hush can hear your voice.",
+                        detail: "So clemii can hear your voice.",
                         action: flow.microphoneReady ? "Allowed" : "Allow",
                         ready: flow.microphoneReady,
                         identifier: "hush.onboarding.microphone",
@@ -1146,7 +1146,7 @@ private struct PermissionSetupOverlay: View {
                     PermissionRow(
                         symbol: "accessibility",
                         title: "Accessibility",
-                        detail: "So hush can type into any app. Opens System Settings.",
+                        detail: "So clemii can type into any app. Opens System Settings.",
                         action: flow.accessibilityReady ? "Enabled" : "Open Settings",
                         ready: flow.accessibilityReady,
                         identifier: "hush.onboarding.accessibility",
@@ -1410,7 +1410,7 @@ private struct ProofCreationCard: View {
             Group {
                 Text("shipped the redesign today 🚀 six months of late nights, finally live. every word here is mine. ")
                     .foregroundStyle(OnboardingPalette.ink)
-                + Text(verified ? "- typed with hush" : "")
+                + Text(verified ? "- typed with clemii" : "")
                     .foregroundStyle(OnboardingPalette.purple)
             }
             .font(.system(size: 20, weight: .bold))

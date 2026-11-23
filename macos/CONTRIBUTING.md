@@ -1,4 +1,4 @@
-# Contributing to hush for macOS
+# Contributing to clemii for macOS
 
 Follow the [shared contribution guide](../CONTRIBUTING.md) for branches, commits,
 pull requests and reporting issues.

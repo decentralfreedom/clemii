@@ -22,7 +22,7 @@ struct VocabularySection: View {
                     .background(.indigo.gradient, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Vocabulary")
-                    Text(count == 0 ? "Teach hush names and terms it gets wrong" : count == 1 ? "1 word" : "\(count) words")
+                    Text(count == 0 ? "Teach clemii names and terms it gets wrong" : count == 1 ? "1 word" : "\(count) words")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                     if boostMissing {
@@ -46,7 +46,7 @@ struct VocabularySection: View {
     }
 }
 
-/// The user's words, and the flow that teaches hush a new one.
+/// The user's words, and the flow that teaches clemii a new one.
 struct VocabularySheet: View {
     let coordinator: DictationCoordinator?
     @Environment(\.dismiss) private var dismiss
@@ -72,7 +72,7 @@ struct VocabularySheet: View {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Vocabulary").font(.title2.bold())
-                    Text("Names, brands and terms hush writes your way.")
+                    Text("Names, brands and terms clemii writes your way.")
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -125,8 +125,8 @@ struct VocabularySheet: View {
             Image(systemName: "character.book.closed.fill")
                 .font(.system(size: 44))
                 .foregroundStyle(.indigo.gradient)
-            Text("Teach hush your words").font(.title3.weight(.semibold))
-            Text("Type a name or term the way you write it, then say it a few times. hush learns what it hears and writes your word from then on.")
+            Text("Teach clemii your words").font(.title3.weight(.semibold))
+            Text("Type a name or term the way you write it, then say it a few times. clemii learns what it hears and writes your word from then on.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: 380)
@@ -181,7 +181,7 @@ private struct VocabularyRow: View {
                         .font(.callout)
                         .foregroundStyle(.orange)
                 } else {
-                    Text(term.spellings.isEmpty ? "hush writes it as is" : "Fixes \(term.soundsLike.map { "\u{201C}\($0)\u{201D}" }.joined(separator: ", "))")
+                    Text(term.spellings.isEmpty ? "clemii writes it as is" : "Fixes \(term.soundsLike.map { "\u{201C}\($0)\u{201D}" }.joined(separator: ", "))")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -242,10 +242,10 @@ private struct RecognitionBoostCard: View {
                 Button("Remove", role: .destructive) { boost.remove() }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("hush keeps fixing the spellings it learned. You can download the boost again at any time.")
+                Text("clemii keeps fixing the spellings it learned. You can download the boost again at any time.")
             }
         } else {
-            Label("hush fixes the spellings it learned. The recognition boost works with Parakeet.", systemImage: "info.circle")
+            Label("clemii fixes the spellings it learned. The recognition boost works with Parakeet.", systemImage: "info.circle")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -263,8 +263,8 @@ private struct RecognitionBoostCard: View {
     private var detail: String {
         switch boost.state {
         case .installed: "Parakeet listens for your words, so it also catches them when it hears them in a new way. \(boost.sizeDescription) on this Mac."
-        case .downloading(let fraction): "\(downloadedDescription(fraction)) of \(boost.sizeDescription). You can keep using hush meanwhile."
-        case .notInstalled: "hush fixes the spellings it learned, but Parakeet does not listen for your words. Download the boost (\(boost.sizeDescription)) to turn it on."
+        case .downloading(let fraction): "\(downloadedDescription(fraction)) of \(boost.sizeDescription). You can keep using clemii meanwhile."
+        case .notInstalled: "clemii fixes the spellings it learned, but Parakeet does not listen for your words. Download the boost (\(boost.sizeDescription)) to turn it on."
         case .failed(let message): message
         }
     }
@@ -363,7 +363,7 @@ private struct WordStep: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Which word should hush learn?").font(.title.bold())
+            Text("Which word should clemii learn?").font(.title.bold())
             Text("Type it exactly as you want it written, with capitals and symbols.")
                 .foregroundStyle(.secondary)
             TextField("Word", text: $teacher.word, prompt: Text("For example, Kubernetes"))
@@ -384,7 +384,7 @@ private struct WordStep: View {
             }
             Spacer()
             HStack {
-                Button("Type What hush Writes Instead\u{2026}") { teacher.step = .manual }
+                Button("Type What clemii Writes Instead\u{2026}") { teacher.step = .manual }
                     .buttonStyle(.link)
                     .disabled(teacher.trimmedWord.isEmpty)
                 Spacer()
@@ -451,7 +451,7 @@ private struct ListenStep: View {
                     .foregroundStyle(.orange)
                     .multilineTextAlignment(.center)
             } else {
-                Text("Say just the word in your normal voice, then pause. hush stops listening on its own.")
+                Text("Say just the word in your normal voice, then pause. clemii stops listening on its own.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -481,7 +481,7 @@ private struct ListenStep: View {
         switch sampler.phase {
         case .getReady: teacher.attempts.isEmpty ? "Get ready\u{2026}" : "Once more\u{2026}"
         case .listening: "Listening"
-        case .checking: "Checking what hush heard\u{2026}"
+        case .checking: "Checking what clemii heard\u{2026}"
         case .idle: teacher.problem == nil ? " " : "Paused"
         }
     }
@@ -575,9 +575,9 @@ private struct ReviewStep: View {
             Text(summary).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("When hush hears").font(.callout.weight(.semibold)).foregroundStyle(.secondary)
+                Text("When clemii hears").font(.callout.weight(.semibold)).foregroundStyle(.secondary)
                 if teacher.spellings.isEmpty {
-                    Text("Nothing to fix: hush already writes \u{201C}\(teacher.trimmedWord)\u{201D}.")
+                    Text("Nothing to fix: clemii already writes \u{201C}\(teacher.trimmedWord)\u{201D}.")
                         .foregroundStyle(.secondary)
                 } else {
                     FlowLayout(spacing: 8) {
@@ -587,7 +587,7 @@ private struct ReviewStep: View {
                     }
                 }
                 HStack {
-                    TextField("Add a spelling", text: $newSpelling, prompt: Text("Another way hush writes it"))
+                    TextField("Add a spelling", text: $newSpelling, prompt: Text("Another way clemii writes it"))
                         .textFieldStyle(.roundedBorder)
                         .onSubmit(add)
                     Button("Add", action: add).disabled(newSpelling.trimmingCharacters(in: .whitespaces).isEmpty)
@@ -621,12 +621,12 @@ private struct ReviewStep: View {
 
     private var summary: String {
         if teacher.recognizedEveryTime {
-            return "hush recognised \u{201C}\(teacher.trimmedWord)\u{201D} every time. Adding it still helps Live Write spell it exactly."
+            return "clemii recognised \u{201C}\(teacher.trimmedWord)\u{201D} every time. Adding it still helps Live Write spell it exactly."
         }
         if teacher.attempts.isEmpty {
-            return "Check the spellings hush replaces with your word."
+            return "Check the spellings clemii replaces with your word."
         }
-        return "hush heard your word differently. From now on it turns these into \u{201C}\(teacher.trimmedWord)\u{201D}."
+        return "clemii heard your word differently. From now on it turns these into \u{201C}\(teacher.trimmedWord)\u{201D}."
     }
 
     private func add() {
@@ -724,7 +724,7 @@ private struct SavedStep: View {
             }
         case .nothingHeard:
             VStack(spacing: 8) {
-                Text("hush didn\u{2019}t hear anything.").foregroundStyle(.secondary)
+                Text("clemii didn\u{2019}t hear anything.").foregroundStyle(.secondary)
                 Button("Try Again") { teacher.tryIt() }
             }
         case .unavailable(let message):
@@ -734,7 +734,7 @@ private struct SavedStep: View {
 
     private func result(_ text: String, recognized: Bool) -> some View {
         VStack(spacing: 8) {
-            Label(recognized ? "hush wrote it your way" : "Not this time", systemImage: recognized ? "checkmark.seal.fill" : "ear.trianglebadge.exclamationmark")
+            Label(recognized ? "clemii wrote it your way" : "Not this time", systemImage: recognized ? "checkmark.seal.fill" : "ear.trianglebadge.exclamationmark")
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(recognized ? .green : .orange)
             Text(highlighted(text))
@@ -769,8 +769,8 @@ private struct ManualStep: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("What does hush write instead?").font(.title.bold())
-            Text("Type how hush gets \u{201C}\(teacher.trimmedWord)\u{201D} wrong. Add as many as you like.")
+            Text("What does clemii write instead?").font(.title.bold())
+            Text("Type how clemii gets \u{201C}\(teacher.trimmedWord)\u{201D} wrong. Add as many as you like.")
                 .foregroundStyle(.secondary)
             HStack {
                 TextField("Spelling", text: $spelling, prompt: Text("For example, cuba netties"))

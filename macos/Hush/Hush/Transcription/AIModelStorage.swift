@@ -1,6 +1,6 @@
 import Foundation
 
-/// One private home for every downloadable AI model owned by Hush.
+/// One private home for every downloadable AI model owned by clemii.
 ///
 /// Keeping this policy separate from the model runtimes prevents third-party SDK
 /// defaults from scattering large model files across Documents or the shared
@@ -33,7 +33,7 @@ nonisolated enum AIModelStorage {
         whisperHuggingFaceRoot.appendingPathComponent("hub", isDirectory: true)
     }
 
-    /// Location used by earlier Hush builds through Hugging Face's default client.
+    /// Location used by earlier clemii builds through Hugging Face's default client.
     static var legacySharedHuggingFaceHubRoot: URL {
         URL(fileURLWithPath: NSHomeDirectory())
             .appendingPathComponent(".cache", isDirectory: true)
@@ -48,8 +48,8 @@ nonisolated enum AIModelStorage {
         "models--mlx-community--Qwen3.5-4B-4bit",
     ]
 
-    /// Moves only repositories supported by Hush from the old shared cache into
-    /// Hush's private application-data directory. Unrelated Hugging Face models
+    /// Moves only repositories supported by clemii from the old shared cache into
+    /// clemii's private application-data directory. Unrelated Hugging Face models
     /// are deliberately left untouched.
     @discardableResult
     static func migrateLegacyQwenRepositories(

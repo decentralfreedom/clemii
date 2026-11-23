@@ -11,7 +11,7 @@ import os
 /// Handy writes recordings aside and renames them too, but only after capture ends.
 @MainActor
 final class RecordingJournal {
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "RecordingJournal")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "RecordingJournal")
     static let partialExtension = "partial"
     static let audioExtension = "f32"
     /// Older recordings beyond this many are removed, so the folder can never grow without bound.
@@ -21,7 +21,7 @@ final class RecordingJournal {
         let id: UUID
         let url: URL
         let date: Date
-        /// The recording was still running when hush stopped.
+        /// The recording was still running when clemii stopped.
         let wasInterrupted: Bool
     }
 

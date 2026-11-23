@@ -5,7 +5,7 @@ final class OnboardingWindowController: NSWindowController {
     init(coordinator: DictationCoordinator, onFinish: @escaping () -> Void) {
         let vc = OnboardingViewController(coordinator: coordinator, onFinish: onFinish)
         let window = NSWindow(contentViewController: vc)
-        window.title = "Welcome to hush"
+        window.title = "Welcome to clemii"
         window.styleMask = [.titled, .closable, .fullSizeContentView]
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden

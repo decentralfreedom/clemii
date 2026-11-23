@@ -85,7 +85,7 @@ final class HistoryViewController: ControlCenterPageViewController {
 
         let retentionRow = ControlCenterKeyValueRow(
             title: "Keep dictation text",
-            subtitle: "Only final text created by hush is stored. Audio is never kept.",
+            subtitle: "Only final text created by clemii is stored. Audio is never kept.",
             trailing: retentionButton
         )
         let actions = NSStackView(views: [clear, reset])
@@ -124,7 +124,7 @@ final class HistoryViewController: ControlCenterPageViewController {
             let text = Settings.shared.historyRetention == .off
                 ? "Dictation history is off. Aggregate activity remains local."
                 : query.isEmpty
-                    ? "Completed hush dictations will appear here."
+                    ? "Completed clemii dictations will appear here."
                     : "No dictations match your search."
             let empty = NSTextField(wrappingLabelWithString: text)
             empty.font = .systemFont(ofSize: 12)
@@ -170,7 +170,7 @@ final class HistoryViewController: ControlCenterPageViewController {
     @objc private func clearHistory(_ sender: Any?) {
         let alert = NSAlert()
         alert.messageText = "Clear dictation history?"
-        alert.informativeText = "This permanently removes stored hush text. Activity totals remain available."
+        alert.informativeText = "This permanently removes stored clemii text. Activity totals remain available."
         alert.addButton(withTitle: "Clear History")
         alert.addButton(withTitle: "Cancel")
         alert.alertStyle = .warning
@@ -222,7 +222,7 @@ private final class HistoryItemRow: NSView {
 
         var details = [item.appName, Self.dateFormatter.string(from: item.createdAt)]
         if item.isHushEditorOutput {
-            details.append("Typed in hush")
+            details.append("Typed in clemii")
         } else {
             details.append(item.duration.hushCompactDuration)
         }

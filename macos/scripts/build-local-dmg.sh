@@ -12,6 +12,6 @@ xcodebuild -project Hush/Hush.xcodeproj -scheme Hush -configuration Release \
   HUSH_PROOF_SHORT_URL="${HUSH_PROOF_SHORT_URL:-http://127.0.0.1:3000/s/}" \
   HUSH_UPDATE_FEED_URL="${HUSH_UPDATE_FEED_URL:-http://127.0.0.1:8088/alpha/appcast.xml}" \
   HUSH_RELEASE_CHANNEL='Local Development' HUSH_RELEASE_SLUG=alpha.1-local build
-ARGS=(--local --app "${DERIVED_DATA_DIRECTORY}/Build/Products/Release/hush.app")
+ARGS=(--local --app "${DERIVED_DATA_DIRECTORY}/Build/Products/Release/clemii.app")
 [[ $# == 0 ]] || ARGS+=(--output "$1")
 "${SCRIPT_DIRECTORY}/release-dmg.sh" "${ARGS[@]}"

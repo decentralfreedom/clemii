@@ -106,7 +106,7 @@ nonisolated final class CoworkerTrace: @unchecked Sendable {
                 events.append(["elapsed_ms": Int(Date().timeIntervalSince(started) * 1_000),
                                "stage": stage, "fields": fields.mapValues { String($0.prefix(2_000)) }])
                 try persist()
-            } catch { failed = true; NSLog("Hush development trace write failed: %@", error.localizedDescription) }
+            } catch { failed = true; NSLog("clemii development trace write failed: %@", error.localizedDescription) }
         }
     }
 
@@ -139,7 +139,7 @@ nonisolated final class CoworkerTrace: @unchecked Sendable {
                 try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: file.path)
                 artifactSizes[name] = data.count
                 try persist()
-            } catch { failed = true; NSLog("Hush development artifact write failed: %@", error.localizedDescription) }
+            } catch { failed = true; NSLog("clemii development artifact write failed: %@", error.localizedDescription) }
         }
     }
 

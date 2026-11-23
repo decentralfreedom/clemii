@@ -12,7 +12,7 @@ import WhisperKit
 ///    so first-launch transcription works fully offline with zero downloads.
 /// 2. **HuggingFace download** — for everything else WhisperKit's normal flow runs:
 ///    snapshot the variant from `argmaxinc/whisperkit-coreml` and cache it under
-///    Hush's private Application Support model directory.
+///    clemii's private Application Support model directory.
 ///
 /// The whole class opts out of the project's MainActor default isolation: WhisperKit's
 /// async API is intentionally non-isolated and we don't want every property access to
@@ -21,7 +21,7 @@ import WhisperKit
 nonisolated
 final class WhisperKitTranscriber: Transcriber, @unchecked Sendable {
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "WhisperKit")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "WhisperKit")
 
     private var pipe: WhisperKit?
     private var loadedID: String?
@@ -203,7 +203,7 @@ final class WhisperKitTranscriber: Transcriber, @unchecked Sendable {
         } ? folder.path : nil
     }
 
-    /// Keeps every WhisperKit filesystem entry point inside Hush application data.
+    /// Keeps every WhisperKit filesystem entry point inside clemii application data.
     /// `tokenizerFolder` is intentionally explicit because Argmax otherwise defaults
     /// its tokenizer Hub client to `~/Documents/huggingface` even when `modelFolder`
     /// points somewhere else.

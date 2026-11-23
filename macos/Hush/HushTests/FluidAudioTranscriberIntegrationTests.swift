@@ -30,7 +30,7 @@ struct FluidAudioTranscriberIntegrationTests {
         Clip(file: "en-yes", language: "en", reference: "Yes."),
         Clip(file: "en-short", language: "en", reference: "Send it now."),
         Clip(file: "en-sentence", language: "en", reference: "Please schedule the design review with Clara for Thursday at three thirty."),
-        Clip(file: "en-long", language: "en", reference: "Hush is a dictation app for the Mac. You hold a shortcut, speak naturally, and the text appears wherever your cursor is. Everything runs on this computer, so your voice never leaves the device, and it keeps working when you are offline on a plane or in a train."),
+        Clip(file: "en-long", language: "en", reference: "clemii is a dictation app for the Mac. You hold a shortcut, speak naturally, and the text appears wherever your cursor is. Everything runs on this computer, so your voice never leaves the device, and it keeps working when you are offline on a plane or in a train."),
         Clip(file: "de-short", language: "de", reference: "Ja, gerne."),
         Clip(file: "de-sentence", language: "de", reference: "Bitte schick mir die Unterlagen bis Freitag, damit wir das Angebot rechtzeitig fertigstellen können."),
     ]

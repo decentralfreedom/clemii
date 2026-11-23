@@ -80,7 +80,7 @@ private final class HUDMovingBackgroundView: NSView {
         }
 
         let title = "Native Liquid Glass motion test"
-        let detail = "The background moves. The real hush panel remains stationary."
+        let detail = "The background moves. The real clemii panel remains stationary."
         title.draw(
             at: NSPoint(x: 48, y: 48),
             withAttributes: [

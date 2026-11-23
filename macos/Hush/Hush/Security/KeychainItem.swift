@@ -4,18 +4,18 @@ import Security
 
 /// One generic-password item, stored as Apple recommends for new Mac code (TN3137): in the
 /// data protection keychain, whose access follows the app's keychain-access-groups
-/// entitlement, so macOS never asks "hush wants to use your confidential information".
+/// entitlement, so macOS never asks "clemii wants to use your confidential information".
 ///
 /// - Items written by earlier versions live in the file-based keychain. The first read moves
 ///   them over and deletes the old copy, so nobody is signed out and no key changes.
 /// - A build without the entitlement (an ad-hoc build of a contributor, which has no
 ///   provisioning profile) gets errSecMissingEntitlement; it then keeps using the file-based
-///   keychain, as hush did before.
+///   keychain, as clemii did before.
 nonisolated struct KeychainItem: Sendable {
     let service: String
     let account: String
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "Keychain")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "Keychain")
 
     func read() throws -> Data? {
         switch Self.copy(query(protected: true)) {
@@ -104,7 +104,7 @@ nonisolated struct KeychainItem: Sendable {
         let update = SecItemUpdate(base as CFDictionary, [kSecValueData as String: data] as CFDictionary)
         guard update == errSecItemNotFound else { return update }
         var add = base
-        // Apple: "Always use the most restrictive option that makes sense for your app." hush
+        // Apple: "Always use the most restrictive option that makes sense for your app." clemii
         // reads these while the user is logged in and the Mac is unlocked; ThisDeviceOnly keeps
         // them out of iCloud and out of other devices' backups.
         add[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly

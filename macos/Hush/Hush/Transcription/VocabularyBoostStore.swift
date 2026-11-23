@@ -94,7 +94,7 @@ final class VocabularyBoostStore: ObservableObject {
             try ParakeetVocabularyBoost.remove()
             state = .notInstalled
         } catch {
-            state = .failed("hush could not remove the boost: \(error.localizedDescription)")
+            state = .failed("clemii could not remove the boost: \(error.localizedDescription)")
         }
         #endif
     }

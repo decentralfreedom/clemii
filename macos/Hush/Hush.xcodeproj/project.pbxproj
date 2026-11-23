@@ -21,7 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1AF6C4902FAC951000E7E55B /* hush.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hush.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1AF6C4902FAC951000E7E55B /* clemii.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = clemii.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000001 /* HushTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HushTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000000000000000000001 /* HushUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HushUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -123,7 +123,7 @@
 		1AF6C4912FAC951000E7E55B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1AF6C4902FAC951000E7E55B /* hush.app */,
+				1AF6C4902FAC951000E7E55B /* clemii.app */,
 				A10000000000000000000001 /* HushTests.xctest */,
 				A20000000000000000000001 /* HushUITests.xctest */,
 			);
@@ -164,7 +164,7 @@
 				BC43FC8C5C8D4FB0B562DEC6 /* Tokenizers */,
 			);
 			productName = Hush;
-			productReference = 1AF6C4902FAC951000E7E55B /* hush.app */;
+			productReference = 1AF6C4902FAC951000E7E55B /* clemii.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A10000000000000000000005 /* HushTests */ = {
@@ -346,11 +346,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.decentralfreedom.hush.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.decentralfreedom.clemii.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/hush.app/Contents/MacOS/hush";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/clemii.app/Contents/MacOS/clemii";
 			};
 			name = Debug;
 		};
@@ -361,11 +361,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.decentralfreedom.hush.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.decentralfreedom.clemii.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/hush.app/Contents/MacOS/hush";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/clemii.app/Contents/MacOS/clemii";
 			};
 			name = Release;
 		};
@@ -375,7 +375,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.decentralfreedom.hush.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.decentralfreedom.clemii.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_TARGET_NAME = Hush;
@@ -388,7 +388,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.decentralfreedom.hush.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.decentralfreedom.clemii.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_TARGET_NAME = Hush;
@@ -544,9 +544,9 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.decentralfreedom.hush;
+				PRODUCT_BUNDLE_IDENTIFIER = com.decentralfreedom.clemii;
 				PRODUCT_MODULE_NAME = Hush;
-				PRODUCT_NAME = hush;
+				PRODUCT_NAME = clemii;
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -582,9 +582,9 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.decentralfreedom.hush;
+				PRODUCT_BUNDLE_IDENTIFIER = com.decentralfreedom.clemii;
 				PRODUCT_MODULE_NAME = Hush;
-				PRODUCT_NAME = hush;
+				PRODUCT_NAME = clemii;
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;

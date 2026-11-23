@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>hush</string>
+	<string>clemii</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -35,23 +35,23 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>hush listens to your microphone to transcribe what you say into text.</string>
+	<string>clemii listens to your microphone to transcribe what you say into text.</string>
 	<key>NSServices</key>
 	<array>
 		<dict>
 			<key>NSMenuItem</key>
 			<dict>
 				<key>default</key>
-				<string>Edit Selection with hush</string>
+				<string>Edit Selection with clemii</string>
 			</dict>
 			<key>NSMessage</key>
 			<string>editSelection</string>
 			<key>NSPortName</key>
-			<string>hush</string>
+			<string>clemii</string>
 			<key>NSRestricted</key>
 			<false/>
 			<key>NSServiceDescription</key>
-		<string>Edit only the selected text privately with hush.</string>
+		<string>Edit only the selected text privately with clemii.</string>
 			<key>NSSendTypes</key>
 			<array>
 				<string>public.utf8-plain-text</string>

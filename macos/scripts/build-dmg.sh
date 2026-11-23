@@ -7,7 +7,7 @@ REPOSITORY_DIRECTORY="$(cd "${SCRIPT_DIRECTORY}/.." && pwd)"
 DERIVED_DATA_DIRECTORY="${HUSH_DERIVED_DATA_PATH:-/tmp/hush-release}"
 RELEASE_DIRECTORY="${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}"
 TEAM="${HUSH_DEVELOPMENT_TEAM:-3A22UK7C9L}"
-APP_PATH="${RELEASE_DIRECTORY}/export/hush.app"
+APP_PATH="${RELEASE_DIRECTORY}/export/clemii.app"
 export HUSH_DEVELOPMENT_TEAM="${TEAM}"
 export HUSH_NOTARY_KEYCHAIN_PROFILE="${HUSH_NOTARY_KEYCHAIN_PROFILE:-HushNotary}"
 
@@ -56,7 +56,7 @@ xcodebuild -exportArchive -allowProvisioningUpdates -archivePath "${RELEASE_DIRE
   -exportOptionsPlist "${RELEASE_DIRECTORY}/ExportOptions.plist" \
   -exportPath "${RELEASE_DIRECTORY}/export" \
   2>&1 | tee "${RELEASE_DIRECTORY}/reports/export.log"
-python3 "${SCRIPT_DIRECTORY}/check_assistant_release.py" "${APP_PATH}/Contents/MacOS/hush"
+python3 "${SCRIPT_DIRECTORY}/check_assistant_release.py" "${APP_PATH}/Contents/MacOS/clemii"
 python3 "${SCRIPT_DIRECTORY}/check_distribution.py" "${APP_PATH}" \
   --report "${RELEASE_DIRECTORY}/reports/app-preflight.json"
 # Submit the outermost distribution container once; Apple also checks its app.

@@ -8,7 +8,7 @@ final class SettingsWindowController: NSWindowController {
         let vc = HushControlCenterViewController(coordinator: coordinator)
         controlCenter = vc
         let window = NSWindow(contentViewController: vc)
-        window.title = "hush"
+        window.title = "clemii"
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.styleMask.insert(.fullSizeContentView)
         window.titlebarAppearsTransparent = true

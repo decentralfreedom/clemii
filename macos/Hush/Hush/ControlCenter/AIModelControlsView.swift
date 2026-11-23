@@ -104,7 +104,7 @@ final class AIModelControlsView: NSStackView {
         let installed = library.installed(item)
         if let failure = library.failures[item] { return failure }
         if library.busy(item) { return library.detail(item) }
-        if library.bundled(item) { return purpose + " · Included with hush" }
+        if library.bundled(item) { return purpose + " · Included with clemii" }
         if let size = library.sizes[item], installed { return purpose + " · " + ByteCountFormatter.string(fromByteCount: size, countStyle: .file) }
         return purpose + (installed ? "" : " · Not installed")
     }
@@ -232,7 +232,7 @@ final class AIModelControlsView: NSStackView {
         switch item {
         case .voice: effect = "Assistant will need voice setup again."
         case .intelligence: effect = "Any personas using this model will be turned off. Assistant will ask for setup if it needs this model."
-        case .speech: effect = "If this is your active transcription model, hush will switch to the model included with the app."
+        case .speech: effect = "If this is your active transcription model, clemii will switch to the model included with the app."
         }
         alert.informativeText = "\(effect) Your styles and settings are kept. You can download the model again from this page."
         alert.addButton(withTitle: "Remove"); alert.addButton(withTitle: "Cancel")

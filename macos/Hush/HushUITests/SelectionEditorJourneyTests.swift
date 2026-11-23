@@ -95,7 +95,7 @@ final class SelectionEditorJourneyTests: XCTestCase {
             "Reviewed “Make it shorter” against the current text, applied the requested change, and checked the new version for completeness."
         ].waitForExistence(timeout: 2))
         XCTAssertTrue(
-            app.staticTexts["People can test the microphone during onboarding, making hush easier to understand."]
+            app.staticTexts["People can test the microphone during onboarding, making clemii easier to understand."]
                 .waitForExistence(timeout: 5)
         )
         XCTAssertFalse(app.staticTexts["What would you like to do with this text?"].exists)
@@ -119,7 +119,7 @@ final class SelectionEditorJourneyTests: XCTestCase {
         prompt.typeKey(.return, modifierFlags: [])
         XCTAssertTrue(app.staticTexts["I made the tone friendlier and more natural."].waitForExistence(timeout: 2))
         XCTAssertTrue(
-            app.staticTexts["People can try the microphone during onboarding, so hush feels natural from the very first moment."]
+            app.staticTexts["People can try the microphone during onboarding, so clemii feels natural from the very first moment."]
                 .waitForExistence(timeout: 5)
         )
         XCTAssertTrue(app.staticTexts["hush.editor.ai.artifact.2"].exists)

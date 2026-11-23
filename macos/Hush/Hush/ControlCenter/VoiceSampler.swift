@@ -2,7 +2,7 @@ import Combine
 import Foundation
 
 /// Listens for one spoken sample through dictation's own recorder and speech model, and
-/// stops by itself when the user pauses (`SpeechEndpoint`). Used to teach hush a word.
+/// stops by itself when the user pauses (`SpeechEndpoint`). Used to teach clemii a word.
 @MainActor
 final class VoiceSampler: ObservableObject {
     enum Phase: Equatable { case idle, getReady, listening, checking }
@@ -28,7 +28,7 @@ final class VoiceSampler: ObservableObject {
     var isAvailable: Bool { coordinator?.vocabularySampleModelID != nil }
 
     func listen(_ endpoint: SpeechEndpoint) async -> Outcome {
-        guard let coordinator else { return .unavailable("Open hush from the menu bar to teach it words.") }
+        guard let coordinator else { return .unavailable("Open clemii from the menu bar to teach it words.") }
         let modelID = coordinator.vocabularySampleModelID
         self.endpoint = endpoint
         levels = [Float](repeating: 0, count: Self.levelCount)
@@ -79,8 +79,8 @@ final class VoiceSampler: ObservableObject {
     }
 }
 
-/// The steps of teaching hush a word, after FluidVoice's flow: type the word, say it a
-/// few times while hush shows what it hears, keep those spellings, then try it out.
+/// The steps of teaching clemii a word, after FluidVoice's flow: type the word, say it a
+/// few times while clemii shows what it hears, keep those spellings, then try it out.
 @MainActor
 final class WordTeacher: ObservableObject {
     enum Step: Equatable { case word, listen, review, saved, manual }
@@ -182,7 +182,7 @@ final class WordTeacher: ObservableObject {
         step = .saved
     }
 
-    /// The user says a sentence with the word; hush shows what it would write.
+    /// The user says a sentence with the word; clemii shows what it would write.
     func tryIt() {
         stop()
         trial = .listening
@@ -231,7 +231,7 @@ final class WordTeacher: ObservableObject {
             case .nothingHeard:
                 guard !Task.isCancelled else { return }
                 misses += 1
-                problem = "hush didn\u{2019}t hear anything. Say \u{201C}\(trimmedWord)\u{201D} a little closer to the microphone."
+                problem = "clemii didn\u{2019}t hear anything. Say \u{201C}\(trimmedWord)\u{201D} a little closer to the microphone."
                 if misses >= 3 {
                     sampler.phase = .idle
                     return

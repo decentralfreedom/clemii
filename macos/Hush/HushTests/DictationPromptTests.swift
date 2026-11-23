@@ -76,7 +76,7 @@ struct DictationPromptTests {
         #expect(messages.last?.content == "<persona>\(persona.systemPrompt)</persona>\n<creativity>\(persona.creativityHint)</creativity>\n<language>German</language>\n<dictation>Bitte schreib eine kurze Nachricht an das Team.</dictation>")
     }
 
-    @Test("Apple's instructions hold only hush's rules and the mode's examples")
+    @Test("Apple's instructions hold only clemii's rules and the mode's examples")
     func appleInstructions() {
         let instructions = Profile.appleDictationInstructions(for: .compose)
         #expect(instructions.hasPrefix(Profile.dictationRules(for: .compose)))

@@ -42,7 +42,7 @@ final class ModelDownloadService {
     /// Per-model download state. Models absent from the dictionary are idle.
     let states = CurrentValueSubject<[String: State], Never>([:])
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "ModelDownload")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "ModelDownload")
     private var task: Task<Void, Never>?
     private var activeID: String?
 
@@ -165,7 +165,7 @@ final class ModelDownloadService {
         return "Download failed"
     }
 
-    /// Downloads (and, for FluidAudio, compiles) the model files into Hush's private
+    /// Downloads (and, for FluidAudio, compiles) the model files into clemii's private
     /// model storage, using each engine's own documented download API.
     private static func fetch(
         _ model: ModelInfo,

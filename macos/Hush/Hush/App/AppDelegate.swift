@@ -18,7 +18,7 @@ enum HushMain {
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
-    static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "App")
+    static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "App")
     private static let maximumServiceSelectionLength = 100_000
 
     private var menuBarController: MenuBarController?
@@ -154,7 +154,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func assistantIsOff() {
-        dictationCoordinator?.hud.flash(message: "Assistant is off. Turn it on in hush AI.")
+        dictationCoordinator?.hud.flash(message: "Assistant is off. Turn it on in clemii AI.")
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -178,11 +178,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         guard selectedText.count <= Self.maximumServiceSelectionLength else {
-            error.pointee = "The selected text is too long to edit with hush"
+            error.pointee = "The selected text is too long to edit with clemii"
             return
         }
         guard let sourceApplication = currentExternalApplication() else {
-            error.pointee = "hush could not identify the app containing the selection"
+            error.pointee = "clemii could not identify the app containing the selection"
             return
         }
 
@@ -301,13 +301,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let editor = HushSelectionEditor { text, instruction, _, _ in
             try await Task.sleep(for: .milliseconds(320))
             if instruction.localizedCaseInsensitiveContains("short") {
-                return "People can test the microphone during onboarding, making hush easier to understand."
+                return "People can test the microphone during onboarding, making clemii easier to understand."
             }
             if instruction.localizedCaseInsensitiveContains("smart") {
                 return "People can test the microphone directly in onboarding, creating a more intuitive and immediately understandable product experience."
             }
             if instruction.localizedCaseInsensitiveContains("friendly") {
-                return "People can try the microphone during onboarding, so hush feels natural from the very first moment."
+                return "People can try the microphone during onboarding, so clemii feels natural from the very first moment."
             }
             if instruction.localizedCaseInsensitiveContains("what would you improve") {
                 return "<message>I would make the opening more direct, shorten the middle sentence, and end with the user benefit so the idea feels more confident.</message>"
@@ -399,7 +399,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         let controller = HushControlCenterViewController(coordinator: nil, previewMode: true)
         let window = NSWindow(contentViewController: controller)
-        window.title = "hush Preview"
+        window.title = "clemii Preview"
         window.isRestorable = false
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.styleMask.insert(.fullSizeContentView)

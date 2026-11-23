@@ -8,7 +8,7 @@ import os
 /// (SpeechRoundsBenchmark: 97% identical text, p90 wait after release 79 ms against 219 ms).
 @MainActor
 final class SpeechRoundRunner {
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "SpeechRounds")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "SpeechRounds")
     private static let sampleRate = AudioRecorder.targetSampleRate
     /// The HUD level (peak × 1.5) above which the recording counts as speech, about -36 dBFS.
     private static let speechLevel: Float = 0.025

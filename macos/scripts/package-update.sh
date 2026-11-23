@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP_PATH="${1:-${HUSH_RELEASE_DIRECTORY:-${SCRIPT_DIRECTORY}/../artifacts/release}/export/hush.app}"
+APP_PATH="${1:-${HUSH_RELEASE_DIRECTORY:-${SCRIPT_DIRECTORY}/../artifacts/release}/export/clemii.app}"
 OUTPUT_DIRECTORY="${2:-${SCRIPT_DIRECTORY}/../artifacts/updates/alpha}"
 UPDATE_ORIGIN="${HUSH_UPDATE_ORIGIN:-https://updates.behu.sh}"
 UPDATE_CHANNEL="${HUSH_UPDATE_CHANNEL:-alpha}"
@@ -23,7 +23,7 @@ VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "${INF
 BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "${INFO_PLIST}")"
 RELEASE_SLUG="$(/usr/libexec/PlistBuddy -c 'Print :HushReleaseSlug' "${INFO_PLIST}" 2>/dev/null || true)"
 
-if [[ "${BUNDLE_IDENTIFIER}" != "com.decentralfreedom.hush" ]]; then
+if [[ "${BUNDLE_IDENTIFIER}" != "com.decentralfreedom.clemii" ]]; then
   echo "Refusing to publish unexpected bundle identifier: ${BUNDLE_IDENTIFIER}" >&2
   exit 1
 fi
@@ -44,13 +44,13 @@ if [[ -z "${SPARKLE_BIN_DIRECTORY}" ]]; then
   fi
 fi
 if [[ ! -x "${SPARKLE_BIN_DIRECTORY}/generate_appcast" ]]; then
-  echo "Sparkle tools not found. Build Hush once or set HUSH_SPARKLE_BIN_DIRECTORY." >&2
+  echo "Sparkle tools not found. Build clemii once or set HUSH_SPARKLE_BIN_DIRECTORY." >&2
   exit 1
 fi
 
 mkdir -p "${OUTPUT_DIRECTORY}"
 SUFFIX="${RELEASE_SLUG:+-${RELEASE_SLUG}}"
-ARCHIVE_NAME="hush-${VERSION}${SUFFIX}-build.${BUILD}.zip"
+ARCHIVE_NAME="clemii-${VERSION}${SUFFIX}-build.${BUILD}.zip"
 ARCHIVE_PATH="${OUTPUT_DIRECTORY}/${ARCHIVE_NAME}"
 rm -f "${ARCHIVE_PATH}"
 ditto -c -k --sequesterRsrc --keepParent "${APP_PATH}" "${ARCHIVE_PATH}"

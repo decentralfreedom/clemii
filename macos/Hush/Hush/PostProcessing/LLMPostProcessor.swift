@@ -5,7 +5,7 @@ import OSLog
 /// `Settings.shared.llmProvider`:
 ///
 /// - `.off` → light cleanup only (`BasicPostProcessor`: trim + collapse
-///   spaces). This is the default — Hush behaves exactly as before the
+///   spaces). This is the default — clemii behaves exactly as before the
 ///   profiles feature landed. Zero network, zero LLM RAM.
 ///
 /// - Apple Intelligence or a local Qwen provider runs cleanup plus the active profile's
@@ -19,7 +19,7 @@ import OSLog
 /// `DictationCoordinator.postProcessor`.
 struct LLMPostProcessor: TextPostProcessor {
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "LLMPostProcessor")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "LLMPostProcessor")
 
     /// The profile to apply *when an LLM provider is active*. Captured at
     /// processor construction time so the coordinator can swap processors

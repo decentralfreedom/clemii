@@ -133,7 +133,7 @@ public struct ProofManifest: Codable, Equatable, Sendable {
         }
     }
 
-    /// One microphone capture inserted into a Hush composer session. The
+    /// One microphone capture inserted into a clemii composer session. The
     /// signed hash proves which audio produced this section without retaining
     /// or uploading the recording itself.
     public struct VoiceSegment: Codable, Equatable, Sendable, Identifiable {

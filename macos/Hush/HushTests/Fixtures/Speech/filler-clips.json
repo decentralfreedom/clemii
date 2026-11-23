@@ -1,5 +1,5 @@
 {
-  "about": "Speech benchmark for filler handling per engine. 'spoken' is what the speaker says, 'reference' is the text hush should insert, 'fillers' are the hesitation sounds in 'spoken'. Synthetic clips come from scripts/speech-benchmark-clips.sh (macOS voices); real recordings use the same ids as <id>.wav in a folder outside Git. Never edit a reference to make an engine look better.",
+  "about": "Speech benchmark for filler handling per engine. 'spoken' is what the speaker says, 'reference' is the text clemii should insert, 'fillers' are the hesitation sounds in 'spoken'. Synthetic clips come from scripts/speech-benchmark-clips.sh (macOS voices); real recordings use the same ids as <id>.wav in a folder outside Git. Never edit a reference to make an engine look better.",
   "version": 1,
   "clips": [
     { "id": "de-01", "language": "de", "voice": "Anna", "spoken": "Äh, also ich hab gestern mit dem Team gesprochen und, ähm, wir verschieben das Release auf Freitag.", "reference": "Also ich hab gestern mit dem Team gesprochen und wir verschieben das Release auf Freitag.", "fillers": ["äh", "ähm"] },

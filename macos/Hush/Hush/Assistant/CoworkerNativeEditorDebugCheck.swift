@@ -43,20 +43,20 @@ enum CoworkerNativeEditorDebugCheck {
                           try CoworkerNativeTextAccess(field: field).text().isEmpty else {
                         throw CoworkerError.changedContext
                     }
-                    let first = AssistantCompanionController.draft("Hush editor test\n\nGerman breakfast\nBrötchen\nEier\nKäse 🧀")
+                    let first = AssistantCompanionController.draft("clemii editor test\n\nGerman breakfast\nBrötchen\nEier\nKäse 🧀")
                     let result = try await destination.insert(first)
                     report["insert_result"] = String(describing: result)
                     guard result == .verified else { throw CoworkerError.changedContext }
                     let current = try CoworkerTextTarget(application: notes)
                     let revision = try destination.revisionTarget(current: current)
-                    let revised = AssistantCompanionController.draft("Hush editor test\n\nGerman breakfast\nBrötchen\nEier\nKäse 🧀\nKaffee")
+                    let revised = AssistantCompanionController.draft("clemii editor test\n\nGerman breakfast\nBrötchen\nEier\nKäse 🧀\nKaffee")
                     report["revision_result"] = String(describing: try await revision.insert(revised))
                     guard let finalField = CoworkerAX.element(kAXFocusedUIElementAttribute, app) else {
                         throw CoworkerError.changedContext
                     }
                     let text = try CoworkerNativeTextAccess(field: finalField).text()
                     report["exact_text_verified"] = text == revised.plainText
-                    report["no_duplicate"] = text.components(separatedBy: "Hush editor test").count == 2
+                    report["no_duplicate"] = text.components(separatedBy: "clemii editor test").count == 2
                     do { try current.validate(); report["stale_snapshot_rejected"] = false }
                     catch { report["stale_snapshot_rejected"] = true }
                 }

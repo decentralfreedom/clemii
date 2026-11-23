@@ -17,7 +17,7 @@ struct SpeechEngineTests {
         #expect(SpeechEngine.engine(for: "distil-whisper_distil-large-v3") == .whisperKit)
     }
 
-    @Test("Parakeet files live in Hush application data")
+    @Test("Parakeet files live in clemii application data")
     func parakeetStorage() {
         let root = AIModelStorage.root.standardizedFileURL.path
         for model in ParakeetModel.allCases {
@@ -136,7 +136,7 @@ struct SpeechEngineTests {
     }
 
     #if canImport(FluidAudio)
-    @Test("Hush's Parakeet layout matches FluidAudio's own cache contract")
+    @Test("clemii's Parakeet layout matches FluidAudio's own cache contract")
     func matchesFluidAudioContract() {
         for model in ParakeetModel.allCases {
             #expect(model.repositoryFolderName == model.repository.folderName)

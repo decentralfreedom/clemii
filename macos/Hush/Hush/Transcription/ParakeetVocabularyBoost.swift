@@ -11,10 +11,10 @@ import FluidAudio
 /// purpose and can remove; without it the learned spellings still apply.
 ///
 /// This is `VocabularyBoostingSession`'s pipeline built from FluidAudio's public parts,
-/// because the session reads its tokenizer from FluidAudio's default cache and hush keeps
+/// because the session reads its tokenizer from FluidAudio's default cache and clemii keeps
 /// every model in `AIModelStorage`. The parameters follow the session exactly.
 actor ParakeetVocabularyBoost {
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "VocabularyBoost")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "VocabularyBoost")
     static let variant = CtcModelVariant.ctc110m
     /// The download, as FluidAudio documents it, for the consent dialog.
     static let downloadSize = Measurement(value: 97.5, unit: UnitInformationStorage.megabytes)
@@ -51,7 +51,7 @@ actor ParakeetVocabularyBoost {
 
     /// A personal vocabulary is small and often short ("Qwen", "hush"), the case where the
     /// default rescorer replaces ordinary words that were never said. In dictation a wrong
-    /// replacement is worse than a missed one, so hush takes FluidAudio's documented
+    /// replacement is worse than a missed one, so clemii takes FluidAudio's documented
     /// short-vocabulary settings (#702, #724): no acoustic-only rescue (false positives
     /// 94 to 19 and recall 0.92 to 0.97 in its measurement), a smaller boost for short
     /// words, and similarity floors.

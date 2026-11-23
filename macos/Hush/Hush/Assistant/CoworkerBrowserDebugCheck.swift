@@ -1,7 +1,7 @@
 #if DEBUG
 import AppKit
 
-/// Explicit local development checks using Hush's normal permission identity.
+/// Explicit local development checks using clemii's normal permission identity.
 /// No messages, files or accounts are changed. Browser tests leave their new tab open.
 @MainActor
 enum CoworkerBrowserDebugCheck {

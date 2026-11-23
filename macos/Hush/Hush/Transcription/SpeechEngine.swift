@@ -1,6 +1,6 @@
 import Foundation
 
-/// The on-device speech recognition runtimes Hush can run.
+/// The on-device speech recognition runtimes clemii can run.
 ///
 /// Every transcription model belongs to exactly one engine. The engine decides which
 /// `Transcriber` implementation loads it and where its files live on disk.
@@ -46,7 +46,7 @@ enum SpeechEngine: String, Sendable, Codable, CaseIterable {
     }
 }
 
-/// The Parakeet models Hush offers through FluidAudio.
+/// The Parakeet models clemii offers through FluidAudio.
 ///
 /// This is a curated list rather than a scraped catalog: FluidAudio's `AsrModelVersion`
 /// enum is the source of truth for what the pinned package can load, so the list only

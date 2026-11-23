@@ -118,7 +118,7 @@ private struct AssistantView: View {
                 Image(systemName: "cursorarrow.rays").font(.system(size: 23, weight: .medium)).foregroundStyle(Color(nsColor: DesignTokens.brand500))
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Hey Hush").font(.system(size: 21, weight: .semibold))
-                    Text("hush\u{2019}s AI assistant, right here.").font(.system(size: 12)).foregroundStyle(.secondary)
+                    Text("clemii\u{2019}s AI assistant, right here.").font(.system(size: 12)).foregroundStyle(.secondary)
                         .accessibilityIdentifier("hush.assistant.ai-disclosure")
                 }
                 Spacer()
@@ -218,7 +218,7 @@ private struct AssistantUnavailableView: View {
                 .accessibilityIdentifier("hush.assistant.unavailable")
             Text("This preview writes and inserts email drafts in Apple Mail. Open it with Control + Fn while the email body is focused.")
                 .font(.system(size: 13)).foregroundStyle(.secondary)
-            Button("Open hush settings", action: onSettings)
+            Button("Open clemii settings", action: onSettings)
             Spacer()
             Label("Writing stays on this Mac", systemImage: "lock.shield").font(.system(size: 12)).foregroundStyle(.secondary)
         }.padding(28).frame(minWidth: 380, minHeight: 480).background(Color(nsColor: .windowBackgroundColor))
@@ -244,10 +244,10 @@ private final class AssistantCursorController {
         panel.contentView = NSHostingView(rootView:
             HStack(spacing: 4) {
                 Image(systemName: "cursorarrow").font(.system(size: 14, weight: .semibold))
-                Text("hush").font(.system(size: 11, weight: .semibold))
+                Text("clemii").font(.system(size: 11, weight: .semibold))
             }.foregroundStyle(.white).padding(.horizontal, 8).padding(.vertical, 6)
                 .background(Color(nsColor: DesignTokens.brand500), in: Capsule())
-                .accessibilityLabel("hush email destination")
+                .accessibilityLabel("clemii email destination")
         )
         panel.setFrameOrigin(point)
         panel.orderFrontRegardless()

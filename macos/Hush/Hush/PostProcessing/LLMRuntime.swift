@@ -75,7 +75,7 @@ final class LLMRuntime {
         do {
             let migrated = try AIModelStorage.migrateLegacyQwenRepositories()
             if !migrated.isEmpty {
-                Self.log.notice("Moved \(migrated.count) legacy Qwen model cache(s) into Hush application data")
+                Self.log.notice("Moved \(migrated.count) legacy Qwen model cache(s) into clemii application data")
             }
         } catch {
             Self.log.error("Could not migrate legacy Qwen model cache: \(error.localizedDescription, privacy: .public)")
@@ -84,7 +84,7 @@ final class LLMRuntime {
         for model in QwenModel.allCases { refreshQwenDiskState(for: model) }
     }
 
-    fileprivate static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "LLMRuntime")
+    fileprivate static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "LLMRuntime")
 
     /// One Combine ping for the Settings UI / menu bar to re-render on any
     /// state change (Apple availability flipped, Qwen download progressed
@@ -665,7 +665,7 @@ final class LLMRuntime {
         #endif
     }
 
-    /// How the dictation reaches Apple's on-device model. hush uses `.examplesAsTurns`;
+    /// How the dictation reaches Apple's on-device model. clemii uses `.examplesAsTurns`;
     /// the others stay for the live evaluation that compares them (PersonaLiveTests).
     /// Guided generation was measured too and did worst: it lost umlauts and
     /// corrections, so plain text replies remain.
@@ -681,7 +681,7 @@ final class LLMRuntime {
         case withoutExamples
     }
 
-    /// Apple's on-device model: hush's fixed rules and examples as instructions, which the
+    /// Apple's on-device model: clemii's fixed rules and examples as instructions, which the
     /// model obeys over prompts, and a fresh session per dictation, so an earlier
     /// dictation never shapes this one.
     func generateAppleDictation(transcript: String, profile: Profile, style: AppleDictationStyle = .examplesAsTurns) async throws -> String {
@@ -776,7 +776,7 @@ final class LLMRuntime {
     }
 
     #if canImport(MLXLLM) && canImport(MLXLMCommon) && canImport(MLXHuggingFace) && canImport(HuggingFace)
-    /// Everything Qwen sees for one dictation: hush's rules as the system message, the
+    /// Everything Qwen sees for one dictation: clemii's rules as the system message, the
     /// examples as earlier turns with their answers, then the user's persona and dictation.
     /// The user's terms for the writing prompt; read on the main actor, where dictation runs.
     static var vocabularyTerms: [String] { Settings.shared.vocabulary.map(\.term) }

@@ -13,7 +13,7 @@ final class AssistantJourneyTests: XCTestCase {
         let waiting = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value CONTAINS %@ AND value CONTAINS %@", "Step 2", "2s"), object: progress)
         XCTAssertEqual(XCTWaiter.wait(for: [waiting], timeout: 7), .completed)
         XCTAssertEqual(app.staticTexts["hush.companion.status"].value as? String, "Choosing the next action")
-        screenshotCompanion("Hush - checked sequence progress", app)
+        screenshotCompanion("clemii - checked sequence progress", app)
         app.typeKey(.escape, modifierFlags: [])
         XCTAssertEqual(app.textViews["hush.assistant.fixture.body"].value as? String, "Search results: First music video")
         XCTAssertFalse(app.buttons["hush.companion.apply"].exists)
@@ -118,7 +118,7 @@ final class AssistantJourneyTests: XCTestCase {
         let speech = app.staticTexts["hush.companion.speech"]
         XCTAssertTrue(speech.waitForExistence(timeout: 4))
         XCTAssertFalse(app.textFields["hush.companion.prompt"].exists)
-        screenshotCompanion("Hush - spoken reply bubble", app, detail: true)
+        screenshotCompanion("clemii - spoken reply bubble", app, detail: true)
         app.typeKey(.escape, modifierFlags: [])
         XCTAssertFalse(speech.exists)
         let hidden = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"),
@@ -146,7 +146,7 @@ final class AssistantJourneyTests: XCTestCase {
         XCTAssertFalse(app.windows["hush.assistant.window"].exists)
         XCTAssertTrue(app.buttons["hush.companion.microphone"].exists)
         XCTAssertLessThan(app.dialogs["hush.companion.cursor.window"].frame.height, 80)
-        screenshotCompanion("Hush coworker - compact entry", app)
+        screenshotCompanion("clemii coworker - compact entry", app)
     }
 
     func testSpokenTurnFollowUpAndInsertion() throws {
@@ -236,7 +236,7 @@ final class AssistantJourneyTests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for: [inserted], timeout: 6), .completed)
         XCTAssertFalse(app.buttons["hush.companion.apply"].exists)
         XCTAssertFalse(app.buttons["hush.companion.preview"].exists)
-        screenshotCompanion("Hush coworker - draft updated", app)
+        screenshotCompanion("clemii coworker - draft updated", app)
     }
 
     func testClarificationContinuesByVoiceWithoutAForm() {
@@ -251,7 +251,7 @@ final class AssistantJourneyTests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for: [question], timeout: 5), .completed)
         XCTAssertFalse(app.descendants(matching: .any)["hush.companion.surface"].exists)
         XCTAssertFalse(app.textFields["hush.companion.prompt"].exists)
-        screenshotCompanion("Hush coworker - awaiting spoken answer", app)
+        screenshotCompanion("clemii coworker - awaiting spoken answer", app)
         microphone.click()
         let body = app.textViews["hush.assistant.fixture.body"]
         let inserted = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value CONTAINS %@", "Tomorrow at 10 works for me."), object: body)
@@ -314,7 +314,7 @@ final class AssistantJourneyTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["hush.assistant.draft"].waitForExistence(timeout: 5))
         app.buttons["hush.assistant.fixture.change"].click()
         app.buttons["hush.assistant.insert"].click()
-        XCTAssertTrue(waitForStatus("The destination changed. Reopen hush from the email body to bind it again.", in: app))
+        XCTAssertTrue(waitForStatus("The destination changed. Reopen clemii from the email body to bind it again.", in: app))
         XCTAssertEqual(app.textViews["hush.assistant.fixture.body"].value as? String, "A newer draft typed by the user.")
         screenshot("Hey Hush Dark - Changed destination")
     }

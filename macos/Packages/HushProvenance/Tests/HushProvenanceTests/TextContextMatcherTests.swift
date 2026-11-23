@@ -2,12 +2,12 @@ import Foundation
 import Testing
 @testable import HushProvenance
 
-@Suite("Contextual Hush editor")
+@Suite("Contextual clemii editor")
 struct TextContextMatcherTests {
-    @Test("detects an exact recent Hush message and its visible proof")
+    @Test("detects an exact recent clemii message and its visible proof")
     func detectsMessageAndProof() throws {
         let message = "Perfect, let us lock in Thursday at ten."
-        let signature = "\n\n-typed with hush: https://behu.sh/A7k2Qx#k=private"
+        let signature = "\n\n-typed with clemii: https://behu.sh/A7k2Qx#k=private"
         let field = "Earlier text\n\(message)\(signature)\nLater text"
 
         let match = try #require(TextContextMatcher.match(
@@ -30,7 +30,7 @@ struct TextContextMatcherTests {
     @Test("detects the linked signature label without a visible URL")
     func detectsLinkedSignature() throws {
         let message = "A short verified message."
-        let field = "\(message)\n\n-typed with hush"
+        let field = "\(message)\n\n-typed with clemii"
         let match = try #require(TextContextMatcher.match(
             fieldValue: field,
             bundleIdentifier: "com.apple.notes",
@@ -68,7 +68,7 @@ struct TextContextMatcherTests {
 
     @Test("replacement validation fails closed after source text changes")
     func rejectsStaleReplacement() throws {
-        let message = "Original Hush message text"
+        let message = "Original clemii message text"
         let match = try #require(TextContextMatcher.match(
             fieldValue: message,
             bundleIdentifier: "com.apple.TextEdit",
@@ -108,11 +108,11 @@ struct TextContextMatcherTests {
         ) == nil)
     }
 
-    @Test("expands a partial selection to the complete Hush message and proof")
+    @Test("expands a partial selection to the complete clemii message and proof")
     func expandsPartialSelectionToCompleteMessage() throws {
         let message = "Please review the complete launch checklist before Thursday morning."
-        let firstProof = "\n\n-typed with hush: https://behu.sh/A7k2Qx#k=first"
-        let staleProof = "\n\n-typed with hush: https://behu.sh/B8m3Ry#k=stale"
+        let firstProof = "\n\n-typed with clemii: https://behu.sh/A7k2Qx#k=first"
+        let staleProof = "\n\n-typed with clemii: https://behu.sh/B8m3Ry#k=stale"
         let field = "Intro\n\n\(message)\(firstProof)\(staleProof)\n\nFooter"
         let messageLocation = (field as NSString).range(of: message).location
         let selectedRange = NSRange(location: messageLocation + 7, length: 12)
@@ -147,9 +147,9 @@ struct TextContextMatcherTests {
         #expect(match.sourceText == "Original unrefined wording")
     }
 
-    @Test("does not use another nearby Hush message for an unrelated selection")
+    @Test("does not use another nearby clemii message for an unrelated selection")
     func rejectsUnrelatedSelectionNearKnownMessage() {
-        let known = "This complete paragraph was previously created and retained by Hush."
+        let known = "This complete paragraph was previously created and retained by clemii."
         let pasted = "This paragraph came from an unrelated pasted source and is selected."
         let field = "\(known)\n\n\(pasted)"
         let selectedRange = (field as NSString).range(of: pasted)
@@ -172,16 +172,16 @@ struct TextContextMatcherTests {
     @Test("chooses the historical message nearest the caret")
     func choosesNearestMessage() {
         let older = RecentTextCandidate(
-            text: "The older Hush message",
+            text: "The older clemii message",
             bundleIdentifier: "com.apple.TextEdit",
             copiedToClipboard: false
         )
         let newer = RecentTextCandidate(
-            text: "The newer Hush message",
+            text: "The newer clemii message",
             bundleIdentifier: "com.apple.TextEdit",
             copiedToClipboard: false
         )
-        let document = "The older Hush message\n\nUnrelated notes\n\nThe newer Hush message"
+        let document = "The older clemii message\n\nUnrelated notes\n\nThe newer clemii message"
 
         let match = TextContextMatcher.match(
             fieldValue: document,
@@ -194,11 +194,11 @@ struct TextContextMatcherTests {
         #expect(match?.replacementRange.location == 0)
     }
 
-    @Test("reopens a lightly edited Hush message without a time limit")
+    @Test("reopens a lightly edited clemii message without a time limit")
     func detectsStrictApproximateMatch() throws {
         let original = "Please review the complete onboarding journey before Thursday and send the final notes to the product team."
         let current = "Please review the complete onboarding journey before Thursday and send the final notes to our product team."
-        let field = "Unrelated introduction\n\n\(current)\n\n-typed with hush: https://behu.sh/A7k2Qx#k=private"
+        let field = "Unrelated introduction\n\n\(current)\n\n-typed with clemii: https://behu.sh/A7k2Qx#k=private"
 
         let match = try #require(TextContextMatcher.match(
             fieldValue: field,

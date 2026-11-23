@@ -18,7 +18,7 @@ final class ChatGPTAccount {
 
     static let manageUsageURL = URL(string: "https://chatgpt.com/settings/usage")!
     static let privacyPolicyURL = URL(string: "https://openai.com/policies/privacy-policy/")!
-    /// After a usage limit, plan requests pause for this long before hush tries again.
+    /// After a usage limit, plan requests pause for this long before clemii tries again.
     static let limitPause: TimeInterval = 15 * 60
 
     let changes = PassthroughSubject<Void, Never>()
@@ -168,12 +168,12 @@ final class ChatGPTAccount {
 extension ChatGPTError: LocalizedError {
     var errorDescription: String? {
         switch self {
-        case .usageLimitReached: "Your ChatGPT plan\u{2019}s limit for hush is reached."
-        case .notEligible: "This ChatGPT account can\u{2019}t use its plan in hush."
+        case .usageLimitReached: "Your ChatGPT plan\u{2019}s limit for clemii is reached."
+        case .notEligible: "This ChatGPT account can\u{2019}t use its plan in clemii."
         case .temporarilyUnavailable: "ChatGPT is not available right now."
         case .signInRequired: "Sign in to ChatGPT again."
-        case .planUsageNotGranted: "hush wasn\u{2019}t allowed to use your ChatGPT plan."
-        case .network: "hush couldn\u{2019}t reach ChatGPT."
+        case .planUsageNotGranted: "clemii wasn\u{2019}t allowed to use your ChatGPT plan."
+        case .network: "clemii couldn\u{2019}t reach ChatGPT."
         case .cancelled: "Stopped."
         default: "ChatGPT couldn\u{2019}t do this one."
         }
@@ -200,7 +200,7 @@ extension ChatGPTAccount {
             // settings and OpenAI's policies apply, and OpenAI may keep requests and use them to
             // train its models. store:false only keeps them out of stored API responses, so the
             // dialog does not promise more than that.
-            let account = "You sign in on OpenAI\u{2019}s website; hush never sees your password or your ChatGPT chats. Requests count toward your plan\u{2019}s limits. Your ChatGPT settings and OpenAI\u{2019}s privacy policy apply: OpenAI may keep requests and use them to improve its models unless you turn that off in ChatGPT\u{2019}s data controls."
+            let account = "You sign in on OpenAI\u{2019}s website; clemii never sees your password or your ChatGPT chats. Requests count toward your plan\u{2019}s limits. Your ChatGPT settings and OpenAI\u{2019}s privacy policy apply: OpenAI may keep requests and use them to improve its models unless you turn that off in ChatGPT\u{2019}s data controls."
             switch self {
             case .liveWrite:
                 return """
@@ -210,7 +210,7 @@ extension ChatGPTAccount {
                 """
             case .assistant:
                 return """
-                Assistant will send OpenAI what you ask, text it reads from the app you\u{2019}re working in, and, when it helps, a screenshot of that window. Your conversation stays in hush.
+                Assistant will send OpenAI what you ask, text it reads from the app you\u{2019}re working in, and, when it helps, a screenshot of that window. Your conversation stays in clemii.
 
                 \(account) If ChatGPT can\u{2019}t answer, Assistant uses a model on this Mac when one is installed. You can switch back at any time.
                 """
@@ -262,7 +262,7 @@ extension ChatGPTAccount {
     func disconnectReporting(in window: NSWindow?) {
         let confirm = NSAlert()
         confirm.messageText = "Disconnect ChatGPT?"
-        confirm.informativeText = "hush signs out and stops using your ChatGPT plan. Live Write and Assistant use models on this Mac again."
+        confirm.informativeText = "clemii signs out and stops using your ChatGPT plan. Live Write and Assistant use models on this Mac again."
         confirm.addButton(withTitle: "Disconnect")
         confirm.addButton(withTitle: "Cancel")
         let proceed: (NSApplication.ModalResponse) -> Void = { [weak self] response in
@@ -271,7 +271,7 @@ extension ChatGPTAccount {
                 guard !(await self.disconnect()) else { return }
                 let notice = NSAlert()
                 notice.messageText = "Disconnected on this Mac"
-                notice.informativeText = "hush removed your ChatGPT session, but OpenAI did not confirm the revocation. You can also remove hush in ChatGPT\u{2019}s settings."
+                notice.informativeText = "clemii removed your ChatGPT session, but OpenAI did not confirm the revocation. You can also remove clemii in ChatGPT\u{2019}s settings."
                 if let window { notice.beginSheetModal(for: window, completionHandler: nil) } else { notice.runModal() }
             }
         }

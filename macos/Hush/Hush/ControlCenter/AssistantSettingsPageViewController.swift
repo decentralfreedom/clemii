@@ -49,7 +49,7 @@ struct AssistantSetupSnapshot: Equatable {
     }
 }
 
-/// Where the Assistant stands, in one line, for its page and the hush AI page.
+/// Where the Assistant stands, in one line, for its page and the clemii AI page.
 @MainActor
 struct AssistantStatus {
     let isOn: Bool
@@ -234,15 +234,15 @@ final class AssistantSettingsPageViewController: ControlCenterPageViewController
         // Never claim everything stays on this Mac while the plan answers.
         let cloud = CoworkerModelSettings.isCloud
         header.detail = cloud
-            ? "Talk to hush about what\u{2019}s on your screen, answered with your ChatGPT plan."
-            : "Talk to hush about what\u{2019}s on your screen, entirely on this Mac."
+            ? "Talk to clemii about what\u{2019}s on your screen, answered with your ChatGPT plan."
+            : "Talk to clemii about what\u{2019}s on your screen, entirely on this Mac."
         privacyNote.stringValue = cloud
             ? "Setup walks you through each macOS permission. Listening and spoken replies stay on this Mac; what you ask, text from the app you\u{2019}re in and, when it helps, a screenshot of that window are sent to OpenAI."
-            : "Setup downloads what is missing and walks you through each macOS permission. What you say and show hush stays on this Mac; downloads and websites you open use the internet."
+            : "Setup downloads what is missing and walks you through each macOS permission. What you say and show clemii stays on this Mac; downloads and websites you open use the internet."
     }
 }
 
-/// A native symbol and spacious typography carry the Hush identity without
+/// A native symbol and spacious typography carry the clemii identity without
 /// continuous animation or a web-style settings banner.
 @MainActor
 final class AISettingsHeader: NSView {

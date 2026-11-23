@@ -16,7 +16,7 @@ import OSLog
 @MainActor
 final class HotkeyManager {
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "Hotkey")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "Hotkey")
 
     var onPress: (() -> Void)?
     var onRelease: (() -> Void)?
@@ -144,7 +144,7 @@ final class HotkeyManager {
     }
 
     /// Carbon allows a callback to be installed only once for the same target.
-    /// Every Hush shortcut shares this process-wide callback and dispatches by
+    /// Every clemii shortcut shares this process-wide callback and dispatches by
     /// its unique hotkey id through `registry`.
     private static func installSharedCarbonHandlerIfNeeded() -> OSStatus {
         if sharedHotKeyHandler != nil { return noErr }

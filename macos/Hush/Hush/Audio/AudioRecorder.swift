@@ -20,7 +20,7 @@ import OSLog
 @MainActor
 final class AudioRecorder {
 
-    private static let log = Logger(subsystem: "com.decentralfreedom.hush", category: "Audio")
+    private static let log = Logger(subsystem: "com.decentralfreedom.clemii", category: "Audio")
 
     static let targetSampleRate: Double = 16_000
 
@@ -92,7 +92,7 @@ final class AudioRecorder {
     // MARK: - Lifecycle
 
     /// `journaling: false` keeps the clip off disk, for samples that are never dictation,
-    /// such as a word the user teaches hush.
+    /// such as a word the user teaches clemii.
     func start(journaling: Bool = true) throws {
         guard state == .idle else { return }
 

@@ -24,7 +24,7 @@ protocol Transcriber: Sendable {
     func setVocabulary(_ terms: [VocabularyTerm]) async
 
     /// Like `transcribe`, but exactly as the model hears: without the user's vocabulary.
-    /// Teaching a word shows this, so hush learns what it really hears.
+    /// Teaching a word shows this, so clemii learns what it really hears.
     func transcribeUnaided(samples: [Float], language: String, fallbackCount: Int) async throws -> String?
 }
 
