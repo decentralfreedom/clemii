@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
-import { editorialPolicyPath, type BlogLanguage } from "@hush/article/taxonomy";
+import { editorialPolicyPath, type BlogLanguage } from "@clemii/article/taxonomy";
 import { blogCopy } from "../../shared/blog";
 import { DocumentMetadata } from "../components/DocumentMetadata";
 import { Footer } from "../layout/Footer";

@@ -28,7 +28,7 @@ function apply(mode: ThemeMode) {
   const dark = mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   const html = document.documentElement;
   if (html.classList.contains("dark") === dark) return;
-  // Hold transitions back so the whole UI flips in one paint (theme-switching in @hush/theme).
+  // Hold transitions back so the whole UI flips in one paint (theme-switching in @clemii/theme).
   html.classList.add("theme-switching");
   html.classList.toggle("dark", dark);
   if (releaseFrame !== undefined) cancelAnimationFrame(releaseFrame);

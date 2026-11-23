@@ -117,5 +117,5 @@ const openssl = Bun.spawnSync(["openssl", "req", "-x509", "-newkey", "rsa:2048",
   "-addext", "subjectAltName=DNS:localhost", "-keyout", join(certificateDir, "key.pem"), "-out", join(certificateDir, "cert.pem")]);
 if (openssl.exitCode !== 0) throw new Error(`openssl failed: ${openssl.stderr.toString()}`);
 Bun.serve({ port, fetch: app.fetch, tls: { key: Bun.file(join(certificateDir, "key.pem")), cert: Bun.file(join(certificateDir, "cert.pem")) } });
-console.info(`hush CMS admin journeys on ${admin.publicUrl}`);
+console.info(`clemii CMS admin journeys on ${admin.publicUrl}`);
 process.on("SIGTERM", async () => { await database.drop(); process.exit(0); });

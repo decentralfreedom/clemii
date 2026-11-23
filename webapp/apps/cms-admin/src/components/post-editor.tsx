@@ -6,11 +6,11 @@
 // way back, the status and the actions, and the word count in the corner. A
 // draft saves itself while its author writes; a live post changes only with
 // "Update". The article stays Markdown: blocks are read from it and written
-// back (@hush/article/blocks), and Markdown that blocks cannot hold exactly is
+// back (@clemii/article/blocks), and Markdown that blocks cannot hold exactly is
 // edited as Markdown. The post's settings dock beside it (Cmd/Ctrl+.), and
 // publishing ends on the posts list, which celebrates the post, as in Ghost.
-import { readArticle, writeArticle } from "@hush/article/blocks";
-import { tldrTitles } from "@hush/article/markdown";
+import { readArticle, writeArticle } from "@clemii/article/blocks";
+import { tldrTitles } from "@clemii/article/markdown";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useBlocker, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, PanelRight } from "lucide-react";

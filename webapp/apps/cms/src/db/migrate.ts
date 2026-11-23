@@ -44,5 +44,5 @@ if (import.meta.main) {
   const url = process.env.CMS_DATABASE_URL;
   if (!url) throw new Error("CMS_DATABASE_URL is required");
   await migrateDatabase(url);
-  console.info("hush CMS database is current.");
+  console.info("clemii CMS database is current.");
 }

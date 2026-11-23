@@ -7,7 +7,7 @@
 // that directory, so pages, feeds, covers and image renditions come out as if
 // the files were in the repository, and serves the revision back so the CMS
 // knows when a change is live.
-import { formatArticle } from "@hush/article";
+import { formatArticle } from "@clemii/article";
 import type { Database } from "../db/client";
 import { siteState } from "../db/schema";
 import { listMedia } from "../media/service";

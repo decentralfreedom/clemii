@@ -1,4 +1,4 @@
-# hush web workspace guidance
+# clemii web workspace guidance
 
 - Each app or package has its own `AGENTS.md`; read the one you are changing.
 - Install from this directory (`bun install --frozen-lockfile`); run an app's

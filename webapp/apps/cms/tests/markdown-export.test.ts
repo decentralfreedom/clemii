@@ -5,7 +5,7 @@
 // the file the website and `hush-cms posts pull` use, and a manifest; it is
 // kept like the database backups and never touches them.
 import { afterAll, beforeAll, expect, test } from "bun:test";
-import { parseArticle } from "@hush/article/file";
+import { parseArticle } from "@clemii/article/file";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

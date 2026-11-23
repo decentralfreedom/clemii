@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
-import type { BlogAuthorId } from "@hush/article/authors";
-import type { BlogArticleType, BlogClusterId, BlogLanguage } from "@hush/article/taxonomy";
+import type { BlogAuthorId } from "@clemii/article/authors";
+import type { BlogArticleType, BlogClusterId, BlogLanguage } from "@clemii/article/taxonomy";
 
 /** Public metadata of a published article. Generated; HTML lives in its own chunk. */
 export type BlogPostMetadata = {

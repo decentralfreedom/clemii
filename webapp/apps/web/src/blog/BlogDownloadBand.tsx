@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 import { useEffect, useRef, useState } from "react";
-import { type BlogLanguage } from "@hush/article/taxonomy";
+import { type BlogLanguage } from "@clemii/article/taxonomy";
 import { blogCopy } from "../../shared/blog";
 import { AppleIcon } from "../components/AppleIcon";
 import { DownloadLink } from "../components/DownloadExperience";

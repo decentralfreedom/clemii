@@ -53,7 +53,7 @@ describe.skipIf(!serverUrl)("CMS admin", () => {
     database = await createTestDatabase();
     adminDir = await mkdtemp(join(tmpdir(), "hush-cms-admin-"));
     await mkdir(join(adminDir, "assets"), { recursive: true });
-    await writeFile(join(adminDir, "index.html"), "<!doctype html><title>hush CMS</title><div id=root></div>");
+    await writeFile(join(adminDir, "index.html"), "<!doctype html><title>clemii CMS</title><div id=root></div>");
     await writeFile(join(adminDir, "assets", "app-abc123.js"), "console.log('admin')");
     const media = new LocalObjectStore(await mkdtemp(join(tmpdir(), "hush-cms-media-")));
     app = createApp({ db: database.db, media }, { admin, adminDir });
@@ -182,15 +182,15 @@ describe.skipIf(!serverUrl)("CMS admin", () => {
 
   test("CMS-ADMIN-006 the admin is served on the CMS origin without shadowing the API, and is never indexed", async () => {
     const home = await app.request("/");
-    expect(await home.text()).toContain("<title>hush CMS</title>");
+    expect(await home.text()).toContain("<title>clemii CMS</title>");
     expect(home.headers.get("x-robots-tag")).toBe("noindex, nofollow");
-    expect(await (await app.request("/posts/some-id")).text()).toContain("<title>hush CMS</title>");
+    expect(await (await app.request("/posts/some-id")).text()).toContain("<title>clemii CMS</title>");
     const asset = await app.request("/assets/app-abc123.js");
     expect(asset.headers.get("cache-control")).toBe("public, max-age=31536000, immutable");
     expect((await app.request("/v1/posts")).status).toBe(401);
     expect((await app.request("/health/live")).status).toBe(200);
     expect(await (await app.request("/robots.txt")).text()).toBe("User-agent: *\nDisallow: /\n");
-    expect(await (await app.request("/..%2f..%2fpackage.json")).text()).toContain("<title>hush CMS</title>");
+    expect(await (await app.request("/..%2f..%2fpackage.json")).text()).toContain("<title>clemii CMS</title>");
   });
 
   test("CMS-ADMIN-007 sign-in is configured completely or not at all", () => {

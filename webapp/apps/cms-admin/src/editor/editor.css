@@ -4,7 +4,7 @@
    The editor's styles around Koenig's prose typography (kg-prose.css): the
    variables and base it expects, as Koenig's own stylesheets set them
    (koenig-lexical/src/styles: index.css, components/koenig-lexical.css, MIT,
-   Ghost Foundation), then the hush blocks Koenig has no card for. */
+   Ghost Foundation), then the clemii blocks Koenig has no card for. */
 @import "./kg-prose.css";
 
 :root {
@@ -61,7 +61,7 @@
   --grey-950: #23292f;
   --black: #15171a;
   --green: #30cf43;
-  /* Links and the quote's rule, as the site's accent in Ghost: the violet of the hush summary box. */
+  /* Links and the quote's rule, as the site's accent in Ghost: the violet of the clemii summary box. */
   --kg-accent-color: #7667d7;
   position: relative;
 }
@@ -228,7 +228,7 @@
     background: color-mix(in oklab, var(--kg-accent-color) 12%, transparent);
   }
 
-  /* The summary box ("> [!TLDR]"), drawn as on behu.sh (@hush/article/article.css). */
+  /* The summary box ("> [!TLDR]"), drawn as on behu.sh (@clemii/article/article.css). */
   > div.editor-summary {
     margin: 3.2rem 0 0;
     padding: 2rem 2.2rem 1.6rem;

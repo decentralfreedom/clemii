@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 //
-// The Markdown of a hush article: how it is parsed and written, and the blocks
+// The Markdown of a clemii article: how it is parsed and written, and the blocks
 // an article is made of beyond plain Markdown. Free of Node-only code, so the
 // renderer (article.ts) and the CMS editor read and write articles the same way.
 import type { Table } from "mdast";

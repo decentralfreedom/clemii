@@ -1,5 +1,5 @@
 {
-  "name": "@hush/cms-cli",
+  "name": "@clemii/cms-cli",
   "private": true,
   "license": "AGPL-3.0-only",
   "version": "1.0.0",
@@ -16,7 +16,7 @@
     "install:cli": "bun run build && mkdir -p \"$HOME/.local/bin\" && cp dist/hush-cms \"$HOME/.local/bin/hush-cms\""
   },
   "dependencies": {
-    "@hush/article": "workspace:*"
+    "@clemii/article": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "1.3.9",

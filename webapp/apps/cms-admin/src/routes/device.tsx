@@ -81,7 +81,7 @@ function DevicePage() {
   const request = pending.data;
   return (
     <Card title="Authorize hush-cms">
-      <p className="mt-2 text-sm text-muted-foreground"><strong className="font-semibold text-foreground">{request.clientName}</strong> asks to access the hush CMS. It will be able to:</p>
+      <p className="mt-2 text-sm text-muted-foreground"><strong className="font-semibold text-foreground">{request.clientName}</strong> asks to access the clemii CMS. It will be able to:</p>
       <ul className="mt-4 grid gap-2 text-sm">
         {request.scopes.map((scope) => <li key={scope} className="flex items-start gap-2"><Check className="mt-0.5 size-4 shrink-0 text-state-success" />{scopeText[scope] ?? scope}</li>)}
       </ul>

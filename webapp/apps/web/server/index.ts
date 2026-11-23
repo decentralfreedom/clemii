@@ -124,7 +124,7 @@ const server = Bun.serve({
 console.info(
   JSON.stringify({
     level: "info",
-    message: "Hush proof service listening",
+    message: "clemii proof service listening",
     port: server.port,
     environment: config.environment,
     storage: config.s3 ? "s3" : "local",
@@ -157,7 +157,7 @@ async function shutdown(signal: string) {
   await server.stop(true);
   await cleanup.stop();
   await repository.close();
-  console.info(JSON.stringify({ level: "info", message: "Hush proof service stopped" }));
+  console.info(JSON.stringify({ level: "info", message: "clemii proof service stopped" }));
   process.exit(0);
 }
 process.once("SIGTERM", () => void shutdown("SIGTERM"));

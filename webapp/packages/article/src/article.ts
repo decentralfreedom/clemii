@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 //
-// The hush article contract: parses one Markdown article, validates it and
+// The clemii article contract: parses one Markdown article, validates it and
 // renders it to HTML. Pure: images and the surrounding site arrive through the
 // context, so the static blog build and the CMS share one implementation.
 import { createHash } from "node:crypto";

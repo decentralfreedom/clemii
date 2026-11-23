@@ -4,7 +4,7 @@
 // CMS-SITE journeys (docs/user-journeys/cms.md): the export the website builds
 // from, the site revision and the deploy loop.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { parseArticle, renderArticle } from "@hush/article";
+import { parseArticle, renderArticle } from "@clemii/article";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

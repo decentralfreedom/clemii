@@ -19,10 +19,10 @@ import { copyFile, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import sharp from "sharp";
-import { authorPath, blogAuthors } from "@hush/article/authors";
+import { authorPath, blogAuthors } from "@clemii/article/authors";
 import { siteOrigin } from "../../shared/origin";
-import { type BlogImageOutput, type BlogPost } from "@hush/article";
-import { blogLanguages, blogPath, editorialPolicyPath, linkableSitePaths, type BlogLanguage } from "@hush/article/taxonomy";
+import { type BlogImageOutput, type BlogPost } from "@clemii/article";
+import { blogLanguages, blogPath, editorialPolicyPath, linkableSitePaths, type BlogLanguage } from "@clemii/article/taxonomy";
 import { buildBlog } from "./build-blog";
 import { renderCovers } from "./render-covers";
 

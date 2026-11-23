@@ -6,11 +6,11 @@
       "name": "hush-landing",
     },
     "apps/cms": {
-      "name": "@hush/cms",
+      "name": "@clemii/cms",
       "version": "1.0.0",
       "dependencies": {
+        "@clemii/article": "workspace:*",
         "@hono/zod-openapi": "1.1.5",
-        "@hush/article": "workspace:*",
         "arctic": "3.7.0",
         "drizzle-orm": "0.45.2",
         "hono": "4.13.18",
@@ -26,16 +26,16 @@
       },
     },
     "apps/cms-admin": {
-      "name": "@hush/cms-admin",
+      "name": "@clemii/cms-admin",
       "version": "1.0.0",
       "dependencies": {
+        "@clemii/article": "workspace:*",
+        "@clemii/theme": "workspace:*",
         "@codemirror/commands": "6.11.1",
         "@codemirror/lang-markdown": "6.5.2",
         "@codemirror/language": "6.13.1",
         "@codemirror/state": "6.7.6",
         "@codemirror/view": "6.43.15",
-        "@hush/article": "workspace:*",
-        "@hush/theme": "workspace:*",
         "@lexical/code": "0.53.0",
         "@lexical/link": "0.53.0",
         "@lexical/list": "0.53.0",
@@ -81,13 +81,13 @@
       },
     },
     "apps/cms-cli": {
-      "name": "@hush/cms-cli",
+      "name": "@clemii/cms-cli",
       "version": "1.0.0",
       "bin": {
         "hush-cms": "src/main.ts",
       },
       "dependencies": {
-        "@hush/article": "workspace:*",
+        "@clemii/article": "workspace:*",
       },
       "devDependencies": {
         "@types/bun": "1.3.9",
@@ -97,13 +97,13 @@
       },
     },
     "apps/web": {
-      "name": "@hush/web",
+      "name": "@clemii/web",
       "version": "1.0.0",
       "dependencies": {
         "@aws-sdk/client-s3": "3.1167.0",
         "@aws-sdk/s3-request-presigner": "3.1167.0",
+        "@clemii/article": "workspace:*",
         "@hono/zod-openapi": "1.1.5",
-        "@hush/article": "workspace:*",
         "@tanstack/react-router": "1.170.46",
         "diff": "8.0.3",
         "drizzle-orm": "0.45.2",
@@ -141,7 +141,7 @@
       },
     },
     "packages/article": {
-      "name": "@hush/article",
+      "name": "@clemii/article",
       "version": "1.0.0",
       "dependencies": {
         "@types/mdast": "4.0.4",
@@ -163,7 +163,7 @@
       },
     },
     "packages/theme": {
-      "name": "@hush/theme",
+      "name": "@clemii/theme",
       "version": "1.0.0",
       "dependencies": {
         "@fontsource-variable/inter": "5.3.0",
@@ -272,6 +272,18 @@
     "@bytecodealliance/preview2-shim": ["@bytecodealliance/preview2-shim@0.24.1", "", { "dependencies": { "@bytecodealliance/jco-node-fs": "0.3.2" } }, "sha512-QGZsKD5M76xBhwu3BzLWqYDEpaMX90QWrrfhkQPn2pN9t378koumtdAVH4lr25mqGCZt10YNXkWvyWkw/vJbLQ=="],
 
     "@bytecodealliance/preview3-shim": ["@bytecodealliance/preview3-shim@0.6.1", "", { "dependencies": { "@bytecodealliance/jco-node-fs": "0.3.2", "@bytecodealliance/preview2-shim": "^0.25.0" } }, "sha512-61mEfjfgGmZhEMA0H3waawPKvYd3za9y0vJ7pmQz/9yvm4FR6Ef+cmqhnxDE7ezsM07MY1btP92ymmgsgFwxmg=="],
+
+    "@clemii/article": ["@clemii/article@workspace:packages/article"],
+
+    "@clemii/cms": ["@clemii/cms@workspace:apps/cms"],
+
+    "@clemii/cms-admin": ["@clemii/cms-admin@workspace:apps/cms-admin"],
+
+    "@clemii/cms-cli": ["@clemii/cms-cli@workspace:apps/cms-cli"],
+
+    "@clemii/theme": ["@clemii/theme@workspace:packages/theme"],
+
+    "@clemii/web": ["@clemii/web@workspace:apps/web"],
 
     "@codemirror/autocomplete": ["@codemirror/autocomplete@6.20.4", "", { "dependencies": { "@codemirror/language": "^6.0.0", "@codemirror/state": "^6.0.0", "@codemirror/view": "^6.17.0", "@lezer/common": "^1.0.0" } }, "sha512-yF8RhOf2SXlg00+qtupzLhrglcas61boqaONiNcbPIebHCpJocpqTBA6dyrtUrQO47hqyTdeob/3XnYilT7TaQ=="],
 
@@ -392,18 +404,6 @@
     "@hono/zod-openapi": ["@hono/zod-openapi@1.1.5", "", { "dependencies": { "@asteasolutions/zod-to-openapi": "^8.1.0", "@hono/zod-validator": "^0.7.4", "openapi3-ts": "^4.5.0" }, "peerDependencies": { "hono": ">=4.3.6", "zod": "^4.0.0" } }, "sha512-EAnY6ad4yt/MUKHx716BEGGOXSl5d0/FOLozOYB/pmSEFq07qrzefKFtBEMAgd3hlpJXjH+4lwgTtlAo+BGBgQ=="],
 
     "@hono/zod-validator": ["@hono/zod-validator@0.7.6", "", { "peerDependencies": { "hono": ">=3.9.0", "zod": "^3.25.0 || ^4.0.0" } }, "sha512-Io1B6d011Gj1KknV4rXYz4le5+5EubcWEU/speUjuw9XMMIaP3n78yXLhjd2A3PXaXaUwEAluOiAyLqhBEJgsw=="],
-
-    "@hush/article": ["@hush/article@workspace:packages/article"],
-
-    "@hush/cms": ["@hush/cms@workspace:apps/cms"],
-
-    "@hush/cms-admin": ["@hush/cms-admin@workspace:apps/cms-admin"],
-
-    "@hush/cms-cli": ["@hush/cms-cli@workspace:apps/cms-cli"],
-
-    "@hush/theme": ["@hush/theme@workspace:packages/theme"],
-
-    "@hush/web": ["@hush/web@workspace:apps/web"],
 
     "@img/colour": ["@img/colour@1.1.0", "", {}, "sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ=="],
 

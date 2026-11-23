@@ -132,9 +132,9 @@ pending those confirmations. A merged PR is not legal clearance.
      Sections 2 and 5: Content may be used "to train the models that power ChatGPT";
      users "can easily choose whether your Content can be used to improve and train
      our models". Section 9: prompts are processed "where necessary to perform a
-     contract with you". Section 7 of hush's policy now names the controller and the
+     contract with you". Section 7 of clemii's policy now names the controller and the
      transfer mechanisms as OpenAI states them.
-   - The controller question for hush's operator follows [EDPB Guidelines 07/2020](https://www.edpb.europa.eu/system/files/2021-07/eppb_guidelines_202007_controllerprocessor_final_en.pdf)
+   - The controller question for clemii's operator follows [EDPB Guidelines 07/2020](https://www.edpb.europa.eu/system/files/2021-07/eppb_guidelines_202007_controllerprocessor_final_en.pdf)
      (version 2.1): the content goes from the user's Mac to OpenAI under the user's
      contract, and the operator neither receives it nor decides its use; whether
      that leaves the operator outside both roles is the reviewer's call.
@@ -173,7 +173,7 @@ pending those confirmations. A merged PR is not legal clearance.
      user expressly requested (Abs. 2 Nr. 2), and consent is collected in addition.
    - Out of scope here, flagged for a separate check: Article 50 of the EU AI Act
      (transparency for AI-generated text) applies since 2 August 2026 to providers
-     and deployers of AI systems that generate text; whether hush's Live Write falls
+     and deployers of AI systems that generate text; whether clemii's Live Write falls
      under it or under the exemption for assistive editing is not yet assessed.
 
 ## Primary sources

@@ -9,7 +9,7 @@
 // file with its post's status, dates and images; the images themselves stay
 // in the media bucket under their SHA-256 (src/media/service.ts) instead of
 // being copied every night.
-import { formatArticle, type FrontMatter } from "@hush/article/file";
+import { formatArticle, type FrontMatter } from "@clemii/article/file";
 import type { Database } from "../db/client";
 import { listMedia } from "../media/service";
 import { editableFields, listPosts, type Post } from "../posts/service";

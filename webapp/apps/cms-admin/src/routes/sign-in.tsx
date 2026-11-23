@@ -22,7 +22,7 @@ function GitHubMark() {
 function SignIn() {
   const { next } = Route.useSearch();
   return (
-    <AuthCard title="Sign in to the CMS" description="Write, schedule and publish the hush blog.">
+    <AuthCard title="Sign in to the CMS" description="Write, schedule and publish the clemii blog.">
       {/* Ghost's SubmitButton: the full width, at the auth screens' larger control height. */}
       <Button asChild size="lg" className="mt-4 h-(--control-height) w-full [&_svg]:size-5">
         {/* A full navigation: GitHub redirects back to /auth/github/callback. */}

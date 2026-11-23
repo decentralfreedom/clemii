@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
-import type { BlogImageOutput } from "@hush/article";
+import type { BlogImageOutput } from "@clemii/article";
 import { and, eq } from "drizzle-orm";
 import { createHash } from "node:crypto";
 import sharp from "sharp";

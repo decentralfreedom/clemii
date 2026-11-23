@@ -13,7 +13,7 @@ WORKDIR /app
 # workspace manifest (COPY --parents keeps their paths). Installs stay cached
 # until a manifest changes.
 COPY --parents package.json bun.lock apps/*/package.json packages/*/package.json ./
-RUN bun install --frozen-lockfile --filter @hush/web
+RUN bun install --frozen-lockfile --filter @clemii/web
 COPY packages/article ./packages/article
 
 FROM dependencies AS source
@@ -62,7 +62,7 @@ ENV NODE_ENV=production \
 
 # Every workspace manifest, as in the dependencies stage.
 COPY --parents package.json bun.lock apps/*/package.json packages/*/package.json ./
-RUN bun install --frozen-lockfile --production --filter @hush/web
+RUN bun install --frozen-lockfile --production --filter @clemii/web
 COPY packages/article ./packages/article
 WORKDIR /app/apps/web
 COPY apps/web/server ./server

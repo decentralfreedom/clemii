@@ -1,9 +1,9 @@
 {
-  "name": "@hush/theme",
+  "name": "@clemii/theme",
   "private": true,
   "license": "MIT",
   "version": "1.0.0",
-  "description": "The hush admin's shadcn theme: Ghost Admin's Shade design tokens, unchanged.",
+  "description": "The clemii admin's shadcn theme: Ghost Admin's Shade design tokens, unchanged.",
   "exports": {
     "./element-styles.css": "./src/element-styles.css",
     "./theme.css": "./src/theme.css",

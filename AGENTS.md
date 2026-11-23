@@ -1,7 +1,8 @@
-# hush repository guidance
+# clemii repository guidance
 
-- Write the product name as `hush`. Preserve case-sensitive code identifiers,
-  Xcode targets and filenames.
+- Write the product name as `clemii`. The repository, the macOS app and some
+  service names are still called hush until they are renamed; preserve those
+  and other case-sensitive code identifiers, Xcode targets and filenames.
 - Read `CONTRIBUTING.md` and the nearest component `AGENTS.md` before editing.
 - Keep changes on focused `feat/`, `fix/`, `docs/` or `chore/` branches. Use
   Conventional Commits and a pull request; do not rewrite published history.

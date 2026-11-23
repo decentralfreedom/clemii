@@ -1,4 +1,4 @@
-# hush CMS admin guidance
+# clemii CMS admin guidance
 
 The editor for the blog, served by `apps/cms` on its own origin.
 
@@ -10,10 +10,10 @@ The editor for the blog, served by `apps/cms` on its own origin.
   `apps/shade/src`, MIT), at the commit named in `packages/theme/README.md`.
   Before writing a component, copy Shade's: keep its code, add the attribution
   header and import Radix from the `radix-ui` package. Tokens and colors come
-  from `@hush/theme`, never hard-coded values. Mount portals inside
+  from `@clemii/theme`, never hard-coded values. Mount portals inside
   `ShadeScope` so overlays get the `.shade` styles.
 - Rendered article HTML is shown only in the sandboxed preview frame
-  (`src/components/article-preview.tsx`), styled by `@hush/article/article.css`.
+  (`src/components/article-preview.tsx`), styled by `@clemii/article/article.css`.
 - The CMS sends a strict Content Security Policy: no inline scripts, no
   third-party origins. Keep the admin within it.
 - Required verification: `bun run lint`, `bun run api:check`, `bun run build`,

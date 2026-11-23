@@ -1,6 +1,6 @@
 # hush-cms
 
-The command line for the [hush CMS](../cms/README.md): agents and scripts draft,
+The command line for the [clemii CMS](../cms/README.md): agents and scripts draft,
 check, schedule and publish blog articles with it, through the same OpenAPI
 operations the admin uses. Articles are Markdown files in the hush-seo format
 (`<lang>/<slug>.md`, images in `<lang>/media/<slug>/`).

@@ -2,10 +2,10 @@
 // Copyright 2026 Clemens Kressmann
 import { legalConfig } from "./legal.ts";
 import { releases, releasePath } from "./releases.ts";
-import { editorialPolicyPath, type BlogLanguage } from "@hush/article/taxonomy";
+import { editorialPolicyPath, type BlogLanguage } from "@clemii/article/taxonomy";
 import { blogCopy } from "./blog.ts";
 import { blogPosts } from "./blog-posts.generated.ts";
-import { authorPath, blogAuthors, type BlogAuthorId } from "@hush/article/authors";
+import { authorPath, blogAuthors, type BlogAuthorId } from "@clemii/article/authors";
 
 import { siteOrigin } from "./origin.ts";
 

@@ -9,8 +9,8 @@
 // the list, which the back button or Escape closes. Ghost's sections for
 // members, newsletters, tags and code injection are left out; the article
 // contract's fields take their places.
-import { blogAuthorIds, blogAuthors } from "@hush/article/authors";
-import { blogArticleTypes, blogClusterIds, blogClusters, blogLanguages } from "@hush/article/taxonomy";
+import { blogAuthorIds, blogAuthors } from "@clemii/article/authors";
+import { blogArticleTypes, blogClusterIds, blogClusters, blogLanguages } from "@clemii/article/taxonomy";
 import { ArrowLeft, ArrowUpRight, ChevronRight, History, ImageIcon, Keyboard, Link as LinkIcon, Search } from "lucide-react";
 import {
   createContext, forwardRef, useCallback, useContext, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState,

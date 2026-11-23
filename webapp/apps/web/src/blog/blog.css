@@ -1,4 +1,4 @@
-@import "@hush/article/article.css";
+@import "@clemii/article/article.css";
 /* clemii blog. Reading-first layout; no CSS filters (LANDING-PAINT-001). */
 .blog-article-main,
 .blog-index-main { padding: 48px 20px 96px; }
@@ -26,7 +26,7 @@
   font-weight: 600; margin: 0; color: var(--color-ink); text-wrap: balance;
 }
 /* Articles (.blog-post): the CMS editor's 740px column; the title and lead are
-   @hush/article's .article-title and .article-lead. */
+   @clemii/article's .article-title and .article-lead. */
 .blog-post, .blog-post .blog-article-header, .blog-post .blog-share-end, .blog-post .blog-author-card { max-width: 740px; }
 @media (min-width: 1200px) {
   .blog-post { max-width: 1280px; grid-template-columns: minmax(180px, 1fr) minmax(0, 740px) minmax(180px, 1fr); }

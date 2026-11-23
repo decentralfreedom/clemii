@@ -13,7 +13,7 @@
 // on the post as it is inside the write's transaction. Every change also
 // writes its audit log entry (PRD R13) in that transaction; a run of autosaves
 // is one entry, as it is one revision.
-import { blogPath, type BlogLanguage } from "@hush/article/taxonomy";
+import { blogPath, type BlogLanguage } from "@clemii/article/taxonomy";
 import { and, asc, desc, eq, inArray, like, lte, or, sql } from "drizzle-orm";
 import { recordAudit, recordAudits, type AuditAction } from "../audit/log";
 import { isAgent, systemActor, type Actor } from "../auth/tokens";

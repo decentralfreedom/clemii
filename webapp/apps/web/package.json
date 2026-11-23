@@ -1,5 +1,5 @@
 {
-  "name": "@hush/web",
+  "name": "@clemii/web",
   "private": true,
   "license": "AGPL-3.0-only",
   "version": "1.0.0",
@@ -32,7 +32,7 @@
     "@aws-sdk/client-s3": "3.1167.0",
     "@aws-sdk/s3-request-presigner": "3.1167.0",
     "@hono/zod-openapi": "1.1.5",
-    "@hush/article": "workspace:*",
+    "@clemii/article": "workspace:*",
     "@tanstack/react-router": "1.170.46",
     "diff": "8.0.3",
     "drizzle-orm": "0.45.2",

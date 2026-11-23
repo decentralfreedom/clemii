@@ -1,15 +1,15 @@
 // Adapted from Ghost Admin (TryGhost/Ghost apps/admin/src/shared/analytics/post-share-modal.tsx
 // and apps/admin/src/posts/list/components/post-celebration-modal.tsx, c2617d08),
 // MIT License, Copyright (c) 2013-2026 Ghost Foundation (see packages/theme/LICENSE.ghost).
-// Changes for hush (2026-11-15, Clemens Kressmann, AGPL-3.0-only): no email-only
-// or gift variants, the hush mark and name in place of the site icon and title,
+// Changes for clemii (2026-11-15, Clemens Kressmann, AGPL-3.0-only): no email-only
+// or gift variants, the clemii mark and name in place of the site icon and title,
 // and the post read from the CMS.
 //
 // The post-publish celebration on the posts list: the headline, the post as a
 // card linking to it on behu.sh, and the ways to share it.
-import { blogAuthors, type BlogAuthorId } from "@hush/article/authors";
+import { blogAuthors, type BlogAuthorId } from "@clemii/article/authors";
 import type { Post } from "@/api/cms.generated";
-import { HushLogo } from "@/components/hush-logo";
+import { ClemiiLogo } from "@/components/clemii-logo";
 import { celebrationCopy } from "@/components/publish-celebration";
 import ShareModal, { type ShareModalSocialLink } from "@/components/ui/share-modal";
 import { articleUrl } from "@/lib/article-url";
@@ -60,9 +60,9 @@ export function PostCelebrationModal({ post, wasPublished, postCount, onClose }:
             <h3 className="scroll-m-20 text-lg font-semibold tracking-tight text-text-primary">{title}</h3>
             {post.description && <p className="line-clamp-2">{post.description}</p>}
             <div className="mt-2 flex items-start gap-2">
-              <HushLogo withName={false} className="mt-0.5 [&_svg]:size-4" />
+              <ClemiiLogo withName={false} className="mt-0.5 [&_svg]:size-4" />
               <div className="flex gap-1">
-                <strong>hush</strong>
+                <strong>clemii</strong>
                 <span>&bull;</span>
                 <span>{author}</span>
               </div>

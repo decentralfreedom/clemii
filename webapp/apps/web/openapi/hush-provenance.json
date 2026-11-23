@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Hush Provenance API",
+    "title": "clemii Provenance API",
     "version": "1.0.0-alpha.1",
-    "description": "Content-free control plane for encrypted Hush message proofs."
+    "description": "Content-free control plane for encrypted clemii message proofs."
   },
   "components": {
     "schemas": {},
@@ -112,7 +112,7 @@
         },
         "responses": {
           "201": {
-            "description": "Registered Hush installation",
+            "description": "Registered clemii installation",
             "content": {
               "application/json": {
                 "schema": {
@@ -982,7 +982,7 @@
         },
         "responses": {
           "200": {
-            "description": "Completed proof with a Hush service receipt",
+            "description": "Completed proof with a clemii service receipt",
             "content": {
               "application/json": {
                 "schema": {

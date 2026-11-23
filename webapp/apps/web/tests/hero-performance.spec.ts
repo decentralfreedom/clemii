@@ -32,11 +32,14 @@ async function holdShaders(page: Page) {
       }
       return parameter.call(this, program, name);
     };
-    const draw = prototype.drawArrays;
-    prototype.drawArrays = function (...args: Parameters<typeof draw>) {
-      if (!state.release) state.earlyDraws++;
-      return draw.apply(this, args);
-    };
+    // The figures are indexed geometry, so both kinds of draw call count.
+    for (const name of ["drawArrays", "drawElements"] as const) {
+      const draw = prototype[name] as (...args: unknown[]) => void;
+      (prototype[name] as unknown) = function (this: WebGL2RenderingContext, ...args: unknown[]) {
+        if (!state.release) state.earlyDraws++;
+        return draw.apply(this, args);
+      };
+    }
     const remove = prototype.deleteProgram;
     prototype.deleteProgram = function (...args: Parameters<typeof remove>) {
       state.deletedPrograms++;
@@ -92,13 +95,16 @@ test("LANDING-ENTRY-006 supports renderers without parallel shader compilation",
 
 test("LANDING-ENTRY-006 draws the living hero only while it is on screen and the page is visible", async ({ page }, testInfo) => {
   await page.addInitScript(() => {
-    const original = WebGL2RenderingContext.prototype.drawArrays;
-    WebGL2RenderingContext.prototype.drawArrays = function (...args: Parameters<typeof original>) {
-      if (this.canvas instanceof HTMLCanvasElement && this.canvas.closest(".clemii-core")) {
-        this.canvas.dataset.drawCount = String(Number(this.canvas.dataset.drawCount ?? 0) + 1);
-      }
-      return original.apply(this, args);
-    };
+    // The figures are indexed geometry, so both kinds of draw call count.
+    for (const name of ["drawArrays", "drawElements"] as const) {
+      const original = WebGL2RenderingContext.prototype[name] as (...args: unknown[]) => void;
+      (WebGL2RenderingContext.prototype[name] as unknown) = function (this: WebGL2RenderingContext, ...args: unknown[]) {
+        if (this.canvas instanceof HTMLCanvasElement && this.canvas.closest(".clemii-core")) {
+          this.canvas.dataset.drawCount = String(Number(this.canvas.dataset.drawCount ?? 0) + 1);
+        }
+        return original.apply(this, args);
+      };
+    }
   });
   await page.goto("/");
   const hero = page.locator(".clemii-core");

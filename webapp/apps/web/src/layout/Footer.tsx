@@ -1,6 +1,6 @@
 import { Logo } from "../components/Logo";
 import { blogPosts } from "../../shared/blog-posts.generated";
-import { editorialPolicyPath } from "@hush/article/taxonomy";
+import { editorialPolicyPath } from "@clemii/article/taxonomy";
 import { blogCopy } from "../../shared/blog";
 import type { SiteLanguage } from "../../shared/site";
 import { LanguageSwitcher } from "../i18n/LanguageControls";

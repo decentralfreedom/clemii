@@ -26,7 +26,7 @@ const app = createApp({ db, media }, {
   adminDir: await Bun.file(`${adminDir}/index.html`).exists() ? adminDir : undefined,
 });
 const server = Bun.serve({ port: config.port, fetch: app.fetch, idleTimeout: 30 });
-console.info(JSON.stringify({ level: "info", message: "hush CMS listening", port: server.port, environment: config.environment }));
+console.info(JSON.stringify({ level: "info", message: "clemii CMS listening", port: server.port, environment: config.environment }));
 
 // Graceful shutdown for rolling updates, as the website's (apps/web/server/index.ts):
 // the platform starts the replacement, waits for its health check, then stops this

@@ -3,7 +3,7 @@
 //
 // From Ghost Admin (TryGhost/Ghost apps/admin/src/layout/app-sidebar/sidebar-body-swap.tsx, c2617d08),
 // MIT License, Copyright (c) 2013-2026 Ghost Foundation (see packages/theme/LICENSE.ghost).
-// Adapted: hush's sidebar is not Ghost's resizing capsule, so the swap always
+// Adapted: clemii's sidebar is not Ghost's resizing capsule, so the swap always
 // plays, and the Settings navigation renders in its pane rather than a portal.
 import React from 'react';
 

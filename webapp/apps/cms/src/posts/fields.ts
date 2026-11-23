@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
-import { frontMatterFields } from "@hush/article";
-import { blogAuthorIds } from "@hush/article/authors";
-import { blogClusterIds } from "@hush/article/taxonomy";
+import { frontMatterFields } from "@clemii/article";
+import { blogAuthorIds } from "@clemii/article/authors";
+import { blogClusterIds } from "@clemii/article/taxonomy";
 import { z } from "@hono/zod-openapi";
 
 /**
@@ -10,7 +10,7 @@ import { z } from "@hono/zod-openapi";
  * sets them through draft, schedule, publish and unpublish.
  *
  * A draft is work in progress, so its texts may be empty or of any length. The
- * article contract (@hush/article) applies when a post is scheduled or
+ * article contract (@clemii/article) applies when a post is scheduled or
  * published and to every change while it is live (posts/contract.ts).
  */
 export const postFields = frontMatterFields.pick({ lang: true, slug: true, type: true, cluster: true, author: true }).extend({

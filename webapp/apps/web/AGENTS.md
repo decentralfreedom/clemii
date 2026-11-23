@@ -1,4 +1,4 @@
-# hush web agent guidance
+# clemii web agent guidance
 
 Read `docs/user-journeys/proof-recipient.md` before changing proof APIs, cryptography, storage, or the recipient page. Preserve its journey IDs and fail-closed invariants in code and tests.
 

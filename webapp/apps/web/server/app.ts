@@ -62,7 +62,7 @@ const enrollRoute = createRoute({
   request: { body: { content: { "application/json": { schema: enrollInstallationSchema } } } },
   responses: {
     201: {
-      description: "Registered Hush installation",
+      description: "Registered clemii installation",
       content: { "application/json": { schema: installationResponseSchema } },
     },
     ...errorResponses,
@@ -118,7 +118,7 @@ const completeRoute = createRoute({
   },
   responses: {
     200: {
-      description: "Completed proof with a Hush service receipt",
+      description: "Completed proof with a clemii service receipt",
       content: { "application/json": { schema: completedProofResponseSchema } },
     },
     ...errorResponses,
@@ -281,7 +281,7 @@ export function createApp(input: {
     if (contentType !== "application/vnd.hush.proof+encrypted") {
       throw new ServiceError(
         "invalid_content_type",
-        "Expected an encrypted Hush proof.",
+        "Expected an encrypted clemii proof.",
         422,
       );
     }
@@ -351,9 +351,9 @@ export function createApp(input: {
   app.doc("/openapi.json", {
     openapi: "3.1.0",
     info: {
-      title: "Hush Provenance API",
+      title: "clemii Provenance API",
       version: "1.0.0-alpha.1",
-      description: "Content-free control plane for encrypted Hush message proofs.",
+      description: "Content-free control plane for encrypted clemii message proofs.",
     },
   });
 

@@ -155,7 +155,7 @@ test("shows immutable revision lineage and composer voice sections", async ({ pa
   await expect(page.locator('.proof-timeline li[data-kind="voice"] time')).toHaveCount(3);
   await page.screenshot({ path: testInfo.outputPath("recipient-revision.png"), fullPage: true });
   await expect(page.getByText("Signed refinement")).toHaveCount(0);
-  await expect(page.getByText("Reopened in Hush")).toHaveCount(0);
+  await expect(page.getByText("Reopened in clemii")).toHaveCount(0);
   await expect(
     page.getByText("The complete history recorded in this signed proof."),
   ).toBeVisible();
