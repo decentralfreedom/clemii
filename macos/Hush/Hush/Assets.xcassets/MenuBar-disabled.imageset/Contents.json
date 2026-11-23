@@ -1,21 +1,15 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "menubar-disabled.png",
-      "idiom" : "mac",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "menubar-disabled@2x.png",
-      "idiom" : "mac",
-      "scale" : "2x"
+      "filename": "menubar-disabled.svg",
+      "idiom": "mac"
     }
   ],
-  "info" : {
-    "author" : "hush",
-    "version" : 1
+  "info": {
+    "author": "clemii",
+    "version": 1
   },
-  "properties" : {
-
+  "properties": {
+    "preserves-vector-representation": true
   }
 }

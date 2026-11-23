@@ -38,8 +38,5 @@ cp "$SRC/icon-128-squircle.png" "$BRAND/brand-icon.png"
 cp "$SRC/icon-256-squircle.png" "$BRAND/brand-icon@2x.png"
 echo "✓ BrandIcon.imageset (128 + 256 squircle)"
 
-# Menu-bar templates — sourced from handoff/menubar-*.svg via a small Swift helper that
-# reads SVG into NSImage and writes 22 + 44 px PNGs into the matching ImageSets.
-cd "$ROOT"
-DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}" \
-    xcrun swift "$ROOT/scripts/sync_menubar_icons.swift"
+# Menu-bar icons are not synced here: they are vector assets drawn from the clemii mark's own
+# geometry by the website's generator (webapp/apps/web: bun scripts/gen-clemii-mark.ts).

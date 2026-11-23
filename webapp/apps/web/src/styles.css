@@ -561,3 +561,6 @@
 /* The clemii mark beside its name, wherever the logo stands; the header sets its own, larger lockup. */
 .logo-mark { height: 28px; width: auto; flex-shrink: 0; }
 .logo-wordmark { font-weight: 650; letter-spacing: -0.02em; line-height: 1; }
+
+/* The HUD's badge at rest: the globe of the clemii mark, as the macOS app draws it. */
+.hud-globe { background: radial-gradient(circle at 36% 30%, #58b4ff, #2472e6 38%, #2b3fb8 70%, #24156a); box-shadow: inset 0 0 0 0.75px rgb(155 232 255 / 0.4); }

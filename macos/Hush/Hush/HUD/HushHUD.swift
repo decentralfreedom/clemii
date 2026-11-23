@@ -12,8 +12,8 @@
 //
 //  Component map:
 //    HushHUD          - foreground content inside Apple's AppKit material
-//    HushBadge        - the 42pt stateful app-icon square
-//    HushMark         - the four-bar Hush logo
+//    HushBadge        - the 42pt stateful globe, the one the clemii mark holds
+//    HushMark         - the voice on the globe: four bars
 //    HushCheck        - the inserted checkmark
 //    HushLabel        - two stacked lines, one slot per state
 //    HushWaveform     - live voice or local processing activity
@@ -37,11 +37,16 @@ enum HUDPalette {
     static let red    = Color(hex: 0xFF3B30)
     static let proofAccent = Color(hex: 0xA99DFF)
 
-    /// Aurora - the brand's only colour. "Voice / thinking" moments.
+    /// The globe of the clemii mark: water, light at the upper left, deep at the far edge.
+    static let globe = RadialGradient(
+        colors: [Color(hex: 0x58B4FF), Color(hex: 0x2472E6), Color(hex: 0x2B3FB8), Color(hex: 0x24156A)],
+        center: UnitPoint(x: 0.36, y: 0.3), startRadius: 0, endRadius: 34
+    )
+    /// Aurora - "voice / thinking" moments, in soft tints of the brand's colours.
     static let aurora = AngularGradient(
         gradient: Gradient(colors: [
-            Color(hex: 0xA8E6CF), Color(hex: 0xFFB3D1), Color(hex: 0xC9B8FF),
-            Color(hex: 0x9EC9FF), Color(hex: 0xA8E6CF)
+            Color(hex: 0x9FE3FF), Color(hex: 0xFFB3D1), Color(hex: 0xC9B8FF),
+            Color(hex: 0x9EC9FF), Color(hex: 0x9FE3FF)
         ]),
         center: .center, angle: .degrees(210)
     )
@@ -186,7 +191,7 @@ public struct HushHUD: View {
 
 }
 
-// MARK: - Badge (the hush app icon, made stateful)
+// MARK: - Badge (the globe of the clemii mark, made stateful)
 
 struct HushBadge: View {
     var state: HushState
@@ -194,7 +199,14 @@ struct HushBadge: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 12, style: .continuous).fill(baseFill)
+            Circle().fill(baseFill)
+            // A globe of water while it listens and waits: lit from the upper left, a gloss on it.
+            Circle().fill(HUDPalette.globe).opacity(isGlobe ? 1 : 0)
+            Ellipse().fill(Color.white.opacity(0.32))
+                .frame(width: 15, height: 6.5)
+                .rotationEffect(.degrees(-32))
+                .offset(x: -7, y: -10.5)
+                .opacity(isGlobe ? 1 : 0)
             AuroraFill().opacity(state == .processing ? 1 : 0)
             if state == .inserted {
                 HushCheck()
@@ -207,13 +219,12 @@ struct HushBadge: View {
             }
         }
         .frame(width: 42, height: 42)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(Circle())
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.5)
+            Circle().strokeBorder(Color(hex: 0x9BE8FF).opacity(isGlobe ? 0.4 : 0.08), lineWidth: 0.75)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            Circle()
                 .strokeBorder(HUDPalette.proofAura, lineWidth: 1)
                 .opacity(state == .signing ? 0.65 : 0)
         )
@@ -221,6 +232,14 @@ struct HushBadge: View {
         .animation(.easeInOut(duration: 0.45), value: state)
     }
 
+    /// The globe shows wherever the badge is neither a result (inserted, error) nor the aurora.
+    private var isGlobe: Bool {
+        switch state {
+        case .listening, .signing: return true
+        case .notice: return !isError
+        case .processing, .inserted: return false
+        }
+    }
     private var baseFill: Color {
         switch state {
         case .inserted: return HUDPalette.green
@@ -245,7 +264,7 @@ private struct AuroraFill: View {
     var body: some View {
         TimelineView(.animation) { timeline in
             let angle = timeline.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 7) / 7 * 360
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            Circle()
                 .fill(HUDPalette.aurora)
                 .frame(width: 62, height: 62)
                 .rotationEffect(.degrees(angle))
@@ -253,18 +272,20 @@ private struct AuroraFill: View {
     }
 }
 
-// MARK: - The hush mark (four bars, exact logo proportions)
+// MARK: - The voice on the globe (four bars)
 
+/// The waveform the globe carries, as the globe on the website does: four bars that move while
+/// clemii works on your words.
 struct HushMark: View {
     var color: Color = .white
     var pulse: Bool = false
     private let ratios: [CGFloat] = [16.0/36, 36.0/36, 22.0/36, 10.0/36]
-    private let maxHeight: CGFloat = 22
+    private let maxHeight: CGFloat = 19
 
     var body: some View {
-        TimelineView(.animation) { timeline in
+        TimelineView(.animation(paused: !pulse)) { timeline in
             let t = timeline.date.timeIntervalSinceReferenceDate
-            HStack(spacing: 3) {
+            HStack(spacing: 2.6) {
                 ForEach(0..<4, id: \.self) { i in
                     let s = pulse ? (0.72 + 0.28 * (0.5 + 0.5 * sin(t * 3.1 + Double(i) * 0.9))) : 1
                     Capsule().fill(color).frame(width: 3, height: maxHeight * ratios[i] * s)

@@ -2,9 +2,10 @@
 // Copyright (c) 2026 Clemens Kressmann
 //
 // Draws the clemii mark from the brothers' geometry: the header's mark, the favicon and the hero's
-// flat stand-in. Run: bun scripts/gen-clemii-mark.ts, then bun scripts/generate-favicons.ts
+// flat stand-in; and its one-colour glyph, as the macOS menu bar's four states. Run: bun scripts/gen-clemii-mark.ts, then bun scripts/generate-favicons.ts
 import { writeFileSync } from "node:fs";
-import { along, big, globe, mix, polar, ribbonEdge, small, smooth, type Brother, type Point } from "../src/landing/hero/brothers";
+import { mkdirSync, rmSync, readdirSync } from "node:fs";
+import { along, big, globe, glyph, mix, polar, ribbonEdge, small, smooth, type Brother, type Point } from "../src/landing/hero/brothers";
 
 const web = new URL("..", import.meta.url).pathname;
 const R = 200, cx = 256, cy = 256;
@@ -56,3 +57,35 @@ const titled = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${box}" role="i
 writeFileSync(`${web}public/clemii-mark.svg`, titled);
 writeFileSync(`${web}public/favicon.svg`, titled);
 writeFileSync(`${web}src/landing/clemii-mark.svg`, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${box}" aria-hidden="true">${inside}</svg>\n`);
+
+// The glyph. The menu bar's icons are 20 by 18 points, the glyph 16 across: Apple's menu bar is 24
+// points high and tints template images (black and clear only) for light and dark bars itself.
+const shape = glyph();
+function glyphPaths(centreX: number, centreY: number, radius: number, fills: [string, string, string]) {
+  // Small boxes need finer numbers than the mark's, or the curves show steps.
+  const fine = (value: number) => +value.toFixed(3);
+  const spot = ([x, y]: Point) => `${fine(centreX + radius * x)} ${fine(centreY - radius * y)}`;
+  return shape.ribbons.map((points, index) => `<path d="M${points.map(spot).join(" L")} Z" fill="${fills[index]}"/>`).join("")
+    + `<circle cx="${centreX}" cy="${centreY}" r="${fine(radius * shape.dot)}" fill="${fills[2]}"/>`;
+}
+const assets = `${web}../../../macos/Hush/Hush/Assets.xcassets/`;
+const states: Record<string, { template: boolean; fills: [string, string, string]; extra?: string; defs?: string }> = {
+  idle: { template: true, fills: ["#000", "#000", "#000"] },
+  processing: { template: true, fills: ["#000", "#000", "#000"] },
+  // Listening, the mark wakes up in its own colours.
+  recording: { template: false, fills: ["url(#warm)", "url(#cool)", "#6a4afd"],
+    defs: `<defs><linearGradient id="warm" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb11f"/><stop offset="1" stop-color="#ee2a8f"/></linearGradient><linearGradient id="cool" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#16b4f8"/><stop offset="1" stop-color="#a55cfd"/></linearGradient></defs>` },
+  // Unavailable: struck through, in the warning red.
+  disabled: { template: false, fills: ["#e0654e", "#e0654e", "#e0654e"], extra: `<path d="M3.2 15.8 16.8 2.2" fill="none" stroke="#e0654e" stroke-width="1.9" stroke-linecap="round"/>` },
+};
+for (const [state, { template, fills, extra = "", defs = "" }] of Object.entries(states)) {
+  const folder = `${assets}MenuBar-${state}.imageset/`;
+  mkdirSync(folder, { recursive: true });
+  for (const file of readdirSync(folder)) rmSync(folder + file);
+  writeFileSync(`${folder}menubar-${state}.svg`, `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="18" viewBox="0 0 20 18">${defs}${glyphPaths(10, 9, 8, fills)}${extra}</svg>\n`);
+  writeFileSync(`${folder}Contents.json`, `${JSON.stringify({
+    images: [{ filename: `menubar-${state}.svg`, idiom: "mac" }],
+    info: { author: "clemii", version: 1 },
+    properties: { "preserves-vector-representation": true, ...(template ? { "template-rendering-intent": "template" } : {}) },
+  }, null, 2)}\n`);
+}

@@ -1,21 +1,16 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "menubar-idle.png",
-      "idiom" : "mac",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "menubar-idle@2x.png",
-      "idiom" : "mac",
-      "scale" : "2x"
+      "filename": "menubar-idle.svg",
+      "idiom": "mac"
     }
   ],
-  "info" : {
-    "author" : "hush",
-    "version" : 1
+  "info": {
+    "author": "clemii",
+    "version": 1
   },
-  "properties" : {
-    "template-rendering-intent" : "template"
+  "properties": {
+    "preserves-vector-representation": true,
+    "template-rendering-intent": "template"
   }
 }

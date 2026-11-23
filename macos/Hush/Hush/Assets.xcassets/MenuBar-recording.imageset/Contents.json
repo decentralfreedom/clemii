@@ -1,21 +1,15 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "menubar-recording.png",
-      "idiom" : "mac",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "menubar-recording@2x.png",
-      "idiom" : "mac",
-      "scale" : "2x"
+      "filename": "menubar-recording.svg",
+      "idiom": "mac"
     }
   ],
-  "info" : {
-    "author" : "hush",
-    "version" : 1
+  "info": {
+    "author": "clemii",
+    "version": 1
   },
-  "properties" : {
-
+  "properties": {
+    "preserves-vector-representation": true
   }
 }
