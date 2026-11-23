@@ -1,3 +1,4 @@
+import AVFoundation
 import AppKit
 import Combine
 import SwiftUI
@@ -450,13 +451,20 @@ final class OnboardingFlowModel: ObservableObject {
     }
 }
 
+/// The onboarding's colours are the clemii mark's: the big brother's warm run from ember to rose,
+/// the little one's cool run from sky to violet, and the globe's indigo between them.
 private enum OnboardingPalette {
     static let ink = Color(red: 0.086, green: 0.09, blue: 0.106)
     static let muted = Color(red: 0.435, green: 0.443, blue: 0.471)
     static let faint = Color(red: 0.627, green: 0.639, blue: 0.667)
-    static let purple = Color(red: 0.471, green: 0.408, blue: 0.957)
-    static let purple2 = Color(red: 0.624, green: 0.569, blue: 1)
-    static let blue = Color(red: 0.471, green: 0.714, blue: 1)
+    static let ember = Color(red: 1, green: 0.541, blue: 0.11)
+    static let rose = Color(red: 0.933, green: 0.165, blue: 0.561)
+    static let violet = Color(red: 0.647, green: 0.18, blue: 0.988)
+    static let sky = Color(red: 0.086, green: 0.706, blue: 0.973)
+    /// The globe's indigo: the accent for symbols, links and shadows.
+    static let purple = Color(red: 0.29, green: 0.247, blue: 0.863)
+    static let purple2 = Color(red: 0.541, green: 0.424, blue: 1)
+    static let blue = sky
     static let green = Color(red: 0.192, green: 0.659, blue: 0.42)
     static let go = Color(red: 0.204, green: 0.78, blue: 0.349)
 
@@ -466,21 +474,23 @@ private enum OnboardingPalette {
             Color(red: 1, green: 0.702, blue: 0.78),
             Color(red: 0.788, green: 0.722, blue: 1),
             Color(red: 0.62, green: 0.788, blue: 1),
-            Color(red: 0.659, green: 0.902, blue: 0.812),
+            Color(red: 0.624, green: 0.89, blue: 1),
             Color(red: 1, green: 0.839, blue: 0.647),
         ],
         center: .center,
         angle: .degrees(210)
     )
 
+    /// Buttons and filled badges: the cool run through the globe's indigo.
     static let brand = LinearGradient(
-        colors: [Color(red: 0.56, green: 0.725, blue: 1), purple, Color(red: 0.55, green: 0.459, blue: 0.937)],
+        colors: [Color(red: 0.2, green: 0.62, blue: 0.98), purple, Color(red: 0.58, green: 0.27, blue: 0.96)],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
+    /// Headlines: the whole of the mark, warm to cool.
     static let headline = LinearGradient(
-        colors: [Color(red: 0.424, green: 0.369, blue: 0.953), Color(red: 0.608, green: 0.475, blue: 0.937), Color(red: 0.42, green: 0.682, blue: 1)],
+        colors: [ember, rose, violet, sky],
         startPoint: .leading,
         endPoint: .trailing
     )
@@ -523,12 +533,12 @@ private struct ImmersiveOnboardingView: View {
                 endPoint: .bottomTrailing
             )
             Circle()
-                .fill(Color(red: 0.72, green: 0.68, blue: 1).opacity(0.24))
+                .fill(OnboardingPalette.ember.opacity(0.13))
                 .frame(width: 470, height: 470)
                 .blur(radius: 75)
                 .offset(x: -430, y: -360)
             Circle()
-                .fill(Color(red: 0.56, green: 0.8, blue: 1).opacity(0.23))
+                .fill(OnboardingPalette.sky.opacity(0.2))
                 .frame(width: 560, height: 560)
                 .blur(radius: 90)
                 .offset(x: 520, y: 420)
@@ -638,7 +648,7 @@ private struct OnboardingCompletionOverlay: View {
 
                 Text(ready
                     ? "Your private workspace and Dashboard are ready on this Mac."
-                    : "Bringing voice, personas, proof, and shortcuts into one private workspace."
+                    : "Putting your voice and your shortcuts into one private workspace."
                 )
                 .font(.system(size: 17, weight: .medium))
                 .foregroundStyle(OnboardingPalette.muted)
@@ -826,7 +836,7 @@ private struct WelcomeOnboardingStep: View {
                     .lineLimit(1)
                     .id(flow.headlineIndex)
                     .transition(.opacity.combined(with: .offset(y: 10)))
-                Text("Speak naturally and get polished, private text you can confidently share with a signed creation trail.")
+                Text("Speak naturally and clemii writes it for you. Dictation and an assistant that stay on your Mac.")
                     .font(.system(size: 20))
                     .foregroundStyle(OnboardingPalette.muted)
                     .lineSpacing(7)
@@ -873,26 +883,25 @@ private struct WelcomeAppVisual: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(OnboardingPalette.purple.opacity(0.12))
-                .frame(width: 390, height: 390)
-                .blur(radius: 2)
-            RoundedRectangle(cornerRadius: 92, style: .continuous)
-                .fill(.white.opacity(0.64))
-                .frame(width: 355, height: 355)
-                .overlay { RoundedRectangle(cornerRadius: 92, style: .continuous).stroke(.white.opacity(0.9)) }
-                .shadow(color: Color(red: 0.28, green: 0.28, blue: 0.46).opacity(0.18), radius: 38, y: 24)
-            RoundedRectangle(cornerRadius: 39, style: .continuous)
-                .fill(LinearGradient(colors: [Color(red: 0.15, green: 0.15, blue: 0.16), Color(red: 0.065, green: 0.065, blue: 0.075)], startPoint: .topLeading, endPoint: .bottomTrailing))
-                .frame(width: 148, height: 148)
-                .shadow(color: .black.opacity(0.27), radius: 22, y: 16)
-                .overlay { HushWaveMark(color: .white).frame(width: 76, height: 70) }
+                .fill(OnboardingPalette.ember.opacity(0.1))
+                .frame(width: 300, height: 300)
+                .blur(radius: 40)
+                .offset(x: -70, y: 30)
+            Circle()
+                .fill(OnboardingPalette.sky.opacity(0.16))
+                .frame(width: 320, height: 320)
+                .blur(radius: 44)
+                .offset(x: 70, y: -20)
+            HeroFilm()
+                .frame(width: 440, height: 440)
+                .accessibilityLabel("clemii and his big brother fly around a globe that shows your voice.")
             FloatingChip(symbol: "checkmark.shield", text: "Signed at\ncreation")
-                .offset(x: 158, y: -154)
+                .offset(x: 158, y: -184)
             FloatingChip(symbol: "waveform", text: "Local\ntranscription")
-                .offset(x: -156, y: 150)
+                .offset(x: -156, y: 186)
             if showsPersona {
                 PersonaPreviewChip()
-                    .offset(x: -176, y: -35)
+                    .offset(x: -176, y: -175)
                     .transition(.opacity.combined(with: .scale(scale: 0.94)))
             }
         }
@@ -901,16 +910,67 @@ private struct WelcomeAppVisual: View {
     }
 }
 
-private struct HushWaveMark: View {
-    let color: Color
-    private let heights: [CGFloat] = [25, 48, 70, 44, 22]
+/// The website's hero, filmed (webapp/apps/web: bun scripts/generate-hero-film.ts): the globe
+/// swells into place, clemii and his big brother come out of it and greet, then fly their rounds.
+/// The film has an alpha channel, so it plays over the window's own background, and starts again
+/// with the greeting when it ends. People who ask for less motion see the brothers in calm flight.
+private struct HeroFilm: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var isStill: Bool {
+        reduceMotion || ProcessInfo.processInfo.arguments.contains("--onboarding-ui-test")
+            || ProcessInfo.processInfo.environment["HUSH_TEST_HOST"] == "1"
+    }
 
     var body: some View {
-        HStack(spacing: 8) {
-            ForEach(Array(heights.enumerated()), id: \.offset) { _, height in
-                Capsule().fill(color).frame(width: 10, height: height)
+        if isStill {
+            if let url = Bundle.main.url(forResource: "clemii-hero", withExtension: "png"), let still = NSImage(contentsOf: url) {
+                Image(nsImage: still).resizable().scaledToFit()
+            }
+        } else {
+            HeroFilmPlayer()
+        }
+    }
+}
+
+private struct HeroFilmPlayer: NSViewRepresentable {
+    func makeNSView(context: Context) -> HeroFilmView { HeroFilmView() }
+    func updateNSView(_ view: HeroFilmView, context: Context) {}
+    static func dismantleNSView(_ view: HeroFilmView, coordinator: ()) { view.stop() }
+}
+
+final class HeroFilmView: NSView {
+    private let player = AVPlayer()
+    private var ended: NSObjectProtocol?
+
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+        let film = AVPlayerLayer(player: player)
+        film.videoGravity = .resizeAspect
+        film.backgroundColor = .clear
+        layer = film
+        wantsLayer = true
+        guard let url = Bundle.main.url(forResource: "clemii-hero", withExtension: "mov") else { return }
+        let item = AVPlayerItem(url: url)
+        player.replaceCurrentItem(with: item)
+        player.isMuted = true
+        player.actionAtItemEnd = .none
+        ended = NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: item, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.player.seek(to: .zero)
+                self?.player.play()
             }
         }
+        player.play()
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError("init(coder:) is not used") }
+
+    func stop() {
+        player.pause()
+        if let ended { NotificationCenter.default.removeObserver(ended) }
+        ended = nil
     }
 }
 
@@ -1113,7 +1173,7 @@ private struct PermissionSetupOverlay: View {
                         Text("Allow clemii to listen and type.")
                             .font(.system(size: 30, weight: .bold))
                             .tracking(-1.1)
-                        Text("Grant both to continue. Accessibility opens System Settings - switch it on, then come back.")
+                        Text("Grant both to continue. Accessibility opens System Settings. Switch it on and come back.")
                             .font(.system(size: 15))
                             .foregroundStyle(OnboardingPalette.muted)
                             .lineSpacing(4)
@@ -1228,7 +1288,7 @@ private struct PersonasOnboardingStep: View {
                     .font(.system(size: 58, weight: .bold))
                     .tracking(-3)
                 GradientHeadline(text: "Live Write.")
-                Text("Say \u{201C}an email to Tom that I\u{2019}m running late\u{201D} and get the finished email. Everything else is cleaned up in your words. It runs entirely on your Mac with Apple\u{2019}s on-device model; nothing is sent to the cloud.")
+                Text("Say \u{201C}an email to Tom that I\u{2019}m running late\u{201D} and get the finished email. Everything else is cleaned up in your words. It runs entirely on your Mac with Apple\u{2019}s on-device model. Nothing is sent to the cloud.")
                     .font(.system(size: 17))
                     .foregroundStyle(OnboardingPalette.muted)
                     .lineSpacing(7)
@@ -1349,7 +1409,7 @@ private struct ProofOnboardingStep: View {
                     .font(.system(size: 58, weight: .bold))
                     .tracking(-3)
                 GradientHeadline(text: "really you.")
-                Text("Feeds are full of AI slop. Prove your words are really yours. A signed trail shows your post came from your voice, not a bot.")
+                Text("Feeds are full of AI slop. Prove your words are really yours. A signed trail shows your post came from your voice and not from a bot.")
                     .font(.system(size: 17))
                     .foregroundStyle(OnboardingPalette.muted)
                     .lineSpacing(7)

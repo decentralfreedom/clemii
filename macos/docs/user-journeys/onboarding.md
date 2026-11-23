@@ -10,6 +10,7 @@ The onboarding is a native four-step product demo, not a settings checklist. It 
 
 - A fresh launch never reads or writes the user's Documents folder. Transcription and language models live under clemii's Application Support directory.
 - The welcome step appears before any system permission dialog.
+- The welcome step shows the website's hero as a film: the globe swells into place, clemii and his big brother come out of it and greet, then fly their rounds. The film is bundled, has no sound, and gives way to a still of the brothers when Reduce Motion is on. Colours are the clemii mark's: ember to rose, sky to violet, and the globe's indigo.
 - The window uses the focused 1280 by 860 onboarding canvas, native macOS controls, clemii aurora surfaces, a centered clemii title, and a four-part progress rail.
 - Microphone and Accessibility access are requested only after the user taps the voice-test microphone. Both are required to complete the guided practice so the first real dictation can listen and type successfully.
 - The bundled transcription model is self-contained, including its tokenizer. It prepares exactly once in the background, never requires a first-run download, and remains loaded for immediate dictation.
