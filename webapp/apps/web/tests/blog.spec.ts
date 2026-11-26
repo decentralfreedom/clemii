@@ -25,15 +25,15 @@ test("BLOG-001 reads a prerendered article without JavaScript", async ({ browser
   expect(JSON.parse(scripts.at(-1)!)).toMatchObject({
     "@type": "BreadcrumbList",
     itemListElement: [
-      { position: 1, name: "clemii", item: "https://behu.sh/" },
-      { position: 2, name: "The clemii blog", item: "https://behu.sh/blog" },
+      { position: 1, name: "clemii", item: "https://clemii.com/" },
+      { position: 2, name: "The clemii blog", item: "https://clemii.com/blog" },
       { position: 3, name: "Fixture article body heading" },
     ],
   });
   expect(data).toMatchObject({
     "@type": "BlogPosting", headline: "Fixture article body heading",
     datePublished: "2026-11-01T00:00:00Z", dateModified: "2026-11-10T00:00:00Z",
-    author: { "@type": "Person", name: "Clemens Kressmann", url: "https://behu.sh/authors/clemens-kressmann" },
+    author: { "@type": "Person", name: "Clemens Kressmann", url: "https://clemii.com/authors/clemens-kressmann" },
   });
   await context.close();
 });
@@ -106,8 +106,8 @@ test("BLOG-007 links bylines to a prerendered author profile with ProfilePage da
   const data = JSON.parse((await plain.locator('script[type="application/ld+json"]').allInnerTexts())[0]!);
   expect(data).toMatchObject({
     "@type": "ProfilePage",
-    mainEntity: { "@type": "Person", name: "Clemens Kressmann", url: "https://behu.sh/authors/clemens-kressmann",
-      image: "https://behu.sh/media/authors/clemens-kressmann.webp",
+    mainEntity: { "@type": "Person", name: "Clemens Kressmann", url: "https://clemii.com/authors/clemens-kressmann",
+      image: "https://clemii.com/media/authors/clemens-kressmann.webp",
       sameAs: ["https://www.linkedin.com/in/clemens-kressmann/", "https://github.com/Powermama"] },
   });
   await expect(plain.locator(".blog-card-grid .blog-card")).toHaveCount(2);
@@ -149,15 +149,15 @@ test("BLOG-008 keeps the way back and sharing in a quiet margin, with no content
 test("BLOG-009 serves the article artwork as the social preview and on cards, never as an article hero", async ({ page, request }) => {
   await page.goto(article);
   const image = await page.locator('meta[property="og:image"]').getAttribute("content");
-  expect(image).toMatch(/^https:\/\/behu\.sh\/blog\/covers\/fixture-dictation-without-cloud-[a-f0-9]{10}-social\.png$/);
+  expect(image).toMatch(/^https:\/\/clemii\.com\/blog\/covers\/fixture-dictation-without-cloud-[a-f0-9]{10}-social\.png$/);
   await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", image!);
   const scripts = await page.locator('script[type="application/ld+json"]').allInnerTexts();
   const data = JSON.parse(scripts[0]!);
   expect(JSON.parse(scripts.at(-1)!)).toMatchObject({
     "@type": "BreadcrumbList",
     itemListElement: [
-      { position: 1, name: "clemii", item: "https://behu.sh/" },
-      { position: 2, name: "The clemii blog", item: "https://behu.sh/blog" },
+      { position: 1, name: "clemii", item: "https://clemii.com/" },
+      { position: 2, name: "The clemii blog", item: "https://clemii.com/blog" },
       { position: 3, name: "Fixture article body heading" },
     ],
   });
