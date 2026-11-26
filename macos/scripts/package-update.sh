@@ -64,10 +64,15 @@ if [[ -n "${HUSH_RELEASE_NOTES_FILE:-}" ]]; then
   cp "${HUSH_RELEASE_NOTES_FILE}" "${ARCHIVE_PATH%.*}.md"
 fi
 
+# hush (builds 18 and older) reads this channel too and shares the EdDSA key, so Sparkle
+# would install clemii over hush.app under the old name. For those builds every clemii
+# update is informational: Sparkle shows it with the link and installs nothing.
+FIRST_CLEMII_BUILD=19
 "${SPARKLE_BIN_DIRECTORY}/generate_appcast" \
   --account "${SPARKLE_ACCOUNT}" \
   --download-url-prefix "${UPDATE_ORIGIN%/}/${UPDATE_CHANNEL}/" \
   --link "https://clemii.com" \
+  --informational-update-versions "<${FIRST_CLEMII_BUILD}" \
   --maximum-versions 3 \
   --maximum-deltas 3 \
   --delta-compression lzfse \
@@ -75,6 +80,11 @@ fi
   "${OUTPUT_DIRECTORY}"
 
 APPCAST_PATH="${OUTPUT_DIRECTORY}/appcast.xml"
+INFORMATIONAL_BELOW="$(xmllint --xpath "string(//*[local-name()='item'][*[local-name()='version' and text()='${BUILD}']]/*[local-name()='informationalUpdate']/*[local-name()='belowVersion'])" "${APPCAST_PATH}")"
+if [[ "${INFORMATIONAL_BELOW}" != "${FIRST_CLEMII_BUILD}" ]]; then
+  echo "Build ${BUILD} is not informational for hush builds below ${FIRST_CLEMII_BUILD}; refusing to publish." >&2
+  exit 1
+fi
 # Sparkle 2.9+ infers this from the arm64 app. Verify the generated metadata
 # rather than editing an automatically generated appcast after signing.
 HARDWARE_REQUIREMENT="$(xmllint --xpath "string(//*[local-name()='item'][*[local-name()='version' and text()='${BUILD}']]/*[local-name()='hardwareRequirements'])" "${APPCAST_PATH}")"
