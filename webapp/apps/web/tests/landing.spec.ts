@@ -155,6 +155,10 @@ test("keeps download colors and position on hover and press", async ({ page }, t
     await expect(button).toHaveCSS("background-color", colors.background);
     await expect(button).toHaveCSS("color", colors.foreground);
     await expect(button).toHaveCSS("translate", "none");
+    // Moving away with the button held drags a link, and Chromium can hold the next mouse
+    // event until that drag ends. This journey is about the pressed look, so the press is
+    // cancelled by moving off without starting a drag.
+    await button.evaluate(el => el.setAttribute("draggable", "false"));
     await page.mouse.down();
     await expect(button).toHaveCSS("background-color", colors.background);
     await expect(button).toHaveCSS("color", colors.foreground);
