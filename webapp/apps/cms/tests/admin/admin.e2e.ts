@@ -331,7 +331,7 @@ test("CMS-009 the post settings dock beside the editor, and Cmd/Ctrl+. toggles t
     const [text, panel] = [(await article(signedIn).boundingBox())!, (await settings(signedIn).boundingBox())!];
     expect(text.x + text.width).toBeLessThanOrEqual(panel.x);
   }
-  await expect(settings(signedIn).getByText(`behu.sh/blog/${post.slug}`)).toBeVisible();
+  await expect(settings(signedIn).getByText(`clemii.com/blog/${post.slug}`)).toBeVisible();
 
   // Meta data opens as a pane over the list; Escape returns to the list.
   await settings(signedIn).getByRole("button", { name: "Meta data" }).click();
@@ -384,8 +384,8 @@ test("CMS-010 publishing celebrates the post on the posts list, with its link to
   const celebration = signedIn.getByRole("dialog");
   await expect(celebration.getByRole("heading", { level: 2 })).toContainText("Boom! It’s out there.");
   await expect(celebration.getByRole("heading", { level: 2 })).toContainText(/That’s \d+ posts? published\./);
-  // The post as a card, linking to it on behu.sh.
-  const url = `https://behu.sh/blog/${post.slug}`;
+  // The post as a card, linking to it on clemii.com.
+  const url = `https://clemii.com/blog/${post.slug}`;
   const card = celebration.getByRole("link", { name: /How to dictate on a Mac without the cloud/ });
   await expect(card).toHaveAttribute("href", url);
   await expect(card).toHaveAttribute("target", "_blank");
@@ -698,7 +698,7 @@ test("CMS-018 a published post's analytics page, as Ghost's: from the posts list
   // The funnel keeps to the days both sources have, 15 to 20 November: the 1 November impressions and the 21 November visits are left out.
   // Each source in its own group, side by side: Google's clicks never lead into the site's page views.
   const google = signedIn.getByRole("region", { name: "Google Search" });
-  const site = signedIn.getByRole("region", { name: "On behu.sh" });
+  const site = signedIn.getByRole("region", { name: "On clemii.com" });
   await expect(google.getByTestId("funnel-impressions-value")).toHaveText("300");
   await expect(google.getByTestId("funnel-clicks")).toContainText("2.0% CTR");
   await expect(site.getByTestId("funnel-pageviews-value")).toHaveText("40");

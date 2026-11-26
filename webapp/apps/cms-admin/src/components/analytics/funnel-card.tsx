@@ -44,7 +44,7 @@ export function FunnelCard({ search, traffic }: { search: { from: string; to: st
   // step leading into the other. Search Console's clicks and Umami's page views measure different things.
   const groups = [
     { label: "Google Search", source: "Search Console", steps: steps.slice(0, 2) },
-    { label: "On behu.sh", source: "Umami", steps: steps.slice(2) },
+    { label: "On clemii.com", source: "Umami", steps: steps.slice(2) },
   ];
   return (
     <Card>
@@ -70,7 +70,7 @@ export function FunnelCard({ search, traffic }: { search: { from: string; to: st
           ))}
         </div>
         <p className="mt-6 text-sm text-text-secondary">
-          Page views and downloads are counted on behu.sh's server, without cookies, and not for visitors who ask not to be tracked (Do Not Track, Global Privacy Control).
+          Page views and downloads are counted on clemii.com's server, without cookies, and not for visitors who ask not to be tracked (Do Not Track, Global Privacy Control).
         </p>
       </CardContent>
     </Card>
