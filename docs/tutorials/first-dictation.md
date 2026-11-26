@@ -8,7 +8,7 @@ speech model; optional writing and assistant models can wait until later.
 
 ## Install and listen
 
-1. [Download hush](https://behu.sh/), open the disk image and drag the app into
+1. [Download clemii](https://clemii.com/), open the disk image and drag the app into
    **Applications**. Open it from there.
 2. Follow the welcome flow. When you reach the voice practice, enable Microphone
    and Accessibility through the contextual setup controls.
@@ -25,7 +25,7 @@ shortcut and permissions, the transcript should appear in the note.
 
 If you changed the shortcut during setup, use that shortcut instead. If text
 does not appear, confirm the text field has focus and Accessibility is enabled
-for the installed copy of hush. Without automatic insertion, copy the transcript
+for the installed copy of clemii. Without automatic insertion, copy the transcript
 from the clipboard and paste it manually. Microphone permission is required to
 capture your voice; ordinary dictation does not require Screen Recording.
 

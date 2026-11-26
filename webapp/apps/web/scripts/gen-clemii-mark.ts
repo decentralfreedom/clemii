@@ -65,6 +65,11 @@ const titled = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${box}" role="i
 writeFileSync(`${web}public/clemii-mark.svg`, titled);
 writeFileSync(`${web}public/favicon.svg`, titled);
 writeFileSync(`${web}src/landing/clemii-mark.svg`, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${box}" aria-hidden="true">${inside}</svg>\n`);
+// The README's wordmark, as the site's header sets it: the mark, then the name. One file for
+// GitHub's light theme and one for its dark theme; only the name's colour differs.
+for (const [file, ink] of [["clemii-wordmark.svg", "#1f201e"], ["clemii-wordmark-dark.svg", "#f8f8f6"]]) {
+  writeFileSync(`${web}../../../docs/assets/${file}`, `<svg xmlns="http://www.w3.org/2000/svg" width="248" height="72" viewBox="0 0 248 72" role="img" aria-label="clemii"><svg x="0" y="4" width="64" height="64" viewBox="${box}">${inside}</svg><text x="78" y="56" fill="${ink}" font-family="Arial, Helvetica, sans-serif" font-size="60" font-weight="700" letter-spacing="-3">clemii</text></svg>\n`);
+}
 
 // The glyph. The menu bar's icons are 20 by 18 points, the glyph 16 across: Apple's menu bar is 24
 // points high and tints template images (black and clear only) for light and dark bars itself.

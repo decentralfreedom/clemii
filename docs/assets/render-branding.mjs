@@ -7,15 +7,23 @@ import { fileURLToPath } from "node:url";
 const require = createRequire(new URL("../../webapp/apps/web/package.json", import.meta.url));
 const { chromium } = require("@playwright/test");
 const browser = await chromium.launch();
+// The README cover first: the social preview is drawn from it.
+const renders = [
+  ["../../macos/docs/assets/readme-cover.html", "../../macos/docs/assets/readme-cover.png", { width: 1280, height: 900 }],
+  ["github-social.html", "github-social.png", { width: 1280, height: 640 }],
+];
 try {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 640 }, deviceScaleFactor: 1 });
-  await page.route(/^https?:/, route => route.abort());
-  await page.goto(new URL("github-social.html", import.meta.url).href);
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-    await Promise.all([...document.images].map(image => image.decode()));
-  });
-  await page.screenshot({ path: fileURLToPath(new URL("github-social.png", import.meta.url)) });
+  for (const [source, output, viewport] of renders) {
+    const page = await browser.newPage({ viewport, deviceScaleFactor: 1 });
+    await page.route(/^https?:/, route => route.abort());
+    await page.goto(new URL(source, import.meta.url).href);
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      await Promise.all([...document.images].map(image => image.decode()));
+    });
+    await page.screenshot({ path: fileURLToPath(new URL(output, import.meta.url)) });
+    await page.close();
+  }
 } finally {
   await browser.close();
 }
