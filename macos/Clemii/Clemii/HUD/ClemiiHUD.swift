@@ -37,10 +37,13 @@ enum HUDPalette {
     static let red    = Color(hex: 0xFF3B30)
     static let proofAccent = Color(hex: 0xA99DFF)
 
-    /// The globe of the clemii mark: water, light at the upper left, deep at the far edge.
-    static let globe = RadialGradient(
-        colors: [Color(hex: 0x58B4FF), Color(hex: 0x2472E6), Color(hex: 0x2B3FB8), Color(hex: 0x24156A)],
-        center: UnitPoint(x: 0.36, y: 0.3), startRadius: 0, endRadius: 34
+    /// The globe of the clemii mark, drawn flat like the aurora: its blues swept round it.
+    static let globe = AngularGradient(
+        gradient: Gradient(colors: [
+            Color(hex: 0x58B4FF), Color(hex: 0x2472E6), Color(hex: 0x2B3FB8),
+            Color(hex: 0x2472E6), Color(hex: 0x58B4FF)
+        ]),
+        center: .center, angle: .degrees(210)
     )
     /// Aurora - "voice / thinking" moments, in soft tints of the brand's colours.
     static let aurora = AngularGradient(
@@ -200,13 +203,8 @@ struct ClemiiBadge: View {
     var body: some View {
         ZStack {
             Circle().fill(baseFill)
-            // A globe of water while it listens and waits: lit from the upper left, a gloss on it.
+            // The globe while it listens and waits, flat like the aurora that follows it.
             Circle().fill(HUDPalette.globe).opacity(isGlobe ? 1 : 0)
-            Ellipse().fill(Color.white.opacity(0.32))
-                .frame(width: 15, height: 6.5)
-                .rotationEffect(.degrees(-32))
-                .offset(x: -7, y: -10.5)
-                .opacity(isGlobe ? 1 : 0)
             AuroraFill().opacity(state == .processing ? 1 : 0)
             if state == .inserted {
                 ClemiiCheck()
@@ -221,7 +219,7 @@ struct ClemiiBadge: View {
         .frame(width: 42, height: 42)
         .clipShape(Circle())
         .overlay(
-            Circle().strokeBorder(Color(hex: 0x9BE8FF).opacity(isGlobe ? 0.4 : 0.08), lineWidth: 0.75)
+            Circle().strokeBorder(Color.white.opacity(0.08), lineWidth: 0.75)
         )
         .overlay(
             Circle()
