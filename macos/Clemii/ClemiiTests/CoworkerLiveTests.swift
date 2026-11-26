@@ -160,7 +160,7 @@ struct CoworkerLiveTests {
         #expect(meeting.action == .meeting)
         #expect(meeting.minutes == 30)
         #expect(meeting.start.hasPrefix("2026-11-05T15:30"))
-        let kokoro = KokoroAneManager(defaultVoice: "af_heart", directory: AIModelStorage.fluidAudioRoot, version: .v3)
+        let kokoro = CoworkerVoice.makeManager()
         let voiceStart = Date()
         try await kokoro.initialize(preloadVoices: ["af_heart"])
         print("[coworker-live] Kokoro prepare \(Date().timeIntervalSince(voiceStart))s")

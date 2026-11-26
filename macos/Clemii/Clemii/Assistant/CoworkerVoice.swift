@@ -2,6 +2,7 @@ import AVFoundation
 import FluidAudio
 import NaturalLanguage
 import Combine
+import CoreML
 
 @MainActor
 protocol CoworkerSpeaking: AnyObject {
@@ -35,7 +36,7 @@ final class CoworkerVoice: CoworkerSpeaking {
     }
     var onStatus: ((String) -> Void)?
     var onUtterance: ((String?) -> Void)?
-    private var manager = KokoroAneManager(defaultVoice: "af_heart", directory: AIModelStorage.fluidAudioRoot, version: .v3)
+    private var manager = CoworkerVoice.makeManager()
     private var removing = false
     private var preparation: Task<Void, Error>?
     private var prepared = false
@@ -76,7 +77,7 @@ final class CoworkerVoice: CoworkerSpeaking {
             try Task.checkCancellation()
             // Compile a representative short-response path while the user is speaking
             // or the writer is working. Discard this audio; it is never played or stored.
-            _ = try await manager.synthesize(text: "I'm ready. Tell me what you would like to change.", voice: "af_heart")
+            _ = try await manager.synthesize(text: Self.warmUpSentence, voice: "af_heart")
         }
         preparation = task
         do {
@@ -155,7 +156,7 @@ final class CoworkerVoice: CoworkerSpeaking {
         await manager.cleanup()
         prepared = false
         preparation = nil
-        manager = KokoroAneManager(defaultVoice: "af_heart", directory: AIModelStorage.fluidAudioRoot, version: .v3)
+        manager = CoworkerVoice.makeManager()
     }
 
     func removeModel() async throws {
@@ -171,7 +172,7 @@ final class CoworkerVoice: CoworkerSpeaking {
         await manager.cleanup()
         prepared = false
         preparation = nil
-        manager = KokoroAneManager(defaultVoice: "af_heart", directory: AIModelStorage.fluidAudioRoot, version: .v3)
+        manager = CoworkerVoice.makeManager()
         do {
             try VoiceModelFiles.remove(in: AIModelStorage.fluidAudioRoot)
             setupState.send(.unchecked)
@@ -179,6 +180,23 @@ final class CoworkerVoice: CoworkerSpeaking {
             setupState.send(.failed(error.localizedDescription))
             throw error
         }
+    }
+
+    nonisolated static let warmUpSentence = "I'm ready. Tell me what you would like to change."
+
+    /// Kokoro's Alignment stage traps the process in Apple's BNNS whenever a sentence comes to
+    /// exactly 48 tokens on the Neural Engine route, as the setup sentence does (FluidAudio #1172).
+    /// On the CPU alone it runs cleanly and as fast. FluidAudio #1198 removes the stage, and with a
+    /// release that carries it this routing can go (#178).
+    nonisolated static var computeUnits: KokoroAneComputeUnits {
+        var units = KokoroAneComputeUnits.default
+        units.alignment = .cpuOnly
+        return units
+    }
+
+    nonisolated static func makeManager() -> KokoroAneManager {
+        KokoroAneManager(defaultVoice: "af_heart", directory: AIModelStorage.fluidAudioRoot,
+                         computeUnits: computeUnits, version: .v3)
     }
 
     nonisolated static func chunks(_ text: String) -> [String] {
