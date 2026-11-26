@@ -26,10 +26,10 @@ const blocked = () => { throw new Error("SecurityError"); };
 
 describe("article URLs", () => {
   test("an English post lives under /blog, a German one under /de/blog", () => {
-    expect(articleUrl("en", "local-dictation")).toBe("https://behu.sh/blog/local-dictation");
-    expect(articleUrl("de", "diktieren-ohne-cloud")).toBe("https://behu.sh/de/blog/diktieren-ohne-cloud");
-    expect(articleUrlPreview("de", "diktieren")).toBe("behu.sh/de/blog/diktieren");
-    expect(articleUrlPreview("en", "")).toBe("behu.sh/blog/…");
+    expect(articleUrl("en", "local-dictation")).toBe("https://clemii.com/blog/local-dictation");
+    expect(articleUrl("de", "diktieren-ohne-cloud")).toBe("https://clemii.com/de/blog/diktieren-ohne-cloud");
+    expect(articleUrlPreview("de", "diktieren")).toBe("clemii.com/de/blog/diktieren");
+    expect(articleUrlPreview("en", "")).toBe("clemii.com/blog/…");
   });
 });
 
