@@ -89,8 +89,8 @@ export const privatePageMetadata: PageMetadata = {
 
 /** The not-found page, prerendered once per language and served with status 404. */
 export const notFoundPages: Record<SiteLanguage, PageMetadata> = {
-  en: { title: "Page not found - hush", description: "This page does not exist on behu.sh.", canonicalPath: "/", indexable: false, language: "en" },
-  de: { title: "Seite nicht gefunden - hush", description: "Diese Seite gibt es auf behu.sh nicht.", canonicalPath: "/de", indexable: false, language: "de" },
+  en: { title: "Page not found - hush", description: "This page does not exist on clemii.com.", canonicalPath: "/", indexable: false, language: "en" },
+  de: { title: "Seite nicht gefunden - hush", description: "Diese Seite gibt es auf clemii.com nicht.", canonicalPath: "/de", indexable: false, language: "de" },
 };
 /** Prerendered documents for unknown addresses, keyed in pages.json by language. */
 export const notFoundDocumentKey = (language: SiteLanguage) => `404:${language}`;

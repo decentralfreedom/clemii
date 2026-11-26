@@ -15,10 +15,10 @@ test("public pages provide readable content and unique previews without JavaScri
       await expect(page).toHaveTitle(title!);
       expect((await page.locator("h1").innerText()).replace(/\s+/g, " ")).toBe(heading);
       await expect(page.locator("h1")).toBeVisible();
-      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://behu.sh${path}`);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://clemii.com${path}`);
       await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", title!);
-      await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", `https://behu.sh${path}`);
-      await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", `https://behu.sh/social/${image}.png`);
+      await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", `https://clemii.com${path}`);
+      await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", `https://clemii.com/social/${image}.png`);
       await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
       // The product links, not the language switcher, which may also point to this page.
       await expect(page.locator("footer").getByRole("link", { name: "Verified Messages" })).toBeVisible();
@@ -38,7 +38,7 @@ test("public pages provide readable content and unique previews without JavaScri
       await page.goto(`${test.info().project.use.baseURL}${path}`);
       await expect(page.locator("html")).toHaveAttribute("lang", language!);
       await expect(page.locator("address")).toBeVisible();
-      await expect(page.locator(`link[hreflang="${language === "de" ? "en" : "de"}"]`)).toHaveAttribute("href", `https://behu.sh${alternate}`);
+      await expect(page.locator(`link[hreflang="${language === "de" ? "en" : "de"}"]`)).toHaveAttribute("href", `https://clemii.com${alternate}`);
     }
   } finally { await context.close(); }
 });
@@ -60,12 +60,12 @@ test("hydrates under the existing CSP without losing the public page", async ({ 
 
 test("keeps discovery public, preserves private no-store and returns genuine 404s", async ({ request }) => {
   const sitemap = await (await request.get("/sitemap.xml")).text();
-  expect(sitemap).toContain("https://behu.sh/verified-messages");
+  expect(sitemap).toContain("https://clemii.com/verified-messages");
   expect(sitemap).not.toMatch(/\/p\/|\/s\/|\/v1\/|alpha|datenschutz/);
   const llms = await (await request.get("/llms.txt")).text();
   expect(llms).toMatch(/^# hush\n/);
   expect(llms).toContain("https://github.com/decentralfreedom/hush");
-  expect(llms).not.toMatch(/https:\/\/behu.sh\/(p|s|v1)\//);
+  expect(llms).not.toMatch(/https:\/\/clemii.com\/(p|s|v1)\//);
   for (const path of ["/p/unknown", "/releases/0.1.0-alpha.5", "/impressum"]) {
     const response = await request.get(path);
     expect(response.headers()["x-robots-tag"]).toBe("noindex, nofollow");
@@ -95,8 +95,8 @@ test("SEARCH-004 names the site and shows its icon and logo wherever search engi
     if (size) expect((await response.body()).readUInt32BE(16), path).toBe(size);
   }
   const data = (await page.locator('script[type="application/ld+json"]').allInnerTexts()).map((text) => JSON.parse(text));
-  expect(data.find((item) => item["@type"] === "WebSite")).toMatchObject({ name: "hush", url: "https://behu.sh/" });
+  expect(data.find((item) => item["@type"] === "WebSite")).toMatchObject({ name: "hush", url: "https://clemii.com/" });
   expect(data.find((item) => item["@type"] === "Organization")).toMatchObject({
-    name: "hush", logo: { url: "https://behu.sh/logo.png", width: 512, height: 512 },
+    name: "hush", logo: { url: "https://clemii.com/logo.png", width: 512, height: 512 },
   });
 });

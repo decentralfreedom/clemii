@@ -27,7 +27,7 @@ export function PostPreview({ open, onOpenChange, preview, problems, lang, lead,
   preview: Preview | null;
   problems: string[];
   lang: "en" | "de";
-  /** The excerpt, shown as the article's lead as on behu.sh. */
+  /** The excerpt, shown as the article's lead as on clemii.com. */
   lead: string;
   /** The owner's approval of a draft for agents: whether it covers the post as it is, or lapsed since. */
   approval?: { current: boolean; lapsed: boolean; busy: boolean; onApprove: () => void };

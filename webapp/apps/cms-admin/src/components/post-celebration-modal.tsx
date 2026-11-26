@@ -6,7 +6,7 @@
 // and the post read from the CMS.
 //
 // The post-publish celebration on the posts list: the headline, the post as a
-// card linking to it on behu.sh, and the ways to share it.
+// card linking to it on clemii.com, and the ways to share it.
 import { blogAuthors, type BlogAuthorId } from "@hush/article/authors";
 import type { Post } from "@/api/cms.generated";
 import { HushLogo } from "@/components/hush-logo";

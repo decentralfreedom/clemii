@@ -583,7 +583,7 @@ export function PostEditor({ post, onCreated, onReopen }: { post?: Post; onCreat
               </div>
               <div className="col-start-3 ml-auto" data-writing-focus={writingFocus}>
                 <div className="flex items-center gap-x-[calc(var(--spacing)*3*(1-var(--editor-settings-progress)))] editor-settings-motion-[column-gap] max-[500px]:gap-x-[calc(var(--spacing)*(1-var(--editor-settings-progress)))]">
-                  {/* As in Ghost, a draft is previewed; a live post is on behu.sh. */}
+                  {/* As in Ghost, a draft is previewed; a live post is on clemii.com. */}
                   {post?.status === "draft" && (
                     <Button variant="ghost" className={headerButton} aria-pressed={showPreview} onClick={() => setShowPreview((value) => !value)}>Preview</Button>
                   )}

@@ -199,7 +199,7 @@ function MobileNavBar() {
           <Link to="/analytics" search={{}}><ChartNoAxesColumn strokeWidth={1.5} /><span className="sr-only">Analytics</span></Link>
         </Button>
         <Button asChild size="icon" variant="ghost" className={cn(mobileNavButton, "bg-transparent")}>
-          <a href="https://behu.sh/blog" target="_blank" rel="noreferrer"><AppWindow strokeWidth={1.5} /><span className="sr-only">View site</span></a>
+          <a href="https://clemii.com/blog" target="_blank" rel="noreferrer"><AppWindow strokeWidth={1.5} /><span className="sr-only">View site</span></a>
         </Button>
         <SidebarTrigger className="h-9 rounded-full px-8 hover:bg-transparent">
           <Ellipsis strokeWidth={1.5} />
@@ -237,10 +237,10 @@ function AppLayout() {
               <SidebarMenu>
                 <SidebarMenuItem className="group/viewsite">
                   <SidebarMenuButton asChild>
-                    <a href="https://behu.sh/blog" target="_blank" rel="noreferrer"><AppWindow /><span>View site</span></a>
+                    <a href="https://clemii.com/blog" target="_blank" rel="noreferrer"><AppWindow /><span>View site</span></a>
                   </SidebarMenuButton>
                   <a
-                    href="https://behu.sh/blog" target="_blank" rel="noreferrer" aria-label="Open behu.sh in a new tab"
+                    href="https://clemii.com/blog" target="_blank" rel="noreferrer" aria-label="Open clemii.com in a new tab"
                     className="absolute top-0 right-0 flex size-8 items-center justify-center rounded-full text-gray-700 opacity-0 group-hover/viewsite:opacity-100 hover:bg-sidebar-accent focus-visible:opacity-100"
                   >
                     <ExternalLink size={16} />
