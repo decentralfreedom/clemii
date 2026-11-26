@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Clemens Kressmann
 //
 // Draws the clemii mark from the brothers' geometry: the header's mark, the favicon and the hero's
-// flat stand-in; and its one-colour glyph, as the macOS menu bar's four states. Run: bun scripts/gen-clemii-mark.ts, then bun scripts/generate-favicons.ts
+// flat stand-in; the README's wordmarks; and its one-colour glyph, as the macOS menu bar's four states. Run: bun scripts/gen-clemii-mark.ts, then bun scripts/generate-favicons.ts
 import { writeFileSync } from "node:fs";
 import { existsSync, mkdirSync, rmSync, readdirSync } from "node:fs";
 import { along, big, globe, glyph, mix, polar, ribbonEdge, small, smooth, type Brother, type Point } from "../src/landing/hero/brothers";
