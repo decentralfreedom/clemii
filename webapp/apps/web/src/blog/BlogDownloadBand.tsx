@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 import { useEffect, useRef, useState } from "react";
-import { type BlogLanguage } from "@hush/article/taxonomy";
+import { type BlogLanguage } from "@clemii/article/taxonomy";
 import { blogCopy } from "../../shared/blog";
 import { AppleIcon } from "../components/AppleIcon";
 import { DownloadLink } from "../components/DownloadExperience";
-import { HushHud, type HushHudState } from "../components/visuals/HushHud";
+import { ClemiiHud, type ClemiiHudState } from "../components/visuals/ClemiiHud";
 import { latestEntry } from "../components/latest-entry";
 
 // One dictation, as the app shows it: listen, process on the Mac, insert.
-const sequence: Array<{ state: HushHudState; ms: number }> = [
+const sequence: Array<{ state: ClemiiHudState; ms: number }> = [
   { state: "listening", ms: 2600 },
   { state: "processing", ms: 700 },
   { state: "drafted", ms: 3200 },
@@ -86,7 +86,7 @@ function DemoWindow({ demo, typed }: { demo: Demo; typed: boolean }) {
       <div className="blog-cta-window" data-kind="terminal">
         <div className="blog-cta-window-bar"><i /><i /><i /><span>{demo.title}</span></div>
         <div className="blog-terminal">
-          <p className="blog-terminal-line"><span className="blog-terminal-path">~/hush</span> % {demo.prompt}</p>
+          <p className="blog-terminal-line"><span className="blog-terminal-path">~/clemii</span> % {demo.prompt}</p>
           <div className="blog-terminal-box"><span className="blog-terminal-prompt">&gt;</span><Typed text={demo.text} typed={typed} className="blog-cta-window-text" /></div>
         </div>
       </div>
@@ -124,7 +124,7 @@ export function BlogDownloadBand({ lang }: { lang: BlogLanguage }) {
         </div>
         <div className="blog-cta-stage" ref={stage} aria-hidden="true">
           <DemoWindow demo={demo} typed={typed} />
-          <HushHud
+          <ClemiiHud
             state={state}
             className="blog-cta-hud"
             copy={{

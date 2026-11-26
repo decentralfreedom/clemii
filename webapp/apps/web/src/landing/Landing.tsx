@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { siApple } from "simple-icons";
 import { Header } from "../layout/Header";
 import { Footer } from "../layout/Footer";
-import { LocalUniverse, WaveMark } from "./LocalUniverse";
+import { LocalUniverse } from "./LocalUniverse";
 import { useLandingEntrance } from "./useLandingEntrance";
 import { VisionStory } from "./VisionStory";
 import { DocumentMetadata } from "../components/DocumentMetadata";
@@ -29,7 +29,7 @@ function MacDownload() {
 export function Landing({ lang = "en" }: { lang?: SiteLanguage }) {
   const root = useRef<HTMLDivElement>(null);
   useLandingEntrance(root);
-  return <div className="hush-landing" id="top" data-opening="pending" ref={root}>
+  return <div className="clemii-landing" id="top" data-opening="pending" ref={root}>
     <DocumentMetadata {...sitePages[lang === "de" ? "/de" : "/"]!} />
     <a className="landing-skip" href="#main">{m.skip_to_content()}</a>
     <Header progress />
@@ -48,7 +48,7 @@ export function Landing({ lang = "en" }: { lang?: SiteLanguage }) {
       <VisionStory />
       <div className="story-afterword">
         <section className="landing-faq" aria-labelledby="faq-title"><h2 id="faq-title"><Lines text={m.faq_title()} /></h2><div>{questions.map(item => <details key={item.question()}><summary>{item.question()}<span aria-hidden="true">+</span></summary><p>{item.answer()}</p></details>)}</div></section>
-        <section className="landing-final"><span className="final-imprint" aria-hidden="true">hush.</span><div className="final-mark"><WaveMark /></div><h2><Lines text={m.final_title()} /></h2><MacDownload /><a className="release-link" href="/releases">{m.final_release_link()}</a></section>
+        <section className="landing-final"><span className="final-imprint" aria-hidden="true">clemii.</span><img className="final-mark" src="/clemii-mark.svg" alt="" /><h2><Lines text={m.final_title()} /></h2><MacDownload /><a className="release-link" href="/releases">{m.final_release_link()}</a></section>
       </div>
     </main>
     <Footer />

@@ -3,7 +3,7 @@
 .site-brand { margin-right: auto; flex-shrink: 0; }
 .site-menu-toggle { display: none; }
 .site-mobile-start { display: none; }
-.site-brand > a { font-size: 25px; gap: 12px; }
+.site-brand > a { font-size: 25px; gap: 8px; }
 .site-brand > a > span:first-child { width: 40px; height: 40px; border-radius: 12px; }
 .site-brand > a > span:first-child svg { width: 21px; height: 21px; }
 .site-header-links { display: flex; align-items: center; justify-content: flex-end; gap: 32px; font-size: 14px; font-weight: 450; color: var(--header-muted); }
@@ -15,10 +15,10 @@
 .site-community > span { padding: 2px 6px; border: 1px solid #a7b6bf59; border-radius: 5px; font-size: 9px; line-height: 1.3; }
 .site-header .site-header-download { gap: 8px; min-height: 46px; padding: 0 24px; font-size: 14px; border-radius: 100px; background: #24272b; color: white; flex-shrink: 0; }
 .site-header .site-header-download svg { width: 14px; height: 16px; flex-shrink: 0; }
-.site-header :focus-visible { outline: 2px solid #397d94; outline-offset: 5px; }
+.site-header :focus-visible { outline: 2px solid #4a3fdc; outline-offset: 5px; }
 .site-header[data-theme="dark"] { --header-ink: #edf3f5; --header-muted: #b6c7d4; background: #111827; }
-.site-header[data-theme="dark"] .site-brand .logo-wordmark > span { color: #8cede7; }
-.site-header[data-theme="dark"] .site-header-download { color: #111827; background: #e7f4f0; }
+.site-header[data-theme="dark"] .site-brand .logo-wordmark > span { color: #9fe3ff; }
+.site-header[data-theme="dark"] .site-header-download { color: #111827; background: #eef0ff; }
 .site-header-context { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 8px; }
 @media (max-width: 850px) {
   .site-header nav { gap: 24px; }
@@ -31,8 +31,8 @@
   .site-mobile-start { display: block; }
   .site-header .site-compact-download { min-height: 44px; padding: 0 12px; gap: 7px; border-radius: 100px; background: #24272b; color: white; font-size: 12px; font-weight: 550; letter-spacing: -.01em; white-space: nowrap; }
   .site-compact-download svg { width: 14px; height: 17px; flex-shrink: 0; }
-  .site-header[data-theme="dark"] .site-compact-download { background: #e7f4f0; color: #111827; }
-  .site-brand > a { font-size: 23px; gap: 10px; }
+  .site-header[data-theme="dark"] .site-compact-download { background: #eef0ff; color: #111827; }
+  .site-brand > a { font-size: 23px; gap: 7px; }
   .site-brand > a > span:first-child { width: 37px; height: 37px; }
   .site-menu-toggle { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; padding: 0; border: 1px solid #a7b6bf40; border-radius: 50%; background: transparent; color: var(--header-ink); cursor: pointer; }
   .site-menu-toggle svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; fill: none; }
@@ -41,7 +41,7 @@
   .site-header[data-menu-open="true"] .site-mobile-start { display: none; }
   .site-header nav .site-header-download { justify-content: center; width: 100%; min-height: 60px; margin-top: auto; padding: 0 22px; gap: 11px; border: 1px solid #24272b; border-radius: 18px; font-size: 17px; font-weight: 550; letter-spacing: -.01em; background: linear-gradient(#34383d, #24272b); box-shadow: inset 0 1px 1px #ffffff28, 0 3px 8px #171d3112; }
   .site-header nav .site-header-download svg { width: 21px; height: 24px; }
-  .site-header[data-theme="dark"] nav .site-header-download { background: #e7f4f0; border-color: #e7f4f0; }
+  .site-header[data-theme="dark"] nav .site-header-download { background: #eef0ff; border-color: #eef0ff; }
   .site-header-links { display: none; grid-column: 1 / -1; padding: clamp(36px, 8svh, 76px) 0 max(12px, env(safe-area-inset-bottom)); min-height: calc(100svh - 72px); font-size: clamp(24px, 6.8vw, 34px); font-weight: 500; letter-spacing: -.035em; }
   .site-header-links[data-open="true"] { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 8px; animation: navigation-arrive .18s ease-out; }
   .site-header-links a, .site-header-links .site-community { padding: 14px 4px; min-height: 62px; gap: 14px; }
@@ -54,4 +54,15 @@
 @media (prefers-reduced-motion: reduce) {
   .site-header a { transition: none; }
   .site-header-links[data-open="true"] { animation: none; }
+}
+
+/* The clemii lockup in Firefox's measured proportions (its logo-word-hor-2026.svg): the name's capitals are
+   half the symbol's height, and the gap from the symbol's visible edge is a quarter of it (preview). */
+.site-brand .logo-mark { height: 40px; width: auto; }
+.site-brand .logo-wordmark { font-family: inherit; font-weight: 650; font-size: 28px; letter-spacing: -0.02em; line-height: 1; }
+.site-brand > a { gap: 10px; }
+@media (max-width: 640px) {
+  .site-brand .logo-mark { height: 34px; }
+  .site-brand .logo-wordmark { font-size: 24px; }
+  .site-brand > a { gap: 8.5px; }
 }

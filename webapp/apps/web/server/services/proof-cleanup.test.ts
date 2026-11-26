@@ -20,7 +20,7 @@ for (const backend of postgresURL ? ["sqlite", "postgres"] : ["sqlite"]) {
     const repository = backend === "postgres"
       ? new PostgresProofRepository(postgresURL!)
       : new SQLiteProofRepository(join(directory, "proofs.sqlite"));
-    const objects = new LocalProofObjectStore(join(directory, "objects"), "http://hush.test");
+    const objects = new LocalProofObjectStore(join(directory, "objects"), "http://clemii.test");
     try {
       const now = new Date();
       const old = new Date(now.getTime() - PROOF_RETENTION_MS - 1000);

@@ -14,7 +14,7 @@ export function FinalCta() {
         </h2>
         <p className="section-heading-copy mx-auto max-w-lg text-pretty leading-7 text-muted">
           {latestRelease
-            ? "Download hush. It is free, private, and dangerously satisfying."
+            ? "Download clemii. It is free, private, and dangerously satisfying."
             : "The next Mac release is on its way. Free, private, and entirely on-device."}
         </p>
         <DownloadLink className="mt-8 gap-2.5">

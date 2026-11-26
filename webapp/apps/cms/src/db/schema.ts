@@ -7,8 +7,8 @@
 // and lives in post_renditions. Two JSON columns are deliberate: a revision's
 // snapshot is an immutable historical record and a rendition's table of
 // contents is a value of the rendered document; neither is queried inside.
-// Authors and clusters are ids validated against @hush/article.
-import type { TocEntry } from "@hush/article";
+// Authors and clusters are ids validated against @clemii/article.
+import type { TocEntry } from "@clemii/article";
 import { relations, sql } from "drizzle-orm";
 import { bigint, boolean, check, date, doublePrecision, index, integer, jsonb, pgEnum, pgTable, primaryKey, smallint, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 

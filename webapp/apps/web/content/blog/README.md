@@ -1,6 +1,6 @@
 # Blog content
 
-Published articles live in the hush CMS (`webapp/apps/cms`), not in this
+Published articles live in the clemii CMS (`webapp/apps/cms`), not in this
 repository. Production builds the blog from the CMS at deploy time. This
 directory only holds articles for local previews; Git ignores everything in it
 except this file, so a draft never lands in the public repository.
@@ -12,10 +12,10 @@ not translate articles.
 
 Use the hush-seo skill (research with treg, outline, article). It writes
 `<lang>/<slug>.md` with `draft: true`. The article contract (front matter
-fields, headings, FAQ section, links, wording) lives in `@hush/article`; the
+fields, headings, FAQ section, links, wording) lives in `@clemii/article`; the
 CMS and this build apply the same rules.
 
-- **Author:** `author:` is an id from `@hush/article/authors` (for example
+- **Author:** `author:` is an id from `@clemii/article/authors` (for example
   `clemens-kressmann`). Name, bio and profile links live only there; bylines,
   feeds, the author page and the structured data are derived from it.
 - **Images:** put screenshots in `<lang>/media/<slug>/` and reference them in a

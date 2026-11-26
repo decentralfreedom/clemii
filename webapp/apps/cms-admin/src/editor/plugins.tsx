@@ -4,7 +4,7 @@
 // The editor's smaller behaviours: what changes are reported to the screen,
 // pasting Markdown and links, dropping images, the language of a code block
 // and a table's rows and columns.
-import { readArticle, type Block } from "@hush/article/blocks";
+import { readArticle, type Block } from "@clemii/article/blocks";
 import { $isCodeNode } from "@lexical/code";
 import { TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";

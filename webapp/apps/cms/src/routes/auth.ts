@@ -71,7 +71,7 @@ export function authRoutes(db: Database, admin: AdminConfig) {
     }
     if (!admin.allowedGithubIds.has(user.id)) {
       console.info(JSON.stringify({ level: "info", message: "Refused an admin sign-in", githubUserId: user.id }));
-      return signInFailed(context, "This GitHub account may not use the hush CMS.", 403);
+      return signInFailed(context, "This GitHub account may not use the clemii CMS.", 403);
     }
     const session = await createSession(db, { githubUserId: user.id, githubLogin: user.login });
     await recordAudit(db, { name: `github:${user.login}`, githubUserId: user.id }, "owner.signed_in", { subject: user.login });

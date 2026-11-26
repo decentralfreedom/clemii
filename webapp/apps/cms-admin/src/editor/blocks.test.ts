@@ -4,7 +4,7 @@
 // The editor shows an article as nodes and hands it back as the same blocks,
 // so opening an article in the editor and saving it changes nothing.
 import { expect, test } from "bun:test";
-import { readArticle, writeArticle, type Block } from "@hush/article/blocks";
+import { readArticle, writeArticle, type Block } from "@clemii/article/blocks";
 import { createHeadlessEditor } from "@lexical/headless";
 import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
 import { $getBlocks, $setBlocks } from "./blocks";
@@ -18,7 +18,7 @@ const article = `# How to dictate on a Mac without the cloud
 > - Local dictation keeps **your voice** on the Mac.
 > - It needs the internet *once*, for the model.
 
-Local dictation keeps your voice on your Mac. Read more on [the *home* page](/ "hush") with \`code\`, ~~old~~ and a\\
+Local dictation keeps your voice on your Mac. Read more on [the *home* page](/ "clemii") with \`code\`, ~~old~~ and a\\
 hard break.
 
 ## How does it work?
@@ -51,7 +51,7 @@ Checks:
 
 | Tool | Runs locally | Price |
 | :--- | :---: | ---: |
-| hush | **yes** | free |
+| clemii | **yes** | free |
 | Other | no, see [why](/) | 10 $ |
 
 \`\`\`sh

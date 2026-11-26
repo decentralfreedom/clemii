@@ -26,12 +26,12 @@ export const blogAuthors = {
       { label: "GitHub", url: "https://github.com/Powermama" },
     ],
     role: {
-      en: "Entrepreneur, maker of hush",
-      de: "Unternehmer, Entwickler von hush",
+      en: "Entrepreneur, maker of clemii",
+      de: "Unternehmer, Entwickler von clemii",
     },
     bio: {
-      en: "Clemens Kressmann is an entrepreneur driven by the idea of decentral freedom: software that runs on your own devices and stays in your hands. His work runs from business through UI design to programming, and he builds open-source projects, including hush, a dictation and AI app for the Mac.",
-      de: "Clemens Kressmann ist Unternehmer und folgt der Idee der dezentralen Freiheit: Software, die auf eigenen Geräten läuft und in der eigenen Hand bleibt. Seine Arbeit reicht vom Geschäftlichen über UI-Design bis zur Programmierung. Er entwickelt Open-Source-Projekte, darunter hush, eine Diktier- und KI-App für den Mac.",
+      en: "Clemens Kressmann is an entrepreneur driven by the idea of decentral freedom: software that runs on your own devices and stays in your hands. His work runs from business through UI design to programming, and he builds open-source projects, including clemii, a dictation and AI app for the Mac.",
+      de: "Clemens Kressmann ist Unternehmer und folgt der Idee der dezentralen Freiheit: Software, die auf eigenen Geräten läuft und in der eigenen Hand bleibt. Seine Arbeit reicht vom Geschäftlichen über UI-Design bis zur Programmierung. Er entwickelt Open-Source-Projekte, darunter clemii, eine Diktier- und KI-App für den Mac.",
     },
   },
 } as const satisfies Record<string, BlogAuthor>;

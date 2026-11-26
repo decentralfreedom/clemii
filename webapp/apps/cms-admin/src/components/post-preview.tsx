@@ -6,7 +6,7 @@
 // title, Desktop and Mobile, Close and Publish, and the rendered article below
 // it, in a phone frame on Mobile. What the article contract still refuses is
 // listed above the article. For a draft, the owner approves what they see here
-// for an agent to schedule or publish (hush's own step; Ghost has no agents).
+// for an agent to schedule or publish (clemii's own step; Ghost has no agents).
 import { Check, Laptop, Smartphone } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import type { Preview } from "@/api/cms.generated";

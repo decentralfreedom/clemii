@@ -5,7 +5,7 @@ FROM oven/bun:1.3.9-alpine AS admin
 
 WORKDIR /app
 COPY --parents package.json bun.lock apps/*/package.json packages/*/package.json ./
-RUN bun install --frozen-lockfile --filter @hush/cms-admin
+RUN bun install --frozen-lockfile --filter @clemii/cms-admin
 COPY packages/article ./packages/article
 COPY packages/theme ./packages/theme
 COPY apps/cms/openapi ./apps/cms/openapi
@@ -25,7 +25,7 @@ ENV NODE_ENV=production \
 # A frozen install checks the lockfile against every workspace, so copy each
 # workspace manifest (COPY --parents keeps their paths).
 COPY --parents package.json bun.lock apps/*/package.json packages/*/package.json ./
-RUN bun install --frozen-lockfile --production --filter @hush/cms
+RUN bun install --frozen-lockfile --production --filter @clemii/cms
 COPY packages/article ./packages/article
 WORKDIR /app/apps/cms
 COPY apps/cms/src ./src

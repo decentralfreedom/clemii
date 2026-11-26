@@ -1,13 +1,13 @@
-/* The hush admin's shadcn theme: the design tokens of Shade, Ghost Admin's
+/* The clemii admin's shadcn theme: the design tokens of Shade, Ghost Admin's
    design system, unchanged (TryGhost/Ghost apps/shade at c2617d08, MIT, see
    ../LICENSE.ghost). Use it like Ghost Admin does (apps/shade/styles.css):
 
-     @import "@hush/theme/element-styles.css";
+     @import "@clemii/theme/element-styles.css";
      @import "tailwindcss/theme.css";
-     @import "@hush/theme/preflight.css";
+     @import "@clemii/theme/preflight.css";
      @import "tailwindcss/utilities.css";
      @import "tw-animate-css";
-     @import "@hush/theme/theme.css";
+     @import "@clemii/theme/theme.css";
 
    with data-admin7-design="false" on <html> (Ghost's shipping palette),
    class="react-admin" on <body> and the app inside an element with class

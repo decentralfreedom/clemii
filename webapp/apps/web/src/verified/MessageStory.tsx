@@ -1,6 +1,6 @@
 import { artwork } from "../media/artwork";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { HushMascotArtwork } from "../landing/HushMascot";
+import { ClemiiMascotArtwork } from "../landing/ClemiiMascot";
 import "./message-story.css";
 import { latestEntry } from "../components/latest-entry";
 
@@ -105,13 +105,13 @@ export function MessageStory() {
         <h2 id="message-story-title">Let your words<br />carry their story.</h2>
         <figure>
           <img src={artwork.twitteringMachine.src} srcSet={artwork.twitteringMachine.srcSet} sizes="(max-width: 760px) 100vw, 620px" width="994" height="1350" loading="lazy" decoding="async" alt="Paul Klee’s mechanical birds, recoloured in blue and rose." />
-          <figcaption><a href="https://commons.wikimedia.org/wiki/File:Die_Zwitscher-Maschine_(Twittering_Machine),_1922_-_Paul_Klee.jpg" target="_blank" rel="noreferrer">Twittering Machine · Paul Klee, 1922.</a><br />Public domain. Recoloured for hush.</figcaption>
+          <figcaption><a href="https://commons.wikimedia.org/wiki/File:Die_Zwitscher-Maschine_(Twittering_Machine),_1922_-_Paul_Klee.jpg" target="_blank" rel="noreferrer">Twittering Machine · Paul Klee, 1922.</a><br />Public domain. Recoloured for clemii.</figcaption>
         </figure>
       </div>
 
       <div className="message-story-player" data-running={running} data-phase={STAGES[phase].toLowerCase()}>
         <div className="message-story-window" ref={windowRef} onFocusCapture={() => setPlaying(false)}>
-          <div className="message-story-chrome"><span>{phase === 1 && <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 5-7 7 7 7M5 12h15" /></svg>}{["hush", "Post", "Private proof"][phase]}</span><span>Illustration</span></div>
+          <div className="message-story-chrome"><span>{phase === 1 && <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 5-7 7 7 7M5 12h15" /></svg>}{["clemii", "Post", "Private proof"][phase]}</span><span>Illustration</span></div>
           <div key={phase} className="message-story-scene" id="message-story-scene" role="group" aria-label={`${STAGES[phase]} illustration`}>
             {phase === 0 && <div className="message-record">
               <div className="message-record-state"><span aria-hidden="true" />Listening on your Mac</div>
@@ -121,9 +121,9 @@ export function MessageStory() {
             </div>}
 
             {phase === 1 && <div className="message-social" aria-label="Illustrative shared message">
-              <div className="message-social-author"><span className="message-avatar" role="img" aria-label="hushy, the hush mascot"><HushMascotArtwork state="listening" portrait /></span><div><strong>hushy</strong><span>@heyhush</span></div><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" /></svg></div>
+              <div className="message-social-author"><span className="message-avatar" role="img" aria-label="clemii, the mascot"><ClemiiMascotArtwork state="listening" portrait /></span><div><strong>clemii</strong><span>@heyhush</span></div><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" /></svg></div>
               <p className="message-post-content">{MESSAGE}{" "}<a className="message-signature" href="#message-example-proof" onClick={event => { event.preventDefault(); focusProof.current = true; selectStage(2); }}>
-                - verified by hush
+                - verified by clemii
                 {running && <svg className="message-click-cursor" viewBox="0 0 30 36" aria-hidden="true"><path d="M4 3v26l7-7 6 11 5-3-6-10h10Z" fill="#1c3741" stroke="white" strokeWidth="2" /></svg>}
               </a></p>
               <p className="message-post-meta"><time dateTime="2026-11-04T10:42:27Z">10:42 AM · Nov 4, 2026</time><span aria-hidden="true"> · </span><span><strong>1,204</strong> Views</span></p>
@@ -131,10 +131,10 @@ export function MessageStory() {
             </div>}
 
             {phase === 2 && <article ref={proofRef} id="message-example-proof" className="message-proof" tabIndex={-1} aria-label="Illustrative Verified Message">
-              <div className="message-proof-status"><span aria-hidden="true">✓</span><div><h3>Verified hush message</h3><p>The signed history matches.</p></div></div>
+              <div className="message-proof-status"><span aria-hidden="true">✓</span><div><h3>Verified clemii message</h3><p>The signed history matches.</p></div></div>
               <blockquote>{MESSAGE}</blockquote>
               <ol className="message-history">
-                <li><span>Voice captured in hush</span><time dateTime="2026-11-04T10:42:08Z">10:42:08 UTC</time></li>
+                <li><span>Voice captured in clemii</span><time dateTime="2026-11-04T10:42:08Z">10:42:08 UTC</time></li>
                 <li><span>Manual edit recorded</span><time dateTime="2026-11-04T10:42:26Z">10:42:26 UTC</time></li>
                 <li><span>Final wording signed</span><time dateTime="2026-11-04T10:42:27Z">10:42:27 UTC</time></li>
               </ol>

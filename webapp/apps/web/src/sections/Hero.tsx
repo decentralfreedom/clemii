@@ -26,7 +26,7 @@ export function Hero() {
         </Reveal>
         <Reveal delay={160}>
           <p className="mx-auto mt-6 max-w-[600px] text-base leading-7 text-muted sm:text-[19px]">
-            hush turns your voice into polished text{" "}
+            clemii turns your voice into polished text{" "}
             <strong className="font-semibold text-ink">
               anywhere you type on your Mac
             </strong>

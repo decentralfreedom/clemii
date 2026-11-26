@@ -3,12 +3,7 @@ import { useEffect, useRef, type CSSProperties } from "react";
 import { ResponsiveField } from "./ResponsiveField";
 import { startLandingEntranceWithoutScene } from "./entrance/landingEntrance";
 import { m } from "../paraglide/messages";
-
-export function WaveMark({ className = "" }: { className?: string }) {
-  return <svg className={className} viewBox="0 0 80 80" fill="none" aria-hidden="true">
-    <path d="M17 34v12M32 20v40M48 27v26M63 35v10" stroke="currentColor" strokeWidth="6.5" strokeLinecap="round" />
-  </svg>;
-}
+import clemiiMark from "./clemii-mark.svg?raw";
 
 const apps = [
   { name: "Mail", file: "mail", x: 23, y: 19 },
@@ -22,7 +17,7 @@ const apps = [
 
 function showFallback(host: HTMLElement) {
   host.dataset.scene = "fallback";
-  startLandingEntranceWithoutScene(host.closest<HTMLElement>(".hush-landing"));
+  startLandingEntranceWithoutScene(host.closest<HTMLElement>(".clemii-landing"));
 }
 
 export function LocalUniverse() {
@@ -38,14 +33,14 @@ export function LocalUniverse() {
     }).connection;
     if (host.current && (connection?.saveData || /^(slow-)?2g$/.test(connection?.effectiveType ?? ""))) {
       host.current.dataset.fallback = "immediate";
-      const entry = host.current.closest<HTMLElement>(".hush-landing");
+      const entry = host.current.closest<HTMLElement>(".clemii-landing");
       if (entry) entry.dataset.opening = "complete";
     }
     // Fetch immediately. The CSS fallback bounds content visibility independently
     // while a fast scene can coordinate the original entrance choreography.
-    void import("./HushScene").then(async ({ mountHushScene }) => {
+    void import("./ClemiiScene").then(async ({ mountClemiiScene }) => {
       if (!cancelled && host.current) {
-        dispose = await mountHushScene(host.current, controller.signal);
+        dispose = await mountClemiiScene(host.current, controller.signal);
         if (cancelled) { dispose?.(); return; }
         if (!dispose) showFallback(host.current);
       }
@@ -68,8 +63,8 @@ export function LocalUniverse() {
       <ellipse cx="500" cy="250" rx="320" ry="150" className="inner-orbit" />
       {apps.map(app => <path key={app.name} d={`M500 250 Q ${app.x * 10} 250 ${app.x * 10} ${app.y * 5}`} />)}
     </svg>
-    <div className="hush-core" ref={host} aria-hidden="true">
-      <div className="core-fallback"><i /><i /><div><WaveMark /></div></div>
+    <div className="clemii-core" ref={host} aria-hidden="true">
+      <div className="core-fallback clemii" dangerouslySetInnerHTML={{ __html: clemiiMark }} />
     </div>
     {apps.map((app, index) => <div className={`orbit-app orbit-${app.file}`} key={app.name}
       style={{ left: `${app.x}%`, top: `${app.y}%`, "--app-delay": `${index * 0.08}s` } as CSSProperties} aria-hidden="true">

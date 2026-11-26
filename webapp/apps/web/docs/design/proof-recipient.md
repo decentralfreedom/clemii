@@ -2,7 +2,7 @@
 
 ## Brief and direction
 
-The recipient arrives to inspect someone else's words. Show the real message first, make its signed history understandable at a glance, then invite the recipient to try hush. Reuse the full-width public header and the existing download destination. Never manufacture a waveform, an identity, missing events, or intermediate message text.
+The recipient arrives to inspect someone else's words. Show the real message first, make its signed history understandable at a glance, then invite the recipient to try clemii. Reuse the full-width public header and the existing download destination. Never manufacture a waveform, an identity, missing events, or intermediate message text.
 
 Palette: porcelain #FAFBFC, graphite #24272B, slate #626973, recording blue #356B89, AI plum #76589A, signature green #267452. Use the site's native system sans for interface and message, with tabular numerals for recorded times. Keep message lines under 65 characters.
 
@@ -11,7 +11,7 @@ Layout:
 ```
 shared header                                        Download
 
-Verified hush message                         signature seal
+Verified clemii message                         signature seal
 author disclosure
 The actual signed words, large and readable
 voice / local AI / manual changes, when recorded
@@ -23,7 +23,7 @@ cleanup + time
 AI or typing + time
 signed + time
 
-hushy       Give your words a story, too.       Download for Mac
+clemii       Give your words a story, too.       Download for Mac
 
 technical details / privacy
 ```

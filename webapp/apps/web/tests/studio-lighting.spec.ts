@@ -24,8 +24,8 @@ test("Vite preview renders the 3D hero and rose with HTTP-decoded lighting", asy
   await page.goto(origin);
   const response = await lightingResponse;
   expect(response.headers()["content-encoding"]).toBe("gzip");
-  await expect(page.locator(".hush-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
-  await expect(page.locator(".hush-core canvas")).toHaveCSS("opacity", "1");
+  await expect(page.locator(".clemii-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
+  await expect(page.locator(".clemii-core canvas")).toHaveCSS("opacity", "1");
   const rose = page.locator(".freedom-bloom");
   await rose.scrollIntoViewIfNeeded();
   await expect(rose).toHaveAttribute("data-scene", "ready", { timeout: 15000 });

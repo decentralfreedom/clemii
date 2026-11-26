@@ -6,8 +6,8 @@
 // "By … - in … - date" and the status in Ghost's colors, scheduled first, then
 // drafts, then published. The sidebar's views filter by status. A post the
 // editor just published or scheduled is celebrated here, as Ghost's list does.
-import { blogAuthors, type BlogAuthorId } from "@hush/article/authors";
-import { blogClusters, type BlogClusterId } from "@hush/article/taxonomy";
+import { blogAuthors, type BlogAuthorId } from "@clemii/article/authors";
+import { blogClusters, type BlogClusterId } from "@clemii/article/taxonomy";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowUpDown, ChartNoAxesColumn, ImageIcon, Pen, PenLine, Plus, SearchX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";

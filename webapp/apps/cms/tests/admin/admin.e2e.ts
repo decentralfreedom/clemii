@@ -390,7 +390,7 @@ test("CMS-010 publishing celebrates the post on the posts list, with its link to
   await expect(card).toHaveAttribute("href", url);
   await expect(card).toHaveAttribute("target", "_blank");
   await expect(card).toContainText("A practical guide to dictating on a Mac");
-  await expect(card).toContainText("hush");
+  await expect(card).toContainText("clemii");
   await expect(card).toContainText("Clemens Kressmann");
   // Sharing names the post's address.
   await expect(celebration.getByRole("link", { name: "Share on X" })).toHaveAttribute("href", `https://twitter.com/intent/tweet?text=${encodeURIComponent("How to dictate on a Mac without the cloud")}%0A${encodeURIComponent(url)}`);

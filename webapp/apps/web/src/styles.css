@@ -6,8 +6,16 @@
   --color-ink: #1f201e;
   --color-muted: #686963;
   --color-soft: #a7a8a1;
-  --color-peach: #f78d6b;
+  --color-peach: #ff8a4a;
   --color-lilac: #ddd8ff;
+  /* The brand's colours, as the mark and the hero's two brothers wear them: the big one's warm
+     run from sun to rose, the little one's cool run from sky to violet, and the globe's indigo. */
+  --color-brand-sun: #ffd22a;
+  --color-brand-ember: #ff8a1c;
+  --color-brand-rose: #ee2a8f;
+  --color-brand-violet: #a52efc;
+  --color-brand-sky: #16b4f8;
+  --color-brand-indigo: #4a3fdc;
   --color-success: #33b36b;
   --font-display: "SF Pro Display", "SF Pro Text", -apple-system,
     BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -46,7 +54,7 @@
   }
 
   ::selection {
-    background: var(--color-ink);
+    background: var(--color-brand-indigo);
     color: white;
   }
 }
@@ -107,7 +115,7 @@
     #ffb3c7,
     #c9b8ff,
     #9ec9ff,
-    #a8e6cf,
+    #9fe3ff,
     #ffd6a5
   );
   filter: blur(24px);
@@ -125,7 +133,7 @@
     #ffb3c7,
     #c9b8ff,
     #9ec9ff,
-    #a8e6cf,
+    #9fe3ff,
     #ffd6a5
   );
   box-shadow:
@@ -182,11 +190,11 @@
 .workflow-aurora {
   background: conic-gradient(
     from 210deg,
-    #a8e6cf,
+    #9fe3ff,
     #ffb3d1,
     #c9b8ff,
     #9ec9ff,
-    #a8e6cf
+    #9fe3ff
   );
   background-size: 160% 160%;
   animation: workflow-aurora-shift 3.5s linear infinite;
@@ -549,3 +557,7 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+/* The clemii mark beside its name, wherever the logo stands; the header sets its own, larger lockup. */
+.logo-mark { height: 28px; width: auto; flex-shrink: 0; }
+.logo-wordmark { font-weight: 650; letter-spacing: -0.02em; line-height: 1; }

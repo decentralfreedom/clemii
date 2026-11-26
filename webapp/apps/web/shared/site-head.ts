@@ -2,7 +2,7 @@
 // Copyright 2026 Clemens Kressmann
 import type { BlogPosting, BreadcrumbList, Person, ProfilePage } from "schema-dts";
 import { blogCopy } from "./blog.ts";
-import { authorPath, blogAuthors, type BlogAuthorId } from "@hush/article/authors";
+import { authorPath, blogAuthors, type BlogAuthorId } from "@clemii/article/authors";
 import { landingPaths, organizationData, siteOrigin, softwareDescription, websiteData, type PageMetadata } from "./site.ts";
 
 const escapeHTML = (value: string) => value.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
@@ -27,12 +27,12 @@ export function renderPageHead(page: PageMetadata): string {
   const canonical = escapeHTML(`${siteOrigin}${page.canonicalPath}`);
   const article = page.article;
   const verified = page.canonicalPath === "/verified-messages";
-  const image = `${siteOrigin}${article ? article.image : `/social/${verified ? "verified-messages" : "hush"}.png`}`;
+  const image = `${siteOrigin}${article ? article.image : `/social/${verified ? "verified-messages" : "clemii"}.png`}`;
   const imageAlt = article ? article.imageAlt : verified
-    ? "Give your words their story back. A hush message mock-up with signed capture and edit history."
+    ? "Give your words their story back. A clemii message mock-up with signed capture and edit history."
     : page.language === "de"
-      ? "Die Sprachebene für den Mac. Das hush HUD hört zu, mit Wellenform neben einer Beispielnachricht."
-      : "The voice layer for your Mac. The hush listening HUD with a waveform beside an example message.";
+      ? "Die Sprachebene für den Mac. Das clemii HUD hört zu, mit Wellenform neben einer Beispielnachricht."
+      : "The voice layer for your Mac. The clemii listening HUD with a waveform beside an example message.";
   // Dates are day-precise in the source; publish them as UTC midnight.
   const isoDate = (date: string) => `${date}T00:00:00Z`;
   const articleData = article && {
@@ -55,7 +55,7 @@ export function renderPageHead(page: PageMetadata): string {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "hush", item: `${siteOrigin}/` },
+      { "@type": "ListItem", position: 1, name: "clemii", item: `${siteOrigin}/` },
       { "@type": "ListItem", position: 2, name: blog.heading, item: `${siteOrigin}${blog.indexPath}` },
       { "@type": "ListItem", position: 3, name: article ? article.heading : blogAuthors[page.profile!.author].name },
     ],
@@ -83,7 +83,7 @@ export function renderPageHead(page: PageMetadata): string {
       `<meta property="article:modified_time" content="${isoDate(article.modified)}">`,
       `<meta property="article:author" content="${siteOrigin}${authorPath(page.language, article.author)}">`,
     ] : []),
-    `<meta property="og:site_name" content="hush">`,
+    `<meta property="og:site_name" content="clemii">`,
     `<meta property="og:title" content="${title}">`,
     `<meta property="og:description" content="${description}">`,
     `<meta property="og:url" content="${canonical}">`,

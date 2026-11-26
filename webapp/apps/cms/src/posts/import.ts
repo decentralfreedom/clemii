@@ -5,8 +5,8 @@
 // with images in <lang>/media/<slug>/). Safe to run again: posts are matched by
 // language and slug and updated only where they differ, and published articles
 // keep their original dates.
-import { articleContent, parseArticle } from "@hush/article/file";
-import { blogLanguages } from "@hush/article/taxonomy";
+import { articleContent, parseArticle } from "@clemii/article/file";
+import { blogLanguages } from "@clemii/article/taxonomy";
 import { and, eq } from "drizzle-orm";
 import { readdir } from "node:fs/promises";
 import { extname, join } from "node:path";

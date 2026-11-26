@@ -60,7 +60,7 @@ smooth. Preserve the [visual landing contract](../user-journeys/visual-landing.m
 
 Across `aa22838` and `e0782df`, the hero geometry, physical materials, environment
 resolution, capped pixel ratio and three-second pose animation are unchanged.
-`HushScene.ts` differs only in three removed page-entrance state assignments.
+`ClemiiScene.ts` differs only in three removed page-entrance state assignments.
 The pinned Three.js version is `0.187.0` in both revisions. The main changes are
 in orchestration, CSS timing, delivery and dependency versions outside Three.js.
 
@@ -180,12 +180,12 @@ controlled single-factor comparison, not another unmeasured warmup workaround.
   2022, so it supports the symptom category, not current causal attribution.
 - A [Three.js Safari discussion](https://discourse.threejs.org/t/issue-with-orbitcontrols-on-safari/28317)
   reports stutter on particular Apple devices while another maintainer could
-  not reproduce it. Device, OS and Safari version matter; hush uses no OrbitControls.
+  not reproduce it. Device, OS and Safari version matter; clemii uses no OrbitControls.
 - A [first-hand startup investigation](https://discourse.threejs.org/t/why-a-heavy-three-js-scene-tanks-pagespeed-and-it-is-not-your-javascript/94734)
   describes real-draw warmup and non-blocking fences after shader preparation.
-  Its post-processing/software-rendering workload differs from hush and its
+  Its post-processing/software-rendering workload differs from clemii and its
   reported gains are not transferred to this project.
-- Current WebGPU/PassNode compilation reports are not matches for hush's
+- Current WebGPU/PassNode compilation reports are not matches for clemii's
   `WebGLRenderer` and must not motivate an unrelated renderer migration.
 
 Three.js explicitly documents `initTexture()` for moving decode/upload costs
@@ -201,7 +201,7 @@ server is not a production performance baseline.
 
 Observed on 2026-11-12 UTC: client `index-es3IzbZU.js`, stylesheet
 `index-CI3RzlD3.css`, hydration `route-0c26bff4f48d0887.js` and hero
-`HushScene-B8wk0zOm.js`. The downloaded hero is byte-for-byte identical to the
+`ClemiiScene-B8wk0zOm.js`. The downloaded hero is byte-for-byte identical to the
 baseline build: SHA-256
 `30f287c36fab0e3fa14243178f1730dd1754bda0d743509675fbf9b2954a3621`.
 This identifies the hero module, not the complete deployed build or an exact
@@ -293,7 +293,7 @@ as hints, with an equally usable path when Safari exposes none.
 
 Read [Vite's official llms.txt](https://vite.dev/llms.txt), then its linked guides.
 Vite does not mandate an application folder architecture. The following
-boundaries are a hush design decision informed by its guidance.
+boundaries are a clemii design decision informed by its guidance.
 
 ```text
 src/landing/
@@ -302,7 +302,7 @@ src/landing/
   useLandingEntrance.ts        finite HTML/CSS entrance
   entrance/
     landingEntrance.ts         one-shot readiness and CSS fallback clock
-  HushScene.ts                preparation and DOM/visibility lifecycle
+  ClemiiScene.ts                preparation and DOM/visibility lifecycle
   hero/
     createHeroScene.ts         geometry, materials, lights, resource ownership
   StudioEnvironment.ts         shared download/validation, owned GPU textures

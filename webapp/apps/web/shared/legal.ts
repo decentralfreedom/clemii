@@ -30,8 +30,8 @@ export const legalConfig = {
     privacyURL: "https://www.hetzner.com/de/legal/privacy-policy/",
   },
   projectStatus: {
-    en: "hush is free and open source. It is currently in alpha.",
-    de: "hush ist kostenlos und Open Source. Die Software befindet sich derzeit in der Alpha-Phase.",
+    en: "clemii is free and open source. It is currently in alpha.",
+    de: "clemii ist kostenlos und Open Source. Die Software befindet sich derzeit in der Alpha-Phase.",
   },
 } as const;
 

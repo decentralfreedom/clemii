@@ -13,7 +13,7 @@ export function HowItWorks() {
               <span className="block text-soft">Without leaving your Mac.</span>
             </>
           }
-          text="Watch hush capture, refine, verify, and insert your thought using only the models and secure hardware already on your Mac."
+          text="Watch clemii capture, refine, verify, and insert your thought using only the models and secure hardware already on your Mac."
         />
         <Reveal>
           <LocalWorkflowDemo />

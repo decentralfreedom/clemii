@@ -4,7 +4,7 @@
 // The page the owner meets before the admin: signing in and connecting a
 // device. Laid out as Ghost Admin's auth screens (apps/admin/src/auth/
 // auth-layout.tsx: AuthLayout, AuthHeader): one centred column on the sidebar
-// colour, the icon over a large title, larger controls. Under it the hush
+// colour, the icon over a large title, larger controls. Under it the clemii
 // mark's waveform runs along the bottom of the page, breathing slowly as if it
 // listened, fading out before the text; still under Reduce Motion. Every colour
 // is a theme token, so light and dark both hold.
@@ -35,8 +35,8 @@ function Waveform() {
   );
 }
 
-/** The hush mark at Ghost's site-icon size, outlined so its dark tile holds on a dark page. */
-function HushMark() {
+/** The clemii mark at Ghost's site-icon size, outlined so its dark tile holds on a dark page. */
+function ClemiiMark() {
   return (
     <svg viewBox="0 0 64 64" aria-hidden="true" className="size-15 rounded-[14px] dark:ring-1 dark:ring-white/15">
       <rect width="64" height="64" rx="15" ry="15" fill="#1F201E" />
@@ -53,7 +53,7 @@ export function AuthCard({ title, description, children }: { title: string; desc
       <Waveform />
       <div className="my-auto w-full max-w-[400px] py-12">
         <header className="mb-8 flex flex-col items-center gap-5 text-center">
-          <HushMark />
+          <ClemiiMark />
           <h1 className="text-4xl leading-tight font-bold tracking-tighter text-balance">{title}</h1>
           {description && <p className="text-lg text-muted-foreground">{description}</p>}
         </header>

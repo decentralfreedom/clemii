@@ -34,7 +34,7 @@ class MemoryObjectStore implements ProofObjectStore {
     contentType: string;
   }): Promise<UploadTarget> {
     return {
-      url: `http://hush.test/v1/proofs/${input.proofId}/content?token=${input.uploadToken}`,
+      url: `http://clemii.test/v1/proofs/${input.proofId}/content?token=${input.uploadToken}`,
       headers: { "content-type": input.contentType },
     };
   }
@@ -52,7 +52,7 @@ class MemoryObjectStore implements ProofObjectStore {
   }
 }
 
-describe("Hush provenance API", () => {
+describe("clemii provenance API", () => {
   let repository: SQLiteProofRepository;
   let objects: MemoryObjectStore;
   let app: ReturnType<typeof createApp>;
@@ -66,9 +66,9 @@ describe("Hush provenance API", () => {
       repository,
       objects,
       serviceKey,
-      "http://hush.test",
+      "http://clemii.test",
     );
-    app = createApp({ proofService: service, allowedOrigin: "http://hush.test" });
+    app = createApp({ proofService: service, allowedOrigin: "http://clemii.test" });
   });
 
   afterEach(() => repository.close());
@@ -197,14 +197,14 @@ describe("Hush provenance API", () => {
       200,
     );
     const shortProofUrl = new URL(completed.proofUrl);
-    expect(shortProofUrl.origin).toBe("http://hush.test");
+    expect(shortProofUrl.origin).toBe("http://clemii.test");
     expect(shortProofUrl.pathname).toMatch(/^\/s\/[A-Za-z0-9_-]{6}$/);
     expect(shortProofUrl.hash).toBe("");
 
     const aliasResponse = await app.request(shortProofUrl.pathname);
     expect(aliasResponse.status).toBe(302);
     expect(aliasResponse.headers.get("location")).toBe(
-      `http://hush.test/p/${reservation.slug}`,
+      `http://clemii.test/p/${reservation.slug}`,
     );
     expect(aliasResponse.headers.get("location")).not.toContain("#");
     expect(aliasResponse.headers.get("cache-control")).toBe(
@@ -218,7 +218,7 @@ describe("Hush provenance API", () => {
     });
     expect(aliasHeadResponse.status).toBe(302);
     expect(aliasHeadResponse.headers.get("location")).toBe(
-      `http://hush.test/p/${reservation.slug}`,
+      `http://clemii.test/p/${reservation.slug}`,
     );
     expect(await aliasHeadResponse.text()).toBe("");
 
@@ -226,7 +226,7 @@ describe("Hush provenance API", () => {
     const rootAliasResponse = await app.request(rootAliasPath);
     expect(rootAliasResponse.status).toBe(302);
     expect(rootAliasResponse.headers.get("location")).toBe(
-      `http://hush.test/p/${reservation.slug}`,
+      `http://clemii.test/p/${reservation.slug}`,
     );
     expect(rootAliasResponse.headers.get("cache-control")).toBe(
       "public, max-age=300, s-maxage=300",
@@ -274,8 +274,8 @@ describe("Hush provenance API", () => {
       proofService: new ProofService(repository, objects, {
         ...rotatedKey,
         publicKeys: { ...serviceKey.publicKeys, ...rotatedKey.publicKeys },
-      }, "http://hush.test"),
-      allowedOrigin: "http://hush.test",
+      }, "http://clemii.test"),
+      allowedOrigin: "http://clemii.test",
     });
     const afterRotation = await requestJson<PublicProof>(rotatedApp, `/v1/proofs/${reservation.slug}`, undefined, 200);
     expect(afterRotation.receipt.keyId).toBe(serviceKey.id);

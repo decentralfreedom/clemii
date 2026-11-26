@@ -13,7 +13,7 @@ export const benefits = [
   {
     eyebrow: "Genuinely private",
     title: "Your words stay yours.",
-    text: "Voice, transcripts, and models remain on your Mac. hush works the same with Wi-Fi switched off.",
+    text: "Voice, transcripts, and models remain on your Mac. clemii works the same with Wi-Fi switched off.",
     visual: "privacy",
     gridClassName: "lg:col-span-2",
     surfaceClassName: "bg-ink text-white",
@@ -21,7 +21,7 @@ export const benefits = [
   {
     eyebrow: "Everywhere",
     title: "One shortcut for you.",
-    text: "If there is a cursor, hush can type there. No copy and paste, browser extension, or context switching.",
+    text: "If there is a cursor, clemii can type there. No copy and paste, browser extension, or context switching.",
     visual: "shortcut",
     gridClassName: "",
     surfaceClassName: "bg-white",
@@ -29,7 +29,7 @@ export const benefits = [
   {
     eyebrow: "Work faster",
     title: "Save time.",
-    text: "Speak naturally while hush turns each thought into polished text on your Mac.",
+    text: "Speak naturally while clemii turns each thought into polished text on your Mac.",
     visual: "typingSpeed",
     gridClassName: "",
     surfaceClassName: "bg-white",
@@ -63,7 +63,7 @@ export const faqs = [
   {
     question: "How is this different from other dictation tools?",
     answer:
-      "hush runs both transcription and refinement on-device. You get the same polished result without sending voice or text to a cloud service.",
+      "clemii runs both transcription and refinement on-device. You get the same polished result without sending voice or text to a cloud service.",
   },
   {
     question: "Can it really write in my tone?",
@@ -73,6 +73,6 @@ export const faqs = [
   {
     question: "What if I do not like it?",
     answer:
-      "Remove hush and your local workflow is unchanged. The private alpha is free and requires no account.",
+      "Remove clemii and your local workflow is unchanged. The private alpha is free and requires no account.",
   },
 ] as const;

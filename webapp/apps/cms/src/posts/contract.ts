@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 //
-// Runs the @hush/article contract against a stored post, with the site as the
+// Runs the @clemii/article contract against a stored post, with the site as the
 // database knows it: published articles, their authors, the blog indexes and
 // the site pages articles may link to.
-import { frontMatterSchema, renderArticle, type BlogPost } from "@hush/article";
-import { authorPath } from "@hush/article/authors";
-import { blogPath, editorialPolicyPath, linkableSitePaths, type BlogLanguage } from "@hush/article/taxonomy";
+import { frontMatterSchema, renderArticle, type BlogPost } from "@clemii/article";
+import { authorPath } from "@clemii/article/authors";
+import { blogPath, editorialPolicyPath, linkableSitePaths, type BlogLanguage } from "@clemii/article/taxonomy";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { loadMedia, type Cms } from "../media/service";
 import { posts } from "../db/schema";

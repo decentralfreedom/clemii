@@ -16,7 +16,7 @@ const article = `# How to dictate on a Mac without the cloud
 > - Local dictation keeps **your voice** on the Mac.
 > - It needs the internet *once*, for the model.
 
-Local dictation keeps your voice on your Mac. Read more on [the home page](/ "hush") or in
+Local dictation keeps your voice on your Mac. Read more on [the home page](/ "clemii") or in
 the [editorial policy](/blog/editorial-policy), with \`code\`, ~~old~~ and a\\
 hard break. Stars like 2 * 3 and under_scores stay as typed.
 
@@ -35,7 +35,7 @@ hard break. Stars like 2 * 3 and under_scores stay as typed.
 
 | Tool | Runs locally | Price |
 | :--- | :---: | ---: |
-| hush | **yes** | free |
+| clemii | **yes** | free |
 | Other | no | 10 $ |
 
 \`\`\`sh
@@ -64,7 +64,7 @@ test("an article reads as blocks and is written back with the same meaning", () 
   expect(readArticle(written).article).toEqual(blocks!);
   // The page a reader gets is the same, apart from line endings inside paragraphs.
   expect(html(written)).toBe(html(article).replace("or in\nthe", "or in the"));
-  expect(written).toContain("| Tool | Runs locally | Price |\n| :--- | :---: | ---: |\n| hush | **yes** | free |");
+  expect(written).toContain("| Tool | Runs locally | Price |\n| :--- | :---: | ---: |\n| clemii | **yes** | free |");
   // Written once, it stays as it is.
   expect(writeArticle(readArticle(written).article!)).toBe(written);
 });

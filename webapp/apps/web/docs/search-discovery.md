@@ -29,7 +29,7 @@ pages retain noindex/no-store. `/releases/latest` redirects to the current versi
 ## Blog
 
 Published articles enter the same catalogue through
-`shared/blog-posts.generated.ts`, generated at build time from the hush CMS in
+`shared/blog-posts.generated.ts`, generated at build time from the clemii CMS in
 production (from `content/blog/<lang>/` or test fixtures otherwise), so
 canonical URLs, the sitemap
 (`lastmod` from each article's `updated` date), `llms.txt` and prerendering work

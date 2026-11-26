@@ -5,8 +5,8 @@
 // calls of the generated client; the CMS decides what is allowed (token scopes,
 // the owner's approval, the article contract), the CLI only reports it. Exit
 // codes: 0 done, 1 refused or failed, 2 wrong usage.
-import { formatArticle, readDraftContent, type FrontMatter } from "@hush/article/file";
-import { blogPath, type BlogLanguage } from "@hush/article/taxonomy";
+import { formatArticle, readDraftContent, type FrontMatter } from "@clemii/article/file";
+import { blogPath, type BlogLanguage } from "@clemii/article/taxonomy";
 import { createHash } from "node:crypto";
 import { mkdir, readdir } from "node:fs/promises";
 import { hostname } from "node:os";
@@ -22,7 +22,7 @@ import { CredentialError, deleteToken, promptToken, readToken, saveToken, stored
 
 export const defaultUrl = "https://cms.behu.sh";
 
-const usage = `hush-cms: the hush blog CMS from the command line
+const usage = `hush-cms: the clemii blog CMS from the command line
 
 Usage: hush-cms <command> [options]
 

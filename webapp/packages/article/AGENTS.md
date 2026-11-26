@@ -1,4 +1,4 @@
-# @hush/article guidance
+# @clemii/article guidance
 
 The article contract and renderer shared by the website and the CMS: front
 matter schema, content rules, Markdown-to-HTML rendering, the author list and

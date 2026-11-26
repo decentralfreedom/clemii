@@ -1,6 +1,6 @@
 import { Logo } from "../components/Logo";
 import { blogPosts } from "../../shared/blog-posts.generated";
-import { editorialPolicyPath } from "@hush/article/taxonomy";
+import { editorialPolicyPath } from "@clemii/article/taxonomy";
 import { blogCopy } from "../../shared/blog";
 import type { SiteLanguage } from "../../shared/site";
 import { LanguageSwitcher } from "../i18n/LanguageControls";
@@ -41,7 +41,7 @@ export function Footer() {
           </nav>
         </div>
         <div className="mt-12 border-t border-black/8 pt-6 text-xs text-soft">
-          <span>© {new Date().getFullYear()} hush</span>
+          <span>© {new Date().getFullYear()} clemii</span>
         </div>
       </div>
     </footer>

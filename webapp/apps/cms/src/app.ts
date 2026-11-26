@@ -95,7 +95,7 @@ export function createApp(cms: Cms, options: AppOptions = {}) {
   app.route("/", postRoutes(cms));
   app.route("/", siteRoutes(cms));
   app.openAPIRegistry.registerComponent("securitySchemes", "bearer", { type: "http", scheme: "bearer" });
-  app.doc31("/openapi.json", { openapi: "3.1.0", info: { title: "hush CMS", version: "1.0.0" } });
+  app.doc31("/openapi.json", { openapi: "3.1.0", info: { title: "clemii CMS", version: "1.0.0" } });
   if (options.adminDir) {
     const root = options.adminDir;
     const adminPath = (path: string) => !apiPaths.test(path);

@@ -10,7 +10,7 @@ test("LANDING-LIGHTING-001 caches the original compressed texture without interm
   const response = await lighting;
   expect(response.headers()["cache-control"]).toBe("public, max-age=31536000, immutable, no-transform");
   expect(response.headers()["content-encoding"]).toBeUndefined();
-  await expect(page.locator(".hush-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
+  await expect(page.locator(".clemii-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
 });
 
 test("LANDING-LIGHTING-002 renders the hero and rose with legacy edge-compressed lighting", async ({ page }) => {
@@ -23,10 +23,10 @@ test("LANDING-LIGHTING-002 renders the hero and rose with legacy edge-compressed
     contentType: "application/gzip", body: gzipSync(asset),
   }));
   await page.goto("/");
-  await expect(page.locator(".hush-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
+  await expect(page.locator(".clemii-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
   await page.locator(".freedom-bloom").scrollIntoViewIfNeeded();
   await expect(page.locator(".freedom-bloom")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
-  await expect(page.locator(".hush-core canvas")).toHaveCount(1);
+  await expect(page.locator(".clemii-core canvas")).toHaveCount(1);
   await expect(page.locator(".freedom-bloom canvas")).toHaveCount(1);
 });
 
@@ -36,7 +36,7 @@ test("keeps navigation usable when lighting exceeds the supported compression la
     contentType: "application/gzip", body: gzipSync(gzipSync(asset)),
   }));
   await page.goto("/");
-  await expect(page.locator(".hush-core")).toHaveAttribute("data-scene", "fallback");
+  await expect(page.locator(".clemii-core")).toHaveAttribute("data-scene", "fallback");
   await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1");
   await expect(page.locator(".hero-actions .landing-download")).toBeVisible();
 });

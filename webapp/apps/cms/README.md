@@ -1,8 +1,8 @@
-# hush CMS
+# clemii CMS
 
-The `@hush/cms` service manages blog posts for behu.sh: drafts, scheduling,
+The `@clemii/cms` service manages blog posts for behu.sh: drafts, scheduling,
 publishing, revisions and scoped API tokens. Articles are validated and rendered
-with [`@hush/article`](../../packages/article/AGENTS.md), the same contract the
+with [`@clemii/article`](../../packages/article/AGENTS.md), the same contract the
 website's static build uses. Design: see the PRD linked from
 [the web workspace](../../README.md).
 

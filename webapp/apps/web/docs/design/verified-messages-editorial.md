@@ -6,7 +6,7 @@ Keep the fragmented robot opening and final download. Between them, use a single
 
 Palette: midnight #111827, cold paper #EDF3F5, silver #D9E6EC, cyan #8CEDE7 and printed pink #F190C9. System sans carries the headline and social post. Georgia gives the spoken words and their proof a personal scale. The public-domain artwork provides the colour and texture; the foreground UI stays restrained and readable.
 
-    Let your words          [ hush / illustration         ]
+    Let your words          [ clemii / illustration         ]
     carry their story.      [ recording -> post -> proof   ]
     Klee artwork            [ one consistent message      ]
                             Record    Share    Verify   pause
@@ -19,7 +19,7 @@ Mobile stacks the headline and window with artwork visible around the compositio
 
 A finite 15-second sequence shows recording at 0-5s, a social post at 5-10s, and its proof at 10-15s. Start when the window is meaningfully visible, pause offscreen or when the tab is hidden, and stop on the proof. An illustrative cursor approaches the signature before the transition. Manual stage selection and keyboard focus pause playback. Pause/resume/replay controls remain unobtrusive. Reduced motion starts on the final proof and allows all three stages without animation.
 
-The social post uses a compact author row with the shared vector hush mascot as its avatar, display name hushy and handle @heyhush, ordinary social typography, timestamp, views and engagement icons. Its clickable “- verified by hush” signature lives inside the post body, in the same paragraph without a blank line, not in a separate footer or action bar. No edit chip interrupts the message. Clicking or pressing Enter on the signature displays the illustrative proof and moves focus there. The proof shows a concise three-event chronology without an extra disclosure.
+The social post uses a compact author row with the shared vector clemii mascot as its avatar, display name clemii and handle @heyhush, ordinary social typography, timestamp, views and engagement icons. Its clickable “- verified by clemii” signature lives inside the post body, in the same paragraph without a blank line, not in a separate footer or action bar. No edit chip interrupts the message. Clicking or pressing Enter on the signature displays the illustrative proof and moves focus there. The proof shows a concise three-event chronology without an extra disclosure.
 
 ## Artwork
 

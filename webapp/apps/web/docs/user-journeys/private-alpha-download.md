@@ -1,6 +1,6 @@
 # Private alpha download journey
 
-This document defines the public download and first-launch experience for hush testers.
+This document defines the public download and first-launch experience for clemii testers.
 
 ## Goal
 
@@ -13,7 +13,7 @@ Download selected
   -> /download?from=<page> counts the download and redirects (302, no-store)
   -> release metadata selects the immutable notarized build
   -> browser downloads that exact DMG and opens its release notes
-  -> tester moves hush to Applications and opens it normally
+  -> tester moves clemii to Applications and opens it normally
 ```
 
 ## Trust invariants

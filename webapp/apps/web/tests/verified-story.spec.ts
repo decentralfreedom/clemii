@@ -31,19 +31,19 @@ test("LANDING-VM-003 follows one message through the illustrated story", async (
 
   await story.getByRole("button", { name: "Share", exact: true }).click();
   await expect(story.getByLabel("Illustrative shared message").locator(".message-post-content")).toContainText("Let’s build something that matters, together.");
-  await expect(story.locator(".message-post-content").getByRole("link", { name: "- verified by hush" })).toBeVisible();
-  await expect(story.getByRole("img", { name: "hushy, the hush mascot" })).toBeVisible();
-  await expect(story.getByText("hushy", { exact: true })).toBeVisible();
+  await expect(story.locator(".message-post-content").getByRole("link", { name: "- verified by clemii" })).toBeVisible();
+  await expect(story.getByRole("img", { name: "clemii, the mascot" })).toBeVisible();
+  await expect(story.getByText("clemii", { exact: true })).toBeVisible();
   await expect(story.getByText("@heyhush", { exact: true })).toBeVisible();
   await expect(story.locator(".message-post-content br")).toHaveCount(0);
   await expect(story.getByText(/Illustrative record and times/)).toHaveCount(0);
   await story.screenshot({ path: testInfo.outputPath("story-share.png") });
-  const link = story.getByRole("link", { name: "- verified by hush" });
+  const link = story.getByRole("link", { name: "- verified by clemii" });
   await link.focus();
   await page.keyboard.press("Enter");
   const proof = page.getByRole("article", { name: "Illustrative Verified Message" });
   await expect(proof).toBeFocused();
-  await expect(proof.getByRole("heading", { name: "Verified hush message" })).toBeVisible();
+  await expect(proof.getByRole("heading", { name: "Verified clemii message" })).toBeVisible();
   await expect(story.getByText("Illustration", { exact: true })).toBeVisible();
   await expect(proof.locator("blockquote")).toHaveText("Let’s build something that matters, together.");
   await expect(proof.locator("li")).toHaveCount(3);
@@ -63,7 +63,7 @@ test("LANDING-VM-003 follows one message through the illustrated story", async (
     await expect(download).toHaveCSS("color", colors.text);
   }
   if (isMobile) await expect(page.locator(".vm-download").first()).toBeVisible();
-  else await expect(page.getByRole("link", { name: "Download hush", exact: true }).first()).toHaveAttribute("href", `/download?from=${encodeURIComponent(new URL(page.url()).pathname)}`);
+  else await expect(page.getByRole("link", { name: "Download clemii", exact: true }).first()).toHaveAttribute("href", `/download?from=${encodeURIComponent(new URL(page.url()).pathname)}`);
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
   expect(externalImages).toEqual([]);
   expect(errors).toEqual([]);
@@ -94,7 +94,7 @@ test("LANDING-VM-004 keeps the story usable without WebGL or motion", async ({ p
   await expect(page.getByText("Listening on your Mac")).toBeVisible();
   await expect(page.locator(".message-story-scene")).toHaveCSS("animation-name", "none");
   await page.getByRole("button", { name: "Share", exact: true }).click();
-  await page.getByRole("link", { name: "- verified by hush" }).click();
+  await page.getByRole("link", { name: "- verified by clemii" }).click();
   const proof = page.getByRole("article", { name: "Illustrative Verified Message" });
   await expect(proof).toBeFocused();
   await expect(proof.locator("li")).toHaveCount(3);

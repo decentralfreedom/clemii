@@ -307,7 +307,7 @@ export function ProductDemo() {
         )}
       </div>
       <p className="mt-[34px] text-center text-[13.5px] text-soft">
-        This is hush working.{" "}
+        This is clemii working.{" "}
         <span className="font-medium text-muted">Try it</span>, then watch local
         AI rewrite it for any context.
       </p>

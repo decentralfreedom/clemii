@@ -28,15 +28,15 @@ await Bun.write("public/sitemap.xml", sitemap);
 // Private proof pages, short links and the API are not for search engines.
 await Bun.write("public/robots.txt", ["User-agent: *", "Allow: /", "Disallow: /p/", "Disallow: /s/", "Disallow: /v1/", "", `Sitemap: ${siteOrigin}/sitemap.xml`, ""].join("\n"));
 await Bun.write("public/llms.txt", [
-  "# hush", "",
+  "# clemii", "",
   "> Free, open-source voice dictation and local AI for Apple silicon Macs.", "",
-  "hush transcribes speech, refines writing with optional personas and offers a beta assistant. macOS 15 or later is required. An 8 GB Mac can run transcription; 16 GB is recommended for the optional assistant.", "",
+  "clemii transcribes speech, refines writing with optional personas and offers a beta assistant. macOS 15 or later is required. An 8 GB Mac can run transcription; 16 GB is recommended for the optional assistant.", "",
   "After model downloads, transcription and AI inference run locally. Model downloads, updates, web actions and publishing optional Verified Messages use network connections.", "",
   "Verified Messages share encrypted signed capture and edit history. They do not establish identity, human presence or truth. Private proof links and their fragment keys are not public documentation and must not be indexed or included in summaries.", "",
   "## Product", "",
   ...publicPages.map(page => `- [${page.title}](${siteOrigin}${page.canonicalPath}): ${page.description}`), "",
   "## Source and contribution", "",
-  "- [hush on GitHub](https://github.com/decentralfreedom/hush): macOS app and website monorepo.",
+  "- [clemii on GitHub](https://github.com/decentralfreedom/hush): macOS app and website monorepo.",
   "- [Licensing](https://github.com/decentralfreedom/hush/blob/main/LICENSING.md): AGPL-3.0-only for original code; separately licensed components and assets retain their terms.",
   "- [Contributing](https://github.com/decentralfreedom/hush/blob/main/CONTRIBUTING.md): development and contribution workflow.", "",
   "## Optional", "",

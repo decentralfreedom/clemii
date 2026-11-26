@@ -5,7 +5,7 @@
 // Console now, Umami for the funnel): its current page and every page it had
 // before a slug or language change, from its revisions, so a post's history
 // follows it. Only the path counts, never the host, so the domain may change.
-import { blogPath, type BlogLanguage } from "@hush/article/taxonomy";
+import { blogPath, type BlogLanguage } from "@clemii/article/taxonomy";
 import { sql } from "drizzle-orm";
 import type { Database } from "../db/client";
 import { postRevisions, posts } from "../db/schema";

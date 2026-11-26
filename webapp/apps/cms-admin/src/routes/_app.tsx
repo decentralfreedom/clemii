@@ -11,7 +11,7 @@ import { AppWindow, ChartNoAxesColumn, Check, ChevronRight, ChevronsUpDown, Elli
 import { useMemo, useState, type CSSProperties } from "react";
 import { requireSession } from "@/api/require-session";
 import { sessionQuery, signOut } from "@/api/session";
-import { HushLogo } from "@/components/hush-logo";
+import { ClemiiLogo } from "@/components/clemii-logo";
 import { useThemeMode, type ThemeMode } from "@/components/theme-mode";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,9 +49,9 @@ function useCloseMobileSidebar() {
 function SiteIdentity() {
   const close = useCloseMobileSidebar();
   return (
-    <Link to="/" aria-label="hush CMS, posts" onClick={close} className="flex w-full min-w-0 items-center gap-2 text-foreground">
-      <HushLogo withName={false} className="[&_svg]:size-8" />
-      <span className="heading-font-features min-w-0 truncate text-lg font-semibold text-foreground">hush</span>
+    <Link to="/" aria-label="clemii CMS, posts" onClick={close} className="flex w-full min-w-0 items-center gap-2 text-foreground">
+      <ClemiiLogo withName={false} className="[&_svg]:size-8" />
+      <span className="heading-font-features min-w-0 truncate text-lg font-semibold text-foreground">clemii</span>
     </Link>
   );
 }

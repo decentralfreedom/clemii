@@ -1,4 +1,4 @@
-"""Strip embedded textures from the CC0 rose for hush's own materials.
+"""Strip embedded textures from the CC0 rose for clemii's own materials.
 Usage: python3 scripts/prepare-rose.py downloaded-rose.glb
 Source and licence: public/art/CREDITS.md. Keeps source geometry and attribution.
 """

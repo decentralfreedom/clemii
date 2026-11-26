@@ -35,7 +35,7 @@ export async function saveToken(origin: string, token: string) {
   if (!tokenPattern.test(token)) throw new CredentialError("That is not a CMS token (they start with hcms_).");
   // `security -i` reads the command from stdin, so the token is never an argument.
   const saved = Bun.spawnSync(["security", "-i"], {
-    stdin: new TextEncoder().encode(`add-generic-password -U -s ${service} -a ${origin} -l "hush CMS token" -w ${token}\n`),
+    stdin: new TextEncoder().encode(`add-generic-password -U -s ${service} -a ${origin} -l "clemii CMS token" -w ${token}\n`),
     stdout: "ignore", stderr: "pipe",
   });
   if (saved.exitCode !== 0 || saved.stderr.length) throw new CredentialError("The Keychain refused to store the token.");

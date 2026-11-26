@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 import { useState } from "react";
-import { blogAuthors } from "@hush/article/authors";
-import { blogClusters, type BlogClusterId, type BlogLanguage } from "@hush/article/taxonomy";
+import { blogAuthors } from "@clemii/article/authors";
+import { blogClusters, type BlogClusterId, type BlogLanguage } from "@clemii/article/taxonomy";
 import { blogCopy, type BlogPostMetadata } from "../../shared/blog";
 import { blogPosts } from "../../shared/blog-posts.generated";
 import { DocumentMetadata } from "../components/DocumentMetadata";

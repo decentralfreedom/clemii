@@ -4,7 +4,7 @@
 // Publishing, full screen, as Ghost's publish flow (apps/admin/src/editor/publish):
 // the options (on the site; now or at a time), then a final review with the one
 // button that publishes, and, for a live post, the way back to a draft. Ghost's
-// newsletter and member options are left out: a hush article goes to the site.
+// newsletter and member options are left out: a clemii article goes to the site.
 // What the article contract refuses is shown where the button was pressed.
 import { ArrowLeft, ArrowRight, ChevronDown, Clock, Send } from "lucide-react";
 import { useId, useState, type ReactNode } from "react";

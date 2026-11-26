@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { HushRelease, ReleaseSection } from "../../shared/releases";
+import type { ClemiiRelease, ReleaseSection } from "../../shared/releases";
 import {
   latestRelease,
   releasePath,
@@ -29,7 +29,7 @@ function ReleaseHeader() {
   );
 }
 
-function ReleaseChanges({ release }: { release: HushRelease }) {
+function ReleaseChanges({ release }: { release: ClemiiRelease }) {
   return (
     <div className="mt-10 space-y-10 sm:mt-12">
       {release.sections.map((section) => (
@@ -71,8 +71,8 @@ export function ReleaseIndexPage() {
   return (
     <div className="min-h-screen bg-canvas text-ink">
       <DocumentMetadata
-        title="hush release notes"
-        description="See what is new, improved, and fixed in every hush release."
+        title="clemii release notes"
+        description="See what is new, improved, and fixed in every clemii release."
         canonicalPath="/releases"
         indexable={hasPublicRelease}
       />
@@ -83,7 +83,7 @@ export function ReleaseIndexPage() {
             Release notes.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted sm:text-xl">
-            Every meaningful change to hush, in one place.
+            Every meaningful change to clemii, in one place.
           </p>
 
           <div className="mt-16 sm:mt-24">
@@ -101,7 +101,7 @@ export function ReleaseIndexPage() {
                   from this website.
                 </p>
                 <ButtonLink href="/" variant="secondary" className="mt-8">
-                  Explore hush
+                  Explore clemii
                 </ButtonLink>
               </section>
             )}
@@ -142,11 +142,11 @@ export function ReleaseIndexPage() {
   );
 }
 
-export function ReleaseDetailPage({ release }: { release: HushRelease }) {
+export function ReleaseDetailPage({ release }: { release: ClemiiRelease }) {
   return (
     <div className="min-h-screen bg-canvas text-ink">
         <DocumentMetadata
-          title={`hush ${release.displayVersion} release notes`}
+          title={`clemii ${release.displayVersion} release notes`}
           description={release.summary}
           canonicalPath={releasePath(release)}
           indexable={release.visibility === "public"}
@@ -183,7 +183,7 @@ export function ReleaseDetailPage({ release }: { release: HushRelease }) {
                 What changed
               </h2>
               <p className="mt-3 max-w-2xl leading-7 text-muted">
-                The useful details, written for the people using hush.
+                The useful details, written for the people using clemii.
               </p>
             </div>
 
@@ -246,8 +246,8 @@ export function MissingReleasePage() {
   return (
     <div className="grid min-h-screen place-items-center bg-canvas px-5 text-center text-ink">
       <DocumentMetadata
-        title="Release not found - hush"
-        description="This hush release could not be found."
+        title="Release not found - clemii"
+        description="This clemii release could not be found."
         canonicalPath="/releases"
         indexable={false}
       />

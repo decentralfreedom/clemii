@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
-import type { BlogAuthorId } from "@hush/article/authors";
-import type { BlogArticleType, BlogClusterId, BlogLanguage } from "@hush/article/taxonomy";
+import type { BlogAuthorId } from "@clemii/article/authors";
+import type { BlogArticleType, BlogClusterId, BlogLanguage } from "@clemii/article/taxonomy";
 
 /** Public metadata of a published article. Generated; HTML lives in its own chunk. */
 export type BlogPostMetadata = {
@@ -28,9 +28,9 @@ export type BlogPostMetadata = {
 export const blogCopy = {
   en: {
     indexPath: "/blog",
-    indexTitle: "hush blog - Dictation and local AI on Mac",
-    indexDescription: "Practical guides to voice dictation, speech-to-text and local AI on Mac, written by the team that builds hush, the free and open-source dictation app.",
-    heading: "The hush blog",
+    indexTitle: "clemii blog - Dictation and local AI on Mac",
+    indexDescription: "Practical guides to voice dictation, speech-to-text and local AI on Mac, written by the team that builds clemii, the free and open-source dictation app.",
+    heading: "The clemii blog",
     lead: "Practical guides to dictation, speech-to-text and local AI on Mac.",
     readingTime: (minutes: number) => `${minutes} min read`,
     readingTimeShort: (minutes: number) => `${minutes} min`,
@@ -42,9 +42,9 @@ export const blogCopy = {
     readArticle: "Read article",
     topics: "Topics",
     allTopics: "All",
-    editorialTitle: "Editorial policy - hush blog",
+    editorialTitle: "Editorial policy - clemii blog",
     editorialHeading: "Editorial policy",
-    editorialDescription: "How the hush blog researches, tests, writes and corrects its articles: primary sources with dates, our own tests, reviewed AI use and no affiliate links.",
+    editorialDescription: "How the clemii blog researches, tests, writes and corrects its articles: primary sources with dates, our own tests, reviewed AI use and no affiliate links.",
     writtenBy: "Written by",
     share: "Share",
     copyLink: "Copy link",
@@ -57,7 +57,7 @@ export const blogCopy = {
     authorElsewhere: "Elsewhere",
     ctaTitle: "Dictate on your Mac, with models that run locally",
     ctaDownload: "Download for Mac",
-    ctaMobile: "Get hush for Mac",
+    ctaMobile: "Get clemii for Mac",
     // The download card replays one dictation; HUD labels match the app.
     // The download band replays one dictation per loop, each into an app with its own look.
     // App names and HUD labels match the app, which is in English.
@@ -66,17 +66,17 @@ export const blogCopy = {
         text: "Hi Anna, thanks for the sharp notes on the deck. I'll rework the pricing slide and send it before Friday's call." },
       { kind: "slack", app: "Slack", title: "# product", from: "Lea", earlier: "Is the new onboarding ready for review?",
         text: "Yes, it's ready. Leave comments on anything that feels off and I'll fix it before tomorrow's release." },
-      { kind: "terminal", app: "Terminal", title: "claude ~/hush", prompt: "claude",
+      { kind: "terminal", app: "Terminal", title: "claude ~/clemii", prompt: "claude",
         text: "Give every download demo its own app layout, keep the word count exact and run the blog tests." },
     ],
-    ctaBody: "hush is free and open source. Your dictation and AI models run on your Mac; web search, model downloads, updates and optional Verified Messages use the internet.",
+    ctaBody: "clemii is free and open source. Your dictation and AI models run on your Mac; web search, model downloads, updates and optional Verified Messages use the internet.",
     by: "By",
   },
   de: {
     indexPath: "/de/blog",
-    indexTitle: "hush Blog - Diktieren und lokale KI auf dem Mac",
-    indexDescription: "Praktische Anleitungen zu Diktat, Spracherkennung und lokaler KI auf dem Mac, geschrieben vom Team hinter hush, der kostenlosen Open-Source-Diktier-App.",
-    heading: "Der hush Blog",
+    indexTitle: "clemii Blog - Diktieren und lokale KI auf dem Mac",
+    indexDescription: "Praktische Anleitungen zu Diktat, Spracherkennung und lokaler KI auf dem Mac, geschrieben vom Team hinter clemii, der kostenlosen Open-Source-Diktier-App.",
+    heading: "Der clemii Blog",
     lead: "Praktische Anleitungen zu Diktat, Spracherkennung und lokaler KI auf dem Mac.",
     readingTime: (minutes: number) => `${minutes} Min. Lesezeit`,
     readingTimeShort: (minutes: number) => `${minutes} Min.`,
@@ -88,9 +88,9 @@ export const blogCopy = {
     readArticle: "Artikel lesen",
     topics: "Themen",
     allTopics: "Alle",
-    editorialTitle: "Redaktionelle Richtlinien - hush Blog",
+    editorialTitle: "Redaktionelle Richtlinien - clemii Blog",
     editorialHeading: "Redaktionelle Richtlinien",
-    editorialDescription: "Wie der hush Blog Artikel recherchiert, testet, schreibt und korrigiert: Primärquellen mit Datum, eigene Tests, geprüfter KI-Einsatz, keine Affiliate-Links.",
+    editorialDescription: "Wie der clemii Blog Artikel recherchiert, testet, schreibt und korrigiert: Primärquellen mit Datum, eigene Tests, geprüfter KI-Einsatz, keine Affiliate-Links.",
     writtenBy: "Geschrieben von",
     share: "Teilen",
     copyLink: "Link kopieren",
@@ -103,16 +103,16 @@ export const blogCopy = {
     authorElsewhere: "Profile",
     ctaTitle: "Diktieren auf dem Mac, mit Modellen, die lokal laufen",
     ctaDownload: "Download für Mac",
-    ctaMobile: "hush für den Mac holen",
+    ctaMobile: "clemii für den Mac holen",
     ctaDemos: [
       { kind: "mail", app: "Mail", title: "Neue E-Mail", fields: [["An:", "Anna Weber"], ["Betreff:", "Feedback zum Pitch Deck"]],
         text: "Hallo Anna, danke für die klaren Anmerkungen. Die überarbeitete Preisfolie kommt vor dem Termin am Freitag." },
       { kind: "slack", app: "Slack", title: "# produkt", from: "Lea", earlier: "Ist das neue Onboarding bereit für das Review?",
         text: "Ja, ist bereit. Anmerkungen bitte direkt als Kommentar, Korrekturen folgen vor dem Release morgen." },
-      { kind: "terminal", app: "Terminal", title: "claude ~/hush", prompt: "claude",
+      { kind: "terminal", app: "Terminal", title: "claude ~/clemii", prompt: "claude",
         text: "Jede Download-Demo bekommt ein eigenes App-Layout, die Wortzahl bleibt exakt, danach die Blog-Tests ausführen." },
     ],
-    ctaBody: "hush ist kostenlos und Open Source. Diktat und KI-Modelle laufen auf dem Mac; Websuche, Modell-Downloads, Updates und optionale Verified Messages nutzen das Internet.",
+    ctaBody: "clemii ist kostenlos und Open Source. Diktat und KI-Modelle laufen auf dem Mac; Websuche, Modell-Downloads, Updates und optionale Verified Messages nutzen das Internet.",
     by: "Von",
   },
 } as const;

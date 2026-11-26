@@ -3,14 +3,14 @@
 //
 // Builds the static blog from a content directory: reads every Markdown article,
 // applies the rules that span articles (unique slugs and keywords, links between
-// them) and leaves each article's contract and rendering to @hush/article. Pure
+// them) and leaves each article's contract and rendering to @clemii/article. Pure
 // apart from reading the content directory, so it can be tested against
 // fixtures. The writer lives in generate-blog.ts.
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { parseArticle, renderArticle, type ArticleContext, type BlogPost, type ParsedArticle } from "@hush/article";
-import { authorPath } from "@hush/article/authors";
-import { blogLanguages, blogPath, editorialPolicyPath } from "@hush/article/taxonomy";
+import { parseArticle, renderArticle, type ArticleContext, type BlogPost, type ParsedArticle } from "@clemii/article";
+import { authorPath } from "@clemii/article/authors";
+import { blogLanguages, blogPath, editorialPolicyPath } from "@clemii/article/taxonomy";
 
 export const coverTemplatePath = join(import.meta.dir, "cover-template.html");
 

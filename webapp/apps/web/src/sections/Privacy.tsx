@@ -17,7 +17,7 @@ export function Privacy() {
           </h2>
           <p className="section-heading-copy max-w-lg text-pretty leading-7 text-white/55">
             Audio, transcription, and local AI stay on-device. If you choose a
-            Verified Message, hush publishes only its encrypted proof package.
+            Verified Message, clemii publishes only its encrypted proof package.
             The decryption key stays in the private link.
           </p>
         </Reveal>

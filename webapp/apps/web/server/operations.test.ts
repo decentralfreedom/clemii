@@ -13,9 +13,9 @@ import { LocalProofObjectStore } from "./storage/local-object-store";
 async function appWith(options: Partial<Parameters<typeof createApp>[0]>) {
   const repository = new SQLiteProofRepository();
   const directory = await mkdtemp(join(tmpdir(), "hush-ops-"));
-  const objects = new LocalProofObjectStore(directory, "http://hush.test");
-  const service = new ProofService(repository, objects, await createEphemeralServiceKey(), "http://hush.test");
-  return { repository, directory, app: createApp({ proofService: service, allowedOrigin: "http://hush.test", ...options }) };
+  const objects = new LocalProofObjectStore(directory, "http://clemii.test");
+  const service = new ProofService(repository, objects, await createEphemeralServiceKey(), "http://clemii.test");
+  return { repository, directory, app: createApp({ proofService: service, allowedOrigin: "http://clemii.test", ...options }) };
 }
 
 describe("operations for zero-downtime deployments", () => {
@@ -62,7 +62,7 @@ describe("operations for zero-downtime deployments", () => {
   test("local proof objects are written atomically", async () => {
     const directory = await mkdtemp(join(tmpdir(), "hush-objects-"));
     cleanups.push(() => rm(directory, { recursive: true, force: true }));
-    const store = new LocalProofObjectStore(directory, "http://hush.test");
+    const store = new LocalProofObjectStore(directory, "http://clemii.test");
     const key = "proofs/0f8fad5b-d9cb-469f-a165-70867728950e.bin";
     await store.put(key, new Uint8Array([1, 2, 3]));
     await store.put(key, new Uint8Array([4, 5]));

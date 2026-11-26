@@ -5,7 +5,7 @@ import { startLandingEntrance } from "./entrance/landingEntrance";
 import { latestEntry } from "../components/latest-entry";
 
 // Original procedural artwork. No downloaded model or texture is required.
-export async function mountHushScene(host: HTMLElement, signal: AbortSignal) {
+export async function mountClemiiScene(host: HTMLElement, signal: AbortSignal) {
   const environmentMap = await loadStudioEnvironment();
   if (signal.aborted || !host.isConnected) { environmentMap.dispose(); return null; }
   const canvas = document.createElement("canvas");
@@ -17,7 +17,7 @@ export async function mountHushScene(host: HTMLElement, signal: AbortSignal) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.15;
   canvas.setAttribute("aria-hidden", "true");
-  const { scene, camera, body, layers, dispose: disposeScene } = createHeroScene(environmentMap);
+  const { scene, camera, body, layers, animate, dispose: disposeScene } = createHeroScene(environmentMap);
   let disposed = false;
   function releaseResources() {
     if (disposed) return;
@@ -48,7 +48,7 @@ export async function mountHushScene(host: HTMLElement, signal: AbortSignal) {
   let ready = false;
   let targetX = -0.16, targetY = -0.42;
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
-  const entry = host.closest<HTMLElement>(".hush-landing");
+  const entry = host.closest<HTMLElement>(".clemii-landing");
   let started: number | undefined;
   let opening = !reducedMotion.matches && !document.hidden && window.scrollY < 100 && entry?.dataset.opening === "pending";
   // A scene that arrives after the CSS fallback revealed the page (slow first
@@ -99,11 +99,14 @@ export async function mountHushScene(host: HTMLElement, signal: AbortSignal) {
     body.scale.setScalar(1 - (1 - ease) * 0.35 + Math.sin(progress * Math.PI) * 0.12);
     body.rotation.z = -0.09 + (1 - ease) * 0.28;
     host.style.translate = opening ? `0 ${dockY * (1 - ease)}px` : "";
+    // The mark is alive while it is on screen, and still for visitors who ask for less motion.
+    const alive = !reducedMotion.matches;
+    if (alive) animate(now / 1000, opening || late ? progress : 1);
     renderer.render(scene, camera);
     if (!ready) { ready = true; host.dataset.scene = "ready"; }
     if (opening && progress === 1) finish();
     if (late && progress === 1) late = false;
-    if (progress < 1 || Math.abs(targetX - body.rotation.x) + Math.abs(targetY - body.rotation.y) > 0.001) schedule();
+    if (alive || progress < 1 || Math.abs(targetX - body.rotation.x) + Math.abs(targetY - body.rotation.y) > 0.001) schedule();
   }
   function resize() {
     const { width, height } = host.getBoundingClientRect();

@@ -31,7 +31,7 @@ export function Showcase() {
               <span className="block text-soft">runs the whole thing.</span>
             </>
           }
-          text="Pick your models, shape your writing styles, and teach hush your words. Then close it and forget it exists."
+          text="Pick your models, shape your writing styles, and teach clemii your words. Then close it and forget it exists."
         />
         <Reveal>
           <div className="overflow-hidden rounded-[2rem] border border-black/8 bg-white shadow-[0_24px_70px_rgb(31_32_30/0.1)] md:grid md:grid-cols-[210px_1fr]">

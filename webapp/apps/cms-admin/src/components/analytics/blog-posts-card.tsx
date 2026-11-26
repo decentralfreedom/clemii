@@ -29,7 +29,7 @@ export function BlogPostsCard({ posts, range, counted }: { posts: BlogAnalyticsP
     <Card>
       <CardHeader>
         <CardTitle>Posts</CardTitle>
-        <CardDescription>{counted ? "Which posts bring readers who download hush, most downloads first." : "Which posts Google sends readers to, most clicks first; page views and downloads follow once Umami counts these days."}</CardDescription>
+        <CardDescription>{counted ? "Which posts bring readers who download clemii, most downloads first." : "Which posts Google sends readers to, most clicks first; page views and downloads follow once Umami counts these days."}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {!posts.length ? (

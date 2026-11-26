@@ -5,7 +5,7 @@ test("keeps navigation and static artwork usable when studio lighting fails", as
   page.on("pageerror", error => errors.push(error.message));
   await page.route(/studio-lighting.*\.gz$/, route => route.abort());
   await page.goto("/");
-  await expect(page.locator(".hush-core")).toHaveAttribute("data-scene", "fallback");
+  await expect(page.locator(".clemii-core")).toHaveAttribute("data-scene", "fallback");
   await expect(page.locator(".site-header")).toHaveCSS("opacity", "1");
   await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1");
   await expect(page.locator(".hero-actions .landing-download")).toBeVisible();
@@ -19,13 +19,13 @@ test("keeps navigation and static artwork usable when studio lighting fails", as
 test("LANDING-ENTRY-001 plays the text entrance from the first paint and coordinates the universe's calendar with the prepared scene", async ({ page }, testInfo) => {
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
-  await page.route(/HushScene.*\.js/, async route => { await gate; await route.continue(); });
+  await page.route(/ClemiiScene.*\.js/, async route => { await gate; await route.continue(); });
   // Hold only the fallback clock to exercise a prompt scene on slow CI GPUs.
   // The real three-second choreography runs normally once the scene starts it.
   await page.route(/\/assets\/.*\.css$/, async route => {
     const response = await route.fetch();
     await route.fulfill({ response, body: await response.text() +
-      '\n.hush-landing[data-opening="pending"] :is(.hush-core,.orbit-app,.universe-paths,.universe-halo,.universe-texture) { animation-play-state: paused; }' });
+      '\n.clemii-landing[data-opening="pending"] :is(.clemii-core,.orbit-app,.universe-paths,.universe-halo,.universe-texture) { animation-play-state: paused; }' });
   });
   try {
     await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -63,11 +63,11 @@ test("LANDING-ENTRY-001 plays the text entrance from the first paint and coordin
     }
     await expect(page.locator(".hero-actions .landing-download")).toBeVisible();
     await expect(page.locator(".landing-loader")).toHaveCount(0);
-    await expect(page.locator(".hush-core")).toHaveCSS("opacity", "0");
+    await expect(page.locator(".clemii-core")).toHaveCSS("opacity", "0");
     const layout = await page.locator(".hero-introduction").boundingBox();
     release();
-    await expect(page.locator(".hush-landing")).toHaveAttribute("data-opening", "playing", { timeout: 15000 });
-    const calendar = await page.evaluate(() => [".hush-core", ".orbit-app", ".universe-paths", ".universe-texture", ".universe-halo"].map(selector => {
+    await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "playing", { timeout: 15000 });
+    const calendar = await page.evaluate(() => [".clemii-core", ".orbit-app", ".universe-paths", ".universe-texture", ".universe-halo"].map(selector => {
       const animation = document.querySelector(selector)!.getAnimations()[0];
       if (!animation) throw new Error(`${selector} has no entrance animation`);
       const timing = animation.effect!.getTiming();
@@ -82,29 +82,29 @@ test("LANDING-ENTRY-001 plays the text entrance from the first paint and coordin
       document.querySelector(selector)!.getAnimations().every(item => item.playState === "finished")))).toEqual([true, true, true]);
     expect(await page.locator(".hero-introduction").boundingBox()).toEqual(layout);
   } finally { release(); }
-  await expect(page.locator(".hush-landing")).toHaveAttribute("data-opening", "complete");
+  await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "complete");
   await expect(page.locator(".site-header")).toHaveCSS("opacity", "1");
   await expect(page.locator(".hero-introduction")).toHaveCSS("opacity", "1");
   await expect(page.locator(".hero-introduction")).toHaveCSS("filter", "none");
-  await expect(page.locator(".hush-core canvas")).toHaveCSS("opacity", "1", { timeout: 15000 });
+  await expect(page.locator(".clemii-core canvas")).toHaveCSS("opacity", "1", { timeout: 15000 });
   await page.screenshot({ path: testInfo.outputPath("entrance-complete.png") });
 });
 
 test("LANDING-ENTRY-002 shows content before a slow scene without replaying the entrance", async ({ page }) => {
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
-  await page.route(/HushScene.*\.js/, async route => { await gate; await route.continue(); });
+  await page.route(/ClemiiScene.*\.js/, async route => { await gate; await route.continue(); });
   try {
     await page.goto("/", { waitUntil: "domcontentloaded" });
-    await expect(page.locator(".hush-landing")).toHaveAttribute("data-opening", "complete", { timeout: 5000 });
+    await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "complete", { timeout: 5000 });
     await expect(page.locator(".site-header")).toHaveCSS("opacity", "1");
     await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1");
     await expect(page.locator(".hero-actions .landing-download")).toBeVisible();
   } finally { release(); }
   // The usable-page deadline above is independent of scene readiness. Compiling the
   // deferred WebGL scene on a software renderer has a separate readiness budget.
-  await expect(page.locator(".hush-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
-  await expect(page.locator(".hush-landing")).toHaveAttribute("data-opening", "complete");
+  await expect(page.locator(".clemii-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
+  await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "complete");
   await expect(page.locator(".site-header")).toHaveCSS("animation-name", "none");
 });
 
@@ -121,12 +121,12 @@ test("LANDING-ENTRY-003 reveals the prerendered page while application JavaScrip
     await expect(page.locator(".hero-introduction")).toHaveCSS("opacity", "1", { timeout: 2500 });
     await expect(page.locator(".site-header")).toHaveCSS("opacity", "1", { timeout: 2500 });
     await expect(page.locator(".hero-download-area")).toHaveCSS("opacity", "1", { timeout: 2500 });
-    await expect(page.locator(".hush-core")).toHaveCSS("opacity", "1", { timeout: 4800 });
+    await expect(page.locator(".clemii-core")).toHaveCSS("opacity", "1", { timeout: 4800 });
     await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1");
     await expect(page.locator(".site-header a[href='/verified-messages']").first()).toHaveAttribute("href", "/verified-messages");
-    await expect(page.locator(".hush-core canvas")).toHaveCount(0);
+    await expect(page.locator(".clemii-core canvas")).toHaveCount(0);
   } finally { release(); }
-  await expect(page.locator(".hush-landing")).toHaveAttribute("data-opening", "complete");
+  await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "complete");
   await expect(page.locator(".hero-introduction")).toHaveCSS("opacity", "1");
 });
 
@@ -137,7 +137,7 @@ test("LANDING-ENTRY-004 keeps the public page readable when application JavaScri
   await expect(page.locator(".site-header")).toHaveCSS("opacity", "1");
   await expect(page.locator(".hero-download-area")).toHaveCSS("opacity", "1");
   await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1");
-  await expect(page.locator(".hush-core canvas")).toHaveCount(0);
+  await expect(page.locator(".clemii-core canvas")).toHaveCount(0);
   await page.locator("footer a[href='/verified-messages']").click();
   await expect(page).toHaveURL(/\/verified-messages$/);
   await expect(page.locator("h1")).toBeVisible();
@@ -147,10 +147,18 @@ test("LANDING-ENTRY-009 plays the entrance when the landing's stylesheet arrives
   // A slow connection: the page's own stylesheet comes last. The first paint waits for it, so the entrance must too.
   await page.route(/\/assets\/Landing-.*\.css$/, async route => { await new Promise(resolve => setTimeout(resolve, 1500)); await route.continue(); });
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await page.waitForFunction(() => [...document.querySelectorAll<HTMLLinkElement>('head link[rel="stylesheet"]')].every(link => link.sheet));
-  await expect(page.locator(".hush-landing")).not.toHaveAttribute("data-opening", "complete");
-  const header = await page.evaluate(() => document.querySelector(".site-header")!.getAnimations().map(animation => (animation as CSSAnimation).animationName));
-  expect(header).toContain("header-arrive");
+  // Read the page in the very frame its last stylesheet arrives: a busy machine must not turn this into a race with the entrance itself.
+  const arrived = await page.evaluate(async () => {
+    const pending = [...document.querySelectorAll<HTMLLinkElement>('head link[rel="stylesheet"]')].filter(link => !link.sheet);
+    await Promise.all(pending.map(link => new Promise(resolve => link.addEventListener("load", resolve, { once: true }))));
+    await new Promise(requestAnimationFrame);
+    return {
+      opening: document.querySelector<HTMLElement>(".clemii-landing")!.dataset.opening,
+      header: document.querySelector(".site-header")!.getAnimations().map(animation => (animation as CSSAnimation).animationName),
+    };
+  });
+  expect(arrived.opening).not.toBe("complete");
+  expect(arrived.header).toContain("header-arrive");
 });
 
 test("LANDING-ENTRY-008 links every page's own styles in its prerendered head", async ({ page, request }) => {

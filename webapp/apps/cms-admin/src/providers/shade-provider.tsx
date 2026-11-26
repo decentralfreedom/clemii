@@ -1,6 +1,6 @@
 // From Shade, Ghost Admin's design system (TryGhost/Ghost apps/shade/src, c2617d08),
 // MIT License, Copyright (c) 2013-2026 Ghost Foundation (see packages/theme/LICENSE.ghost).
-// Slimmed for the hush admin: no dirty-state provider, no text-field focus tracking,
+// Slimmed for the clemii admin: no dirty-state provider, no text-field focus tracking,
 // and the three toast icons are inlined from apps/shade/src/assets/icons.
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';

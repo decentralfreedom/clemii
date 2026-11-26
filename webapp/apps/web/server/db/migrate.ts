@@ -14,7 +14,7 @@ const client = postgres(connectionString, { max: 1, prepare: false });
 try {
   await client`select pg_advisory_lock(${MIGRATION_LOCK_ID})`;
   await migrate(drizzle(client), { migrationsFolder: "server/db/migrations" });
-  console.info("Hush provenance database is current.");
+  console.info("clemii provenance database is current.");
 } finally {
   await client`select pg_advisory_unlock(${MIGRATION_LOCK_ID})`.catch(() => {});
   await client.end({ timeout: 5 });

@@ -31,13 +31,13 @@ test("LANDING-ENTRY-005 preserves interactive scripts under CSP regardless of HT
     `);
 
     for (const [open, close] of [["script", "script"], ["SCRIPT", "SCRIPT"], ["ScRiPt", "sCrIpT"], ["script ", "script data-end='ignored'"], ["script\n", "script\t"]]) {
-      await writeFile(join(directory, "dist/index.html"), '<html><head><!--hush-head-start--><!--hush-head-end--></head><body></body></html>');
+      await writeFile(join(directory, "dist/index.html"), '<html><head><!--clemii-head-start--><!--clemii-head-end--></head><body></body></html>');
       // Prerendering preloads the landing scene and each page's own code from the build manifest, then removes it.
       await mkdir(join(directory, "dist/.vite"), { recursive: true });
       const pageModules = ["src/app/App.tsx", "src/landing/GermanLanding.tsx", "src/verified/VerifiedMessagesPage.tsx",
         "src/releases/ReleaseNotesPage.tsx", "src/releases/ReleaseRoute.tsx", "src/legal/LegalPages.tsx"];
       await writeFile(join(directory, "dist/.vite/manifest.json"), JSON.stringify({
-        "src/landing/HushScene.ts": { file: "assets/HushScene.js", isDynamicEntry: true, assets: ["assets/studio-lighting.ktx2.gz"] },
+        "src/landing/ClemiiScene.ts": { file: "assets/ClemiiScene.js", isDynamicEntry: true, assets: ["assets/studio-lighting.ktx2.gz"] },
         ...Object.fromEntries(pageModules.map((key) => [key, { file: `assets/${key.split("/").at(-1)!.replace(/\.tsx$/, "")}.js`, isDynamicEntry: true }])),
         // The landing's own styles come with a chunk it imports.
         "src/app/App.tsx": { file: "assets/App.js", isDynamicEntry: true, imports: ["_Landing.js"] },

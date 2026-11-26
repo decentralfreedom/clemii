@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
-import { editorialPolicyPath, type BlogLanguage } from "@hush/article/taxonomy";
+import { editorialPolicyPath, type BlogLanguage } from "@clemii/article/taxonomy";
 import { blogCopy } from "../../shared/blog";
 import { DocumentMetadata } from "../components/DocumentMetadata";
 import { Footer } from "../layout/Footer";
@@ -14,7 +14,7 @@ type Section = { heading: string; body: string[] };
 // pipeline or the hush-seo skill actually enforces; keep them in sync.
 const policy: Record<BlogLanguage, { lead: string; sections: Section[] }> = {
   en: {
-    lead: "How we research, test, write and correct the articles on the hush blog.",
+    lead: "How we research, test, write and correct the articles on the clemii blog.",
     sections: [
       { heading: "Who writes", body: [
         "Every article is signed by a named author with a public profile. It shows the publication date and, once something changes, the date of the last update.",
@@ -30,8 +30,8 @@ const policy: Record<BlogLanguage, { lead: string; sections: Section[] }> = {
       { heading: "How we use AI", body: [
         "AI tools help with research and drafting. Before an article is published, the author checks every claim, step and number against the sources and is responsible for the result. We do not publish unreviewed AI text.",
       ] },
-      { heading: "hush in our articles", body: [
-        "hush is our own product. We mention it where it is a fair answer to the question, say what it does not do, and describe other tools accurately. There are no affiliate links and no paid placements.",
+      { heading: "clemii in our articles", body: [
+        "clemii is our own product. We mention it where it is a fair answer to the question, say what it does not do, and describe other tools accurately. There are no affiliate links and no paid placements.",
       ] },
       { heading: "Corrections and updates", body: [
         "If something is wrong or out of date, write to hello@behu.sh. We correct it, update the article's date and, for substantial changes, note what changed.",
@@ -42,7 +42,7 @@ const policy: Record<BlogLanguage, { lead: string; sections: Section[] }> = {
     ],
   },
   de: {
-    lead: "Wie die Artikel im hush Blog recherchiert, getestet, geschrieben und korrigiert werden.",
+    lead: "Wie die Artikel im clemii Blog recherchiert, getestet, geschrieben und korrigiert werden.",
     sections: [
       { heading: "Wer schreibt", body: [
         "Jeder Artikel ist von einer namentlich genannten Person mit öffentlichem Profil gezeichnet. Er zeigt das Veröffentlichungsdatum und nach Änderungen das Datum der letzten Aktualisierung.",
@@ -58,8 +58,8 @@ const policy: Record<BlogLanguage, { lead: string; sections: Section[] }> = {
       { heading: "Wie KI genutzt wird", body: [
         "KI-Werkzeuge helfen bei Recherche und Entwurf. Vor der Veröffentlichung prüft der Autor jede Aussage, jeden Schritt und jede Zahl anhand der Quellen und verantwortet das Ergebnis. Ungeprüfte KI-Texte werden nicht veröffentlicht.",
       ] },
-      { heading: "hush in den Artikeln", body: [
-        "hush ist das eigene Produkt. Es wird dort erwähnt, wo es eine faire Antwort auf die Frage ist, mit seinen Grenzen, und andere Werkzeuge werden korrekt beschrieben. Es gibt keine Affiliate-Links und keine bezahlten Platzierungen.",
+      { heading: "clemii in den Artikeln", body: [
+        "clemii ist das eigene Produkt. Es wird dort erwähnt, wo es eine faire Antwort auf die Frage ist, mit seinen Grenzen, und andere Werkzeuge werden korrekt beschrieben. Es gibt keine Affiliate-Links und keine bezahlten Platzierungen.",
       ] },
       { heading: "Korrekturen und Aktualisierungen", body: [
         "Fehler oder veraltete Angaben bitte an hello@behu.sh melden. Sie werden korrigiert, das Datum des Artikels wird aktualisiert, und bei größeren Änderungen steht im Artikel, was sich geändert hat.",

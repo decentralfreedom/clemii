@@ -9,9 +9,9 @@ test("NOTFOUND-001 answers an unknown address with a 404 page and a way home", a
   const response = await page.goto("/this-page-does-not-exist");
   expect(response!.status()).toBe(404);
   await expect(page.locator("h1")).toHaveText("This page got lost.");
-  await expect(page).toHaveTitle("Page not found - hush");
+  await expect(page).toHaveTitle("Page not found - clemii");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
-  await expect(page.locator(".hush-mascot-sad")).toBeVisible();
+  await expect(page.locator(".clemii-mascot-sad")).toBeVisible();
   await expect(page.locator("footer")).toBeVisible();
   await page.getByRole("link", { name: "Back to home" }).click();
   await expect(page).toHaveURL(/\/$/);

@@ -1,4 +1,4 @@
-# hush editorial artwork
+# clemii editorial artwork
 
 Active image sources live in `src/media/art/` and are served with Vite-generated
 content hashes. This public credit record and all licenses below remain in force.
@@ -20,7 +20,7 @@ These are existing public-domain artworks and an openly licensed photograph, not
 - The photographer expressly released the photograph into the public domain worldwide; the sculpture is also public domain.
 - Downloaded the 960 x 1404 thumbnail on 4 November 2026. Cropped to x=0, y=80, width=960, height=1000; encoded as WebP at quality 78. The small version is 480 x 500.
 - Files: `aristotle.webp`, `aristotle-small.webp`; treated `aristotle-blue.webp`, `aristotle-blue-small.webp`.
-- The page masks the portrait, uses a blue/ice duotone and offsets two horizontal strips. The copy is hush's own writing, not a quotation attributed to Aristotle.
+- The page masks the portrait, uses a blue/ice duotone and offsets two horizontal strips. The copy is clemii's own writing, not a quotation attributed to Aristotle.
 
 ## Liberty Leading the People
 
@@ -39,7 +39,7 @@ These are existing public-domain artworks and an openly licensed photograph, not
 - The reproduction is marked with [Public Domain Mark 1.0](https://creativecommons.org/publicdomain/mark/1.0/).
 - Downloaded the 960 x 1076 thumbnail on 4 November 2026. Encoded as WebP at quality 82, with a 480 x 538 responsive version. Colours are softened (saturation 62%); a square display crop is applied with CSS.
 - Files: `geographer.webp`, `geographer-small.webp`; treated `geographer-muted.webp`, `geographer-muted-small.webp`.
-- The intelligence section shows the painting with its own visible caption and an original Three.js/SVG hush companion, considering an idea beside the map. Liberty's attribution stays with the preceding banner.
+- The intelligence section shows the painting with its own visible caption and an original Three.js/SVG clemii companion, considering an idea beside the map. Liberty's attribution stays with the preceding banner.
 
 ## Steve Jobs, 2010 (unused archive asset)
 
@@ -47,8 +47,8 @@ These are existing public-domain artworks and an openly licensed photograph, not
 - [Source and rights statement](https://commons.wikimedia.org/wiki/File:Steve_Jobs_Headshot_2010-CROP2.jpg).
 - Used under [Creative Commons Attribution-ShareAlike 3.0 Unported](https://creativecommons.org/licenses/by-sa/3.0/).
 - Downloaded the 960 x 1535 thumbnail on 4 November 2026. Encoded as WebP at quality 82; the responsive version is 480 x 768.
-- Files: `steve-jobs.webp`, `steve-jobs-small.webp`. Both files and hush's monochrome, cyan/magenta strip and scanline photographic treatment are distributed under the same CC BY-SA 3.0 license. The reusable treatment is documented in `src/landing/story.css` under `.makers-art`, `.makers-portrait-base`, `.makers-slice` and `.makers-scanlines`.
-- hush's original accompanying copy expresses inspiration from the Macintosh's creative spirit. It is not a quotation from Steve Jobs. The accompanying “Think different.” motif references Apple’s campaign, not an audio recording or quotation attributed to this photograph. The original Three.js/SVG hush mascot is a separate illustrative element. No Apple, estate or photographer endorsement is implied.
+- Files: `steve-jobs.webp`, `steve-jobs-small.webp`. Both files and clemii's monochrome, cyan/magenta strip and scanline photographic treatment are distributed under the same CC BY-SA 3.0 license. The reusable treatment is documented in `src/landing/story.css` under `.makers-art`, `.makers-portrait-base`, `.makers-slice` and `.makers-scanlines`.
+- clemii's original accompanying copy expresses inspiration from the Macintosh's creative spirit. It is not a quotation from Steve Jobs. The accompanying “Think different.” motif references Apple’s campaign, not an audio recording or quotation attributed to this photograph. The original Three.js/SVG clemii mascot is a separate illustrative element. No Apple, estate or photographer endorsement is implied.
 
 ## The printing press (Der Buchdrucker), 1568
 
@@ -64,7 +64,7 @@ These are existing public-domain artworks and an openly licensed photograph, not
 - [Source and rights statement](https://commons.wikimedia.org/wiki/File:Ameca_Generation_1.jpg).
 - Licensed under [Creative Commons Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/).
 - Downloaded the 878 x 973 original on 4 November 2026. Cropped to x=49, y=0, width=780, height=973; WebP quality 82, plus a 480 x 599 version at quality 80.
-- Files: `robot-portrait.webp`, `robot-portrait-small.webp`; recoloured `robot-portrait-teal.webp`, `robot-portrait-teal-small.webp` and `robot-portrait-violet.webp`. All these files and hush's six-panel photographic adaptation are distributed under CC BY-SA 4.0. The adaptation is implemented in `src/verified/PortraitScene.ts` and the `.vm-portrait-fallback` / `.vm-portrait-fragment` styles in `src/verified/verified-editorial.css`.
+- Files: `robot-portrait.webp`, `robot-portrait-small.webp`; recoloured `robot-portrait-teal.webp`, `robot-portrait-teal-small.webp` and `robot-portrait-violet.webp`. All these files and clemii's six-panel photographic adaptation are distributed under CC BY-SA 4.0. The adaptation is implemented in `src/verified/PortraitScene.ts` and the `.vm-portrait-fallback` / `.vm-portrait-fragment` styles in `src/verified/verified-editorial.css`.
 - The robot image is recoloured in cyan and pink and split into displaced panels. It is a dimensional photo collage, not a 3D scan or an AI-generated image. The nearby message is an independent illustrative example, not attributed to the robot, its creator or photographer. No endorsement is implied.
 
 ## Twittering Machine (Die Zwitscher-Maschine)
@@ -76,7 +76,7 @@ These are existing public-domain artworks and an openly licensed photograph, not
 - Files: `twittering-machine.webp`, `twittering-machine-small.webp`; treated `twittering-machine-muted.webp`, `twittering-machine-muted-small.webp`.
 - The treated files carry a restrained colour shift; CSS adds the rotated paper composition and edge mask. The example voice transcript and time are original illustrative content layered over the painting, not Klee's words or a historical recording.
 
-Editorial artwork has visible credits beneath its composition. Files are hosted on hush's own site, with no third-party image requests.
+Editorial artwork has visible credits beneath its composition. Files are hosted on clemii's own site, with no third-party image requests.
 
 ## Rose sculpture
 
@@ -84,5 +84,5 @@ Editorial artwork has visible credits beneath its composition. Files are hosted 
 - Source: https://www.innerscene.com/tools/library/3d-parts/rose-flower-with-stem-b2a45a50
 - Licence: CC0 1.0 Universal, https://creativecommons.org/publicdomain/zero/1.0/
 - Downloaded 10 November 2026. The source GLB also embeds the CC0 dedication.
-- Adaptation: embedded textures removed with `scripts/prepare-rose.py`; pearl/lilac materials, composition, scaling and scroll-linked petal transforms by hush. Geometry remains from the source asset.
+- Adaptation: embedded textures removed with `scripts/prepare-rose.py`; pearl/lilac materials, composition, scaling and scroll-linked petal transforms by clemii. Geometry remains from the source asset.
 - Served locally as a Vite-hashed asset. No remote viewer, CDN or tracking requests.

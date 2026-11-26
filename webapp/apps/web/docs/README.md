@@ -1,6 +1,6 @@
 # Website and proof-service documentation
 
-[All hush docs](../../../../docs/README.md) · [Run locally](../README.md) ·
+[All clemii docs](../../../../docs/README.md) · [Run locally](../README.md) ·
 [Contribute](../../../../CONTRIBUTING.md)
 
 | Task | Guide |

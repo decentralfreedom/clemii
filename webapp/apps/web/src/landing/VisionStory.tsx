@@ -1,6 +1,6 @@
 import { artwork } from "../media/artwork";
 
-import { HushMascotArtwork, HushMascotGrip } from "./HushMascot";
+import { ClemiiMascotArtwork, ClemiiMascotGrip } from "./ClemiiMascot";
 import { ProvenanceStory } from "./ProvenanceStory";
 import { FreedomBloom } from "./FreedomBloom";
 import { Lines } from "../i18n/Lines";
@@ -41,8 +41,8 @@ export function VisionStory() {
             <svg className="thought-wave" viewBox="0 0 680 160" fill="none" aria-hidden="true">
               <path d="M0 80H105C130 80 130 30 145 30S160 130 175 130 190 5 205 5 220 155 235 155 250 38 265 38 280 112 295 112 310 80 330 80H680" />
             </svg>
-            <div className="thought-companion" role="img" aria-label={m.thought_companion_label()}><HushMascotArtwork state="listening" peeking saturation={0.65} /></div>
-            <div className="thought-companion-grip" aria-hidden="true"><HushMascotGrip /></div>
+            <div className="thought-companion" role="img" aria-label={m.thought_companion_label()}><ClemiiMascotArtwork state="listening" peeking /></div>
+            <div className="thought-companion-grip" aria-hidden="true"><ClemiiMascotGrip /></div>
           </div>
           <figcaption><a href={aristotleSource} target="_blank" rel="noreferrer">{m.thought_credit_link()}</a><span>{m.thought_credit()}</span></figcaption>
         </figure>
@@ -83,7 +83,7 @@ export function VisionStory() {
               width="960" height="1076" loading="lazy" decoding="async" fetchPriority="low"
               alt={m.intelligence_alt()}
             />
-            <div className="local-window-label"><span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" /><b>{m.intelligence_window_label()}</b><div className="window-companion" role="img" aria-label={m.intelligence_companion_label()}><HushMascotArtwork state="thinking" portrait /></div></div>
+            <div className="local-window-label"><span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" /><b>{m.intelligence_window_label()}</b><div className="window-companion" role="img" aria-label={m.intelligence_companion_label()}><ClemiiMascotArtwork state="listening" portrait /></div></div>
           </div>
           <figcaption className="art-credit"><a href={geographerSource} target="_blank" rel="noreferrer">{m.intelligence_credit_link()}</a><span><Lines text={m.intelligence_credit()} /></span></figcaption>
         </figure>

@@ -32,11 +32,14 @@ async function holdShaders(page: Page) {
       }
       return parameter.call(this, program, name);
     };
-    const draw = prototype.drawArrays;
-    prototype.drawArrays = function (...args: Parameters<typeof draw>) {
-      if (!state.release) state.earlyDraws++;
-      return draw.apply(this, args);
-    };
+    // The figures are indexed geometry, so both kinds of draw call count.
+    for (const name of ["drawArrays", "drawElements"] as const) {
+      const draw = prototype[name] as (...args: unknown[]) => void;
+      (prototype[name] as unknown) = function (this: WebGL2RenderingContext, ...args: unknown[]) {
+        if (!state.release) state.earlyDraws++;
+        return draw.apply(this, args);
+      };
+    }
     const remove = prototype.deleteProgram;
     prototype.deleteProgram = function (...args: Parameters<typeof remove>) {
       state.deletedPrograms++;
@@ -49,12 +52,12 @@ test("LANDING-ENTRY-006 keeps content usable while hero shaders prepare", async 
   await holdShaders(page);
   await page.goto("/");
   await expect.poll(async () => (await preparation(page)).polls).toBeGreaterThan(0);
-  await expect(page.locator(".hush-landing")).toHaveAttribute("data-opening", "complete");
+  await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "complete");
   await expect(page.locator(".hero-introduction")).toHaveCSS("opacity", "1");
   await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1");
   expect((await preparation(page)).earlyDraws).toBe(0);
   await releaseShaders(page);
-  await expect(page.locator(".hush-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
+  await expect(page.locator(".clemii-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
   await expect(page.locator(".site-header")).toHaveCSS("animation-name", "none");
 });
 
@@ -73,7 +76,7 @@ test("LANDING-ENTRY-006 releases preparing graphics when navigating away", async
   await expect(page).toHaveURL(/\/verified-messages$/);
   await expect.poll(async () => (await preparation(page)).deletedPrograms).toBeGreaterThan(0);
   await releaseShaders(page);
-  await expect(page.locator(".hush-core")).toHaveCount(0);
+  await expect(page.locator(".clemii-core")).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -86,38 +89,34 @@ test("LANDING-ENTRY-006 supports renderers without parallel shader compilation",
     } as typeof WebGL2RenderingContext.prototype.getExtension;
   });
   await page.goto("/");
-  await expect(page.locator(".hush-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
+  await expect(page.locator(".clemii-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
   await expect(page.locator(".hero-download-area")).toBeVisible();
 });
 
-test("LANDING-ENTRY-006 stops hero draws at rest, offscreen and while hidden", async ({ page }, testInfo) => {
+test("LANDING-ENTRY-006 draws the living hero only while it is on screen and the page is visible", async ({ page }, testInfo) => {
   await page.addInitScript(() => {
-    const original = WebGL2RenderingContext.prototype.drawArrays;
-    WebGL2RenderingContext.prototype.drawArrays = function (...args: Parameters<typeof original>) {
-      if (this.canvas instanceof HTMLCanvasElement && this.canvas.closest(".hush-core")) {
-        this.canvas.dataset.drawCount = String(Number(this.canvas.dataset.drawCount ?? 0) + 1);
-      }
-      return original.apply(this, args);
-    };
+    // The figures are indexed geometry, so both kinds of draw call count.
+    for (const name of ["drawArrays", "drawElements"] as const) {
+      const original = WebGL2RenderingContext.prototype[name] as (...args: unknown[]) => void;
+      (WebGL2RenderingContext.prototype[name] as unknown) = function (this: WebGL2RenderingContext, ...args: unknown[]) {
+        if (this.canvas instanceof HTMLCanvasElement && this.canvas.closest(".clemii-core")) {
+          this.canvas.dataset.drawCount = String(Number(this.canvas.dataset.drawCount ?? 0) + 1);
+        }
+        return original.apply(this, args);
+      };
+    }
   });
   await page.goto("/");
-  const hero = page.locator(".hush-core");
+  const hero = page.locator(".clemii-core");
   const canvas = hero.locator("canvas");
   await expect(hero).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
   await page.mouse.move(0, 0);
   await expect(canvas).toHaveAttribute("data-draw-count", /[1-9]/);
-  // At rest means the three-second entrance has finished and a whole second
-  // passes without a frame: without a GPU (CI's WebKit) one frame can take
-  // longer than 200 ms, so a shorter quiet spell can fall inside the entrance.
-  await expect(page.locator(".hush-landing")).toHaveAttribute("data-opening", "complete", { timeout: 15000 });
-  await expect.poll(async () => {
-    const count = await canvas.getAttribute("data-draw-count");
-    await page.waitForTimeout(1000);
-    return count === await canvas.getAttribute("data-draw-count");
-  }, { timeout: 15000 }).toBe(true);
-  const idle = await canvas.getAttribute("data-draw-count");
-  await page.waitForTimeout(5000);
-  await expect(canvas).toHaveAttribute("data-draw-count", idle!);
+  // The two brothers are alive: after the three-second entrance the hero keeps
+  // drawing for as long as it is on screen and the page is visible.
+  await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "complete", { timeout: 15000 });
+  const settled = Number(await canvas.getAttribute("data-draw-count"));
+  await expect.poll(async () => Number(await canvas.getAttribute("data-draw-count")), { timeout: 15000 }).toBeGreaterThan(settled);
   await page.screenshot({ path: testInfo.outputPath("hero-settled.png") });
   const size = await canvas.evaluate(element => ({
     width: (element as HTMLCanvasElement).width, cssWidth: element.getBoundingClientRect().width,
@@ -130,8 +129,10 @@ test("LANDING-ENTRY-006 stops hero draws at rest, offscreen and while hidden", a
     Object.defineProperty(document, "hidden", { configurable: true, get: () => true });
     document.dispatchEvent(new Event("visibilitychange"));
   });
-  await hero.dispatchEvent("pointermove", { pointerType: "mouse", clientX: 100, clientY: 100 });
   await page.waitForTimeout(300);
+  const idle = await canvas.getAttribute("data-draw-count");
+  await hero.dispatchEvent("pointermove", { pointerType: "mouse", clientX: 100, clientY: 100 });
+  await page.waitForTimeout(700);
   await expect(canvas).toHaveAttribute("data-draw-count", idle!);
   await page.evaluate(() => {
     delete (document as unknown as { hidden?: boolean }).hidden;

@@ -1,4 +1,4 @@
-# hush CMS guidance
+# clemii CMS guidance
 
 The blog CMS: posts, revisions, scheduling and the admin API for the owner and
 for agents. It runs as its own service with its own PostgreSQL, apart from
@@ -18,7 +18,7 @@ Verified Messages.
 
 - Never import from `apps/web` or read `DATABASE_URL` or
   `HUSH_SERVICE_PRIVATE_JWK`; `tests/boundary.test.ts` enforces it.
-- Article rules come from `@hush/article`. Do not re-implement them here.
+- Article rules come from `@clemii/article`. Do not re-implement them here.
 - Keep the schema in third normal form. Change it with `bun run db:generate`;
   migrations stay additive so the previous release keeps running during deploys.
 - Every state change runs in one transaction with its revision.

@@ -243,7 +243,7 @@ describe.skipIf(!serverUrl)("CMS Search Console import", () => {
       { page: "https://behu.sh/blog/dictate-on-mac-old", query: "dictate on mac", date, impressions: 60, clicks: 2, position: 9 },
       { page: "https://behu.sh/blog/dictate-on-mac", query: "dictate on mac", date, impressions: 40, clicks: 1, position: 4 },
       { page: "https://behu.sh/blog/dictate-on-mac", query: "mac dictation offline", date, impressions: 30, clicks: 0, position: 12 },
-      { page: "https://behu.sh/", query: "hush app", date, impressions: 50, clicks: 5, position: 1 },
+      { page: "https://behu.sh/", query: "clemii app", date, impressions: 50, clicks: 5, position: 1 },
       ...extra,
     ];
     const first = fakeGoogle(() => [{ page: "https://behu.sh/blog/dictate-on-mac", date: "2026-11-21", impressions: 130, clicks: 3, position: 7 }], {

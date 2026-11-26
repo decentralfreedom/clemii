@@ -26,7 +26,7 @@ export function TechnicalDetails({ proof }: { proof: VerifiedProof }) {
         ) : null}
       </dl>
       <p className="mt-5 border-t border-black/8 pt-4 text-xs leading-5 text-muted">
-        This verifies a signed hush origin and edit record. It does not prove legal
+        This verifies a signed clemii origin and edit record. It does not prove legal
         identity, factual accuracy, or biological liveness.
       </p>
     </details>

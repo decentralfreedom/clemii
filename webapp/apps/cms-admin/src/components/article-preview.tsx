@@ -8,7 +8,7 @@
 // the article's images then load as the admin's own (img-src 'self',
 // Cross-Origin-Resource-Policy same-origin). Allowing the origin is safe only
 // without allow-scripts; never add both.
-import articleCss from "@hush/article/article.css?raw";
+import articleCss from "@clemii/article/article.css?raw";
 import { cn } from "@/lib/utils";
 
 const page = (heading: string, lead: string, html: string, lang: string) => `<!doctype html><html lang="${lang}"><head><meta charset="utf-8">

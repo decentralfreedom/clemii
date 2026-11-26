@@ -1,9 +1,9 @@
-# Hush landing direction
+# clemii landing direction
 
 ## Design plan
 
 - Porcelain `#FAFBFC`: quiet page surface.
-- Graphite `#24272B`: type, primary actions, the Hush device.
+- Graphite `#24272B`: type, primary actions, the clemii device.
 - Slate `#626973`: supporting text with readable contrast.
 - Silver `#DCE2E8`: physical edges and connecting paths.
 - Ice `#BFE7F1`: translucent layers of the local AI object.
@@ -12,13 +12,13 @@
 Use the system sans stack: large, tightly spaced display type and small, readable interface text. No web font download. Center the hero, align explanatory content left, keep a single readable column on mobile.
 
 ```text
-hush                    GitHub   Verified Messages   Community   Download
+clemii                    GitHub   Verified Messages   Community   Download
 
                      The voice layer for your Mac.
                               one sentence
 
                          Mail       Messages
-                   Notes       [3D hush]       Slack
+                   Notes       [3D clemii]       Slack
                        Chrome           Notion
                            Figma
 
@@ -33,17 +33,17 @@ hush                    GitHub   Verified Messages   Community   Download
 
 ## Review against the brief
 
-The user asked for a circle of familiar app icons, less copy and no logo slider. The hero uses a constellation around Hush's own waveform, showing voice reaching familiar apps. The dimensional object is the distinctive element; the rest is restrained. On review, the user removed the entire example/tab section, the model's status label, replay and skip buttons, and the cursor follower. The background now deforms gently near the pointer instead. The assistant's beta limits and hardware requirements remain in the native FAQ disclosures.
+The user asked for a circle of familiar app icons, less copy and no logo slider. The hero uses a constellation around clemii's own waveform, showing voice reaching familiar apps. The dimensional object is the distinctive element; the rest is restrained. On review, the user removed the entire example/tab section, the model's status label, replay and skip buttons, and the cursor follower. The background now deforms gently near the pointer instead. The assistant's beta limits and hardware requirements remain in the native FAQ disclosures.
 
 The download sits below the icon ring with enough separation from Figma's label. Its entrance uses opacity only, with no blur. A solid dark background remains even if the decorative gradient is unavailable. Hover and press change shading, never position. The header joins the entrance with a brief opacity reveal. Any keyboard, pointer, touch or wheel input completes the entrance immediately.
 
 ## Reference analysis
 
-Inspected `superdesigndev/treg`, including `src/treg/web/landing.html` and `src/treg/web/media/landing/`. The reference uses procedural Three.js geometry, glass/metal materials, connecting paths, and an entrance sequence. Its root license includes additional commercial-use restrictions. Hush's geometry, scene, choreography, copy and styling are independently authored; no reference code or assets are included.
+Inspected `superdesigndev/treg`, including `src/treg/web/landing.html` and `src/treg/web/media/landing/`. The reference uses procedural Three.js geometry, glass/metal materials, connecting paths, and an entrance sequence. Its root license includes additional commercial-use restrictions. clemii's geometry, scene, choreography, copy and styling are independently authored; no reference code or assets are included.
 
 Use a dynamic import for the scene, render on demand, cap resolution, respect reduced motion, dispose GPU resources, and preserve a CSS visual if WebGL or the module is unavailable. Never hide the download behind the animation. The graphic is a product illustration, not a real microphone or an agent running in the browser.
 
-The reference's opening combines a travelling/settling model, staggered content, paths and a background reveal. Hush uses a shorter three-second assembly, delayed icon/path entrance and a final download fade. Wheel, touch and keyboard input end the entrance. Reduced motion shows the composed scene immediately. No scroll lock, external 3D asset, analytics, microphone access or animation loop at rest is added.
+The reference's opening combines a travelling/settling model, staggered content, paths and a background reveal. clemii uses a shorter three-second assembly, delayed icon/path entrance and a final download fade. Wheel, touch and keyboard input end the entrance. Reduced motion shows the composed scene immediately. No scroll lock, external 3D asset, analytics, microphone access or animation loop at rest is added.
 
 Three.js references: [on-demand rendering](https://threejs.org/manual/pages/rendering-on-demand.html), [resource disposal](https://threejs.org/manual/pages/cleanup.html).
 
@@ -99,21 +99,21 @@ Close the story before the FAQ with “For minds of their own.” Original copy 
 
 Review: the symbolic overlays have concrete meanings (local compute, keyboard creation and direct manipulation). They do not introduce a cloud-provider logo wall, product dashboard, or generic neon backdrop. Three classical images lead to the era of personal computing, then the factual FAQ and download.
 
-### Hush as a companion inside the art
+### clemii as a companion inside the art
 
 The user wants a recognisable mascot in different states, composed into the artwork rather than UI panels. Retain the hero's graphite square, silver waveform and ice glass as the character's identity. The two central waveform bars become expressive eyes; small arms and feet give it a physical presence. Use original inline SVG, not generated raster images or a borrowed mascot.
 
-Replace the Vermeer chip/status card and circuit frame with Hush thinking beside the map. Put a listening pose beside Aristotle and a recording pose in the lower part of the Jobs composition, with a small “Think different.” speech motif. Keep faces and hands visible. The slogan is a creative reference, not a claim of a recorded Jobs utterance or endorsement. Remove the separate Jobs cursor so the character carries the gesture.
+Replace the Vermeer chip/status card and circuit frame with clemii thinking beside the map. Put a listening pose beside Aristotle and a recording pose in the lower part of the Jobs composition, with a small “Think different.” speech motif. Keep faces and hands visible. The slogan is a creative reference, not a claim of a recorded Jobs utterance or endorsement. Remove the separate Jobs cursor so the character carries the gesture.
 
 The palette stays graphite #24272B, silver #DCE2E8, ice #BFE7F1 and coral #EF9C90. Three poses share one lightweight SVG component. Each has an accessible illustration label, no button semantics, no microphone access and no live status message. Fine-pointer hover can produce one brief character gesture; reduced motion and touch show a still pose. No page-fixed buddy, chat panel, or dashboard chrome.
 
 Review: a recurring illustrated companion connects the historical artwork to the voice-layer headline. The character belongs to each composition and has a different role in it; it is not a product demonstration floating over the page.
 
-The companion now uses Three.js, as requested, sharing the hero's deferred engine. Use a chibi proportion, bright expressive eyes with small catchlights, a tiny smile and soft coral cheeks. Keep the waveform embossed below the face so it remains recognisably hush. Give each pose a material accessory: listening headphones, thought beads, or a small microphone. The SVG is only a visual fallback when WebGL is unavailable. Mount only near the viewport, stop rendering at rest/offscreen, and dispose resources on unmount. Use lowercase “hush” in visible branding.
+The companion now uses Three.js, as requested, sharing the hero's deferred engine. Use a chibi proportion, bright expressive eyes with small catchlights, a tiny smile and soft coral cheeks. Keep the waveform embossed below the face so it remains recognisably clemii. Give each pose a material accessory: listening headphones, thought beads, or a small microphone. The SVG is only a visual fallback when WebGL is unavailable. Mount only near the viewport, stop rendering at rest/offscreen, and dispose resources on unmount. Use lowercase “clemii” in visible branding.
 
 ### Scroll-linked listening entrance
 
-The latest direction ties the listening character to actual scroll progress. As the Aristotle art moves from the lower viewport into its reading position, hush descends a thin line, points toward “Think out loud” with one hand, and grips the line with the other. The line endpoint follows the projected 3D hand. Sway responds to scroll movement and settles at rest. At the final position the line retracts, the pointing arm relaxes, the character lands with a brief bounce/blink and smiles. Scrolling upward reverses the descent. No scroll lock, autoplay drop or replay control.
+The latest direction ties the listening character to actual scroll progress. As the Aristotle art moves from the lower viewport into its reading position, clemii descends a thin line, points toward “Think out loud” with one hand, and grips the line with the other. The line endpoint follows the projected 3D hand. Sway responds to scroll movement and settles at rest. At the final position the line retracts, the pointing arm relaxes, the character lands with a brief bounce/blink and smiles. Scrolling upward reverses the descent. No scroll lock, autoplay drop or replay control.
 
 The render loop runs only while scroll/gaze smoothing or a bounded landing gesture remains active. Reduced motion and WebGL failure show the settled character without the line. The native scroll handler is passive and is removed on cleanup; hidden/offscreen scenes stop rendering. The figure remains the positioning context throughout.
 
@@ -125,7 +125,7 @@ Palette: midnight ink #111827, cold paper #EAF3F7, electric cyan #8CEDE7, printe
 
 Layout: a left-aligned headline and short historical introduction; below, a woodcut on the left becomes a field of fragmented voices on the right. A drawn thread passes through the composition and ends at the message-history conclusion. Following the user's review, remove the captured/edited/signed labels, explanatory paragraphs and disclosure from this ending. Keep only the headline and link to the full Verified Messages story, where optionality and proof limits remain explicit. “Who said that?” is solid dark lettering on irregular cyan/pink graffiti strips. A split organic/wireframe face carries the visual question. Keep the smaller copy-of-a-copy line beneath the painted lettering and the source credit clear of the image.
 
-Review: cyberpunk is the explicit user direction, so the dark surface and cyan/pink displacement are intentional. The historic woodcut, printing-to-network transition and unbroken history thread make this specific to hush's voice/provenance narrative. No extra mascot or fake verified badge is needed. Images remain locally served, responsive and credited. The artwork is static and readable with reduced motion or image failure; any fine-pointer movement is limited to displacement of decorative fragments.
+Review: cyberpunk is the explicit user direction, so the dark surface and cyan/pink displacement are intentional. The historic woodcut, printing-to-network transition and unbroken history thread make this specific to clemii's voice/provenance narrative. No extra mascot or fake verified badge is needed. Images remain locally served, responsive and credited. The artwork is static and readable with reduced motion or image failure; any fine-pointer movement is limited to displacement of decorative fragments.
 
 ## Latest story simplification
 

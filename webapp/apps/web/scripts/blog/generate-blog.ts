@@ -19,10 +19,10 @@ import { copyFile, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import sharp from "sharp";
-import { authorPath, blogAuthors } from "@hush/article/authors";
+import { authorPath, blogAuthors } from "@clemii/article/authors";
 import { siteOrigin } from "../../shared/origin";
-import { type BlogImageOutput, type BlogPost } from "@hush/article";
-import { blogLanguages, blogPath, editorialPolicyPath, linkableSitePaths, type BlogLanguage } from "@hush/article/taxonomy";
+import { type BlogImageOutput, type BlogPost } from "@clemii/article";
+import { blogLanguages, blogPath, editorialPolicyPath, linkableSitePaths, type BlogLanguage } from "@clemii/article/taxonomy";
 import { buildBlog } from "./build-blog";
 import { renderCovers } from "./render-covers";
 
@@ -108,7 +108,7 @@ function feed(lang: BlogLanguage) {
   return [
     '<?xml version="1.0" encoding="utf-8"?>',
     `<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="${lang}">`,
-    `  <title>${lang === "de" ? "hush Blog" : "hush blog"}</title>`,
+    `  <title>${lang === "de" ? "clemii Blog" : "clemii blog"}</title>`,
     `  <id>${home}</id>`,
     `  <link rel="alternate" type="text/html" href="${home}"/>`,
     `  <link rel="self" type="application/atom+xml" href="${home}/feed.xml"/>`,

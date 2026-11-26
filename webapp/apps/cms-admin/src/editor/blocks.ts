@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 //
-// Between an article's blocks (@hush/article/blocks) and the editor's nodes:
+// Between an article's blocks (@clemii/article/blocks) and the editor's nodes:
 // $setBlocks fills the editor from blocks, $getBlocks reads them back. Both
 // run inside editor.update() or editor.read().
 import { $createCodeNode, $isCodeNode } from "@lexical/code";
@@ -12,7 +12,7 @@ import { $createHeadingNode, $createQuoteNode, $isHeadingNode, $isQuoteNode } fr
 import {
   $createTableCellNode, $createTableNode, $createTableRowNode, $isTableCellNode, $isTableNode, $isTableRowNode, TableCellHeaderStates,
 } from "@lexical/table";
-import { tidyInline, type Block, type Inline, type ListBlock, type ListItem, type ParagraphBlock } from "@hush/article/blocks";
+import { tidyInline, type Block, type Inline, type ListBlock, type ListItem, type ParagraphBlock } from "@clemii/article/blocks";
 import {
   $createLineBreakNode, $createParagraphNode, $createTextNode, $getRoot, $getState, $isElementNode, $isLineBreakNode, $isParagraphNode,
   $isTextNode, $setState, type ElementNode, type LexicalNode,

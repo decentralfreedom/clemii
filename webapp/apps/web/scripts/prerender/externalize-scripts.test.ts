@@ -6,7 +6,7 @@ import { externalizeScripts } from "./externalize-scripts";
 test("preserves inert markup, attributed scripts, order and exact hydration data", () => {
   const inert = '<!--<script>comment()</script>--><template><script>template()</script></template>' +
     '<noscript><script>noscript()</script></noscript>' +
-    '<script type="application/ld+json">{"name":"hush"}</script>';
+    '<script type="application/ld+json">{"name":"clemii"}</script>';
   const module = '<script type="module" src="/entry.js"></script>';
   const first = 'window.$_TSR = "\u0000/&<";';
   const second = "window.order = 2;";

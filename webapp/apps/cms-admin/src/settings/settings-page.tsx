@@ -5,7 +5,7 @@
 // main-content.tsx, settings-sections.tsx; components/searchable-section.tsx,
 // top-level-group.tsx; advanced/integrations.tsx): each group's title over its
 // cards, the card in view marked in the navigation, Escape back to the app.
-// hush has three sections: the owner's account, the API's integrations and
+// clemii has three sections: the owner's account, the API's integrations and
 // the history of changes (history.tsx).
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";

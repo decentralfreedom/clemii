@@ -4,7 +4,7 @@
 // The article's body as blocks, edited the way Ghost's editor (Koenig) is:
 // rich text with Markdown shortcuts, a floating toolbar, the card menu and
 // cards for images, the summary, code, tables and dividers.
-import type { Block } from "@hush/article/blocks";
+import type { Block } from "@clemii/article/blocks";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { LexicalComposer, type InitialConfigType } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";

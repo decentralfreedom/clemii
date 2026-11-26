@@ -139,7 +139,7 @@ async function round() {
   if (healthy) lastHealthyTick = Date.now();
 }
 
-log("info", "hush CMS scheduler started");
+log("info", "clemii CMS scheduler started");
 while (!stopping) {
   await tick();
   for (let waited = 0; waited < 60_000 && !stopping; waited += 1_000) await Bun.sleep(1_000);
