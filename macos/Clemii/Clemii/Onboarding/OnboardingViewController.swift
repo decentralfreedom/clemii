@@ -481,7 +481,7 @@ private enum OnboardingPalette {
         angle: .degrees(210)
     )
 
-    /// Buttons and filled badges: the cool run through the globe's indigo.
+    /// Filled badges and glows: the cool run through the globe's indigo. Buttons take the accent colour.
     static let brand = LinearGradient(
         colors: [Color(red: 0.2, green: 0.62, blue: 0.98), purple, Color(red: 0.58, green: 0.27, blue: 0.96)],
         startPoint: .topLeading,
@@ -603,13 +603,13 @@ private struct ImmersiveOnboardingView: View {
                 .lineLimit(2)
             Spacer(minLength: 28)
             Button("Back") { flow.goBack() }
-                .buttonStyle(OnboardingSecondaryButtonStyle())
+                .buttonStyle(.bordered)
+                .controlSize(.extraLarge)
                 .disabled(flow.page == .welcome)
-                .opacity(flow.page == .welcome ? 0.34 : 1)
             Button(flow.primaryTitle) { flow.goForward() }
-                .buttonStyle(OnboardingPrimaryButtonStyle())
+                .buttonStyle(.borderedProminent)
+                .controlSize(.extraLarge)
                 .disabled(!flow.primaryEnabled)
-                .opacity(flow.primaryEnabled ? 1 : 0.38)
                 .accessibilityIdentifier("hush.onboarding.primary")
         }
         .padding(.horizontal, 40)
@@ -779,32 +779,6 @@ private struct OnboardingCompletionOverlay: View {
         try? await Task.sleep(for: .milliseconds(isUITest ? 2_000 : 690))
         guard !Task.isCancelled else { return }
         withAnimation(.easeInOut(duration: 0.3)) { ready = true }
-    }
-}
-
-private struct OnboardingPrimaryButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 16, weight: .bold))
-            .foregroundStyle(.white)
-            .frame(minWidth: 150)
-            .padding(.horizontal, 20)
-            .frame(height: 52)
-            .background(OnboardingPalette.brand, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .shadow(color: OnboardingPalette.purple.opacity(configuration.isPressed ? 0.14 : 0.28), radius: 18, y: 10)
-            .scaleEffect(configuration.isPressed ? 0.98 : 1)
-    }
-}
-
-private struct OnboardingSecondaryButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 15, weight: .semibold))
-            .foregroundStyle(OnboardingPalette.muted)
-            .frame(minWidth: 92)
-            .padding(.horizontal, 16)
-            .frame(height: 52)
-            .background(OnboardingPalette.ink.opacity(configuration.isPressed ? 0.1 : 0.055), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
 
@@ -1221,9 +1195,9 @@ private struct PermissionSetupOverlay: View {
                         .tint(OnboardingPalette.go)
                     Spacer()
                     Button("Continue") { flow.continueFromPermissions() }
-                        .buttonStyle(OnboardingPrimaryButtonStyle())
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.extraLarge)
                         .disabled(!flow.permissionsReady)
-                        .opacity(flow.permissionsReady ? 1 : 0.38)
                         .accessibilityIdentifier("hush.onboarding.permissions.continue")
                 }
                 .padding(.top, 16)
