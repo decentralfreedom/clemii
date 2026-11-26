@@ -941,7 +941,8 @@ final class LLMRuntime {
         }
         #endif
         let decoded = try CoworkerReply.decode(raw)
-        let reply = request.observation.mailDraft == nil ? decoded : CoworkerMailDraftPolicy.normalize(decoded)
+        let normalized = request.observation.mailDraft == nil ? decoded : CoworkerMailDraftPolicy.normalize(decoded)
+        let reply = CoworkerMeetingDates.resolve(normalized, for: request)
         #if DEBUG
         trace?.event("model.decoded", ["action": reply.action.rawValue])
         #endif

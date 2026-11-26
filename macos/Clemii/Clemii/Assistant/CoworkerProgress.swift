@@ -97,7 +97,8 @@ extension CoworkerGenerating {
             if let available = input.observation.availableActions, !available.contains(decoded.action) {
                 throw CoworkerError.invalidResponse
             }
-            let reply = input.observation.mailDraft == nil ? decoded : CoworkerMailDraftPolicy.normalize(decoded)
+            let normalized = input.observation.mailDraft == nil ? decoded : CoworkerMailDraftPolicy.normalize(decoded)
+            let reply = CoworkerMeetingDates.resolve(normalized, for: input)
             var feedback = CoworkerMailDraftPolicy.feedback(for: reply, observation: input.observation)
             if [.write, .revise].contains(reply.action), let maximum = input.maximumDraftCharacters,
                reply.content.count > maximum {
