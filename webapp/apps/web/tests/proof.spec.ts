@@ -237,7 +237,7 @@ test("downloads clemii from the recipient invitation without losing the private 
   if (isMobile) {
     await page.locator(".proof-download").click();
     const sheet = page.getByRole("dialog", { name: "Meet you on your Mac." });
-    await expect(sheet.getByRole("textbox", { name: "clemii download page" })).toHaveValue("https://behu.sh/");
+    await expect(sheet.getByRole("textbox", { name: "clemii download page" })).toHaveValue("https://clemii.com/");
     const email = await sheet.getByRole("link", { name: "Email myself the link" }).getAttribute("href");
     expect(email).not.toContain(fixture.key);
     expect(decodeURIComponent(email!)).not.toContain(fixture.manifest.finalText);
