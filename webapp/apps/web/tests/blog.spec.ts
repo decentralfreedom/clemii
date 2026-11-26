@@ -149,7 +149,7 @@ test("BLOG-008 keeps the way back and sharing in a quiet margin, with no content
 test("BLOG-009 serves the article artwork as the social preview and on cards, never as an article hero", async ({ page, request }) => {
   await page.goto(article);
   const image = await page.locator('meta[property="og:image"]').getAttribute("content");
-  expect(image).toMatch(/^https:\/\/behu\.sh\/blog\/covers\/fixture-dictation-without-cloud-[a-f0-9]{10}-social\.png$/);
+  expect(image).toMatch(/^https:\/\/clemii\.com\/blog\/covers\/fixture-dictation-without-cloud-[a-f0-9]{10}-social\.png$/);
   await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", image!);
   const scripts = await page.locator('script[type="application/ld+json"]').allInnerTexts();
   const data = JSON.parse(scripts[0]!);
