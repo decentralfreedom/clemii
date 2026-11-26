@@ -555,16 +555,18 @@ private struct ImmersiveOnboardingView: View {
             HStack(spacing: 18) {
                 Spacer()
                 Text("\(flow.page.rawValue + 1) of 4")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(OnboardingPalette.muted)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
                     .monospacedDigit()
-                    .frame(width: 60, alignment: .trailing)
-                HStack(spacing: 10) {
+                // A page indicator as Apple draws one: dots, the current one in the accent colour.
+                HStack(spacing: 8) {
                     ForEach(OnboardingFlowModel.Page.allCases, id: \.rawValue) { page in
                         Button { flow.selectPage(page) } label: {
-                            Capsule()
-                                .fill(page == flow.page ? AnyShapeStyle(OnboardingPalette.headline) : AnyShapeStyle(OnboardingPalette.ink.opacity(0.22)))
-                                .frame(width: page == flow.page ? 64 : 54, height: 6)
+                            Circle()
+                                .fill(page == flow.page ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.tertiary))
+                                .frame(width: 7, height: 7)
+                                .padding(3)
+                                .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                         .disabled(page.rawValue > flow.page.rawValue)
