@@ -19,13 +19,13 @@ test("LANG-001 prerenders the German landing page with its own metadata and href
   const html = await page.content();
   expect(html).toContain("Download für Mac");
   expect(html).not.toMatch(/>\s*(Für den Mac laden|Laden)\s*</);
-  for (const [lang, href] of [["en", "https://behu.sh/"], ["de", "https://behu.sh/de"], ["x-default", "https://behu.sh/"]] as const) {
+  for (const [lang, href] of [["en", "https://clemii.com/"], ["de", "https://clemii.com/de"], ["x-default", "https://clemii.com/"]] as const) {
     await expect(page.locator(`link[rel="alternate"][hreflang="${lang}"]`)).toHaveAttribute("href", href);
   }
   const data = JSON.parse((await page.locator('script[type="application/ld+json"]').allInnerTexts())[0]!);
-  expect(data).toMatchObject({ "@type": "SoftwareApplication", inLanguage: "de", url: "https://behu.sh/de", offers: { price: "0" } });
+  expect(data).toMatchObject({ "@type": "SoftwareApplication", inLanguage: "de", url: "https://clemii.com/de", offers: { price: "0" } });
   await page.goto("/");
-  await expect(page.locator('link[rel="alternate"][hreflang="de"]')).toHaveAttribute("href", "https://behu.sh/de");
+  await expect(page.locator('link[rel="alternate"][hreflang="de"]')).toHaveAttribute("href", "https://clemii.com/de");
   await context.close();
 });
 

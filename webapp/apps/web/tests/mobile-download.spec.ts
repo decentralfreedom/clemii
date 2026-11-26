@@ -19,11 +19,11 @@ test("phone visitors can share or copy the Mac link without downloading an insta
   await expect(sheet.getByText("clemii runs on your Mac. Save the link for when you’re there.")).toBeVisible();
   const emailURL = await sheet.getByRole("link", { name: "Email myself the link" }).getAttribute("href");
   expect(emailURL).toMatch(/^mailto:\?/);
-  expect(decodeURIComponent(emailURL!)).toContain("https://behu.sh/");
+  expect(decodeURIComponent(emailURL!)).toContain("https://clemii.com/");
   await sheet.getByRole("button", { name: "Share link", exact: true }).click();
-  await expect(page.locator("html")).toHaveAttribute("data-shared", JSON.stringify({ title: "clemii for Mac", text: "The voice layer for your Mac.", url: "https://behu.sh/" }));
+  await expect(page.locator("html")).toHaveAttribute("data-shared", JSON.stringify({ title: "clemii for Mac", text: "The voice layer for your Mac.", url: "https://clemii.com/" }));
   await sheet.getByRole("button", { name: "Copy link" }).click();
-  await expect(page.locator("html")).toHaveAttribute("data-copied", "https://behu.sh/");
+  await expect(page.locator("html")).toHaveAttribute("data-copied", "https://clemii.com/");
   await expect(sheet.getByRole("status")).toHaveText("Link copied. Open it on your Mac.");
   expect((await sheet.boundingBox())!.width).toBeLessThanOrEqual(390);
   await page.screenshot({ path: testInfo.outputPath("mobile-handoff.png") });

@@ -228,7 +228,7 @@
     background: color-mix(in oklab, var(--kg-accent-color) 12%, transparent);
   }
 
-  /* The summary box ("> [!TLDR]"), drawn as on behu.sh (@clemii/article/article.css). */
+  /* The summary box ("> [!TLDR]"), drawn as on clemii.com (@clemii/article/article.css). */
   > div.editor-summary {
     margin: 3.2rem 0 0;
     padding: 2rem 2.2rem 1.6rem;
@@ -265,7 +265,7 @@
     font-size: 1.7rem;
   }
 
-  /* Its list as behu.sh draws it: a check in a violet circle, a line between items. */
+  /* Its list as clemii.com draws it: a check in a violet circle, a line between items. */
   > div.editor-summary li {
     position: relative;
     list-style: none;
