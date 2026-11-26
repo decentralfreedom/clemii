@@ -81,7 +81,7 @@
 @media (max-width: 768px) { .article-title { font-size: 36px; } }
 @media (max-width: 500px) { .article-title { font-size: 28px; } .article-lead { font-size: 18px; } }
 
-/* Articles: the CMS editor's typography, so an article reads on behu.sh as it
+/* Articles: the CMS editor's typography, so an article reads on clemii.com as it
    was written. Koenig's prose styles (TryGhost/Koenig, kg-prose.css, MIT,
    Ghost Foundation), in px for a 16px root: Georgia for the text, the page's
    own sans for headings, and vertical rhythm by margin-top only, depending on

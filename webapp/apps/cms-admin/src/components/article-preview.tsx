@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 //
-// The rendered article as behu.sh shows it, from the CMS's preview. It runs in
+// The rendered article as clemii.com shows it, from the CMS's preview. It runs in
 // a sandboxed frame that may run no scripts, so author content never executes
 // on the admin's origin, which holds the session. Unlike a fully sandboxed
 // frame it keeps that origin, as Ghost's preview is a page of its own site:
