@@ -7,4 +7,4 @@
 // host serves pages whose canonical links name the real site). Moving the site
 // to another domain changes this line and production's HUSH_PUBLIC_BASE_URL. Its own module, free of the generated blog data, so the blog
 // generator can use it before that data exists.
-export const siteOrigin = "https://behu.sh";
+export const siteOrigin = "https://clemii.com";
