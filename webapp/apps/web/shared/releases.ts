@@ -30,6 +30,54 @@ export type ClemiiRelease = {
 // Older unnotarized builds have been withdrawn from the website.
 export const releases: readonly ClemiiRelease[] = [
   {
+    slug: "0.1.0-alpha.10",
+    version: "0.1.0-alpha.10",
+    displayVersion: "0.1 alpha 10",
+    build: 19,
+    releasedAt: "2026-11-26",
+    displayDate: "26 November 2026",
+    channel: "Private alpha",
+    visibility: "private",
+    title: "hush is now clemii.",
+    summary:
+      "The same private dictation, Live Write and assistant on your Mac, with a new name, a new look and the assistant's voice working on every Mac.",
+    downloadURL:
+      "https://updates.clemii.com/downloads/clemii-0.1.0-alpha.10-build.19.dmg",
+    downloadName: "clemii-0.1.0-alpha.10-build.19.dmg",
+    systemRequirements: "Apple silicon and macOS 15 or later",
+    sections: [
+      {
+        label: "Added",
+        items: [
+          {
+            title: "A new name and look",
+            detail:
+              "clemii has its own icon, menu bar mark and HUD, and a new welcome. Your settings, models and history carry over from hush.",
+          },
+        ],
+      },
+      {
+        label: "Fixed",
+        items: [
+          {
+            title: "The assistant's voice",
+            detail: "Setting up the assistant's voice no longer quits the app on some Macs.",
+          },
+          {
+            title: "Meetings on the day you say",
+            detail: "Ask for Thursday at 3:30 and the calendar draft is on Thursday.",
+          },
+        ],
+      },
+    ],
+    knownNotes: [
+      "clemii is a new app for macOS, so you grant Microphone and Accessibility once more. hush does not update into clemii: install clemii and move hush to the Trash when you are ready.",
+      "macOS may ask you to approve the first launch and name Safari as the download source. This is a normal security prompt; no Terminal command is needed.",
+      "This is still an early alpha. I'm working toward a full public release, and I'd like to open-source the app in the future.",
+      "Built for Macs with Apple silicon. We recommend 16 GB of memory for the optional assistant; it is not a requirement for core dictation.",
+    ],
+  },
+  {
     slug: "0.1.0-alpha.9",
     version: "0.1.0-alpha.9",
     displayVersion: "0.1 alpha 9",
