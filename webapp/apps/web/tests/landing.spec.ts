@@ -357,7 +357,7 @@ test("opens the optional verification story from the privacy section", async ({
   ).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
-    "https://behu.sh/verified-messages",
+    "https://clemii.com/verified-messages",
   );
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
