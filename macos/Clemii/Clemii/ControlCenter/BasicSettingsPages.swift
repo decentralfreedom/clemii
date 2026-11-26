@@ -593,7 +593,9 @@ final class AboutSettingsPageViewController: ControlCenterPageViewController {
             detail: "Version, processing, and privacy details at a glance."
         ))
         let icon = NSImageView()
-        icon.image = NSApp.applicationIconImage
+        // The brand icon has a light and a dark image, so it follows the window's appearance;
+        // the application icon follows the system's icon style instead.
+        icon.image = NSImage(named: "BrandIcon") ?? NSApp.applicationIconImage
         icon.translatesAutoresizingMaskIntoConstraints = false
         icon.widthAnchor.constraint(equalToConstant: 74).isActive = true
         icon.heightAnchor.constraint(equalToConstant: 74).isActive = true

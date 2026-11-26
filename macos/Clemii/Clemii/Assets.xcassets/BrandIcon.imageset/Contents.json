@@ -6,7 +6,29 @@
       "scale" : "1x"
     },
     {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "brand-icon-dark.png",
+      "idiom" : "mac",
+      "scale" : "1x"
+    },
+    {
       "filename" : "brand-icon@2x.png",
+      "idiom" : "mac",
+      "scale" : "2x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "brand-icon-dark@2x.png",
       "idiom" : "mac",
       "scale" : "2x"
     }
