@@ -50,7 +50,7 @@ export function BlogFunnel({ blog }: { blog: BlogAnalytics & { from: string; to:
       <CardContent>
         <div aria-hidden className="-mx-6 hidden grid-cols-2 border-b border-border-default px-6 pt-4 pb-3 text-xs text-text-secondary md:grid">
           <span><span className="font-medium">Google Search</span> · Search Console</span>
-          <span className="ps-6"><span className="font-medium">On behu.sh</span> · Umami</span>
+          <span className="ps-6"><span className="font-medium">On clemii.com</span> · Umami</span>
         </div>
         <Tabs value={metric} onValueChange={(value) => setMetric(value as BlogMetric)} variant="kpis">
           <TabsList className="-mx-6 hidden grid-cols-4 md:visible! md:grid!" aria-label="The blog's numbers">
