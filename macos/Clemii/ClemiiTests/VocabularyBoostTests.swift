@@ -15,6 +15,10 @@ struct VocabularyBoostTests {
         #expect(timings.map(\.endTime) == [0.6, 0.8, 1.0])
         let long = ParakeetVocabularyBoost.timings(for: [TimedWord(text: "pause", start: 1)], end: 9)
         #expect(long[0].endTime == 2.5, "a word before a long pause does not span the silence")
+        // FluidAudio leaves a word heard with 0.99 or more alone, so its confidence must be the model's.
+        let sure = ParakeetVocabularyBoost.timings(for: [TimedWord(text: "Seintrava", start: 0, confidence: 0.62)], end: 1)
+        #expect(sure[0].confidence == 0.62)
+        #expect(timings.allSatisfy { $0.confidence == 0 }, "a word without a confidence counts as unsure")
     }
 
     @Test("A word that only drops letters from what was said is not a fix")

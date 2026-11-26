@@ -9,15 +9,23 @@ struct SpeechRoundsTests {
 
     @Test("Tokens become words at each word-start marker, with recording times")
     func tokensToWords() {
-        let tokens: [(text: String, start: TimeInterval)] = [("\u{2581}Hal", 0.1), ("lo", 0.3), ("\u{2581}Welt", 0.6), (" und", 1.0), (".", 1.2)]
+        let tokens: [(text: String, start: TimeInterval, confidence: Float?)] = [
+            ("\u{2581}Hal", 0.1, nil), ("lo", 0.3, nil), ("\u{2581}Welt", 0.6, nil), (" und", 1.0, nil), (".", 1.2, nil)]
         #expect(TimedWord.words(from: tokens, offset: 10) == words([("Hallo", 10.1), ("Welt", 10.6), ("und.", 11.0)]))
     }
 
     @Test("A lone word-start marker starts the next word: \"at 3\" stays two words")
     func loneMarker() {
-        let words = TimedWord.words(from: [("\u{2581}call", 0.0), ("\u{2581}at", 0.4), ("\u{2581}", 0.6), ("3", 0.6), (".", 0.7)])
+        let words = TimedWord.words(from: [("\u{2581}call", 0.0, nil), ("\u{2581}at", 0.4, nil), ("\u{2581}", 0.6, nil),
+                                            ("3", 0.6, nil), (".", 0.7, nil)])
         #expect(words.map(\.text) == ["call", "at", "3."])
         #expect(words[2].start == 0.6)
+    }
+
+    @Test("A word is as sure as its least sure token")
+    func confidence() {
+        let words = TimedWord.words(from: [("\u{2581}Sein", 0.0, 0.99), ("tra", 0.2, 0.62), ("va", 0.3, 0.97), ("\u{2581}report", 0.5, 1)])
+        #expect(words.map(\.confidence) == [0.62, 1])
     }
 
     @Test("No round yet: release transcribes everything and keeps all of it")

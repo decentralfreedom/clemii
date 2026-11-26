@@ -4,12 +4,15 @@ import Foundation
 nonisolated struct TimedWord: Equatable, Sendable {
     var text: String
     var start: TimeInterval
+    /// The lowest confidence of the word's tokens, or nil when the model gave none.
+    var confidence: Float? = nil
 }
 
 nonisolated extension TimedWord {
     /// Groups tokens into words: a token that starts with a space or SentencePiece's "▁"
     /// begins a new word. `offset` places a window's times in the whole recording.
-    static func words(from tokens: [(text: String, start: TimeInterval)], offset: TimeInterval = 0) -> [TimedWord] {
+    static func words(from tokens: [(text: String, start: TimeInterval, confidence: Float?)],
+                      offset: TimeInterval = 0) -> [TimedWord] {
         var words: [TimedWord] = []
         // Parakeet writes some words as a lone "▁" token followed by the word's pieces,
         // such as "▁", "3" for the "3" in "at 3": the boundary carries over to them.
@@ -23,9 +26,12 @@ nonisolated extension TimedWord {
             }
             boundaryPending = false
             if startsWord || words.isEmpty {
-                words.append(TimedWord(text: text, start: offset + token.start))
+                words.append(TimedWord(text: text, start: offset + token.start, confidence: token.confidence))
             } else {
                 words[words.count - 1].text += text
+                if let confidence = token.confidence {
+                    words[words.count - 1].confidence = min(words[words.count - 1].confidence ?? confidence, confidence)
+                }
             }
         }
         return words

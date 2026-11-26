@@ -186,12 +186,13 @@ actor ParakeetVocabularyBoost {
     }
 
     /// Token timings from the timed words speech rounds keep: one "▁word" token per word,
-    /// ending where the next word starts.
+    /// ending where the next word starts, with the word's own confidence. FluidAudio does not
+    /// bias against a word heard with 0.99 or more, so a word without one counts as unsure.
     nonisolated static func timings(for words: [TimedWord], end: TimeInterval) -> [TokenTiming] {
         words.enumerated().map { index, word in
             let next = index + 1 < words.count ? words[index + 1].start : end
             return TokenTiming(token: "\u{2581}" + word.text, tokenId: 0, startTime: word.start,
-                               endTime: max(word.start, min(next, word.start + 1.5)), confidence: 1)
+                               endTime: max(word.start, min(next, word.start + 1.5)), confidence: word.confidence ?? 0)
         }
     }
 }

@@ -168,7 +168,7 @@ final class FluidAudioTranscriber: Transcriber, @unchecked Sendable {
             // No timings: one word list at the window start keeps the text, not the cut.
             return result.text.split(separator: " ").map { TimedWord(text: String($0), start: offset) }
         }
-        return TimedWord.words(from: timings.map { ($0.token, $0.startTime) }, offset: offset)
+        return TimedWord.words(from: timings.map { ($0.token, $0.startTime, $0.confidence) }, offset: offset)
     }
 
     func unload() async {
