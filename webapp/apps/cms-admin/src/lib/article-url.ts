@@ -3,9 +3,9 @@
 import { blogPath, type BlogLanguage } from "@clemii/article/taxonomy";
 
 /** The website the blog is published on. */
-export const siteOrigin = "https://behu.sh";
+export const siteOrigin = "https://clemii.com";
 
-/** Where a post lives on the website: https://behu.sh/blog/<slug>, or /de/blog/<slug> in German. */
+/** Where a post lives on the website: https://clemii.com/blog/<slug>, or /de/blog/<slug> in German. */
 export function articleUrl(lang: string, slug: string) {
   return `${siteOrigin}${blogPath(lang === "de" ? "de" : "en" satisfies BlogLanguage, slug)}`;
 }
