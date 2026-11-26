@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-FEED_URL="${1:-https://updates.behu.sh/alpha/appcast.xml}"
+FEED_URL="${1:-https://updates.clemii.com/alpha/appcast.xml}"
 TEMPORARY_DIRECTORY="$(mktemp -d)"
 trap 'rm -rf "${TEMPORARY_DIRECTORY}"' EXIT
 

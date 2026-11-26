@@ -535,7 +535,7 @@
 				GENERATE_INFOPLIST_FILE = NO;
 				HUSH_RELEASE_CHANNEL = "Alpha 5";
 				HUSH_RELEASE_SLUG = alpha.9;
-				HUSH_UPDATE_FEED_URL = "https://updates.behu.sh/alpha/appcast.xml";
+				HUSH_UPDATE_FEED_URL = "https://updates.clemii.com/alpha/appcast.xml";
 				HUSH_PROOF_SERVICE_URL = "http://127.0.0.1:3000";
 				HUSH_PROOF_SHORT_URL = "http://127.0.0.1:3000/s/";
 				INFOPLIST_FILE = Clemii/Info.plist;
@@ -573,9 +573,9 @@
 				GENERATE_INFOPLIST_FILE = NO;
 				HUSH_RELEASE_CHANNEL = "Alpha 5";
 				HUSH_RELEASE_SLUG = alpha.9;
-				HUSH_UPDATE_FEED_URL = "https://updates.behu.sh/alpha/appcast.xml";
-				HUSH_PROOF_SERVICE_URL = "https://behu.sh";
-				HUSH_PROOF_SHORT_URL = "https://behu.sh/s/";
+				HUSH_UPDATE_FEED_URL = "https://updates.clemii.com/alpha/appcast.xml";
+				HUSH_PROOF_SERVICE_URL = "https://clemii.com";
+				HUSH_PROOF_SHORT_URL = "https://clemii.com/s/";
 				INFOPLIST_FILE = Clemii/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

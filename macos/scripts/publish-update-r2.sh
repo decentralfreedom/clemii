@@ -125,4 +125,4 @@ if [[ -n "${DMG_PATH}" ]]; then
     --cache-control 'no-store'
 fi
 
-echo "Published update feed: https://updates.behu.sh/${UPDATE_CHANNEL}/appcast.xml"
+echo "Published update feed: https://updates.clemii.com/${UPDATE_CHANNEL}/appcast.xml"

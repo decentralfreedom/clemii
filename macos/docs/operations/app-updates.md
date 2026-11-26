@@ -20,10 +20,12 @@ Xcode Release archive
   -> explicitly requested Apple notarization and stapling
   -> Sparkle EdDSA-signed ZIP and appcast
   -> Cloudflare R2
-  -> https://updates.behu.sh
+  -> https://updates.clemii.com (and updates.behu.sh for builds released before it)
 ```
 
-The bundle identifier, Sparkle public key, and update origin stay stable.
+The Sparkle public key stays stable. clemii has its own bundle identifier
+(`com.decentralfreedom.clemii`) and update origin, so hush installs do not
+update into clemii; install clemii instead.
 Public packaging and publishing require successful postflight checks. See
 [Developer ID distribution](notarization.md) for the strategy and source review.
 
@@ -35,19 +37,20 @@ Public packaging and publishing require successful postflight checks. See
 2. Create the dedicated public update bucket. The current production bucket is
    named `clemii`.
 3. Open the bucket, then **Settings > Public access > Custom Domains**.
-4. Select **Connect Domain** and enter `updates.behu.sh`.
+4. Select **Connect Domain** and enter `updates.clemii.com`. `updates.behu.sh`
+   stays connected as well: builds released before clemii read their feed there.
 5. Confirm the connection. Cloudflare creates the required DNS record and
    serves the bucket through its CDN.
 
-Do not point `updates.behu.sh` at Coolify. `behu.sh` continues to point at the
-Coolify web service, while `updates.behu.sh` points directly at R2.
+Do not point `updates.clemii.com` at Coolify. `clemii.com` points at the
+Coolify web service, while `updates.clemii.com` points directly at R2.
 
 After the first publish, these URLs become public:
 
 ```text
-https://updates.behu.sh/alpha/appcast.xml
-https://updates.behu.sh/alpha/hush-<version>-<channel>-build.<build>.zip
-https://updates.behu.sh/downloads/hush-latest.dmg
+https://updates.clemii.com/alpha/appcast.xml
+https://updates.clemii.com/alpha/clemii-<version>-<channel>-build.<build>.zip
+https://updates.clemii.com/downloads/hush-latest.dmg
 ```
 
 ### 2. Create a publishing token
@@ -63,7 +66,7 @@ machine or CI secrets only. The running proof service does not need access to
 the update bucket.
 
 Cloudflare's custom domain makes the complete bucket public. Do not connect
-`updates.behu.sh` to a bucket used for encrypted proof objects or any other
+`updates.clemii.com` to a bucket used for encrypted proof objects or any other
 application data. Keep the `clemii` bucket dedicated to public release artifacts
 even when other application objects are encrypted.
 
@@ -264,7 +267,7 @@ The updater itself does not change. Configure Xcode signing and store notary
 credentials once:
 
 ```sh
-xcrun notarytool store-credentials ClemiiNotary --team-id 3A22UK7C9L
+xcrun notarytool store-credentials HushNotary --team-id 3A22UK7C9L
 ```
 
 Only after reviewing the candidate, opt in to submission. Submit the final DMG
@@ -273,7 +276,7 @@ candidate remains available:
 
 ```sh
 export HUSH_NOTARIZE=1
-export HUSH_NOTARY_KEYCHAIN_PROFILE=ClemiiNotary
+export HUSH_NOTARY_KEYCHAIN_PROFILE=HushNotary
 ./scripts/release-dmg.sh --app artifacts/release/export/clemii.app \
   --output artifacts/release/final/hush-0.1.0-alpha.4-build.13.dmg
 ```

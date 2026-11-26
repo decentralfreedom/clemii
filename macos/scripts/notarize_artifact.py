@@ -106,7 +106,7 @@ def main():
         parser.error("Submission is opt-in. Review the candidate before setting HUSH_NOTARIZE=1.")
     root = Path(__file__).resolve().parent.parent
     try:
-        notarize(args.artifact, os.environ.get("HUSH_NOTARY_KEYCHAIN_PROFILE", "ClemiiNotary"),
+        notarize(args.artifact, os.environ.get("HUSH_NOTARY_KEYCHAIN_PROFILE", "HushNotary"),
                  os.environ.get("HUSH_DEVELOPMENT_TEAM", "3A22UK7C9L"),
                  Path(os.environ.get("HUSH_NOTARY_REPORTS", str(root / "artifacts/notarization"))),
                  args.resume)

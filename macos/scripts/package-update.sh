@@ -5,8 +5,9 @@ set -euo pipefail
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_PATH="${1:-${HUSH_RELEASE_DIRECTORY:-${SCRIPT_DIRECTORY}/../artifacts/release}/export/clemii.app}"
 OUTPUT_DIRECTORY="${2:-${SCRIPT_DIRECTORY}/../artifacts/updates/alpha}"
-UPDATE_ORIGIN="${HUSH_UPDATE_ORIGIN:-https://updates.behu.sh}"
+UPDATE_ORIGIN="${HUSH_UPDATE_ORIGIN:-https://updates.clemii.com}"
 UPDATE_CHANNEL="${HUSH_UPDATE_CHANNEL:-alpha}"
+# The Keychain account holding the Sparkle EdDSA key: a stored name, not an address. Keep it.
 SPARKLE_ACCOUNT="${HUSH_SPARKLE_ACCOUNT:-behu.sh}"
 SPARKLE_BIN_DIRECTORY="${HUSH_SPARKLE_BIN_DIRECTORY:-}"
 
@@ -66,7 +67,7 @@ fi
 "${SPARKLE_BIN_DIRECTORY}/generate_appcast" \
   --account "${SPARKLE_ACCOUNT}" \
   --download-url-prefix "${UPDATE_ORIGIN%/}/${UPDATE_CHANNEL}/" \
-  --link "https://behu.sh" \
+  --link "https://clemii.com" \
   --maximum-versions 3 \
   --maximum-deltas 3 \
   --delta-compression lzfse \

@@ -7,13 +7,13 @@ struct ProofServiceConfigurationTests {
         let configuration = ProofServiceConfiguration.resolve(
             environment: [:],
             infoDictionary: [
-                "ClemiiProofServiceURL": "https://behu.sh",
-                "ClemiiProofShortURL": "https://behu.sh/s/",
+                "ClemiiProofServiceURL": "https://clemii.com",
+                "ClemiiProofShortURL": "https://clemii.com/s/",
             ]
         )
 
-        #expect(configuration.serviceURL == URL(string: "https://behu.sh"))
-        #expect(configuration.proofURLBaseURL == URL(string: "https://behu.sh/s/"))
+        #expect(configuration.serviceURL == URL(string: "https://clemii.com"))
+        #expect(configuration.proofURLBaseURL == URL(string: "https://clemii.com/s/"))
     }
 
     @Test func environmentCanSelectLocalDevelopmentServer() throws {
@@ -23,8 +23,8 @@ struct ProofServiceConfigurationTests {
                 "HUSH_PROOF_SHORT_URL": "http://127.0.0.1:3000/s/",
             ],
             infoDictionary: [
-                "ClemiiProofServiceURL": "https://behu.sh",
-                "ClemiiProofShortURL": "https://behu.sh/s/",
+                "ClemiiProofServiceURL": "https://clemii.com",
+                "ClemiiProofShortURL": "https://clemii.com/s/",
             ]
         )
 
@@ -36,8 +36,8 @@ struct ProofServiceConfigurationTests {
         let configuration = ProofServiceConfiguration.resolve(
             environment: ["HUSH_PROOF_SERVICE_URL": "http://localhost:4000"],
             infoDictionary: [
-                "ClemiiProofServiceURL": "https://behu.sh",
-                "ClemiiProofShortURL": "https://behu.sh/s/",
+                "ClemiiProofServiceURL": "https://clemii.com",
+                "ClemiiProofShortURL": "https://clemii.com/s/",
             ]
         )
 
@@ -49,12 +49,12 @@ struct ProofServiceConfigurationTests {
         let configuration = ProofServiceConfiguration.resolve(
             environment: [
                 "HUSH_PROOF_SERVICE_URL": "http://example.com",
-                "HUSH_PROOF_SHORT_URL": "https://behu.sh/s/?redirect=other",
+                "HUSH_PROOF_SHORT_URL": "https://clemii.com/s/?redirect=other",
             ],
             infoDictionary: [:]
         )
 
         #expect(configuration.serviceURL == ProofServiceConfiguration.productionServiceURL)
-        #expect(configuration.proofURLBaseURL == URL(string: "https://behu.sh/s"))
+        #expect(configuration.proofURLBaseURL == URL(string: "https://clemii.com/s"))
     }
 }

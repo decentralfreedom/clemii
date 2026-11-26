@@ -216,7 +216,7 @@ final class VerifiedMessagesSettingsPageViewController: ControlCenterPageViewCon
             : "\(exceptionCount) rules"
         destinationExceptionsButton.isEnabled = enabled && destinationMode == .smart
         signaturePreview.stringValue = presentation == .visibleURL
-            ? "-typed with clemii: behu.sh/A7k2Qx#k=private-key"
+            ? "-typed with clemii: clemii.com/A7k2Qx#k=private-key"
             : "-typed with clemii"
         statusLabel.stringValue = enabled
             ? "Message contents are encrypted on this Mac. The private key exists only in the link."

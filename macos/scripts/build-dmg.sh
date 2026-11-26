@@ -9,7 +9,8 @@ RELEASE_DIRECTORY="${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/r
 TEAM="${HUSH_DEVELOPMENT_TEAM:-3A22UK7C9L}"
 APP_PATH="${RELEASE_DIRECTORY}/export/clemii.app"
 export HUSH_DEVELOPMENT_TEAM="${TEAM}"
-export HUSH_NOTARY_KEYCHAIN_PROFILE="${HUSH_NOTARY_KEYCHAIN_PROFILE:-ClemiiNotary}"
+# The notarytool Keychain profile on the release Mac: a stored name, like the HUSH_ variables. Keep it.
+export HUSH_NOTARY_KEYCHAIN_PROFILE="${HUSH_NOTARY_KEYCHAIN_PROFILE:-HushNotary}"
 
 if [[ $# -gt 1 || ! "${HUSH_NOTARIZE:-0}" =~ ^[01]$ ]]; then
   echo "Usage: $0 [output.dmg]. Submission requires explicit HUSH_NOTARIZE=1." >&2
@@ -44,9 +45,9 @@ xcodebuild -project Clemii/Clemii.xcodeproj -scheme Clemii -configuration Releas
   -allowProvisioningUpdates \
   CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM="${TEAM}" CODE_SIGN_ENTITLEMENTS=Clemii/Clemii-Team.entitlements \
   ARCHS=arm64 ONLY_ACTIVE_ARCH=NO \
-  HUSH_PROOF_SERVICE_URL="${HUSH_PROOF_SERVICE_URL:-https://behu.sh}" \
-  HUSH_PROOF_SHORT_URL="${HUSH_PROOF_SHORT_URL:-https://behu.sh/s/}" \
-  HUSH_UPDATE_FEED_URL="${HUSH_UPDATE_FEED_URL:-https://updates.behu.sh/alpha/appcast.xml}" \
+  HUSH_PROOF_SERVICE_URL="${HUSH_PROOF_SERVICE_URL:-https://clemii.com}" \
+  HUSH_PROOF_SHORT_URL="${HUSH_PROOF_SHORT_URL:-https://clemii.com/s/}" \
+  HUSH_UPDATE_FEED_URL="${HUSH_UPDATE_FEED_URL:-https://updates.clemii.com/alpha/appcast.xml}" \
   ${RELEASE_ARGUMENTS[@]+"${RELEASE_ARGUMENTS[@]}"} archive -archivePath "${RELEASE_DIRECTORY}/Clemii.xcarchive" \
   2>&1 | tee "${RELEASE_DIRECTORY}/reports/archive.log"
 

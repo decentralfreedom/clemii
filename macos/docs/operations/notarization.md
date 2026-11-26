@@ -89,7 +89,7 @@ Create an app-specific password under Apple Account > Sign-In and Security.
 Enter it at the secure Terminal prompt, never in Git, shell history or chat:
 
 ```sh
-xcrun notarytool store-credentials ClemiiNotary --team-id 3A22UK7C9L
+xcrun notarytool store-credentials HushNotary --team-id 3A22UK7C9L
 ```
 
 The Developer ID Application certificate and its private key must also be in the
@@ -130,8 +130,8 @@ notarization time or bypass notarytool's preflight with `--force`.
 ## Check an existing submission
 
 ```sh
-xcrun notarytool history --keychain-profile ClemiiNotary
-xcrun notarytool info SUBMISSION_ID --keychain-profile ClemiiNotary
+xcrun notarytool history --keychain-profile HushNotary
+xcrun notarytool info SUBMISSION_ID --keychain-profile HushNotary
 ```
 
 `In Progress` means Apple is still processing; `Accepted` is success. Inspect

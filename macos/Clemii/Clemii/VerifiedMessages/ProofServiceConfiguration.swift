@@ -1,7 +1,7 @@
 import Foundation
 
 struct ProofServiceConfiguration: Equatable {
-    static let productionServiceURL = URL(string: "https://behu.sh")!
+    static let productionServiceURL = URL(string: "https://clemii.com")!
 
     let serviceURL: URL
     let proofURLBaseURL: URL

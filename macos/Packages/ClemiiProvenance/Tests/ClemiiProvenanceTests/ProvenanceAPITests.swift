@@ -222,7 +222,7 @@ struct ProvenanceAPITests {
     @Test("creates a rich signature with the private proof URL as its link")
     func createsRichSignatureLink() throws {
         let url = try #require(URL(
-            string: "https://behu.sh/A7k2Qx#k=private-decryption-key"
+            string: "https://clemii.com/A7k2Qx#k=private-decryption-key"
         ))
         let content = ProofSignatureFormatter.content(
             for: "Perfect, let's lock in Thursday at 10.",

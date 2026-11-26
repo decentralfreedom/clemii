@@ -7,7 +7,7 @@ struct TextContextMatcherTests {
     @Test("detects an exact recent clemii message and its visible proof")
     func detectsMessageAndProof() throws {
         let message = "Perfect, let us lock in Thursday at ten."
-        let signature = "\n\n-typed with clemii: https://behu.sh/A7k2Qx#k=private"
+        let signature = "\n\n-typed with clemii: https://clemii.com/A7k2Qx#k=private"
         let field = "Earlier text\n\(message)\(signature)\nLater text"
 
         let match = try #require(TextContextMatcher.match(
@@ -111,8 +111,8 @@ struct TextContextMatcherTests {
     @Test("expands a partial selection to the complete clemii message and proof")
     func expandsPartialSelectionToCompleteMessage() throws {
         let message = "Please review the complete launch checklist before Thursday morning."
-        let firstProof = "\n\n-typed with clemii: https://behu.sh/A7k2Qx#k=first"
-        let staleProof = "\n\n-typed with clemii: https://behu.sh/B8m3Ry#k=stale"
+        let firstProof = "\n\n-typed with clemii: https://clemii.com/A7k2Qx#k=first"
+        let staleProof = "\n\n-typed with clemii: https://clemii.com/B8m3Ry#k=stale"
         let field = "Intro\n\n\(message)\(firstProof)\(staleProof)\n\nFooter"
         let messageLocation = (field as NSString).range(of: message).location
         let selectedRange = NSRange(location: messageLocation + 7, length: 12)
@@ -198,7 +198,7 @@ struct TextContextMatcherTests {
     func detectsStrictApproximateMatch() throws {
         let original = "Please review the complete onboarding journey before Thursday and send the final notes to the product team."
         let current = "Please review the complete onboarding journey before Thursday and send the final notes to our product team."
-        let field = "Unrelated introduction\n\n\(current)\n\n-typed with clemii: https://behu.sh/A7k2Qx#k=private"
+        let field = "Unrelated introduction\n\n\(current)\n\n-typed with clemii: https://clemii.com/A7k2Qx#k=private"
 
         let match = try #require(TextContextMatcher.match(
             fieldValue: field,

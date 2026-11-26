@@ -28,7 +28,7 @@ final class ClemiiUpdateManager {
         if ProcessInfo.processInfo.arguments.contains("--update-ui-test") {
             let alert = NSAlert()
             alert.messageText = "clemii updates are ready"
-            alert.informativeText = "Release builds check updates.behu.sh and verify every update before installation."
+            alert.informativeText = "Release builds check updates.clemii.com and verify every update before installation."
             alert.addButton(withTitle: "OK")
             alert.runModal()
             return
