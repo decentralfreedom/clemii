@@ -152,7 +152,7 @@ export function createHeroScene(environmentMap: THREE.CompressedCubeTexture) {
       const seconds = now - born, cycle = greeting ? 7 : (now - greeted + 7.25) % 8;
       // The opening: the logo's globe swells into the globe of water, and its ring leans back into the orbit.
       const logo = opening.logo(arrival);
-      const swell = greeting ? logoGlobe + (1 - logoGlobe) * backOut((arrival - 0.15) / 0.4) : 1;
+      const swell = greeting ? logoGlobe + (1 - logoGlobe) * backOut((arrival - 0.04) / 0.45) : 1;
       ring.rotation.x = lean * (1 - logo);
       water.color.lerpColors(deepWater, logoWater, logo);
       water.emissive.lerpColors(deepLight, logoLight, logo);

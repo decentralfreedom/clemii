@@ -26,9 +26,9 @@ test("LANDING-ENTRY-001 plays the whole entrance from the first paint, and the 3
     // The first paint waits for every stylesheet in the head; DOMContentLoaded does not.
     await page.waitForFunction(() => [...document.querySelectorAll<HTMLLinkElement>('head link[rel="stylesheet"]')].every(link => link.sheet));
     await expect(page.locator(".site-header")).toHaveCSS("position", "relative");
-    // One CSS calendar from the first paint: the text, the flat logo and the universe.
+    // One CSS calendar from the first paint: the text and the universe. The flat logo simply stands.
     const calendar = await page.evaluate(async () => {
-      const animations = [".site-header", ".hero-introduction", ".hero-download-area", ".core-fallback", ".orbit-app", ".universe-paths", ".universe-texture", ".universe-halo"]
+      const animations = [".site-header", ".hero-introduction", ".hero-download-area", ".orbit-app", ".universe-paths", ".universe-texture", ".universe-halo"]
         .map(selector => ({ selector, animation: document.querySelector(selector)!.getAnimations()[0] }));
       await Promise.all(animations.map(({ animation }) => animation?.ready));
       return animations.map(({ selector, animation }) => {
@@ -39,7 +39,7 @@ test("LANDING-ENTRY-001 plays the whole entrance from the first paint, and the 3
     });
     expect(calendar.filter(item => item.missing).map(item => item.selector)).toEqual([]);
     expect(calendar.map(({ delay, duration }) => [delay, duration])).toEqual([
-      [120, 1050], [0, 900], [1100, 700], [100, 600], [1000, 1150], [850, 1500], [0, 2400], [300, 1400],
+      [120, 1050], [0, 900], [1100, 700], [1000, 1150], [850, 1500], [0, 2400], [300, 1400],
     ]);
     expect(Math.max(...calendar.map(item => item.start)) - Math.min(...calendar.map(item => item.start))).toBeLessThan(1);
     const fade = await page.evaluate(() => {
@@ -90,7 +90,7 @@ test("LANDING-ENTRY-002 shows the whole hero with the flat logo before a slow sc
   await page.route(/ClemiiScene.*\.js/, async route => { await gate; await route.continue(); });
   try {
     await page.goto("/", { waitUntil: "domcontentloaded" });
-    // The flat logo has glided in by the time its CSS entrance ends: no deadline, no empty hero.
+    // The flat logo stands from the first paint: no deadline, no empty hero.
     await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1", { timeout: 1500 });
     await expect(page.locator(".site-header")).toHaveCSS("opacity", "1");
     await expect(page.locator(".hero-actions .landing-download")).toBeVisible();
@@ -143,11 +143,9 @@ test("LANDING-ENTRY-009 plays the entrance when the landing's stylesheet arrives
     await new Promise(requestAnimationFrame);
     return {
       header: document.querySelector(".site-header")!.getAnimations().map(animation => (animation as CSSAnimation).animationName),
-      logo: document.querySelector(".core-fallback")!.getAnimations().map(animation => (animation as CSSAnimation).animationName),
     };
   });
   expect(arrived.header).toContain("header-arrive");
-  expect(arrived.logo).toContain("logo-arrive");
 });
 
 test("LANDING-ENTRY-008 links every page's own styles in its prerendered head", async ({ page, request }) => {
