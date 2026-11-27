@@ -13,6 +13,7 @@ import { isIPv4, isIPv6 } from "node:net";
 import type { Env, Hono } from "hono";
 import type { ServerConfig } from "./config";
 import { campaignOf } from "../shared/campaign";
+import { mobileUserAgent } from "../shared/devices";
 import { RateLimitStore, clientKey } from "./http/rate-limiter";
 
 export type Analytics = NonNullable<ServerConfig["analytics"]>;
@@ -88,6 +89,9 @@ export function registerAnalytics<E extends Env>(app: Hono<E>, input: {
     context.header("x-robots-tag", "noindex, nofollow");
     if (!input.downloadURL) return context.redirect("/releases", 302);
     const from = context.req.query("from");
+    // A phone that taps before the page's script has offered the Mac handoff gets no Mac installer:
+    // back to its page, where the button now offers the handoff. Not a download, so not counted.
+    if (mobileUserAgent.test(context.req.header("user-agent") ?? "")) return context.redirect(from && pagePath.test(from) ? from : "/", 302);
     const { analytics } = input;
     if (analytics && !declinesTracking(context.req.raw.headers) && counted.consume(clientKey(context)).allowed) {
       // Never delays the download: the event is sent after the redirect, and a failure is only logged.

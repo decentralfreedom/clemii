@@ -15,6 +15,7 @@ import { DownloadHandoff } from "./DownloadHandoff";
 import { m } from "../paraglide/messages";
 import { useBrowserValue } from "./useBrowserValue";
 import { campaignOf } from "../../shared/campaign";
+import { mobileUserAgent } from "../../shared/devices";
 
 type DownloadLinkProps = Omit<
   ComponentProps<typeof ButtonLink>,
@@ -23,7 +24,7 @@ type DownloadLinkProps = Omit<
 
 export function DownloadLink({ mobileLabel = m.download_mobile(), ...props }: DownloadLinkProps) {
   const mobile = useBrowserValue(() => typeof navigator !== "undefined" && (
-    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    mobileUserAgent.test(navigator.userAgent) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
   ), false);
   // The page the button is on, for the blog funnel (server/analytics.ts).
@@ -46,12 +47,13 @@ export function DownloadLink({ mobileLabel = m.download_mobile(), ...props }: Do
     {handoffOpen && <DownloadHandoff onClose={() => { setHandoffOpen(false); trigger.current?.focus({ preventScroll: true }); }} />}
   </>;
 
-  // A plain download link: the visitor stays on the page, where Safari asks "Allow downloads?".
+  // A plain link: the DMG comes as an attachment, so the visitor stays on the page, where Safari asks
+  // "Allow downloads?". No `download` attribute: it would also save the page /download sends a phone
+  // back to, when the phone taps before this script has offered the handoff.
   return (
     <ButtonLink
       {...props}
       href={downloadPath(page, campaign)}
-      download={release.downloadName}
     />
   );
 }
