@@ -95,11 +95,18 @@ export const notFoundPages: Record<SiteLanguage, PageMetadata> = {
 /** Prerendered documents for unknown addresses, keyed in pages.json by language. */
 export const notFoundDocumentKey = (language: SiteLanguage) => `404:${language}`;
 
+/**
+ * The brand's other names, the same for the site and its publisher as Google asks. The old domain
+ * is not one: Google could show it as the site's name, and the redirects already tie it to clemii.com.
+ */
+const alternateName = ["clemii for Mac"];
+
 /** The publisher everywhere in structured data; its logo is what Google shows for the brand. */
 export const organizationData = {
   "@type": "Organization",
   "@id": `${siteOrigin}/#organization`,
   name: "clemii",
+  alternateName,
   url: `${siteOrigin}/`,
   logo: { "@type": "ImageObject", url: `${siteOrigin}/logo.png`, width: 512, height: 512 },
   sameAs: ["https://github.com/decentralfreedom/hush"],
@@ -111,7 +118,7 @@ export const websiteData = {
   "@type": "WebSite",
   "@id": `${siteOrigin}/#website`,
   name: "clemii",
-  alternateName: ["clemii for Mac", "behu.sh"],
+  alternateName,
   url: `${siteOrigin}/`,
   publisher: { "@id": organizationData["@id"] },
 };
