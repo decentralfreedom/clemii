@@ -17,7 +17,7 @@ export async function mountClemiiScene(host: HTMLElement, signal: AbortSignal) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.15;
   canvas.setAttribute("aria-hidden", "true");
-  const { scene, camera, body, layers, animate, dispose: disposeScene } = createHeroScene(environmentMap);
+  const { scene, camera, body, layers, animate, logo, openingGroup, dispose: disposeScene } = createHeroScene(environmentMap);
   let disposed = false;
   function releaseResources() {
     if (disposed) return;
@@ -31,7 +31,10 @@ export async function mountClemiiScene(host: HTMLElement, signal: AbortSignal) {
   // Dispose immediately on navigation, including while compilation is pending.
   signal.addEventListener("abort", releaseResources, { once: true });
   try {
+    // The opening's water is compiled with the rest, so the logo does not stall as it melts.
+    openingGroup.visible = true;
     await renderer.compileAsync(scene, camera);
+    openingGroup.visible = false;
     if (signal.aborted || !host.isConnected || context.isContextLost()) {
       releaseResources();
       return null;
@@ -55,22 +58,23 @@ export async function mountClemiiScene(host: HTMLElement, signal: AbortSignal) {
   // visits) still settles in, shorter and gentler, while it crossfades over the
   // static core. The visible text never moves again.
   let late = false;
-  let dockY = 0;
   let renderedWidth = 0, renderedHeight = 0;
   function begin() {
     if (reducedMotion.matches || document.hidden) return;
     started = undefined;
     opening = true;
-    const rect = host.getBoundingClientRect();
-    dockY = Math.max(-100, Math.min(100, innerHeight * 0.46 - rect.top - rect.height / 2));
     schedule();
   }
   function finish() {
     opening = false;
-    host.style.removeProperty("translate");
     if (entry?.dataset.opening === "playing") entry.dataset.opening = "complete";
     schedule();
   }
+  let tiltX = targetX, tiltY = targetY;
+  // In development, ?arrival=0.4 holds the opening at that moment, to look at it frame by frame.
+  const held = import.meta.env.DEV ? new URLSearchParams(location.search).get("arrival") : null;
+  const scrub = held === null ? undefined : Math.min(0.999, Math.max(0, Number(held)));
+  if (scrub !== undefined) opening = true;
   body.rotation.set(targetX, targetY, -0.09);
   function schedule() {
     if (!frame && visible && !document.hidden && !disposed) frame = requestAnimationFrame(render);
@@ -86,7 +90,7 @@ export async function mountClemiiScene(host: HTMLElement, signal: AbortSignal) {
       late = !opening && !reducedMotion.matches && !document.hidden && inView;
     }
     const duration = opening ? 3000 : late ? 1400 : 0;
-    const progress = !duration || reducedMotion.matches ? 1 : Math.max(0, Math.min(1, (now - started) / duration));
+    const progress = scrub ?? (!duration || reducedMotion.matches ? 1 : Math.max(0, Math.min(1, (now - started) / duration)));
     // A late arrival moves at 40% of the full assembly's distance.
     const ease = 1 - Math.pow(1 - progress, 4) * (late ? 0.4 : 1);
     for (const [index, layer] of layers.entries()) {
@@ -94,11 +98,16 @@ export async function mountClemiiScene(host: HTMLElement, signal: AbortSignal) {
         layer.y + (1 - ease) * (index - 1) * 1.6,
         layer.z - (1 - ease) * (2 - index) * 2.4);
     }
-    body.rotation.x += (targetX - body.rotation.x) * (reducedMotion.matches ? 1 : 0.12);
-    body.rotation.y += (targetY - body.rotation.y) * (reducedMotion.matches ? 1 : 0.12);
-    body.scale.setScalar(1 - (1 - ease) * 0.35 + Math.sin(progress * Math.PI) * 0.12);
-    body.rotation.z = -0.09 + (1 - ease) * 0.28;
-    host.style.translate = opening ? `0 ${dockY * (1 - ease)}px` : "";
+    tiltX += (targetX - tiltX) * (reducedMotion.matches ? 1 : 0.12);
+    tiltY += (targetY - tiltY) * (reducedMotion.matches ? 1 : 0.12);
+    // The opening starts as the flat logo, face-on and at its size, and turns into the scene's tilt.
+    const flat = opening || late ? logo(progress) : 0;
+    body.rotation.set(tiltX * (1 - flat), tiltY * (1 - flat), -0.09 * (1 - flat));
+    // It opens where the flat logo stands, so the one takes over from the other in place; the logo
+    // glides up into it and grows the last little way to its size as it fades in.
+    const glide = opening || late ? 1 - Math.pow(1 - Math.min(1, progress / 0.17), 3) : 1;
+    body.position.y = -0.32 * (1 - glide);
+    body.scale.setScalar(0.92 + 0.08 * glide);
     // The mark is alive while it is on screen, and still for visitors who ask for less motion.
     const alive = !reducedMotion.matches;
     if (alive) animate(now / 1000, opening || late ? progress : 1);
@@ -106,7 +115,7 @@ export async function mountClemiiScene(host: HTMLElement, signal: AbortSignal) {
     if (!ready) { ready = true; host.dataset.scene = "ready"; }
     if (opening && progress === 1) finish();
     if (late && progress === 1) late = false;
-    if (alive || progress < 1 || Math.abs(targetX - body.rotation.x) + Math.abs(targetY - body.rotation.y) > 0.001) schedule();
+    if (alive || progress < 1 || Math.abs(targetX - tiltX) + Math.abs(targetY - tiltY) > 0.001) schedule();
   }
   function resize() {
     const { width, height } = host.getBoundingClientRect();

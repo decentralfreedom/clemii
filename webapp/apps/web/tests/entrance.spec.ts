@@ -65,14 +65,30 @@ test("LANDING-ENTRY-001 plays the text entrance from the first paint and coordin
     await expect(page.locator(".landing-loader")).toHaveCount(0);
     await expect(page.locator(".clemii-core")).toHaveCSS("opacity", "0");
     const layout = await page.locator(".hero-introduction").boundingBox();
+    // The calendar exists only while the opening plays, which on a software renderer can be over
+    // before a second round trip arrives. So the page reads it itself, in the moment it starts.
+    await page.evaluate(() => {
+      const entry = document.querySelector<HTMLElement>(".clemii-landing")!;
+      const observer = new MutationObserver(() => {
+        if (entry.dataset.opening !== "playing") return;
+        observer.disconnect();
+        const animations = [".clemii-core", ".orbit-app", ".universe-paths", ".universe-texture", ".universe-halo"].map(selector =>
+          ({ selector, animation: document.querySelector(selector)!.getAnimations()[0] }));
+        // Their start times are set as the next frame begins, before it can end the opening.
+        void Promise.all(animations.map(({ animation }) => animation?.ready)).then(() => {
+          (window as unknown as { calendar: unknown }).calendar = animations.map(({ selector, animation }) => {
+            if (!animation) return { selector, missing: true };
+            const timing = animation.effect!.getTiming();
+            return { selector, delay: timing.delay, duration: Number(timing.duration), start: Number(animation.startTime) };
+          });
+        });
+      });
+      observer.observe(entry, { attributes: true, attributeFilter: ["data-opening"] });
+    });
     release();
-    await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "playing", { timeout: 15000 });
-    const calendar = await page.evaluate(() => [".clemii-core", ".orbit-app", ".universe-paths", ".universe-texture", ".universe-halo"].map(selector => {
-      const animation = document.querySelector(selector)!.getAnimations()[0];
-      if (!animation) throw new Error(`${selector} has no entrance animation`);
-      const timing = animation.effect!.getTiming();
-      return { selector, delay: timing.delay, duration: Number(timing.duration), start: Number(animation.startTime) };
-    }));
+    const calendar = await (await page.waitForFunction(() => (window as unknown as { calendar?: unknown }).calendar, null, { timeout: 15000 }))
+      .jsonValue() as { selector: string; delay: number; duration: number; start: number; missing?: boolean }[];
+    expect(calendar.filter(item => item.missing).map(item => item.selector)).toEqual([]);
     expect(calendar.map(({ delay, duration }) => [delay, duration])).toEqual([
       [100, 650], [1000, 1150], [850, 1500], [0, 2400], [300, 1400],
     ]);

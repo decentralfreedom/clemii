@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 import * as THREE from "three";
-import { big, small, smooth } from "./brothers";
+import { big, globe, mix, small, smooth } from "./brothers";
 import { figureWorkshop } from "./figure";
+import { createLiquidOpening, logoPaint, logoRadius } from "./liquid";
+
+const mixColour = (from: string, to: string, along: number) => mix([from, to], along);
 
 /**
  * The hero's model: a globe of water and two small superheroes who fly round
@@ -10,8 +13,8 @@ import { figureWorkshop } from "./figure";
  * assistant's headset, and his big brother. They are jointed figures on an
  * orbit that leans back, so they pass behind the globe and before it; they
  * squabble and they make up, as brothers do. The logo is the same pair drawn
- * as one plain ring. The entrance is the scene's own: the brothers come out of the globe and greet. The caller owns the
- * environment texture.
+ * as one plain ring. The entrance is the scene's own: it opens as that logo in 3D, which turns to
+ * water and becomes the brothers (liquid.ts), and they greet. The caller owns the environment texture.
  */
 export function createHeroScene(environmentMap: THREE.CompressedCubeTexture) {
   const scene = new THREE.Scene();
@@ -54,6 +57,12 @@ export function createHeroScene(environmentMap: THREE.CompressedCubeTexture) {
   const gap = (360 - heroes.reduce((sum, { lead, cape }) => sum + lead + cape, 0)) / 2;
   const starts = [60, 60 + heroes[0]!.cape + gap + heroes[1]!.lead];
   addLayer(ring, 0, 0, 0);
+  const opening = createLiquidOpening(orbit, heroes.map(({ cape }) => cape));
+  ring.add(opening.group);
+  /** The globe as the logo draws it, against the globe of water it becomes. */
+  const logoGlobe = (logoRadius * globe) / 0.85;
+  const lean = ring.rotation.x;
+  const logoWater = new THREE.Color(0x4a2fe8), logoLight = new THREE.Color(0x2a1aa8), deepWater = new THREE.Color(0x051a44), deepLight = new THREE.Color(0x06205c);
 
   // The globe: a sphere of water, in the manner of liquid glass: dark and clear, lit from within, with
   // a bright edge.
@@ -67,6 +76,20 @@ export function createHeroScene(environmentMap: THREE.CompressedCubeTexture) {
   materials.push(edgeLight);
   const edge = new THREE.Mesh(keep(new THREE.SphereGeometry(0.875, 64, 48)), edgeLight);
   orb.add(edge, glow, drop);
+  // The opening's globe is the logo's: its own gradient, light violet at the top left to deep blue at
+  // the bottom right, glossy. It clears into the globe of water as the logo turns.
+  const logoBallShape = keep(new THREE.SphereGeometry(0.86, 64, 48));
+  const paint: number[] = [], tone = new THREE.Color(), corner = new THREE.Vector2(-0.7, 0.8).normalize();
+  const spot = logoBallShape.getAttribute("position");
+  for (let index = 0; index < spot.count; index++) {
+    const along = (1 - (spot.getX(index) * corner.x + spot.getY(index) * corner.y) / 0.86) / 2;
+    tone.set(along < 0.45 ? mixColour("#b874ff", "#6a4afd", along / 0.45) : mixColour("#6a4afd", "#1f3bdc", (along - 0.45) / 0.55));
+    paint.push(tone.r, tone.g, tone.b);
+  }
+  logoBallShape.setAttribute("color", new THREE.Float32BufferAttribute(paint, 3));
+  const logoBallSkin = logoPaint(material({ vertexColors: true, roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 0.6, toneMapped: false, transparent: true }));
+  const logoBall = new THREE.Mesh(logoBallShape, logoBallSkin);
+  opening.group.add(logoBall);
   addLayer(orb, 0, 0, 0);
 
   // What the globe holds, in front: four strokes of light that are, in turn, the three things clemii
@@ -128,8 +151,17 @@ export function createHeroScene(environmentMap: THREE.CompressedCubeTexture) {
       // Two clocks: one that never stops, for flight; and the story's, which the greeting holds at
       // the moment they have made up and lets run on from there.
       const seconds = now - born, cycle = greeting ? 7 : (now - greeted + 7.25) % 8;
-      const swell = backOut(arrival * 1.5);
-      const emerged = heroes.map((_, index) => THREE.MathUtils.clamp((arrival - (index ? 0.06 : 0.3)) / 0.5, 0, 1));
+      // The opening: the logo's globe swells into the globe of water, and its ring leans back into the orbit.
+      const logo = opening.logo(arrival);
+      const swell = greeting ? logoGlobe + (1 - logoGlobe) * backOut((arrival - 0.15) / 0.4) : 1;
+      ring.rotation.x = lean * (1 - logo);
+      water.color.lerpColors(deepWater, logoWater, logo);
+      water.emissive.lerpColors(deepLight, logoLight, logo);
+      edgeLight.opacity = 0.6 * (1 - logo);
+      logoBallSkin.opacity = smooth(logo * 1.4);
+      logoBallSkin.depthWrite = logo > 0.98;
+      logoBall.visible = logo > 0.005;
+      logoBall.scale.setScalar(swell);
       const listening = cycle < 3 ? 1 : cycle < 3.5 ? 1 - (cycle - 3) / 0.5 : cycle > 7.5 ? (cycle - 7.5) / 0.5 : 0;
       // The globe: your voice while they fly, text as they chase, a tick as they land.
       const text = smooth((cycle - 3) / 0.5) - smooth((cycle - 5.55) / 0.3), tick = smooth((cycle - 5.55) / 0.3) - smooth((cycle - 7.5) / 0.4), wave = 1 - text - tick;
@@ -155,16 +187,19 @@ export function createHeroScene(environmentMap: THREE.CompressedCubeTexture) {
       const darts = [bop * (smooth((cycle - 3) / 0.35) - settle - 0.3 * bell(cycle, 2.88, 0.2)), 2 * bop * (smooth((cycle - 3.42) / 0.4) - settle) - 0.3 * bop * bell(cycle, 3.34, 0.14)];
       const chase = Math.sin(turn * Math.PI);
       // In the greeting they look at you with open eyes first, and are glad a moment later.
-      const cross = smooth((cycle - 3) / 0.3) - smooth((cycle - 5.4) / 0.4), fond = (smooth((cycle - 5.7) / 0.3) - smooth((cycle - 7.3) / 0.4)) * (greeting ? smooth((arrival - 0.42) / 0.12) : 1);
+      const cross = smooth((cycle - 3) / 0.3) - smooth((cycle - 5.4) / 0.4), fond = (smooth((cycle - 5.7) / 0.3) - smooth((cycle - 7.3) / 0.4)) * (greeting ? smooth((arrival - 0.74) / 0.1) : 1);
       const angles = heroes.map((_, index) => starts[index]! * degrees - (spin + darts[index]!));
+      // The ribbons turn to water and gather where the brothers fly; each comes out of his drop.
+      const emerged = opening.update(now, arrival, angles);
       heroes.forEach(({ pivot, figure, trunk, legs, arms, upright, blow, feel }, index) => {
         const beat = seconds * 7 + index * 1.9;
         pivot.rotation.z = angles[index]!;
         // He bobs, rolls a little as he goes, and stretches into the chase.
-        // He comes out of the globe: small and inside it, then out to his orbit and a little past it.
-        const out = emerged[index]!, grown = 0.3 + 0.7 * smooth(out);
+        // He forms inside his drop, already a third of his size, and grows out of it as the water
+        // runs off him, a little past his size and back.
+        const out = emerged[index]!, grown = 0.35 + 0.65 * backOut(out);
         pivot.visible = out > 0;
-        figure.position.x = orbit * (0.15 + 0.85 * backOut(out)) + 0.035 * Math.sin(seconds * 2.1 + index * 2);
+        figure.position.x = orbit + 0.035 * Math.sin(seconds * 2.1 + index * 2);
         figure.rotation.x = 0.14 * Math.sin(seconds * 1.3 + index * 2) + 0.35 * chase;
         figure.scale.set(grown * (1 + 0.07 * chase), grown * (1 - 0.04 * chase), grown);
         trunk.rotation.z = 0.05 * Math.sin(beat * 0.5);
@@ -208,15 +243,20 @@ export function createHeroScene(environmentMap: THREE.CompressedCubeTexture) {
       const flare = bell(cycle, 5.7, 0.5);
       water.emissiveIntensity = 0.35 + 0.1 * listening * (1 + Math.sin(seconds * 5.2)) + flare * 0.9;
       orb.scale.set(swell * (1 + 0.018 * Math.sin(seconds * 1.7)), swell * (1 + 0.018 * Math.sin(seconds * 1.7 + 2.1)), swell);
-      front.scale.setScalar(smooth((arrival - 0.5) / 0.35));
+      front.scale.setScalar(smooth((arrival - 0.6) / 0.3));
       // The heart rises with the greeting, and again whenever they make up.
-      const rise = greeting ? THREE.MathUtils.clamp((arrival - 0.12) / 0.8, 0, 1) : THREE.MathUtils.clamp((cycle - 5.7) / 1.7, 0, 1);
+      const rise = greeting ? THREE.MathUtils.clamp((arrival - 0.62) / 0.38, 0, 1) : THREE.MathUtils.clamp((cycle - 5.7) / 1.7, 0, 1);
       heart.visible = rise > 0 && rise < 1 && (greeting || now - greeted > 1);
       heart.scale.setScalar(0.24 * (smooth(rise / 0.2) + 0.25 * bell(rise, 0.2, 0.12)));
       heart.position.y = 0.35 + 0.75 * smooth(rise);
       heartSkin.opacity = 1 - smooth((rise - 0.7) / 0.3);
     },
+    /** How much the opening is still the flat logo, for the caller to hold the scene face-on. */
+    logo: (arrival: number) => opening.logo(arrival),
+    /** The opening's logo and water, shown only while the caller prepares their shaders. */
+    openingGroup: opening.group,
     dispose() {
+      opening.finish();
       for (const geometry of geometries) geometry.dispose();
       for (const surface of materials) surface.dispose();
       for (const texture of textures) texture.dispose();
