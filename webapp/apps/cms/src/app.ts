@@ -49,7 +49,8 @@ export function createApp(cms: Cms, options: AppOptions = {}) {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "blob:"],
+      // Published articles' covers come from the website (the posts list).
+      imgSrc: ["'self'", "data:", "blob:", ...(options.siteUrl ? [new URL(options.siteUrl).origin] : [])],
       connectSrc: ["'self'"],
       fontSrc: ["'self'"],
       frameSrc: ["'self'"],
@@ -92,7 +93,7 @@ export function createApp(cms: Cms, options: AppOptions = {}) {
   app.route("/", trafficRoutes(cms.db));
   app.route("/", linksRoutes(cms.db, options.siteUrl));
   app.route("/", goalsRoutes(cms.db));
-  app.route("/", postRoutes(cms));
+  app.route("/", postRoutes(cms, options.siteUrl));
   app.route("/", siteRoutes(cms));
   app.openAPIRegistry.registerComponent("securitySchemes", "bearer", { type: "http", scheme: "bearer" });
   app.doc31("/openapi.json", { openapi: "3.1.0", info: { title: "clemii CMS", version: "1.0.0" } });

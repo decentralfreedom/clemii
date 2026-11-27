@@ -8,6 +8,7 @@ import { sql } from "drizzle-orm";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { coverPlan } from "@clemii/article";
 import { createApp } from "../src/app";
 import { createToken, systemActor } from "../src/auth/tokens";
 import type { Database } from "../src/db/client";
@@ -25,7 +26,7 @@ describe.skipIf(!serverUrl)("CMS API", () => {
   beforeAll(async () => {
     database = await createTestDatabase();
     db = database.db;
-    app = createApp({ db, media: new LocalObjectStore(await mkdtemp(join(tmpdir(), "hush-cms-media-"))) });
+    app = createApp({ db, media: new LocalObjectStore(await mkdtemp(join(tmpdir(), "hush-cms-media-"))) }, { siteUrl: "https://clemii.com" });
     tokens.reader = await createToken(db, { name: "reader", scopes: ["posts:read"] }, systemActor("test"));
     tokens.writer = await createToken(db, { name: "agent", scopes: ["posts:read", "posts:write"] }, systemActor("test"));
     tokens.publisher = await createToken(db, { name: "agent-publisher", scopes: ["posts:read", "posts:write", "posts:publish"] }, systemActor("test"));
@@ -87,8 +88,11 @@ describe.skipIf(!serverUrl)("CMS API", () => {
 
   test("CMS-API-004 publishes a valid post with its rendered HTML and a revision", async () => {
     const post = await draft({ slug: "goes-live", keyword: "goes live" });
+    expect(post.cover).toBeNull();
     const published = await read(await call("POST", `/v1/posts/${post.id}/publish`, tokens.owner));
     expect(published.status).toBe("published");
+    // The thumbnail the website's blog shows for it, which the website renders on publishing.
+    expect(published.cover).toBe(`https://clemii.com${coverPlan("goes-live", "en", published.rendition.heading).cardPath}`);
     expect(Date.parse(published.publishedAt)).toBeLessThanOrEqual(Date.now());
     expect(published.rendition.html).toContain('<h2 id="how-does-it-work">');
     expect(published.rendition.html).not.toContain("<h1");
@@ -106,6 +110,7 @@ describe.skipIf(!serverUrl)("CMS API", () => {
     const at = new Date(Date.now() + 3_600_000).toISOString();
     const scheduled = await read(await call("POST", `/v1/posts/${post.id}/schedule`, tokens.owner, { publishedAt: at }));
     expect(scheduled.status).toBe("scheduled");
+    expect(scheduled.cover).toBeNull();
     expect(scheduled.rendition.html).toContain("<h2");
     expect((await publishDuePosts(db)).map((due) => due.id)).not.toContain(post.id);
     await db.execute(sql`update posts set published_at = now() - interval '1 second' where id = ${post.id}`);

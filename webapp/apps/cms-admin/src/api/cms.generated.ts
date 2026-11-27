@@ -1114,6 +1114,11 @@ export interface Post {
      * @nullable
      */
   rendition: PostRendition;
+  /**
+     * The published article's thumbnail on the website: its cover card (800px WebP), as the blog shows it. Null until the post is published, or when the CMS does not know the website's address (CMS_SITE_URL).
+     * @nullable
+     */
+  cover: string | null;
   /** Names the post's fields and images as they are now; the owner approves a post by it. */
   contentHash: string;
   /**

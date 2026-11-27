@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright (c) 2026 Clemens Kressmann
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
+import { coverPlan } from "@clemii/article";
+import type { BlogLanguage } from "@clemii/article/taxonomy";
 import { requireOwner, requireScope, type AuthVariables } from "../auth/tokens";
 import { errorSchema, validationHook } from "./errors";
 import { bodyLimit } from "hono/body-limit";
@@ -26,6 +28,7 @@ const postSchema = postFields.extend({
     readingMinutes: z.number().int(),
     renderedAt: z.iso.datetime(),
   }).nullable().describe("What the post renders to; present while it is scheduled or published."),
+  cover: z.string().nullable().describe("The published article's thumbnail on the website: its cover card (800px WebP), as the blog shows it. Null until the post is published, or when the CMS does not know the website's address (CMS_SITE_URL)."),
   contentHash: z.string().describe("Names the post's fields and images as they are now; the owner approves a post by it."),
   approval: z.object({
     approvedBy: z.string(),
@@ -39,12 +42,16 @@ const revisionSchema = z.object({
   autosave: z.boolean().describe("Written by the editor's autosave; holds the last state of that run."), createdAt: z.iso.datetime(),
 }).openapi("Revision");
 
-const serialize = (post: Post) => postSchema.parse({
+const serializer = (siteUrl?: string) => (post: Post) => postSchema.parse({
   ...post,
   publishedAt: post.publishedAt?.toISOString() ?? null,
   createdAt: post.createdAt.toISOString(),
   updatedAt: post.updatedAt.toISOString(),
   rendition: post.rendition && { ...post.rendition, renderedAt: post.rendition.renderedAt.toISOString() },
+  // The website renders covers for the articles it shows, so a draft or scheduled post has none yet.
+  cover: siteUrl && post.status === "published" && post.rendition
+    ? new URL(coverPlan(post.slug, post.lang as BlogLanguage, post.rendition.heading).cardPath, siteUrl).href
+    : null,
   approval: post.approval && { ...post.approval, approvedAt: post.approval.approvedAt.toISOString() },
 });
 
@@ -59,7 +66,8 @@ const errors = {
 const idParam = z.object({ id: z.uuid() });
 const security = [{ bearer: [] }];
 
-export function postRoutes(cms: Cms) {
+export function postRoutes(cms: Cms, siteUrl?: string) {
+  const serialize = serializer(siteUrl);
   const { db } = cms;
   const app = new OpenAPIHono<{ Variables: AuthVariables }>({ defaultHook: validationHook });
 

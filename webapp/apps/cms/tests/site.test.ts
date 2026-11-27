@@ -96,7 +96,6 @@ describe.skipIf(!serverUrl)("CMS site", () => {
     expect(Buffer.from(bytes).equals(await png(1400))).toBe(true);
     const rendered = await renderArticle(article!, {
       knownPaths: new Set(["/", "/blog", "/blog/exported", "/blog/authors/clemens-kressmann"]),
-      coverSeed: [],
       loadImage: async () => ({ bytes, source: "original" }),
     });
     expect(rendered.problems).toEqual([]);
