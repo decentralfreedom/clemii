@@ -40,7 +40,6 @@ export function createHeroScene(environmentMap: THREE.CompressedCubeTexture) {
     materials.push(result);
     return result;
   }
-  const layers: { object: THREE.Object3D; x: number; y: number; z: number }[] = [];
   function addLayer(object: THREE.Object3D, x: number, y: number, z: number) {
     object.position.set(x, y, z);
     body.add(object);
@@ -133,7 +132,7 @@ export function createHeroScene(environmentMap: THREE.CompressedCubeTexture) {
   let born: number | undefined, greeted: number | undefined;
   const backOut = (value: number) => { const t = Math.min(1, Math.max(0, value)) - 1; return 1 + 2.7 * t ** 3 + 1.7 * t ** 2; };
   const model = {
-    scene, camera, body, layers,
+    scene, camera, body,
     /**
      * The brothers, in a loop. They fly round the globe while it listens, each behind the other's
      * cape. Then they squabble: the big one darts ahead and bops his little brother's cape, clemii

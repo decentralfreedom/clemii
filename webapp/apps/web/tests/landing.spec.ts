@@ -1,4 +1,8 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+/** The hero's CSS entrance has run to its end. */
+const entranceDone = (page: Page, timeout = 15000) => page.waitForFunction(() =>
+  document.querySelector(".landing-hero")!.getAnimations({ subtree: true }).every(animation => animation.playState === "finished"), null, { timeout });
 
 test("renders the visual landing page with a clear download", async ({ page, isMobile }, testInfo) => {
   const errors: string[] = [];
@@ -22,7 +26,7 @@ test("renders the visual landing page with a clear download", async ({ page, isM
   await expect(page.getByText("All on your Mac", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Legal notice" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "A few things to know." })).toBeVisible();
-  await expect(page.locator(".clemii-landing")).not.toHaveAttribute("data-opening", /pending|playing/, { timeout: 15000 });
+  await entranceDone(page);
   await expect(download).toHaveCSS("background-color", "rgb(36, 39, 43)");
   await expect(download).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(page.locator(".hero-download-area")).toHaveCSS("filter", "none");
@@ -89,7 +93,7 @@ test("respects reduced motion while preserving the complete page", async ({ page
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.locator(".orbit-app").first()).toHaveCSS("animation-name", "none");
-  await expect(page.locator(".clemii-landing")).not.toHaveAttribute("data-opening", /pending|playing/);
+  await entranceDone(page);
   await expect(page.locator(".landing-download").first()).toBeVisible();
   await page.locator(".thought-art").evaluate(el => {
     window.scrollTo({ top: scrollY + el.getBoundingClientRect().top - innerHeight * .62, behavior: "instant" });
@@ -106,11 +110,11 @@ test("respects reduced motion while preserving the complete page", async ({ page
   await expect(fragment).toHaveCSS("translate", originalFragmentPosition);
 });
 
-test("allows Escape to end the entrance without blocking the page", async ({ page }) => {
+test("keeps the page usable when Escape is pressed during the entrance", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await page.keyboard.press("Escape");
-  await expect(page.locator(".clemii-landing")).not.toHaveAttribute("data-opening", /pending|playing/);
+  await entranceDone(page);
   await expect(page.locator(".orbit-app").first()).toHaveCSS("opacity", "1");
 });
 
@@ -146,7 +150,7 @@ test("keeps download colors and position on hover and press", async ({ page }, t
   // These buttons look the same with less motion, where the hero stands still.
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  await expect(page.locator(".clemii-landing")).not.toHaveAttribute("data-opening", /pending|playing/, { timeout: 15000 });
+  await entranceDone(page);
   for (const button of await page.locator(".site-header-download, .landing-download").all()) {
     await button.scrollIntoViewIfNeeded();
     await page.mouse.move(0, 0);

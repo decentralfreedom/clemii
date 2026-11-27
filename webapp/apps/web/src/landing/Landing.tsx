@@ -1,10 +1,8 @@
 import { DownloadLink } from "../components/DownloadExperience";
-import { useRef } from "react";
 import { siApple } from "simple-icons";
 import { Header } from "../layout/Header";
 import { Footer } from "../layout/Footer";
 import { LocalUniverse } from "./LocalUniverse";
-import { useLandingEntrance } from "./useLandingEntrance";
 import { VisionStory } from "./VisionStory";
 import { DocumentMetadata } from "../components/DocumentMetadata";
 import { sitePages } from "../../shared/site";
@@ -27,9 +25,7 @@ function MacDownload() {
 
 /** The landing page; `/` in English and `/de` in German share one design. */
 export function Landing({ lang = "en" }: { lang?: SiteLanguage }) {
-  const root = useRef<HTMLDivElement>(null);
-  useLandingEntrance(root);
-  return <div className="clemii-landing" id="top" data-opening="pending" ref={root}>
+  return <div className="clemii-landing" id="top">
     <DocumentMetadata {...sitePages[lang === "de" ? "/de" : "/"]!} />
     <a className="landing-skip" href="#main">{m.skip_to_content()}</a>
     <Header progress />

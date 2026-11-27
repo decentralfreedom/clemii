@@ -14,30 +14,26 @@ const pageHead = (metadata: typeof privatePageMetadata) => head.replace(
   /<!--clemii-head-start-->[\s\S]*?<!--clemii-head-end-->/,
   () => renderPageHead(metadata),
 );
-// The landing scene is imported only after the application starts, and its
-// lighting texture only after the 3D engine has loaded. On a first visit that
-// waterfall missed the entrance's fallback deadline, so landing pages announce
-// the scene's chunks and texture in the head and the browser fetches them with
-// the application.
+// The landing scene is imported only after the application starts. So that the
+// 3D logo takes over from the flat one soon on a first visit, landing pages
+// announce the scene's chunks in the head and the browser fetches them with the
+// application.
 type ManifestChunk = { file: string; isEntry?: boolean; imports?: string[]; assets?: string[]; css?: string[] };
 const manifest: Record<string, ManifestChunk> = await Bun.file("dist/.vite/manifest.json").json();
 const sceneKey = Object.keys(manifest).find((key) => key.endsWith("src/landing/ClemiiScene.ts"));
 if (!sceneKey) throw new Error("Missing the landing scene in the build manifest");
-const sceneFiles = new Set<string>(), sceneAssets = new Set<string>();
+const sceneFiles = new Set<string>();
 (function collect(key: string) {
   const chunk = manifest[key]!;
   // The application entry is already loaded by the page itself.
   if (chunk.isEntry || sceneFiles.has(chunk.file)) return;
   sceneFiles.add(chunk.file);
-  for (const asset of chunk.assets ?? []) if (asset.includes(".ktx2")) sceneAssets.add(asset);
   for (const imported of chunk.imports ?? []) collect(imported);
 })(sceneKey);
-if (!sceneAssets.size) throw new Error("Missing the landing scene's lighting texture in the build manifest");
-const scenePreloads = [
-  ...[...sceneFiles].map((file) => `<link rel="modulepreload" href="/${file}">`),
-  // Matches the scene's same-origin fetch(), so the browser reuses this download.
-  ...[...sceneAssets].map((file) => `<link rel="preload" href="/${file}" as="fetch" crossorigin="anonymous">`),
-].join("");
+// The lighting texture is not preloaded: Safari never hands a <link rel="preload" as="fetch">
+// to the later fetch() and downloads it twice. The page starts that one download itself as it
+// hydrates, alongside these modules (src/landing/LocalUniverse.tsx).
+const scenePreloads = [...sceneFiles].map((file) => `<link rel="modulepreload" href="/${file}">`).join("");
 // Every page loads its own code on demand (src/app/router.tsx). Its chunks are
 // announced in the head, so the browser fetches them with the application
 // instead of after it, and hydration waits for no second round trip.

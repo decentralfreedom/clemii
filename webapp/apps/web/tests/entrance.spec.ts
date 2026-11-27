@@ -16,28 +16,32 @@ test("keeps navigation and static artwork usable when studio lighting fails", as
   expect(errors).toEqual([]);
 });
 
-test("LANDING-ENTRY-001 plays the text entrance from the first paint and coordinates the universe's calendar with the prepared scene", async ({ page }, testInfo) => {
+test("LANDING-ENTRY-001 plays the whole entrance from the first paint, and the 3D logo takes over from the flat one", async ({ page }, testInfo) => {
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
+  // Hold the scene: the entrance must not wait for it.
   await page.route(/ClemiiScene.*\.js/, async route => { await gate; await route.continue(); });
-  // Hold only the fallback clock to exercise a prompt scene on slow CI GPUs.
-  // The real three-second choreography runs normally once the scene starts it.
-  await page.route(/\/assets\/.*\.css$/, async route => {
-    const response = await route.fetch();
-    await route.fulfill({ response, body: await response.text() +
-      '\n.clemii-landing[data-opening="pending"] :is(.clemii-core,.orbit-app,.universe-paths,.universe-halo,.universe-texture) { animation-play-state: paused; }' });
-  });
   try {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     // The first paint waits for every stylesheet in the head; DOMContentLoaded does not.
     await page.waitForFunction(() => [...document.querySelectorAll<HTMLLinkElement>('head link[rel="stylesheet"]')].every(link => link.sheet));
     await expect(page.locator(".site-header")).toHaveCSS("position", "relative");
-    // The text runs its own entrance from the first paint while the universe still waits.
-    const text = await page.evaluate(() => [".site-header", ".hero-introduction", ".hero-download-area"].map(selector => {
-      const timing = document.querySelector(selector)!.getAnimations()[0]?.effect?.getTiming();
-      return [timing?.delay, Number(timing?.duration)];
-    }));
-    expect(text).toEqual([[120, 1050], [0, 900], [1100, 700]]);
+    // One CSS calendar from the first paint: the text, the flat logo and the universe.
+    const calendar = await page.evaluate(async () => {
+      const animations = [".site-header", ".hero-introduction", ".hero-download-area", ".core-fallback", ".orbit-app", ".universe-paths", ".universe-texture", ".universe-halo"]
+        .map(selector => ({ selector, animation: document.querySelector(selector)!.getAnimations()[0] }));
+      await Promise.all(animations.map(({ animation }) => animation?.ready));
+      return animations.map(({ selector, animation }) => {
+        if (!animation) return { selector, missing: true, delay: 0, duration: 0, start: 0 };
+        const timing = animation.effect!.getTiming();
+        return { selector, missing: false, delay: Number(timing.delay), duration: Number(timing.duration), start: Number(animation.startTime) };
+      });
+    });
+    expect(calendar.filter(item => item.missing).map(item => item.selector)).toEqual([]);
+    expect(calendar.map(({ delay, duration }) => [delay, duration])).toEqual([
+      [120, 1050], [0, 900], [1100, 700], [100, 600], [1000, 1150], [850, 1500], [0, 2400], [300, 1400],
+    ]);
+    expect(Math.max(...calendar.map(item => item.start)) - Math.min(...calendar.map(item => item.start))).toBeLessThan(1);
     const fade = await page.evaluate(() => {
       const header = document.querySelector<HTMLElement>(".site-header")!;
       const animation = header.getAnimations().find(item => (item as CSSAnimation).animationName === "header-arrive")!;
@@ -58,70 +62,42 @@ test("LANDING-ENTRY-001 plays the text entrance from the first paint and coordin
     expect(fade.y).toBeLessThan(0);
     expect(fade.sameLayout).toBe(true);
     expect(fade.filter).toBe("none");
-    for (const selector of [".site-header", ".hero-introduction", ".hero-download-area"]) {
+    // Without the scene the hero is whole: the flat logo stands in its place.
+    for (const selector of [".site-header", ".hero-introduction", ".hero-download-area", ".core-fallback"]) {
       await expect(page.locator(selector)).toHaveCSS("opacity", "1", { timeout: 4000 });
     }
     await expect(page.locator(".hero-actions .landing-download")).toBeVisible();
     await expect(page.locator(".landing-loader")).toHaveCount(0);
-    await expect(page.locator(".clemii-core")).toHaveCSS("opacity", "0");
+    await expect(page.locator(".clemii-core canvas")).toHaveCount(0);
     const layout = await page.locator(".hero-introduction").boundingBox();
-    // The calendar exists only while the opening plays, which on a software renderer can be over
-    // before a second round trip arrives. So the page reads it itself, in the moment it starts.
-    await page.evaluate(() => {
-      const entry = document.querySelector<HTMLElement>(".clemii-landing")!;
-      const observer = new MutationObserver(() => {
-        if (entry.dataset.opening !== "playing") return;
-        observer.disconnect();
-        const animations = [".clemii-core", ".orbit-app", ".universe-paths", ".universe-texture", ".universe-halo"].map(selector =>
-          ({ selector, animation: document.querySelector(selector)!.getAnimations()[0] }));
-        // Their start times are set as the next frame begins, before it can end the opening.
-        void Promise.all(animations.map(({ animation }) => animation?.ready)).then(() => {
-          (window as unknown as { calendar: unknown }).calendar = animations.map(({ selector, animation }) => {
-            if (!animation) return { selector, missing: true };
-            const timing = animation.effect!.getTiming();
-            return { selector, delay: timing.delay, duration: Number(timing.duration), start: Number(animation.startTime) };
-          });
-        });
-      });
-      observer.observe(entry, { attributes: true, attributeFilter: ["data-opening"] });
-    });
     release();
-    const calendar = await (await page.waitForFunction(() => (window as unknown as { calendar?: unknown }).calendar, null, { timeout: 15000 }))
-      .jsonValue() as { selector: string; delay: number; duration: number; start: number; missing?: boolean }[];
-    expect(calendar.filter(item => item.missing).map(item => item.selector)).toEqual([]);
-    expect(calendar.map(({ delay, duration }) => [delay, duration])).toEqual([
-      [100, 650], [1000, 1150], [850, 1500], [0, 2400], [300, 1400],
-    ]);
-    expect(Math.max(...calendar.map(item => item.start)) - Math.min(...calendar.map(item => item.start))).toBeLessThan(1);
-    // The scene starting neither replays nor moves the text.
+    // The 3D logo takes over in place, plays the opening, and neither replays nor moves the text.
+    await expect(page.locator(".clemii-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
+    await expect(page.locator(".clemii-core canvas")).toHaveCSS("opacity", "1");
+    await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "0");
     expect(await page.evaluate(() => [".site-header", ".hero-introduction", ".hero-download-area"].map(selector =>
       document.querySelector(selector)!.getAnimations().every(item => item.playState === "finished")))).toEqual([true, true, true]);
     expect(await page.locator(".hero-introduction").boundingBox()).toEqual(layout);
+    await page.waitForFunction(() => performance.getEntriesByName("clemii:opened").length > 0, null, { timeout: 15000 });
   } finally { release(); }
-  await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "complete");
-  await expect(page.locator(".site-header")).toHaveCSS("opacity", "1");
-  await expect(page.locator(".hero-introduction")).toHaveCSS("opacity", "1");
   await expect(page.locator(".hero-introduction")).toHaveCSS("filter", "none");
-  await expect(page.locator(".clemii-core canvas")).toHaveCSS("opacity", "1", { timeout: 15000 });
   await page.screenshot({ path: testInfo.outputPath("entrance-complete.png") });
 });
 
-test("LANDING-ENTRY-002 shows content before a slow scene without replaying the entrance", async ({ page }) => {
+test("LANDING-ENTRY-002 shows the whole hero with the flat logo before a slow scene", async ({ page }) => {
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
   await page.route(/ClemiiScene.*\.js/, async route => { await gate; await route.continue(); });
   try {
     await page.goto("/", { waitUntil: "domcontentloaded" });
-    await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "complete", { timeout: 5000 });
+    // The flat logo has glided in by the time its CSS entrance ends: no deadline, no empty hero.
+    await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1", { timeout: 1500 });
     await expect(page.locator(".site-header")).toHaveCSS("opacity", "1");
-    await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1");
     await expect(page.locator(".hero-actions .landing-download")).toBeVisible();
   } finally { release(); }
-  // The usable-page deadline above is independent of scene readiness. Compiling the
-  // deferred WebGL scene on a software renderer has a separate readiness budget.
+  // Compiling the deferred WebGL scene on a software renderer has its own readiness budget.
   await expect(page.locator(".clemii-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
-  await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "complete");
-  await expect(page.locator(".site-header")).toHaveCSS("animation-name", "none");
+  await expect(page.locator(".site-header")).toHaveCSS("opacity", "1");
 });
 
 test("LANDING-ENTRY-003 reveals the prerendered page while application JavaScript is delayed", async ({ page }) => {
@@ -132,17 +108,14 @@ test("LANDING-ENTRY-003 reveals the prerendered page while application JavaScrip
     await page.goto("/", { waitUntil: "commit" });
     // The real production CSS must arrive, but neither hydration nor WebGL can run.
     await expect(page.locator(".site-header")).toHaveCSS("position", "relative");
-    // Navigation, headline and download arrive without JavaScript, well before the
-    // universe's 3.8-second fallback.
+    // Navigation, headline, download and the flat logo arrive without JavaScript.
     await expect(page.locator(".hero-introduction")).toHaveCSS("opacity", "1", { timeout: 2500 });
     await expect(page.locator(".site-header")).toHaveCSS("opacity", "1", { timeout: 2500 });
     await expect(page.locator(".hero-download-area")).toHaveCSS("opacity", "1", { timeout: 2500 });
-    await expect(page.locator(".clemii-core")).toHaveCSS("opacity", "1", { timeout: 4800 });
-    await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1");
+    await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1", { timeout: 2500 });
     await expect(page.locator(".site-header a[href='/verified-messages']").first()).toHaveAttribute("href", "/verified-messages");
     await expect(page.locator(".clemii-core canvas")).toHaveCount(0);
   } finally { release(); }
-  await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "complete");
   await expect(page.locator(".hero-introduction")).toHaveCSS("opacity", "1");
 });
 
@@ -169,12 +142,12 @@ test("LANDING-ENTRY-009 plays the entrance when the landing's stylesheet arrives
     await Promise.all(pending.map(link => new Promise(resolve => link.addEventListener("load", resolve, { once: true }))));
     await new Promise(requestAnimationFrame);
     return {
-      opening: document.querySelector<HTMLElement>(".clemii-landing")!.dataset.opening,
       header: document.querySelector(".site-header")!.getAnimations().map(animation => (animation as CSSAnimation).animationName),
+      logo: document.querySelector(".core-fallback")!.getAnimations().map(animation => (animation as CSSAnimation).animationName),
     };
   });
-  expect(arrived.opening).not.toBe("complete");
   expect(arrived.header).toContain("header-arrive");
+  expect(arrived.logo).toContain("logo-arrive");
 });
 
 test("LANDING-ENTRY-008 links every page's own styles in its prerendered head", async ({ page, request }) => {
