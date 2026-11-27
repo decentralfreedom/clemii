@@ -4,8 +4,8 @@ import environmentURL from "./assets/studio-lighting.ktx2.gz?url";
 
 let data: Promise<ReturnType<typeof read>> | undefined;
 
-/** Shared download, independently owned GPU textures. No runtime PMREM filtering. */
-export async function loadStudioEnvironment() {
+/** The one shared download of the lighting, decoded once. */
+function download() {
   data ??= (async () => {
     const response = await fetch(environmentURL, { signal: AbortSignal.timeout(8000) });
     if (!response.ok || !response.body) throw new Error("Studio lighting unavailable");
@@ -27,7 +27,17 @@ export async function loadStudioEnvironment() {
     }
     return container;
   })().catch(error => { data = undefined; throw error; });
-  const container = await data;
+  return data;
+}
+
+/** Start the one shared download now, so it runs alongside the 3D engine's code. */
+export function fetchStudioEnvironment() {
+  download().catch(() => {});
+}
+
+/** Shared download, independently owned GPU textures. No runtime PMREM filtering. */
+export async function loadStudioEnvironment() {
+  const container = await download();
   const faces = Array.from({ length: 6 }, (_, face) => ({
     width: container.pixelWidth,
     height: container.pixelHeight,

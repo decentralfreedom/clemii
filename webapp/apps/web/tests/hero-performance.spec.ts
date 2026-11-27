@@ -52,13 +52,13 @@ test("LANDING-ENTRY-006 keeps content usable while hero shaders prepare", async 
   await holdShaders(page);
   await page.goto("/");
   await expect.poll(async () => (await preparation(page)).polls).toBeGreaterThan(0);
-  await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "complete");
   await expect(page.locator(".hero-introduction")).toHaveCSS("opacity", "1");
   await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "1");
   expect((await preparation(page)).earlyDraws).toBe(0);
   await releaseShaders(page);
   await expect(page.locator(".clemii-core")).toHaveAttribute("data-scene", "ready", { timeout: 15000 });
-  await expect(page.locator(".site-header")).toHaveCSS("animation-name", "none");
+  await expect(page.locator(".core-fallback")).toHaveCSS("opacity", "0");
+  await expect(page.locator(".site-header")).toHaveCSS("opacity", "1");
 });
 
 test("LANDING-ENTRY-006 releases preparing graphics when navigating away", async ({ page }) => {
@@ -114,7 +114,7 @@ test("LANDING-ENTRY-006 draws the living hero only while it is on screen and the
   await expect(canvas).toHaveAttribute("data-draw-count", /[1-9]/);
   // The two brothers are alive: after the three-second entrance the hero keeps
   // drawing for as long as it is on screen and the page is visible.
-  await expect(page.locator(".clemii-landing")).toHaveAttribute("data-opening", "complete", { timeout: 15000 });
+  await page.waitForFunction(() => performance.getEntriesByName("clemii:opened").length > 0, null, { timeout: 15000 });
   const settled = Number(await canvas.getAttribute("data-draw-count"));
   await expect.poll(async () => Number(await canvas.getAttribute("data-draw-count")), { timeout: 15000 }).toBeGreaterThan(settled);
   await page.screenshot({ path: testInfo.outputPath("hero-settled.png") });

@@ -1,7 +1,6 @@
 import { shadowedAppIcons } from "../media/appIcons";
 import { useEffect, useRef, type CSSProperties } from "react";
 import { ResponsiveField } from "./ResponsiveField";
-import { startLandingEntranceWithoutScene } from "./entrance/landingEntrance";
 import { m } from "../paraglide/messages";
 import clemiiMark from "./clemii-mark.svg?raw";
 
@@ -15,29 +14,31 @@ const apps = [
   { name: "Figma", file: "figma", x: 50, y: 96 },
 ];
 
+/** The flat logo stays: no 3D scene on this visit. */
 function showFallback(host: HTMLElement) {
   host.dataset.scene = "fallback";
-  startLandingEntranceWithoutScene(host.closest<HTMLElement>(".clemii-landing"));
 }
 
+/**
+ * The hero is whole from the first paint: the flat logo and the universe arrive with the text, in
+ * CSS. The 3D scene is an enhancement that takes over from the flat logo whenever it is ready.
+ */
 export function LocalUniverse() {
   const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let cancelled = false;
     const controller = new AbortController();
     let dispose: (() => void) | null = null;
-    // These optional hints only accelerate the fallback. Safari and browsers
-    // without them use the same bounded CSS window and actual scene readiness.
+    // A visitor who asks to save data, or is on 2G, keeps the flat logo and downloads no 3D.
     const connection = (navigator as Navigator & {
       connection?: { saveData?: boolean; effectiveType?: string };
     }).connection;
     if (host.current && (connection?.saveData || /^(slow-)?2g$/.test(connection?.effectiveType ?? ""))) {
-      host.current.dataset.fallback = "immediate";
-      const entry = host.current.closest<HTMLElement>(".clemii-landing");
-      if (entry) entry.dataset.opening = "complete";
+      showFallback(host.current);
+      return;
     }
-    // Fetch immediately. The CSS fallback bounds content visibility independently
-    // while a fast scene can coordinate the original entrance choreography.
+    // The lighting and the scene's code download together, each once.
+    void import("./StudioEnvironment").then(({ fetchStudioEnvironment }) => fetchStudioEnvironment(), () => {});
     void import("./ClemiiScene").then(async ({ mountClemiiScene }) => {
       if (!cancelled && host.current) {
         dispose = await mountClemiiScene(host.current, controller.signal);
