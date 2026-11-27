@@ -39,6 +39,15 @@ describe("downloads counted at /download (PRD R10)", () => {
     expect(sent).toEqual([]);
   });
 
+  test("sends a phone back to its page instead of the Mac installer, and counts nothing", async () => {
+    const { app, sent } = setup();
+    const iPhone = { "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1" };
+    const response = await app.request("/download?from=/blog/dictate-on-mac", { headers: iPhone });
+    expect([response.status, response.headers.get("location"), response.headers.get("cache-control")]).toEqual([302, "/blog/dictate-on-mac", "no-store"]);
+    expect((await app.request("/download?from=https://evil.example", { headers: iPhone })).headers.get("location")).toBe("/");
+    expect(events(sent)).toEqual([]);
+  });
+
   test("leads to the availability page while the catalog is empty", async () => {
     const { app } = setup({ downloadURL: undefined });
     const response = await app.request("/download?from=/");

@@ -12,6 +12,8 @@ test("phone visitors can share or copy the Mac link without downloading an insta
   page.on("popup", popup => popups.push(popup.url()));
   await page.goto("/");
   const button = page.locator(".landing-download").first();
+  // The handoff is the page's script: act once it has turned the prerendered link into its button.
+  await expect(button).toHaveAttribute("aria-haspopup", "dialog");
   await button.focus();
   await button.click();
   const sheet = page.getByRole("dialog", { name: "Meet you on your Mac." });
@@ -86,4 +88,28 @@ test("iPad desktop browsing offers handoff while narrow Mac windows keep the dow
   await page.reload();
   await expect(page.getByRole("link", { name: "Download for Mac" }).first()).toHaveAttribute("href", /^\/download\?from=/);
   await expect(page.getByRole("button", { name: "Get clemii for Mac" })).toHaveCount(0);
+});
+
+test("LANDING-DOWNLOAD-002 a phone that taps before the page's script loads gets no Mac installer", async ({ browser }) => {
+  const phone = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1",
+  });
+  const page = await phone.newPage();
+  const installers: string[] = [];
+  page.on("request", request => { if (request.url().endsWith(".dmg")) installers.push(request.url()); });
+  let release!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  // A slow connection: the prerendered page is there, its script is not.
+  await page.route(/\/assets\/.*\.js(?:\?.*)?$/, async route => { await gate; await route.continue(); });
+  try {
+    await page.goto("/", { waitUntil: "commit" });
+    const link = page.locator(".landing-download").first();
+    await expect(link).toHaveAttribute("href", "/download?from=%2F");
+    await Promise.all([page.waitForResponse(response => new URL(response.url()).pathname === "/download"), link.click()]);
+    // Back on the page it tapped from, with nothing downloaded.
+    await expect(page).toHaveURL(/\/$/);
+    expect(installers).toEqual([]);
+  } finally { release(); }
+  await phone.close();
 });
