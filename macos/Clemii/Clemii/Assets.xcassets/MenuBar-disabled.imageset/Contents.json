@@ -1,0 +1,15 @@
+{
+  "images": [
+    {
+      "filename": "menubar-disabled.svg",
+      "idiom": "mac"
+    }
+  ],
+  "info": {
+    "author": "clemii",
+    "version": 1
+  },
+  "properties": {
+    "preserves-vector-representation": true
+  }
+}

@@ -100,5 +100,5 @@ modifying imported permissive code, retain its notice and identify your dated
 changes separately. Do not bulk-label generated code, dependencies, model
 weights or artwork as original hush code.
 
-Write the product name as **hush**. Existing identifiers such as the `Hush` Xcode
+Write the product name as **hush**. Existing identifiers such as the `Clemii` Xcode
 scheme keep their exact case.

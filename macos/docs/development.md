@@ -1,4 +1,4 @@
-# Developing hush
+# Developing clemii
 
 ## Toolchain
 
@@ -15,17 +15,17 @@ Additional speech, language, and voice models are downloaded through the app.
 Run these commands from `macos/` in the monorepo:
 
 ```sh
-open Hush/Hush.xcodeproj
+open Clemii/Clemii.xcodeproj
 ```
 
-Select the **Hush** scheme. Under **Signing & Capabilities**, select your own team
+Select the **clemii** scheme. Under **Signing & Capabilities**, select your own team
 for the targets you build. Review the pinned package plugins and macros before
 trusting them in Xcode. Run with **⌘R**.
 
 The command-line equivalent, after that setup, is:
 
 ```sh
-xcodebuild -project Hush/Hush.xcodeproj -scheme Hush -configuration Debug \
+xcodebuild -project Clemii/Clemii.xcodeproj -scheme Clemii -configuration Debug \
   -destination 'platform=macOS,arch=arm64' \
   -onlyUsePackageVersionsFromResolvedFile build
 ```
@@ -47,7 +47,7 @@ or environment:
 ```sh
 HUSH_PROOF_SERVICE_URL=http://127.0.0.1:4000 \
 HUSH_PROOF_SHORT_URL=http://127.0.0.1:4000/s/ \
-  /path/to/hush.app/Contents/MacOS/hush
+  /path/to/clemii.app/Contents/MacOS/clemii
 ```
 
 Remote endpoints must use HTTPS. HTTP is accepted only for loopback addresses.
@@ -57,21 +57,21 @@ Remote endpoints must use HTTPS. HTTP is accepted only for loopback addresses.
 Run the package tests:
 
 ```sh
-swift test --package-path Packages/HushProvenance
+swift test --package-path Packages/ClemiiProvenance
 ```
 
 With the sibling web service running on port 3000, run the integration journey:
 
 ```sh
 HUSH_PROVENANCE_E2E_BASE_URL=http://127.0.0.1:3000 \
-  swift test --package-path Packages/HushProvenance \
+  swift test --package-path Packages/ClemiiProvenance \
   --filter enrollsAndPublishesWithHonoService
 ```
 
 Build the Release configuration:
 
 ```sh
-xcodebuild -project Hush/Hush.xcodeproj -scheme Hush -configuration Release \
+xcodebuild -project Clemii/Clemii.xcodeproj -scheme Clemii -configuration Release \
   -destination 'platform=macOS,arch=arm64' \
   -onlyUsePackageVersionsFromResolvedFile build
 ```
@@ -86,17 +86,17 @@ operation works.
 
 | Location | Purpose |
 | --- | --- |
-| `Hush/Hush` | Native app, audio, hotkeys, control centre, assistant, and insertion |
-| `Hush/HushTests`, `Hush/HushUITests` | Domain and native UI tests |
-| `Hush/BundledModels` | Bundled offline speech model |
-| `Packages/HushProvenance` | Signed-message domain logic and typed service client |
+| `Clemii/Clemii` | Native app, audio, hotkeys, control centre, assistant, and insertion |
+| `Clemii/ClemiiTests`, `Clemii/ClemiiUITests` | Domain and native UI tests |
+| `Clemii/BundledModels` | Bundled offline speech model |
+| `Packages/ClemiiProvenance` | Signed-message domain logic and typed service client |
 | `docs/user-journeys` | Observable behaviour and test ownership |
 | `docs/operations` | Distribution and runtime diagnostics |
 | `scripts` | Packaging, release checks, and development tooling |
 
 ## Releases
 
-hush is in alpha. The numeric bundle version and increasing build number are
+clemii is in alpha. The numeric bundle version and increasing build number are
 separate from prerelease tags such as `v0.1.0-alpha.5`. Release assets must match
 the committed source revision. Beta requires the core journeys to be
 feature-complete without known critical issues; 1.0 also requires a stable data

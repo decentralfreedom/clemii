@@ -27,8 +27,8 @@ class ScopeTests(unittest.TestCase):
                 self.assertEqual(classify([path]), dict(web=True, cms=False, native=False, integration=True))
 
     def test_native_changes_build_and_test_without_browser_jobs(self):
-        for path in ["macos/Hush/Hush/App.swift", "macos/Packages/HushProvenance/Package.resolved",
-                     "macos/scripts/build-dmg.sh", "macos/Hush/Hush.xcodeproj/project.pbxproj"]:
+        for path in ["macos/Clemii/Clemii/App.swift", "macos/Packages/ClemiiProvenance/Package.resolved",
+                     "macos/scripts/build-dmg.sh", "macos/Clemii/Clemii.xcodeproj/project.pbxproj"]:
             with self.subTest(path=path):
                 self.assertEqual(classify([path]), dict(web=False, cms=False, native=True, integration=True))
 
@@ -98,7 +98,7 @@ class ScopeTests(unittest.TestCase):
             self.assertEqual(workspace_dependents(root), {"article": {"web", "cms"}, "editor": {"cms"}})
 
     def test_mixed_changes_run_both_components(self):
-        self.assertEqual(classify(["macos/Hush/App.swift", "webapp/apps/web/src/main.tsx"]),
+        self.assertEqual(classify(["macos/Clemii/App.swift", "webapp/apps/web/src/main.tsx"]),
                          dict(web=True, cms=False, native=True, integration=True))
 
     def test_a_component_workflow_runs_only_its_component(self):
@@ -133,7 +133,7 @@ class ScopeTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertFalse(classify([path], workflow="codeql")["native"])
         self.assertEqual(classify([".github/workflows/codeql.yml"], workflow="codeql"), full_scope())
-        self.assertTrue(classify([".github/workflows/ci.yml", "macos/Hush/App.swift"], workflow="codeql")["native"])
+        self.assertTrue(classify([".github/workflows/ci.yml", "macos/Clemii/App.swift"], workflow="codeql")["native"])
         self.assertEqual(classify(["Makefile"], workflow="codeql"), full_scope())
 
     def test_manual_initial_and_invalid_comparisons_run_everything(self):
@@ -168,7 +168,7 @@ class GitJourneyTests(unittest.TestCase):
 
     def test_push_includes_all_commits_in_the_push(self):
         base = self.git("rev-parse", "HEAD")
-        self.commit("macos/Hush/App.swift", "native")
+        self.commit("macos/Clemii/App.swift", "native")
         head = self.commit("README.md", "docs")
         scope, _ = scope_for_event("push", dict(before=base, after=head), self.repo)
         self.assertEqual(scope, dict(web=False, cms=False, native=True, integration=True))
@@ -176,7 +176,7 @@ class GitJourneyTests(unittest.TestCase):
     def test_merge_group_checks_every_queued_change(self):
         base = self.git("rev-parse", "HEAD")
         self.commit("webapp/apps/web/src/main.tsx", "first queued pull request")
-        head = self.commit("macos/Hush/App.swift", "second queued pull request")
+        head = self.commit("macos/Clemii/App.swift", "second queued pull request")
         event = {"merge_group": {"base_sha": base, "head_sha": head}}
         scope, _ = scope_for_event("merge_group", event, self.repo)
         self.assertEqual(scope, dict(web=True, cms=False, native=True, integration=True))
@@ -185,7 +185,7 @@ class GitJourneyTests(unittest.TestCase):
         self.git("checkout", "-b", "feature")
         head = self.commit("webapp/apps/web/src/main.tsx", "new website")
         self.git("checkout", "main")
-        base = self.commit("macos/Hush/App.swift", "unrelated native change")
+        base = self.commit("macos/Clemii/App.swift", "unrelated native change")
         event = {"pull_request": {"base": {"sha": base}, "head": {"sha": head}}}
         scope, _ = scope_for_event("pull_request", event, self.repo)
         self.assertEqual(scope, dict(web=True, cms=False, native=False, integration=False))

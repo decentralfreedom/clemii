@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/hush-wordmark-dark.svg">
-    <img src="docs/assets/hush-wordmark.svg" width="248" height="72" alt="hush">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/clemii-wordmark-dark.svg">
+    <img src="docs/assets/clemii-wordmark.svg" width="248" height="72" alt="clemii">
   </picture>
 </p>
 
@@ -13,26 +13,26 @@
 </p>
 
 <p align="center">
-  <a href="https://behu.sh/"><strong>Download for Mac</strong></a> ·
-  <a href="https://behu.sh/releases">Releases</a> ·
+  <a href="https://clemii.com/"><strong>Download for Mac</strong></a> ·
+  <a href="https://clemii.com/releases">Releases</a> ·
   <a href="docs/README.md">Documentation</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
 <p align="center">Apple silicon · macOS 15+<br>Free and open source. Currently in alpha.</p>
 
-![The hush dashboard showing dictation activity, time saved, and local models. Real app interface with demo data.](macos/docs/assets/readme-cover.png)
+![The clemii dashboard showing dictation activity, time saved, and local models. Real app interface with demo data.](macos/docs/assets/readme-cover.png)
 
 <p align="center"><sub>Dashboard with demo data. Captured from the native macOS app.</sub></p>
 
-Your computer should make room for your thoughts. **hush** lets you speak into the
+Your computer should make room for your thoughts. **clemii** lets you speak into the
 apps you already use, shape your words with local AI, and keep your flow. Speech
 recognition and AI inference run on your Mac.
 
 ## Start with your voice
 
-1. [Download the notarized alpha](https://behu.sh/), open the DMG, and drag **hush** into **Applications**.
-2. Open hush and follow the guided microphone and Accessibility setup.
+1. [Download the notarized alpha](https://clemii.com/), open the DMG, and drag **clemii** into **Applications**.
+2. Open clemii and follow the guided microphone and Accessibility setup.
 3. Put your cursor in a text field. Hold **Fn**, speak, and release to insert your words.
 
 The bundled speech model works offline. Optional models download once through
@@ -47,7 +47,7 @@ is still pending. Intel Macs are not supported.
 
 ## Make it your own
 
-| | In hush |
+| | In clemii |
 | --- | --- |
 | **Dictate** | Speak where you work. Choose Whisper or Parakeet models and the language coverage you need. |
 | **Find your style** | Polish, rewrite, or create your own Personas using Apple Intelligence where available or downloaded Qwen models. |
@@ -55,18 +55,18 @@ is still pending. Intel Macs are not supported.
 | **Keep the story** | Optional **Verified Messages** let recipients inspect a signed capture and edit record through a private link. |
 
 <details>
-<summary><strong>A closer look at Personas</strong></summary>
+<summary><strong>A closer look at Live Write</strong></summary>
 
-![hush Personas settings with Polish, Business, Casual, Slack DM, and Code comment styles, plus a collapsible local writing engine.](macos/docs/assets/personas.png)
+![clemii Live Write settings: what it does with examples, and the local writing engines Qwen 3.5 and Apple Intelligence.](macos/docs/assets/personas.png)
 
-Choose a writing style or create your own. Model setup and removal stay beside
-the feature that uses them.
+Say what you want and get finished text, or keep your words as you said them.
+Model setup and removal stay beside the feature that uses them.
 
 </details>
 
 **This is an alpha.** The assistant is experimental, and desktop automation
 depends on what each app exposes. Setup, model choices, and behaviour may change.
-See the [release notes](https://behu.sh/releases) for the published build.
+See the [release notes](https://clemii.com/releases) for the published build.
 
 ## Local by design
 
@@ -75,11 +75,11 @@ The assistant requests screen access separately; ordinary dictation does not
 need Screen Recording permission.
 
 Downloads and update checks use the network. If you enable Verified Messages,
-hush uploads an encrypted message record. The original audio is not uploaded;
+clemii uploads an encrypted message record. The original audio is not uploaded;
 the decryption key stays in the private link, and recipients decrypt in their
 browser. A signed history does not establish identity, human presence, or truth.
 
-[Privacy](https://behu.sh/datenschutz) ·
+[Privacy](https://clemii.com/datenschutz) ·
 [How Verified Messages work](macos/docs/user-journeys/verified-messages.md)
 
 ## Built for this Mac
@@ -91,10 +91,10 @@ uses macOS Accessibility and ScreenCaptureKit, with Kokoro for local speech.
 ```sh
 git clone https://github.com/decentralfreedom/hush.git
 cd hush
-open macos/Hush/Hush.xcodeproj
+open macos/Clemii/Clemii.xcodeproj
 ```
 
-Choose the **Hush** scheme and your signing team, then run with **⌘R**. The project
+Choose the **Clemii** scheme and your signing team, then run with **⌘R**. The project
 uses pinned Swift packages. See the [development guide](macos/docs/development.md) for
 toolchain requirements, testing, local proof-service setup, and packaging.
 
@@ -127,20 +127,20 @@ Find your area in the [journey map](docs/reference/user-journeys.md), or learn
 [how the pieces fit together](docs/explanation/architecture.md). We welcome
 clear explanations, thoughtful design feedback and people learning along the way.
 
-If hush is useful to you, **star the repository** to help others discover it.
+If clemii is useful to you, **star the repository** to help others discover it.
 
 ## Star history
 
 <a href="https://www.star-history.com/?repos=decentralfreedom%2Fhush&amp;type=date">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=decentralfreedom/hush&amp;type=date&amp;theme=dark">
-    <img src="https://api.star-history.com/chart?repos=decentralfreedom/hush&amp;type=date" alt="GitHub star history for hush. The graph grows as people star the repository." width="800" height="533">
+    <img src="https://api.star-history.com/chart?repos=decentralfreedom/hush&amp;type=date" alt="GitHub star history for clemii. The graph grows as people star the repository." width="800" height="533">
   </picture>
 </a>
 
 ## License and credits
 
-hush uses **[GNU AGPLv3 only](LICENSE)** for its original code and documentation.
+clemii uses **[GNU AGPLv3 only](LICENSE)** for its original code and documentation.
 Use it, remix it and share improvements under the same terms, including in
 covered modified hosted versions. Commercial use is allowed.
 

@@ -14,7 +14,7 @@ handoff/
 # the Release-AppStore configuration and DEVELOPMENT_TEAM from the
 # project file. This belt-and-suspenders rule ensures the entitlements
 # never get committed even if a future sync ever drops them in by accident.
-Hush/Hush/Hush-AppStore.entitlements
+Clemii/Clemii/Clemii-AppStore.entitlements
 
 # Local Claude/agent state
 .claude/
@@ -29,8 +29,8 @@ Hush/Hush/Hush-AppStore.entitlements
 # at ~547 MB etc.) are too big for plain git and must be fetched on
 # demand with `python3 scripts/fetch_bundled_model.py <variant>`.
 # ──────────────────────────────────────────────────────────────────
-Hush/BundledModels/*
-!Hush/BundledModels/openai_whisper-base/
+Clemii/BundledModels/*
+!Clemii/BundledModels/openai_whisper-base/
 
 # ──────────────────────────────────────────────────────────────────
 # Xcode / Swift build artefacts
@@ -47,8 +47,8 @@ xcuserdata/
 .swiftpm/
 .build/
 Package.resolved
-!Hush/Hush.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
-!Packages/HushProvenance/Package.resolved
+!Clemii/Clemii.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+!Packages/ClemiiProvenance/Package.resolved
 
 # ──────────────────────────────────────────────────────────────────
 # macOS / editor noise
@@ -71,7 +71,7 @@ Thumbs.db
 *.dSYM.zip
 *.ipa
 *.xcarchive
-Hush-*.zip
+Clemii-*.zip
 
 # Local visual QA exports
 previews/
@@ -93,3 +93,6 @@ target/
 *.flv
 *.mov
 *.wmv
+
+# The onboarding film is a bundled resource, not a recording.
+!Clemii/Clemii/Resources/Onboarding/clemii-hero.mov

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Renders the speech benchmark corpus (HushTests/Fixtures/Speech/filler-clips.json)
+# Renders the speech benchmark corpus (ClemiiTests/Fixtures/Speech/filler-clips.json)
 # as 16 kHz mono clips with the macOS voices, one <id>.wav per clip.
 #
 #   scripts/speech-benchmark-clips.sh <output-folder>
@@ -9,7 +9,7 @@
 set -euo pipefail
 
 out="${1:?usage: $0 <output-folder>}"
-corpus="$(cd "$(dirname "$0")/.." && pwd)/Hush/HushTests/Fixtures/Speech/filler-clips.json"
+corpus="$(cd "$(dirname "$0")/.." && pwd)/Clemii/ClemiiTests/Fixtures/Speech/filler-clips.json"
 mkdir -p "$out"
 
 /usr/bin/python3 -I - "$corpus" "$out" <<'PY'

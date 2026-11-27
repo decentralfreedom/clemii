@@ -1,6 +1,6 @@
 # HUD settings journey
 
-This document defines the user-visible contract for previewing and positioning the floating Hush HUD.
+This document defines the user-visible contract for previewing and positioning the floating clemii HUD.
 
 ## Journey
 
@@ -14,7 +14,7 @@ The menu panel is constant and has no preview on this page. Only configurable be
 
 The live HUD joins all Spaces and other applications' full-screen/Stage Manager groups using AppKit overlay collection behaviors. It never becomes the key window or intercepts clicks. Space and display changes reposition a currently visible HUD on the pointer's display. Top placement uses the menu-bar icon only when it belongs to that display. Dismissal stops the elapsed timer and pending auto-hide; later display notifications cannot revive a dismissed session.
 
-On macOS 26 and later, the production HUD and its settings preview use one native `NSGlassEffectView` with the complete HUD foreground assigned as its `contentView`. The material must adapt continuously as content moves beneath it. On earlier supported systems, both paths use the semantic AppKit HUD material with behind-window blending. Hush does not simulate glass with a custom blur, opacity layer, tint, shader, or SwiftUI glass modifier.
+On macOS 26 and later, the production HUD and its settings preview use one native `NSGlassEffectView` with the complete HUD foreground assigned as its `contentView`. The material must adapt continuously as content moves beneath it. On earlier supported systems, both paths use the semantic AppKit HUD material with behind-window blending. clemii does not simulate glass with a custom blur, opacity layer, tint, shader, or SwiftUI glass modifier.
 
 ## Acceptance mapping
 

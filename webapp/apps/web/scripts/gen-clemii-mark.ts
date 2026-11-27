@@ -2,9 +2,10 @@
 // Copyright (c) 2026 Clemens Kressmann
 //
 // Draws the clemii mark from the brothers' geometry: the header's mark, the favicon and the hero's
-// flat stand-in. Run: bun scripts/gen-clemii-mark.ts, then bun scripts/generate-favicons.ts
+// flat stand-in; the README's wordmarks; and its one-colour glyph, as the macOS menu bar's four states. Run: bun scripts/gen-clemii-mark.ts, then bun scripts/generate-favicons.ts
 import { writeFileSync } from "node:fs";
-import { along, big, globe, mix, polar, ribbonEdge, small, smooth, type Brother, type Point } from "../src/landing/hero/brothers";
+import { existsSync, mkdirSync, rmSync, readdirSync } from "node:fs";
+import { along, big, globe, glyph, mix, polar, ribbonEdge, small, smooth, type Brother, type Point } from "../src/landing/hero/brothers";
 
 const web = new URL("..", import.meta.url).pathname;
 const R = 200, cx = 256, cy = 256;
@@ -40,15 +41,23 @@ function ribbon(name: string, me: Brother, other: Brother, from: number, to: num
 }
 const sphere = R * globe;
 // Each ribbon's end lies over the other's start, so the big one's end is drawn again on top.
-const inside = `<defs>
+const globeDefs = `<defs>
 <linearGradient id="globe" x1=".15" y1=".1" x2=".85" y2=".9"><stop offset="0" stop-color="#b874ff"/><stop offset=".45" stop-color="#6a4afd"/><stop offset="1" stop-color="#1f3bdc"/></linearGradient>
 <radialGradient id="globe-shade" cx=".7" cy=".76" r=".75"><stop offset="0" stop-color="#1a1a9c" stop-opacity=".55"/><stop offset="1" stop-color="#1a1a9c" stop-opacity="0"/></radialGradient>
-</defs>
-<g id="globe-ball"><circle cx="${cx}" cy="${cy}" r="${n(sphere)}" fill="url(#globe)"/><circle cx="${cx}" cy="${cy}" r="${n(sphere)}" fill="url(#globe-shade)"/>
-<ellipse cx="${n(cx - sphere * 0.36)}" cy="${n(cy - sphere * 0.52)}" rx="${n(sphere * 0.36)}" ry="${n(sphere * 0.15)}" fill="#fff" fill-opacity=".38" transform="rotate(-32 ${n(cx - sphere * 0.36)} ${n(cy - sphere * 0.52)})"/></g>
-${ribbon("big-brother-cape", big, small, big.head, big.tip)}
-${ribbon("clemii-cape", small, big, small.head, small.tip)}
-${ribbon("big-brother-cape-end", big, small, small.head, big.tip)}`;
+</defs>`;
+const globeBall = `<circle cx="${cx}" cy="${cy}" r="${n(sphere)}" fill="url(#globe)"/><circle cx="${cx}" cy="${cy}" r="${n(sphere)}" fill="url(#globe-shade)"/>`;
+const globeGloss = `<ellipse cx="${n(cx - sphere * 0.36)}" cy="${n(cy - sphere * 0.52)}" rx="${n(sphere * 0.36)}" ry="${n(sphere * 0.15)}" fill="#fff" fill-opacity=".38" transform="rotate(-32 ${n(cx - sphere * 0.36)} ${n(cy - sphere * 0.52)})"/>`;
+const ribbons = {
+  warm: ribbon("big-brother-cape", big, small, big.head, big.tip),
+  cool: ribbon("clemii-cape", small, big, small.head, small.tip),
+  warmEnd: ribbon("big-brother-cape-end", big, small, small.head, big.tip),
+};
+const inside = `${globeDefs}
+<g id="globe-ball">${globeBall}
+${globeGloss}</g>
+${ribbons.warm}
+${ribbons.cool}
+${ribbons.warmEnd}`;
 // A square box about the ring, with a hair of room.
 const reach = R * 1.02;
 const box = `${n(cx - reach)} ${n(cy - reach)} ${n(reach * 2)} ${n(reach * 2)}`;
@@ -56,3 +65,65 @@ const titled = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${box}" role="i
 writeFileSync(`${web}public/clemii-mark.svg`, titled);
 writeFileSync(`${web}public/favicon.svg`, titled);
 writeFileSync(`${web}src/landing/clemii-mark.svg`, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${box}" aria-hidden="true">${inside}</svg>\n`);
+// The README's wordmark, as the site's header sets it: the mark, then the name. One file for
+// GitHub's light theme and one for its dark theme; only the name's colour differs.
+for (const [file, ink] of [["clemii-wordmark.svg", "#1f201e"], ["clemii-wordmark-dark.svg", "#f8f8f6"]]) {
+  writeFileSync(`${web}../../../docs/assets/${file}`, `<svg xmlns="http://www.w3.org/2000/svg" width="248" height="72" viewBox="0 0 248 72" role="img" aria-label="clemii"><svg x="0" y="4" width="64" height="64" viewBox="${box}">${inside}</svg><text x="78" y="56" fill="${ink}" font-family="Arial, Helvetica, sans-serif" font-size="60" font-weight="700" letter-spacing="-3">clemii</text></svg>\n`);
+}
+
+// The glyph. The menu bar's icons are 20 by 18 points, the glyph 16 across: Apple's menu bar is 24
+// points high and tints template images (black and clear only) for light and dark bars itself.
+const shape = glyph();
+function glyphPaths(centreX: number, centreY: number, radius: number, fills: [string, string, string]) {
+  // Small boxes need finer numbers than the mark's, or the curves show steps.
+  const fine = (value: number) => +value.toFixed(3);
+  const spot = ([x, y]: Point) => `${fine(centreX + radius * x)} ${fine(centreY - radius * y)}`;
+  return shape.ribbons.map((points, index) => `<path d="M${points.map(spot).join(" L")} Z" fill="${fills[index]}"/>`).join("")
+    + `<circle cx="${centreX}" cy="${centreY}" r="${fine(radius * shape.dot)}" fill="${fills[2]}"/>`;
+}
+const assets = `${web}../../../macos/Clemii/Clemii/Assets.xcassets/`;
+const states: Record<string, { template: boolean; fills: [string, string, string]; extra?: string; defs?: string }> = {
+  idle: { template: true, fills: ["#000", "#000", "#000"] },
+  processing: { template: true, fills: ["#000", "#000", "#000"] },
+  // Listening, the mark wakes up in its own colours.
+  recording: { template: false, fills: ["url(#warm)", "url(#cool)", "#6a4afd"],
+    defs: `<defs><linearGradient id="warm" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb11f"/><stop offset="1" stop-color="#ee2a8f"/></linearGradient><linearGradient id="cool" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#16b4f8"/><stop offset="1" stop-color="#a55cfd"/></linearGradient></defs>` },
+  // Unavailable: struck through, in the warning red.
+  disabled: { template: false, fills: ["#e0654e", "#e0654e", "#e0654e"], extra: `<path d="M3.2 15.8 16.8 2.2" fill="none" stroke="#e0654e" stroke-width="1.9" stroke-linecap="round"/>` },
+};
+for (const [state, { template, fills, extra = "", defs = "" }] of Object.entries(states)) {
+  const folder = `${assets}MenuBar-${state}.imageset/`;
+  mkdirSync(folder, { recursive: true });
+  for (const file of readdirSync(folder)) rmSync(folder + file);
+  writeFileSync(`${folder}menubar-${state}.svg`, `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="18" viewBox="0 0 20 18">${defs}${glyphPaths(10, 9, 8, fills)}${extra}</svg>\n`);
+  writeFileSync(`${folder}Contents.json`, `${JSON.stringify({
+    images: [{ filename: `menubar-${state}.svg`, idiom: "mac" }],
+    info: { author: "clemii", version: 1 },
+    properties: { "preserves-vector-representation": true, ...(template ? { "template-rendering-intent": "template" } : {}) },
+  }, null, 2)}\n`);
+}
+
+// The macOS app icon is an Icon Composer document, the format Apple asks for. This script draws
+// only its layers: square, unmasked vector images on a 1024 canvas with the content centred. The
+// system masks the corners and lays Liquid Glass over them, so the globe carries no painted gloss
+// here. The document itself (icon.json: the background fill, the groups, glass, shadow and the
+// appearances) belongs to Icon Composer; it is written once, when there is none, and never again,
+// so what is tuned there survives a new drawing of the layers.
+const icon = `${web}../../../macos/Clemii/Clemii/AppIcon.icon/`;
+mkdirSync(`${icon}Assets`, { recursive: true });
+// The ring is 620 points across on the 1024 canvas.
+const layer = (content: string) => `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024"><g transform="translate(512 512) scale(${310 / R}) translate(${-cx} ${-cy})">${content}</g></svg>\n`;
+writeFileSync(`${icon}Assets/globe.svg`, layer(`${globeDefs}${globeBall}`));
+writeFileSync(`${icon}Assets/ribbon-warm.svg`, layer(ribbons.warm));
+writeFileSync(`${icon}Assets/ribbon-cool.svg`, layer(ribbons.cool));
+writeFileSync(`${icon}Assets/ribbon-warm-end.svg`, layer(ribbons.warmEnd));
+const group = (names: string[]) => ({
+  layers: names.map((name) => ({ "image-name": `${name}.svg`, name })),
+  shadow: { kind: "neutral", opacity: 0.5 },
+  translucency: { enabled: false, value: 0.5 },
+});
+if (!existsSync(`${icon}icon.json`)) writeFileSync(`${icon}icon.json`, `${JSON.stringify({
+  fill: { "automatic-gradient": "extended-srgb:0.96000,0.95500,1.00000,1.00000" },
+  groups: [group(["globe"]), group(["ribbon-warm-end", "ribbon-cool", "ribbon-warm"])],
+  "supported-platforms": { squares: ["macOS"] },
+}, null, 2)}\n`);

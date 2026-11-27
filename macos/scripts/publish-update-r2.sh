@@ -13,7 +13,7 @@ if [[ -f "${UPDATE_ENV_FILE}" ]]; then
   set +a
 fi
 
-APP_PATH="${HUSH_APP_PATH:-${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}/export/hush.app}"
+APP_PATH="${HUSH_APP_PATH:-${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}/export/clemii.app}"
 UPDATE_CHANNEL="${HUSH_UPDATE_CHANNEL:-alpha}"
 RELEASE_DIRECTORY="${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}"
 # Each publish stages a fresh mirror of the published channel inside its release
@@ -64,7 +64,7 @@ fi
 
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "${INFO_PLIST}")"
 BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "${INFO_PLIST}")"
-RELEASE_SLUG="$(/usr/libexec/PlistBuddy -c 'Print :HushReleaseSlug' "${INFO_PLIST}" 2>/dev/null || true)"
+RELEASE_SLUG="$(/usr/libexec/PlistBuddy -c 'Print :ClemiiReleaseSlug' "${INFO_PLIST}" 2>/dev/null || true)"
 APPCAST_PATH="${UPDATE_DIRECTORY}/appcast.xml"
 
 if [[ -f "${APPCAST_PATH}" ]]; then
@@ -80,7 +80,7 @@ if [[ -f "${APPCAST_PATH}" ]]; then
   fi
 fi
 
-EXPECTED_DMG_NAME="hush-${VERSION}${RELEASE_SLUG:+-${RELEASE_SLUG}}-build.${BUILD}.dmg"
+EXPECTED_DMG_NAME="clemii-${VERSION}${RELEASE_SLUG:+-${RELEASE_SLUG}}-build.${BUILD}.dmg"
 if [[ -n "${DMG_PATH}" && "$(basename "${DMG_PATH}")" != "${EXPECTED_DMG_NAME}" ]]; then
   echo "DMG name does not match its embedded release identity." >&2
   echo "Expected: ${EXPECTED_DMG_NAME}" >&2
@@ -125,4 +125,4 @@ if [[ -n "${DMG_PATH}" ]]; then
     --cache-control 'no-store'
 fi
 
-echo "Published update feed: https://updates.behu.sh/${UPDATE_CHANNEL}/appcast.xml"
+echo "Published update feed: https://updates.clemii.com/${UPDATE_CHANNEL}/appcast.xml"

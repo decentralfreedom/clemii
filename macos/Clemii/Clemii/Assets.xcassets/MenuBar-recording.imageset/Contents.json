@@ -1,0 +1,15 @@
+{
+  "images": [
+    {
+      "filename": "menubar-recording.svg",
+      "idiom": "mac"
+    }
+  ],
+  "info": {
+    "author": "clemii",
+    "version": 1
+  },
+  "properties": {
+    "preserves-vector-representation": true
+  }
+}

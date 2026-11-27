@@ -45,7 +45,7 @@ hush/
 │   ├── reference/             # journey and test navigation
 │   └── research/              # dated evidence and comparisons
 ├── macos/
-│   ├── Hush/                  # Xcode app and native tests
+│   ├── Clemii/                  # Xcode app and native tests
 │   ├── Packages/              # Swift packages
 │   ├── scripts/               # build and distribution tools
 │   └── docs/                  # native journeys and operating guides

@@ -11,7 +11,7 @@ const defaultCopy: Record<ClemiiHudState, ClemiiHudCopy> = {
 };
 
 /**
- * Web replica of the macOS recording HUD (macos/Hush/Hush/HUD/HushHUD.swift):
+ * Web replica of the macOS recording HUD (macos/Clemii/Clemii/HUD/ClemiiHUD.swift):
  * 72pt tall, the 42pt stateful badge, two stacked labels and the waveform.
  * The caller positions it through className.
  */
@@ -59,12 +59,12 @@ function ClemiiBadge({ state }: { state: ClemiiHudState }) {
   const complete = state === "drafted" || state === "inserted";
   return (
     <div
-      className={`relative grid size-[42px] shrink-0 place-items-center overflow-hidden rounded-xl text-white transition-all duration-500 ${
+      className={`relative grid size-[42px] shrink-0 place-items-center overflow-hidden rounded-full text-white transition-all duration-500 ${
         complete
           ? "bg-success shadow-[0_0_22px_rgb(52_199_89/0.28)]"
           : state === "processing"
             ? "workflow-aurora shadow-[0_0_24px_rgb(201_184_255/0.55)]"
-            : "bg-ink"
+            : "hud-globe"
       }`}
     >
       {complete ? (
@@ -87,10 +87,11 @@ function ClemiiBadge({ state }: { state: ClemiiHudState }) {
   );
 }
 
+/** The voice on the globe: the four bars the macOS HUD's badge carries. */
 function ClemiiMark() {
-  const heights = [13, 23, 31, 21, 12];
+  const heights = [8.5, 19, 11.5, 5.5];
   return (
-    <span className="flex items-center gap-[2.5px]" aria-hidden="true">
+    <span className="flex items-center gap-[2.6px]" aria-hidden="true">
       {heights.map((height, index) => (
         <span
           key={index}

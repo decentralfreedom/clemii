@@ -65,8 +65,8 @@ The Debug build was code-signature verified, installed at `/Applications/hush.ap
 Release separation is checked against the built executable, with Debug as a positive control:
 
 ```sh
-python3 scripts/check_assistant_release.py /path/to/Release/hush.app/Contents/MacOS/hush \
-  --debug /path/to/Debug/hush.app/Contents/MacOS/hush.debug.dylib
+python3 scripts/check_assistant_release.py /path/to/Release/hush.app/Contents/MacOS/clemii \
+  --debug /path/to/Debug/hush.app/Contents/MacOS/clemii.debug.dylib
 ```
 
 ## Follow-up investigation: marker binding and contextual edits

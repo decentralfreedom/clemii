@@ -7,15 +7,16 @@ REPOSITORY_DIRECTORY="$(cd "${SCRIPT_DIRECTORY}/.." && pwd)"
 DERIVED_DATA_DIRECTORY="${HUSH_DERIVED_DATA_PATH:-/tmp/hush-release}"
 RELEASE_DIRECTORY="${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}"
 TEAM="${HUSH_DEVELOPMENT_TEAM:-3A22UK7C9L}"
-APP_PATH="${RELEASE_DIRECTORY}/export/hush.app"
+APP_PATH="${RELEASE_DIRECTORY}/export/clemii.app"
 export HUSH_DEVELOPMENT_TEAM="${TEAM}"
+# The notarytool Keychain profile on the release Mac: a stored name, like the HUSH_ variables. Keep it.
 export HUSH_NOTARY_KEYCHAIN_PROFILE="${HUSH_NOTARY_KEYCHAIN_PROFILE:-HushNotary}"
 
 if [[ $# -gt 1 || ! "${HUSH_NOTARIZE:-0}" =~ ^[01]$ ]]; then
   echo "Usage: $0 [output.dmg]. Submission requires explicit HUSH_NOTARIZE=1." >&2
   exit 1
 fi
-if [[ -e "${RELEASE_DIRECTORY}/Hush.xcarchive" || -e "${RELEASE_DIRECTORY}/export" ]]; then
+if [[ -e "${RELEASE_DIRECTORY}/Clemii.xcarchive" || -e "${RELEASE_DIRECTORY}/export" ]]; then
   echo "Release output already exists. Resume notarization or choose a new HUSH_RELEASE_DIRECTORY." >&2
   exit 1
 fi
@@ -24,7 +25,7 @@ cd "${REPOSITORY_DIRECTORY}"
 git rev-parse HEAD > "${RELEASE_DIRECTORY}/reports/source-revision.txt"
 git diff --binary HEAD > "${RELEASE_DIRECTORY}/reports/source-changes.patch"
 xcodebuild -version > "${RELEASE_DIRECTORY}/reports/xcode-version.txt"
-cp Hush/Hush.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved \
+cp Clemii/Clemii.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved \
   "${RELEASE_DIRECTORY}/reports/Package.resolved"
 cp "${SCRIPT_DIRECTORY}/DeveloperID-ExportOptions.plist" "${RELEASE_DIRECTORY}/ExportOptions.plist"
 /usr/libexec/PlistBuddy -c "Set :teamID ${TEAM}" "${RELEASE_DIRECTORY}/ExportOptions.plist"
@@ -38,25 +39,25 @@ if [[ "${HUSH_TRUST_PINNED_BUILD_TOOLS:-0}" == "1" ]]; then
   TRUST_ARGUMENTS+=(-skipMacroValidation -skipPackagePluginValidation)
 fi
 
-xcodebuild -project Hush/Hush.xcodeproj -scheme Hush -configuration Release \
+xcodebuild -project Clemii/Clemii.xcodeproj -scheme Clemii -configuration Release \
   -destination 'generic/platform=macOS' -derivedDataPath "${DERIVED_DATA_DIRECTORY}" \
   -onlyUsePackageVersionsFromResolvedFile ${TRUST_ARGUMENTS[@]+"${TRUST_ARGUMENTS[@]}"} \
   -allowProvisioningUpdates \
-  CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM="${TEAM}" CODE_SIGN_ENTITLEMENTS=Hush/Hush-Team.entitlements \
+  CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM="${TEAM}" CODE_SIGN_ENTITLEMENTS=Clemii/Clemii-Team.entitlements \
   ARCHS=arm64 ONLY_ACTIVE_ARCH=NO \
-  HUSH_PROOF_SERVICE_URL="${HUSH_PROOF_SERVICE_URL:-https://behu.sh}" \
-  HUSH_PROOF_SHORT_URL="${HUSH_PROOF_SHORT_URL:-https://behu.sh/s/}" \
-  HUSH_UPDATE_FEED_URL="${HUSH_UPDATE_FEED_URL:-https://updates.behu.sh/alpha/appcast.xml}" \
-  ${RELEASE_ARGUMENTS[@]+"${RELEASE_ARGUMENTS[@]}"} archive -archivePath "${RELEASE_DIRECTORY}/Hush.xcarchive" \
+  HUSH_PROOF_SERVICE_URL="${HUSH_PROOF_SERVICE_URL:-https://clemii.com}" \
+  HUSH_PROOF_SHORT_URL="${HUSH_PROOF_SHORT_URL:-https://clemii.com/s/}" \
+  HUSH_UPDATE_FEED_URL="${HUSH_UPDATE_FEED_URL:-https://updates.clemii.com/alpha/appcast.xml}" \
+  ${RELEASE_ARGUMENTS[@]+"${RELEASE_ARGUMENTS[@]}"} archive -archivePath "${RELEASE_DIRECTORY}/Clemii.xcarchive" \
   2>&1 | tee "${RELEASE_DIRECTORY}/reports/archive.log"
 
 # Xcode's direct-distribution export: automatic signing picks the Developer ID certificate
 # and creates or renews the Developer ID provisioning profile the keychain group needs.
-xcodebuild -exportArchive -allowProvisioningUpdates -archivePath "${RELEASE_DIRECTORY}/Hush.xcarchive" \
+xcodebuild -exportArchive -allowProvisioningUpdates -archivePath "${RELEASE_DIRECTORY}/Clemii.xcarchive" \
   -exportOptionsPlist "${RELEASE_DIRECTORY}/ExportOptions.plist" \
   -exportPath "${RELEASE_DIRECTORY}/export" \
   2>&1 | tee "${RELEASE_DIRECTORY}/reports/export.log"
-python3 "${SCRIPT_DIRECTORY}/check_assistant_release.py" "${APP_PATH}/Contents/MacOS/hush"
+python3 "${SCRIPT_DIRECTORY}/check_assistant_release.py" "${APP_PATH}/Contents/MacOS/clemii"
 python3 "${SCRIPT_DIRECTORY}/check_distribution.py" "${APP_PATH}" \
   --report "${RELEASE_DIRECTORY}/reports/app-preflight.json"
 # Submit the outermost distribution container once; Apple also checks its app.

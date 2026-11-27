@@ -15,7 +15,7 @@ Selection becomes active
   -> user holds and releases the dictation shortcut
 Transcript uses the active selection and is inserted
   -> wrong persona was selected
-User selects the Hush output and opens the Compose shortcut
+User selects the clemii output and opens the Compose shortcut
   -> Restore Original or apply another persona
 Corrected message replaces the selected output
   -> selection remains active
@@ -28,15 +28,15 @@ Ready
 - The persona shortcut only opens or closes the selector. It never starts recording.
 - The Persona menu-bar row and persona shortcut share one action and always produce the same outcome.
 - The wheel always includes `No persona`, even when personas are available.
-- The selector always uses one complete ring with a transparent center, giving Hush a stable and recognizable interaction shape at every density. Small libraries distribute their choices generously around the circle. Larger libraries keep six primary slots: `No persona`, four personas including the active persona, and `More`. The `More` button opens a compact searchable popover containing every persona.
+- The selector always uses one complete ring with a transparent center, giving clemii a stable and recognizable interaction shape at every density. Small libraries distribute their choices generously around the circle. Larger libraries keep six primary slots: `No persona`, four personas including the active persona, and `More`. The `More` button opens a compact searchable popover containing every persona.
 - The persona editor follows the system appearance live: switching between Light and Dark while it, or the app, is open redraws every surface. Layer colors are resolved for each appearance, never once at creation.
 - Every persona receives a local automatic SF Symbol inferred from its name and instructions. A user can override it from the persona editor or return to `Auto`; existing saved personas remain in automatic mode without migration work.
 - The Personas library communicates the active persona through the selected card's border, aurora tint, and icon color. It does not repeat that state with an `Active` text label, preserving space for the persona instructions.
-- The selector stays neutral Liquid Glass. Only the active option carries Hush's full processing aurora, while every resting option remains the same size. Hover grows the complete option as one circle and adds a quiet background wash; hovering the active option slightly brightens its aurora. Labels and symbols retain adaptive system contrast over light and dark content.
+- The selector stays neutral Liquid Glass. Only the active option carries clemii's full processing aurora, while every resting option remains the same size. Hover grows the complete option as one circle and adds a quiet background wash; hovering the active option slightly brightens its aurora. Labels and symbols retain adaptive system contrast over light and dark content.
 - Persona selection is persistent and visible in the menu bar. `No persona` is a first-class active selection, not the same as disabling or unloading the local AI provider.
 - Persona choice is captured when recording starts. Later selector or Settings changes cannot alter a recording that is already processing.
-- Voice recorded inside the Hush composer remains plain. Fine Tune stays an explicit post-recording action inside the composer.
-- Hush retains the plain pre-AI transcript under the configured local history policy. Reopening a retained refined message exposes `Previously refined`, `Restore Original`, and every available Fine Tune persona.
+- Voice recorded inside the clemii composer remains plain. Fine Tune stays an explicit post-recording action inside the composer.
+- clemii retains the plain pre-AI transcript under the configured local history policy. Reopening a retained refined message exposes `Previously refined`, `Restore Original`, and every available Fine Tune persona.
 - If Persona AI is off or unavailable, either selector entry point opens Settings on the Personas page instead of presenting disabled controls.
 - Escape, clicking outside the wheel, or pressing the persona shortcut again closes it without changing the active selection.
 
@@ -44,39 +44,39 @@ Ready
 
 ### PW-001 - Open the selector independently
 
-Given Hush is ready, when the user presses the persona shortcut or clicks Persona in the menu bar, then Hush opens a complete circular selector at the pointer without starting a recording. The circle and transparent center remain consistent whether the user has a small or large persona library.
+Given clemii is ready, when the user presses the persona shortcut or clicks Persona in the menu bar, then clemii opens a complete circular selector at the pointer without starting a recording. The circle and transparent center remain consistent whether the user has a small or large persona library.
 
 ### PW-002 - Select the active persona
 
-Given Persona AI is ready and the wheel is open, when the user chooses a persona, then Hush closes the wheel, makes that persona active, and confirms `<persona> active`.
+Given Persona AI is ready and the wheel is open, when the user chooses a persona, then clemii closes the wheel, makes that persona active, and confirms `<persona> active`.
 
 ### PW-003 - Record with the active selection
 
-Given a persona is active, when the user records, then Hush captures that persona at recording start and applies it to the transcript. The persona remains active for later dictations until changed.
+Given a persona is active, when the user records, then clemii captures that persona at recording start and applies it to the transcript. The persona remains active for later dictations until changed.
 
 ### PW-004 - Return to no persona
 
-Given a persona is active, when the user chooses `No persona`, then Hush preserves the local AI provider but inserts locally cleaned transcripts without persona rewriting until another persona is selected.
+Given a persona is active, when the user chooses `No persona`, then clemii preserves the local AI provider but inserts locally cleaned transcripts without persona rewriting until another persona is selected.
 
 ### PW-005 - Recover from the wrong persona
 
-Given a dictated Hush output was refined with the wrong persona and remains in local history, when the user selects that output and opens the Compose shortcut, then Hush reopens the complete retained message. The user can restore the plain pre-AI transcript or apply another persona, then replace the exact selected output. If the destination text changed, Hush copies the correction instead of overwriting unrelated text.
+Given a dictated clemii output was refined with the wrong persona and remains in local history, when the user selects that output and opens the Compose shortcut, then clemii reopens the complete retained message. The user can restore the plain pre-AI transcript or apply another persona, then replace the exact selected output. If the destination text changed, clemii copies the correction instead of overwriting unrelated text.
 
 ### PW-006 - Set up unavailable personas
 
-Given Persona AI is off or unavailable, when the user presses the persona shortcut or clicks Persona in the menu bar, then Hush opens Settings on the Personas page and focuses setup instead of showing a disabled selector.
+Given Persona AI is off or unavailable, when the user presses the persona shortcut or clicks Persona in the menu bar, then clemii opens Settings on the Personas page and focuses setup instead of showing a disabled selector.
 
 ### PW-007 - Reach a large persona library
 
-Given more personas exist than fit cleanly in the radial selector, when the wheel opens, then Hush keeps `No persona`, the active persona, representative nearby personas, and one full-size `More` control directly visible. Choosing `More` opens a native searchable popover containing every persona. The active option never disappears into overflow, and adding profiles never creates overlapping circles or clipped labels.
+Given more personas exist than fit cleanly in the radial selector, when the wheel opens, then clemii keeps `No persona`, the active persona, representative nearby personas, and one full-size `More` control directly visible. Choosing `More` opens a native searchable popover containing every persona. The active option never disappears into overflow, and adding profiles never creates overlapping circles or clipped labels.
 
 ### PW-008 - Personas are optional, on top of Live Write
 
-Given the user opens hush AI > Live Write, the page shows Live Write's switch and status, three short examples of what it does, the Writing engine and, last, `Personas` marked `Optional`. Personas are a compact native list whose first row, `None`, means Live Write decides on its own and is recommended. Clicking a row selects it; a checkmark and the accessibility value show the selection. Choosing a persona turns Live Write on with that persona on top. `Edit` opens a dedicated native sheet containing name, icon, instructions, creativity, and an unsaved test area. `Add Persona` first asks for the persona's purpose, `Write for Me` or `Clean Up My Words`, then opens the same sheet; the sheet's subtitle names the purpose and its `…` menu can switch it. Duplicating a persona keeps its purpose. Cancel discards the draft, while Save commits it once. Automatic icons remain the default and a curated manual SF Symbol is optional. The Writing engine section expands and collapses; it owns Download, Use and Remove controls for the Qwen engines and Use for Apple Intelligence, shared with Assistant. Built-in descriptions are concise, while modified or custom personas display their actual instructions on one line.
+Given the user opens clemii AI > Live Write, the page shows Live Write's switch and status, three short examples of what it does, the Writing engine and, last, `Personas` marked `Optional`. Personas are a compact native list whose first row, `None`, means Live Write decides on its own and is recommended. Clicking a row selects it; a checkmark and the accessibility value show the selection. Choosing a persona turns Live Write on with that persona on top. `Edit` opens a dedicated native sheet containing name, icon, instructions, creativity, and an unsaved test area. `Add Persona` first asks for the persona's purpose, `Write for Me` or `Clean Up My Words`, then opens the same sheet; the sheet's subtitle names the purpose and its `…` menu can switch it. Duplicating a persona keeps its purpose. Cancel discards the draft, while Save commits it once. Automatic icons remain the default and a curated manual SF Symbol is optional. The Writing engine section expands and collapses; it owns Download, Use and Remove controls for the Qwen engines and Use for Apple Intelligence, shared with Assistant. Built-in descriptions are concise, while modified or custom personas display their actual instructions on one line.
 
 ### PW-009 - A persona writes what was asked for
 
-Given Live Write with no persona, or a persona whose purpose is `Write for Me`, when the user dictates a request such as "schreib eine kurze Mail an Tom, dass ich heute später komme", then hush inserts the requested text (the email, list or message) in the language spoken, and never a rewording of the request. Given a persona whose purpose is `Clean Up My Words` (such as "Polish"), the same dictation is inserted as corrected text. Facts the user named (names, days, times, numbers) are kept. Answers that are empty, runaway or that echo the prompt fall back to the user's own words; subject lines nobody asked for, Markdown and template placeholders are removed. With no persona on top, Live Write's own behaviour is the `Write for Me` purpose. In the wheel, `No persona` with Live Write on means Live Write without a persona.
+Given Live Write with no persona, or a persona whose purpose is `Write for Me`, when the user dictates a request such as "schreib eine kurze Mail an Tom, dass ich heute später komme", then clemii inserts the requested text (the email, list or message) in the language spoken, and never a rewording of the request. Given a persona whose purpose is `Clean Up My Words` (such as "Polish"), the same dictation is inserted as corrected text. Facts the user named (names, days, times, numbers) are kept. Answers that are empty, runaway or that echo the prompt fall back to the user's own words; subject lines nobody asked for, Markdown and template placeholders are removed. With no persona on top, Live Write's own behaviour is the `Write for Me` purpose. In the wheel, `No persona` with Live Write on means Live Write without a persona.
 
 ## Test mapping
 
@@ -92,4 +92,4 @@ Given Live Write with no persona, or a persona whose purpose is `Write for Me`, 
 | PW-008 | `PersonaWheelJourneyTests.testPersonaLibraryUsesFocusedEditorSheet` verifies the focused library, selected-card-only state treatment, edit sheet, icon control, test affordance, Save and Cancel actions, and clean Add Persona journey. `PersonaIconResolverTests` verifies automatic inference, manual overrides, and backward-compatible saved profiles. `PersonaEditorSheetTests` verifies that the instructions fill their box, show the saved text and take clicks and typing, with overlay and always-shown scroll bars and with empty or existing instructions, and that switching between dark and light redraws the sheet and its instructions box without relaunching. |
 | PW-009 | `DictationPromptTests` covers the per-model prompts and the purpose. `DictationCleanupTests` covers the fallback and the removal of echoes, subject lines, Markdown and placeholders. `BuiltInPersonaMigrationTests` covers the one-time offer. `PersonaWheelJourneyTests.testPersonaLibraryUsesFocusedEditorSheet` covers the Add Persona purpose menu. The opt-in `PersonaLiveTests` (`HUSH_PERSONA_LIVE=1`) measures every case against the real Qwen and Apple Intelligence models. |
 
-Settings redesign mapping: `PermissionJourneyTests.testPersonasUsesSharedModelsAndKeepsStyleEditing` and `testAISettingsInDarkAppearance` exercise the separate Hush AI pages and capture both appearances.
+Settings redesign mapping: `PermissionJourneyTests.testPersonasUsesSharedModelsAndKeepsStyleEditing` and `testAISettingsInDarkAppearance` exercise the separate clemii AI pages and capture both appearances.

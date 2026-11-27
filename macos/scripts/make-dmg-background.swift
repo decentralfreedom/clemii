@@ -5,7 +5,7 @@
 //
 // The image is a soft cream wash matching `DesignTokens.paper` from the
 // app, with a curved arrow in brand-orange pointing from where the
-// Hush.app icon will sit (140, 180) to where the Applications drop-
+// clemii.app icon will sit (140, 180) to where the Applications drop-
 // link will sit (400, 180). Those coordinates are mirrored from the
 // `--icon`/`--app-drop-link` args in `release-dmg.sh` — keep them in
 // sync if you ever resize the DMG window.
@@ -47,7 +47,7 @@ let pixelWidth  = Int(windowWidth  * scale)
 let pixelHeight = Int(windowHeight * scale)
 
 // ---------------------------------------------------------------------
-// Colours — match the app's DesignTokens (Hush/Design/DesignTokens.swift)
+// Colours — match the app's DesignTokens (Clemii/Design/DesignTokens.swift)
 // and the landing page: warm off-white, ink, peach + lilac.
 // ---------------------------------------------------------------------
 
@@ -103,7 +103,7 @@ func glow(_ color: NSColor, at center: CGPoint, radius: CGFloat, alpha: CGFloat)
 glow(lilac, at: CGPoint(x: windowWidth/2, y: 300), radius: 230, alpha: 0.50)
 glow(peach, at: CGPoint(x: windowWidth/2 - 60, y: 250), radius: 200, alpha: 0.16)
 
-// Arrow geometry. Starts past the right edge of the Hush icon, ends
+// Arrow geometry. Starts past the right edge of the clemii icon, ends
 // just before the left edge of the Applications folder. Small gap on
 // each side so the line doesn't visually touch the icons.
 let gap: CGFloat = 22

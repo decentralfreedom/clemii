@@ -3,10 +3,11 @@
 set -euo pipefail
 
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP_PATH="${1:-${HUSH_RELEASE_DIRECTORY:-${SCRIPT_DIRECTORY}/../artifacts/release}/export/hush.app}"
+APP_PATH="${1:-${HUSH_RELEASE_DIRECTORY:-${SCRIPT_DIRECTORY}/../artifacts/release}/export/clemii.app}"
 OUTPUT_DIRECTORY="${2:-${SCRIPT_DIRECTORY}/../artifacts/updates/alpha}"
-UPDATE_ORIGIN="${HUSH_UPDATE_ORIGIN:-https://updates.behu.sh}"
+UPDATE_ORIGIN="${HUSH_UPDATE_ORIGIN:-https://updates.clemii.com}"
 UPDATE_CHANNEL="${HUSH_UPDATE_CHANNEL:-alpha}"
+# The Keychain account holding the Sparkle EdDSA key: a stored name, not an address. Keep it.
 SPARKLE_ACCOUNT="${HUSH_SPARKLE_ACCOUNT:-behu.sh}"
 SPARKLE_BIN_DIRECTORY="${HUSH_SPARKLE_BIN_DIRECTORY:-}"
 
@@ -21,9 +22,9 @@ INFO_PLIST="${APP_PATH}/Contents/Info.plist"
 BUNDLE_IDENTIFIER="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "${INFO_PLIST}")"
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "${INFO_PLIST}")"
 BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "${INFO_PLIST}")"
-RELEASE_SLUG="$(/usr/libexec/PlistBuddy -c 'Print :HushReleaseSlug' "${INFO_PLIST}" 2>/dev/null || true)"
+RELEASE_SLUG="$(/usr/libexec/PlistBuddy -c 'Print :ClemiiReleaseSlug' "${INFO_PLIST}" 2>/dev/null || true)"
 
-if [[ "${BUNDLE_IDENTIFIER}" != "com.decentralfreedom.hush" ]]; then
+if [[ "${BUNDLE_IDENTIFIER}" != "com.decentralfreedom.clemii" ]]; then
   echo "Refusing to publish unexpected bundle identifier: ${BUNDLE_IDENTIFIER}" >&2
   exit 1
 fi
@@ -32,7 +33,7 @@ if ! [[ "${BUILD}" =~ ^[0-9]+$ ]]; then
   exit 1
 fi
 if [[ -n "${RELEASE_SLUG}" ]] && ! [[ "${RELEASE_SLUG}" =~ ^(alpha|beta|rc)\.[1-9][0-9]*$ ]]; then
-  echo "HushReleaseSlug must be alpha.N, beta.N, rc.N, or empty for stable releases; found: ${RELEASE_SLUG}" >&2
+  echo "ClemiiReleaseSlug must be alpha.N, beta.N, rc.N, or empty for stable releases; found: ${RELEASE_SLUG}" >&2
   exit 1
 fi
 
@@ -44,13 +45,13 @@ if [[ -z "${SPARKLE_BIN_DIRECTORY}" ]]; then
   fi
 fi
 if [[ ! -x "${SPARKLE_BIN_DIRECTORY}/generate_appcast" ]]; then
-  echo "Sparkle tools not found. Build Hush once or set HUSH_SPARKLE_BIN_DIRECTORY." >&2
+  echo "Sparkle tools not found. Build clemii once or set HUSH_SPARKLE_BIN_DIRECTORY." >&2
   exit 1
 fi
 
 mkdir -p "${OUTPUT_DIRECTORY}"
 SUFFIX="${RELEASE_SLUG:+-${RELEASE_SLUG}}"
-ARCHIVE_NAME="hush-${VERSION}${SUFFIX}-build.${BUILD}.zip"
+ARCHIVE_NAME="clemii-${VERSION}${SUFFIX}-build.${BUILD}.zip"
 ARCHIVE_PATH="${OUTPUT_DIRECTORY}/${ARCHIVE_NAME}"
 rm -f "${ARCHIVE_PATH}"
 ditto -c -k --sequesterRsrc --keepParent "${APP_PATH}" "${ARCHIVE_PATH}"
@@ -63,10 +64,15 @@ if [[ -n "${HUSH_RELEASE_NOTES_FILE:-}" ]]; then
   cp "${HUSH_RELEASE_NOTES_FILE}" "${ARCHIVE_PATH%.*}.md"
 fi
 
+# hush (builds 18 and older) reads this channel too and shares the EdDSA key, so Sparkle
+# would install clemii over hush.app under the old name. For those builds every clemii
+# update is informational: Sparkle shows it with the link and installs nothing.
+FIRST_CLEMII_BUILD=19
 "${SPARKLE_BIN_DIRECTORY}/generate_appcast" \
   --account "${SPARKLE_ACCOUNT}" \
   --download-url-prefix "${UPDATE_ORIGIN%/}/${UPDATE_CHANNEL}/" \
-  --link "https://behu.sh" \
+  --link "https://clemii.com" \
+  --informational-update-versions "<${FIRST_CLEMII_BUILD}" \
   --maximum-versions 3 \
   --maximum-deltas 3 \
   --delta-compression lzfse \
@@ -74,6 +80,11 @@ fi
   "${OUTPUT_DIRECTORY}"
 
 APPCAST_PATH="${OUTPUT_DIRECTORY}/appcast.xml"
+INFORMATIONAL_BELOW="$(xmllint --xpath "string(//*[local-name()='item'][*[local-name()='version' and text()='${BUILD}']]/*[local-name()='informationalUpdate']/*[local-name()='belowVersion'])" "${APPCAST_PATH}")"
+if [[ "${INFORMATIONAL_BELOW}" != "${FIRST_CLEMII_BUILD}" ]]; then
+  echo "Build ${BUILD} is not informational for hush builds below ${FIRST_CLEMII_BUILD}; refusing to publish." >&2
+  exit 1
+fi
 # Sparkle 2.9+ infers this from the arm64 app. Verify the generated metadata
 # rather than editing an automatically generated appcast after signing.
 HARDWARE_REQUIREMENT="$(xmllint --xpath "string(//*[local-name()='item'][*[local-name()='version' and text()='${BUILD}']]/*[local-name()='hardwareRequirements'])" "${APPCAST_PATH}")"

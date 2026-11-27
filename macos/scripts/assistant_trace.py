@@ -8,7 +8,7 @@ from pathlib import Path
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("directory", nargs="?", help="A turn directory; defaults to the latest turn")
-    parser.add_argument("--root", type=Path, default=Path.home() / "Library/Application Support/Hush/Development/AssistantTraces")
+    parser.add_argument("--root", type=Path, default=Path.home() / "Library/Application Support/Clemii/Development/AssistantTraces")
     parser.add_argument("--content", action="store_true", help="Also print the captured transcript, context, and model output")
     args = parser.parse_args()
     if args.directory:

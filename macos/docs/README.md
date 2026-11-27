@@ -1,6 +1,6 @@
 # Native app documentation
 
-[All hush docs](../../docs/README.md) · [Contribute](../../CONTRIBUTING.md)
+[All clemii docs](../../docs/README.md) · [Contribute](../../CONTRIBUTING.md)
 
 | Task | Guide |
 | --- | --- |
@@ -18,4 +18,4 @@ history and may describe superseded proposals.
 
 When changing a feature, update its journey and relevant evidence rather than
 adding a second conflicting specification. Preserve case-sensitive filenames
-and identifiers even though the product name is written **hush**.
+and identifiers even though the product name is written **clemii**.

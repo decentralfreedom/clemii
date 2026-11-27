@@ -29,11 +29,11 @@ class InstallerLayoutChecks(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             volume = root / "volume"
-            app = root / "export/hush.app"
-            metadata = {"CFBundleIdentifier": "com.decentralfreedom.hush",
+            app = root / "export/clemii.app"
+            metadata = {"CFBundleIdentifier": "com.decentralfreedom.clemii",
                         "CFBundleShortVersionString": "0.1.0",
-                        "CFBundleVersion": "14", "HushReleaseSlug": "alpha.5"}
-            for target in (volume / "hush.app", app):
+                        "CFBundleVersion": "14", "ClemiiReleaseSlug": "alpha.5"}
+            for target in (volume / "clemii.app", app):
                 (target / "Contents").mkdir(parents=True)
                 (target / "Contents/Info.plist").write_bytes(plistlib.dumps(metadata))
             background = root / "dmg-background.png"
@@ -76,15 +76,15 @@ class SignatureChecks(unittest.TestCase):
         check_signature(METADATA, {}, "TEAM", True)
 
     def test_keychain_group_stays_inside_the_team(self):
-        check_signature(METADATA, {"keychain-access-groups": ["TEAM.com.decentralfreedom.hush"]}, "TEAM", True)
+        check_signature(METADATA, {"keychain-access-groups": ["TEAM.com.decentralfreedom.clemii"]}, "TEAM", True)
         with self.assertRaises(ValueError):
             check_signature(METADATA, {"keychain-access-groups": ["OTHER.com.example"]}, "TEAM", True)
 
     def test_keychain_group_needs_an_embedded_profile(self):
         with tempfile.TemporaryDirectory() as directory:
-            app = Path(directory, "hush.app")
+            app = Path(directory, "clemii.app")
             (app / "Contents").mkdir(parents=True)
-            entitlements = {"keychain-access-groups": ["TEAM.com.decentralfreedom.hush"]}
+            entitlements = {"keychain-access-groups": ["TEAM.com.decentralfreedom.clemii"]}
             with self.assertRaises(ValueError):
                 check_provisioning(app, entitlements)
             (app / "Contents/embedded.provisionprofile").write_bytes(b"profile")
@@ -124,12 +124,12 @@ class NotaryChecks(unittest.TestCase):
         for notary_exit in (0, 37):
             with self.subTest(notary_exit=notary_exit), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
-                app = root / "hush.app"
+                app = root / "clemii.app"
                 (app / "Contents").mkdir(parents=True)
                 (app / "Contents/Info.plist").write_bytes(plistlib.dumps({
                     "CFBundleShortVersionString": "0.1.0",
                     "CFBundleVersion": "13",
-                    "HushReleaseSlug": "alpha.4",
+                    "ClemiiReleaseSlug": "alpha.4",
                 }))
                 commands_path = root / "commands.jsonl"
                 binaries = root / "bin"
@@ -156,7 +156,7 @@ if tool == "python3" and pathlib.Path(args[0]).name == "notarize_artifact.py":
                 environment.update(PATH=f"{binaries}:{os.environ['PATH']}",
                                    HUSH_NOTARIZE="1", HUSH_TEST_NOTARY_EXIT=str(notary_exit),
                                    HUSH_TEST_COMMANDS=str(commands_path))
-                output = root / "hush.dmg"
+                output = root / "clemii.dmg"
                 script = Path(__file__).resolve().parents[1] / "release-dmg.sh"
                 result = subprocess.run(["/bin/bash", str(script), "--app", str(app),
                                          "--output", str(output)], capture_output=True,
@@ -219,11 +219,11 @@ if tool == "python3" and pathlib.Path(args[0]).name == "notarize_artifact.py":
         for status in ("In Progress", "Invalid", "Accepted"):
             with self.subTest(status=status), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
-                app = root / "hush.dmg"
+                app = root / "clemii.dmg"
                 app.write_bytes(b"signed fixture")
                 reports = root / "reports"
                 reports.mkdir()
-                save(reports / f"hush.dmg-{fingerprint(app)}.json", {"id": SUBMISSION_ID})
+                save(reports / f"clemii.dmg-{fingerprint(app)}.json", {"id": SUBMISSION_ID})
                 commands = []
                 def fake_run(*args, **kwargs):
                     commands.append(args)
@@ -245,7 +245,7 @@ class ExportedBundleChecks(unittest.TestCase):
         original = Path(os.environ["HUSH_DISTRIBUTION_TEST_APP"])
         script = Path(__file__).resolve().parents[1] / "check_distribution.py"
         with tempfile.TemporaryDirectory(prefix="hush-seal-test-") as temporary:
-            candidate = Path(temporary) / "hush.app"
+            candidate = Path(temporary) / "clemii.app"
             subprocess.run(["/usr/bin/ditto", str(original), str(candidate)], check=True)
             # Bundle resources are covered by the outer signature seal.
             with (candidate / "Contents/Info.plist").open("ab") as target:

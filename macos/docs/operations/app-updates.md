@@ -1,11 +1,11 @@
-# hush app updates with Sparkle and Cloudflare R2
+# clemii app updates with Sparkle and Cloudflare R2
 
-Hush uses one direct-distribution pipeline from private alpha testing through
+clemii uses one direct-distribution pipeline from private alpha testing through
 notarized production releases:
 
 The supported hardware is Apple Silicon (arm64), on macOS 15 or later. Intel
-Macs are not supported by Hush's local AI stack. The transcription target is an
-8 GB Mac. For Hush Assistant, recommend 16 GB unified memory without imposing a
+Macs are not supported by clemii's local AI stack. The transcription target is an
+8 GB Mac. For clemii Assistant, recommend 16 GB unified memory without imposing a
 16 GB minimum or preventing setup on 8 GB. Actual 8 GB performance still needs
 hardware validation; do not present the target as a completed benchmark.
 
@@ -20,10 +20,12 @@ Xcode Release archive
   -> explicitly requested Apple notarization and stapling
   -> Sparkle EdDSA-signed ZIP and appcast
   -> Cloudflare R2
-  -> https://updates.behu.sh
+  -> https://updates.clemii.com (and updates.behu.sh for builds released before it)
 ```
 
-The bundle identifier, Sparkle public key, and update origin stay stable.
+The Sparkle public key stays stable. clemii has its own bundle identifier
+(`com.decentralfreedom.clemii`) and update origin, so hush installs do not
+update into clemii; install clemii instead.
 Public packaging and publishing require successful postflight checks. See
 [Developer ID distribution](notarization.md) for the strategy and source review.
 
@@ -33,28 +35,29 @@ Public packaging and publishing require successful postflight checks. See
 
 1. Open **Cloudflare Dashboard > Storage & databases > R2**.
 2. Create the dedicated public update bucket. The current production bucket is
-   named `hush`.
+   named `clemii`.
 3. Open the bucket, then **Settings > Public access > Custom Domains**.
-4. Select **Connect Domain** and enter `updates.behu.sh`.
+4. Select **Connect Domain** and enter `updates.clemii.com`. `updates.behu.sh`
+   stays connected as well: builds released before clemii read their feed there.
 5. Confirm the connection. Cloudflare creates the required DNS record and
    serves the bucket through its CDN.
 
-Do not point `updates.behu.sh` at Coolify. `behu.sh` continues to point at the
-Coolify web service, while `updates.behu.sh` points directly at R2.
+Do not point `updates.clemii.com` at Coolify. `clemii.com` points at the
+Coolify web service, while `updates.clemii.com` points directly at R2.
 
 After the first publish, these URLs become public:
 
 ```text
-https://updates.behu.sh/alpha/appcast.xml
-https://updates.behu.sh/alpha/hush-<version>-<channel>-build.<build>.zip
-https://updates.behu.sh/downloads/hush-latest.dmg
+https://updates.clemii.com/alpha/appcast.xml
+https://updates.clemii.com/alpha/clemii-<version>-<channel>-build.<build>.zip
+https://updates.clemii.com/downloads/hush-latest.dmg
 ```
 
 ### 2. Create a publishing token
 
 1. In R2, select **Manage R2 API Tokens**.
 2. Create a token with **Object Read & Write**.
-3. Scope it only to the `hush` update bucket.
+3. Scope it only to the `clemii` update bucket.
 4. Save its Access Key ID, Secret Access Key, and S3 endpoint in a password
    manager. The secret is shown only once.
 
@@ -63,8 +66,8 @@ machine or CI secrets only. The running proof service does not need access to
 the update bucket.
 
 Cloudflare's custom domain makes the complete bucket public. Do not connect
-`updates.behu.sh` to a bucket used for encrypted proof objects or any other
-application data. Keep the `hush` bucket dedicated to public release artifacts
+`updates.clemii.com` to a bucket used for encrypted proof objects or any other
+application data. Keep the `clemii` bucket dedicated to public release artifacts
 even when other application objects are encrypted.
 
 ## Build-machine setup
@@ -93,7 +96,7 @@ name:
 
 ```dotenv
 HUSH_R2_ENDPOINT=https://ACCOUNT_ID.r2.cloudflarestorage.com
-HUSH_R2_BUCKET=hush
+HUSH_R2_BUCKET=clemii
 AWS_ACCESS_KEY_ID=YOUR_R2_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY=YOUR_R2_SECRET_ACCESS_KEY
 AWS_DEFAULT_REGION=auto
@@ -115,7 +118,7 @@ new Mac:
 
 ```sh
 SPARKLE_BIN=/tmp/hush-release/SourcePackages/artifacts/sparkle/Sparkle/bin
-"$SPARKLE_BIN/generate_keys" --account behu.sh -x /secure/offline/Hush-Sparkle.key
+"$SPARKLE_BIN/generate_keys" --account behu.sh -x /secure/offline/Clemii-Sparkle.key
 ```
 
 The exported file is equivalent to a release-signing password. Never commit or
@@ -125,13 +128,13 @@ upload it to R2.
 
 ### Release identity
 
-Hush keeps Apple's numeric bundle requirements separate from human prerelease
+clemii keeps Apple's numeric bundle requirements separate from human prerelease
 labels and Sparkle ordering:
 
 | Purpose | Source | Example |
 | --- | --- | --- |
 | Product milestone | `MARKETING_VERSION` / `CFBundleShortVersionString` | `0.1.0` |
-| Tester maturity | `HUSH_RELEASE_SLUG` / `HushReleaseSlug` | `alpha.1` |
+| Tester maturity | `HUSH_RELEASE_SLUG` / `ClemiiReleaseSlug` | `alpha.1` |
 | Update order | `CURRENT_PROJECT_VERSION` / `CFBundleVersion` | `10` |
 
 Together these identify the release as `0.1.0-alpha.1 (10)`. Artifacts use the
@@ -159,7 +162,7 @@ data-contract change. Commit volume and whether code was written by a human or
 an AI assistant never affect the version. User-visible compatibility does.
 
 Apple requires the short version and build fields to remain numeric. The
-prerelease label therefore stays in Hush's own build setting and artifact
+prerelease label therefore stays in clemii's own build setting and artifact
 names, while Sparkle compares the strictly increasing numeric build.
 
 The publisher downloads the live appcast and refuses any build that is not
@@ -194,7 +197,7 @@ Apple or publish anything:
 ./scripts/build-dmg.sh
 ```
 
-The outputs are `artifacts/release/export/hush.app` and a versioned DMG under
+The outputs are `artifacts/release/export/clemii.app` and a versioned DMG under
 `artifacts/release/dist`. Reports and build logs are under
 `artifacts/release/reports`. The script refuses to overwrite an existing export;
 use a new `HUSH_RELEASE_DIRECTORY` for another candidate. Set
@@ -240,7 +243,7 @@ Packaging a notarized app and generating an appcast do not require R2:
 
 ```sh
 ./scripts/package-update.sh \
-  artifacts/release/export/hush.app \
+  artifacts/release/export/clemii.app \
   /tmp/hush-local-updates/alpha
 
 cd /tmp/hush-local-updates
@@ -274,16 +277,16 @@ candidate remains available:
 ```sh
 export HUSH_NOTARIZE=1
 export HUSH_NOTARY_KEYCHAIN_PROFILE=HushNotary
-./scripts/release-dmg.sh --app artifacts/release/export/hush.app \
+./scripts/release-dmg.sh --app artifacts/release/export/clemii.app \
   --output artifacts/release/final/hush-0.1.0-alpha.4-build.13.dmg
 ```
 
 Use the actual version, slug and build number in the filename. For another
-developer team, set `HUSH_DEVELOPMENT_TEAM` before building; the default is hush's
+developer team, set `HUSH_DEVELOPMENT_TEAM` before building; the default is clemii's
 team. Signing follows Xcode's direct distribution: the archive and the Developer ID
 export use automatic signing with `-allowProvisioningUpdates`, so Xcode picks the
 Developer ID Application certificate and creates or renews the provisioning profile
-that authorises the keychain access group (`Hush/Hush-Team.entitlements`). This needs
+that authorises the keychain access group (`Clemii/Clemii-Team.entitlements`). This needs
 the team's Apple Account signed in under Xcode > Settings > Accounts on the release
 Mac.
 
@@ -301,12 +304,12 @@ providing an independent update-chain guarantee.
 
 ## Tester experience
 
-- Hush checks for alpha updates automatically.
+- clemii checks for alpha updates automatically.
 - Updates download in the background after the tester opts into automatic
   updates.
 - Sparkle presents native macOS update UI and lets the tester choose the
   relaunch moment.
-- **Check for Updates...** in the Hush menu-bar panel remains the manual fallback.
+- **Check for Updates...** in the clemii menu-bar panel remains the manual fallback.
 - An active session is never force-restarted.
 
 Public installers must pass the notarized distribution path. Test the downloaded

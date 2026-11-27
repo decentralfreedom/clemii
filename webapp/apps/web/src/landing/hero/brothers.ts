@@ -51,7 +51,30 @@ export const along = (me: Brother, angle: number) => (angle - me.head) / (me.tip
  * The inner edge of a brother's ribbon at an angle: the ring's inner edge until his brother's head,
  * then out to the rim in a point, so that the end of his cape lies on the outside of his brother.
  */
-export function ribbonEdge(me: Brother, other: Brother, angle: number) {
+export function ribbonEdge(me: Brother, other: Brother, angle: number, edge = inner) {
   const from = other.head < me.head ? other.head + 360 : other.head;
-  return angle <= from ? inner : inner + (1 - inner) * Math.min(1, (angle - from) / (me.tip - from)) ** 1.25;
+  return angle <= from ? edge : edge + (1 - edge) * Math.min(1, (angle - from) / (me.tip - from)) ** 1.25;
+}
+
+/**
+ * The mark as a glyph of one colour, for a menu bar or a small badge, where there is no room for
+ * colour to tell the brothers apart: each ribbon is a comma with air between it and the other, and
+ * the globe is a dot. A little bolder than the mark, to hold at 16 points.
+ */
+export function glyph() {
+  const edge = 0.6, air = 0.14, dot = 0.3;
+  const ribbons = [[big, small], [small, big]].map(([me, other]) => {
+    // Where his brother's cape, lying over his start, comes to its point.
+    const over = other!.tip - 360 < me!.head ? other!.tip : other!.tip - 360;
+    const outer: Point[] = [], innerSide: Point[] = [];
+    for (let angle = me!.head; angle <= me!.tip; angle += 1) {
+      const low = ribbonEdge(me!, other!, angle, edge);
+      const high = angle < over ? edge + (1 - edge) * ((angle - me!.head) / (over - me!.head)) ** 1.25 - air : 1;
+      if (high - low < 0.02) continue;
+      outer.push(polar(angle, high));
+      innerSide.push(polar(angle, low));
+    }
+    return [...outer, ...innerSide.reverse()];
+  });
+  return { ribbons, dot };
 }
