@@ -277,7 +277,7 @@ running version uses it.
    (a read-only token from `bun run cms:token --name website-build --scopes
    posts:read` in the `cms` container) as a locked variable that is available
    at build time and not at runtime. The build reads the CMS at its public
-   address (`HUSH_CMS_URL`, default `https://cms.behu.sh`), so it works on any
+   address (`HUSH_CMS_URL`, default `https://cms.clemii.com`), so it works on any
    builder; the token is the only credential it needs. Without these settings the image
    builds the default target `runtime`, with the blog from `content/blog`.
 

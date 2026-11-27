@@ -37,7 +37,7 @@ is writing that platform's configuration from it, and copying the data.
 | Databases | `postgres:17-alpine`, or the platform's managed PostgreSQL 17 | 5432 | `pg_isready` | one each for web and CMS | a persistent volume, or managed |
 
 Building the production website reads the CMS: it needs the build argument
-`HUSH_CMS_URL` (default `https://cms.behu.sh`) and the build secret
+`HUSH_CMS_URL` (default `https://cms.clemii.com`) and the build secret
 `HUSH_CMS_TOKEN` (a read-only CMS token). Publishing a post rebuilds the site;
 today the scheduler asks Coolify for that build (`CMS_COOLIFY_*`), so on another
 platform this trigger is the one setting to point at its deploy hook.

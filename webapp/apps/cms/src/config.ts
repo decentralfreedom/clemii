@@ -43,7 +43,7 @@ export type SearchConsoleConfig = {
 };
 
 export type AdminConfig = {
-  /** The admin's own origin, such as https://cms.behu.sh: the OAuth callback and the CSRF origin. */
+  /** The admin's own origin, such as https://cms.clemii.com: the OAuth callback and the CSRF origin. */
   publicUrl: string;
   github: { clientId: string; clientSecret: string };
   /** Numeric GitHub user ids allowed to sign in (ids, unlike logins, never change). */

@@ -13,14 +13,14 @@ resource on each deploy ([Coolify: rolling updates](https://coolify.io/docs/appl
 
 | Resource | What | Deploys |
 | --- | --- | --- |
-| `hush-cms-api` | Dockerfile application, the API and the admin at cms.behu.sh | Rolling update on every push: the new container passes `/health/ready`, then the old one drains (10 s) and stops. `scripts/rolling-update-e2e.ts` proves no request is dropped (CI runs it). |
+| `hush-cms-api` | Dockerfile application, the API and the admin at cms.clemii.com | Rolling update on every push: the new container passes `/health/ready`, then the old one drains (10 s) and stops. `scripts/rolling-update-e2e.ts` proves no request is dropped (CI runs it). |
 | `hush-cms-scheduler` | Dockerfile application, the same image built with target `scheduler`, no domain | Rolling update; for a moment two schedulers run, which is safe (every step is idempotent). |
 | `hush-cms-postgres` | Coolify PostgreSQL 17 database, user and database `cms` | Never on code deploys. Its internal address (the database's uuid) never changes. |
 
 The applications reach the database by its internal URL, which Coolify shows
 on the database's page; both apply migrations at start under one lock and
 answer `/health/ready` on port 3100, so they start in any order. The website's
-build reads the CMS at `https://cms.behu.sh`. Keep the database at PostgreSQL
+build reads the CMS at `https://cms.clemii.com`. Keep the database at PostgreSQL
 17: the image's `pg_dump` is version 17 and refuses a newer server.
 
 ## Create the resources
@@ -50,7 +50,7 @@ The applications `hush-cms-api` and `hush-cms-scheduler`, each:
    `webapp/apps/cms-admin/**` (the image includes the admin). Auto deploy on
    push, as the website.
 
-`hush-cms-api` gets the domain `https://cms.behu.sh`. `hush-cms-scheduler`
+`hush-cms-api` gets the domain `https://cms.clemii.com`. `hush-cms-scheduler`
 gets the **Docker Build Stage Target** `scheduler` and no domain.
 
 ### Move from one Compose resource (once)
@@ -63,9 +63,9 @@ Production ran all three services in the Compose resource `hush-cms` until
    `bun run cms:backup && bun run cms:restore --target-url <new database's internal URL>`
    in its `cms` container (a one-off **Scheduled Task**, deleted afterwards).
 3. Deploy `hush-cms-api` and check it is healthy, then move the domain
-   `cms.behu.sh` from `hush-cms` to it.
+   `cms.clemii.com` from `hush-cms` to it.
 4. Stop `hush-cms`, then deploy `hush-cms-scheduler`.
-5. Sign in at cms.behu.sh, run `hush-cms auth status`, and check the
+5. Sign in at cms.clemii.com, run `hush-cms auth status`, and check the
    scheduler's logs for its next tick. Keep the stopped `hush-cms` and its
    volume for a week as a fallback, then delete it.
 
@@ -201,24 +201,24 @@ Check after changes: from the `hush-cms-scheduler` container a request to
 token answers "Missing required permissions: read" (the IP is allowed, the
 token is limited), and from the internet every `/api` path answers 403.
 
-## The admin at cms.behu.sh
+## The admin at cms.clemii.com
 
 The CMS serves its admin (`apps/cms-admin`, built into the image) on its own
 origin. Sign-in is a GitHub OAuth App with PKCE; only listed GitHub user ids get
 a session.
 
 1. **GitHub > Settings > Developer settings > OAuth Apps > New**: name
-   `hush CMS`, homepage `https://cms.behu.sh`, callback
-   `https://cms.behu.sh/auth/github/callback`, wildcard matching off, device
+   `hush CMS`, homepage `https://cms.clemii.com`, callback
+   `https://cms.clemii.com/auth/github/callback`, wildcard matching off, device
    flow off, expiring user tokens on. Generate a client secret.
-2. **Cloudflare DNS**: `cms.behu.sh`, A, the app server's address, proxied.
-3. **Coolify, hush-cms-api > General**: domain `https://cms.behu.sh` (Traefik
+2. **Cloudflare DNS**: `cms.clemii.com`, A, the app server's address, proxied.
+3. **Coolify, hush-cms-api > General**: domain `https://cms.clemii.com` (Traefik
    routes to the container's port 3100; nothing is published on the host).
-4. **Environment variables**, runtime only: `CMS_PUBLIC_URL=https://cms.behu.sh`,
+4. **Environment variables**, runtime only: `CMS_PUBLIC_URL=https://cms.clemii.com`,
    `CMS_ADMIN_GITHUB_IDS` (numeric ids, `https://api.github.com/users/<login>`
    shows `id`), `CMS_GITHUB_CLIENT_ID`, and `CMS_GITHUB_CLIENT_SECRET` locked.
    Copy the secret from GitHub straight into Coolify.
-5. Redeploy, open `https://cms.behu.sh` and sign in. A GitHub account outside
+5. Redeploy, open `https://cms.clemii.com` and sign in. A GitHub account outside
    the list gets "This GitHub account may not use the hush CMS."
 
 Protect the allowed GitHub accounts with a passkey or two-factor
@@ -227,7 +227,7 @@ authentication: the admin inherits their sign-in.
 ## After the first deploy
 
 1. Connect the CLI on the owner's Mac with `hush-cms auth login` and approve
-   its code at cms.behu.sh/device ([CLI guide](../../../cms-cli/README.md)).
+   its code at cms.clemii.com/device ([CLI guide](../../../cms-cli/README.md)).
    `bun run cms:token` in the `cms` container is only for tokens no person
    signs in for, such as the website build's read token (step 7 above).
 2. Check the `cms-scheduler` logs for "Backed up the CMS database" and

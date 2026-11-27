@@ -19,7 +19,7 @@ import { createTestDatabase, serverUrl } from "./database";
 import { credentials, ownerSession } from "./fixtures";
 
 const admin: AdminConfig = {
-  publicUrl: "https://cms.behu.sh",
+  publicUrl: "https://cms.clemii.com",
   github: { clientId: "client-id", clientSecret: "client-secret" },
   allowedGithubIds: new Set([1]),
 };
@@ -61,8 +61,8 @@ describe.skipIf(!serverUrl)("CMS device sign-in", () => {
     expect(start.headers.get("cache-control")).toBe("no-store");
     const { deviceCode, userCode, verificationUri, verificationUriComplete, expiresIn, interval } = start.body;
     expect(userCode).toMatch(/^[BCDFGHJKLMNPQRSTVWXZ]{4}-[BCDFGHJKLMNPQRSTVWXZ]{4}$/);
-    expect(verificationUri).toBe("https://cms.behu.sh/device");
-    expect(verificationUriComplete).toBe(`https://cms.behu.sh/device?code=${userCode}`);
+    expect(verificationUri).toBe("https://cms.clemii.com/device");
+    expect(verificationUriComplete).toBe(`https://cms.clemii.com/device?code=${userCode}`);
     expect([expiresIn, interval]).toEqual([900, 5]);
     const [stored] = await database.db.select().from(deviceAuthorizations).where(eq(deviceAuthorizations.userCode, userCode));
     expect(stored!.deviceCodeHash).not.toBe(deviceCode);

@@ -20,7 +20,7 @@ import {
 import { connect } from "./api/fetcher";
 import { CredentialError, deleteToken, promptToken, readToken, saveToken, storedToken } from "./credentials";
 
-export const defaultUrl = "https://cms.behu.sh";
+export const defaultUrl = "https://cms.clemii.com";
 
 const usage = `hush-cms: the clemii blog CMS from the command line
 
@@ -67,7 +67,7 @@ Goals (objectives and key results, measured from the CMS's numbers)
 
 Access
   auth login [--no-browser]          Signs in through the browser, as gh auth login: approve the
-                                     code shown here at cms.behu.sh/device; the token goes to the
+                                     code shown here at cms.clemii.com/device; the token goes to the
                                      macOS Keychain
   auth login --with-token            Reads a token from stdin instead, for scripts
   auth status                        The token's name, scopes and expiry

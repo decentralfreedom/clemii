@@ -1,6 +1,6 @@
 # clemii CMS admin
 
-The editor for the clemii blog at cms.behu.sh: posts by status, a Markdown editor
+The editor for the clemii blog at cms.clemii.com: posts by status, a Markdown editor
 with the live preview behu.sh will show, post settings, images, history and
 publishing. It is the `@clemii/cms-admin` app in the [web workspace](../../README.md);
 the CMS (`apps/cms`) serves the built admin on its own origin and is its API.
