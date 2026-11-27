@@ -59,17 +59,10 @@ export async function mountClemiiScene(host: HTMLElement, signal: AbortSignal) {
   const held = import.meta.env.DEV ? new URLSearchParams(location.search).get("arrival") : null;
   const scrub = held === null ? undefined : Math.min(0.999, Math.max(0, Number(held)));
   // The one rule for the opening: it plays when the scene is ready while the hero is in view at the
-  // top of a visible page, for a visitor who has not asked for less motion. Otherwise the finished
-  // scene takes over from the flat logo.
+  // top of a visible page, for a visitor who has not asked for less motion: the 3D logo, whose first
+  // frame is the flat logo, turns into the brothers at once. Otherwise the finished scene takes over.
   let opening = scrub !== undefined || (!reducedMotion.matches && !document.hidden && scrollY < 100 &&
     host.getBoundingClientRect().top < innerHeight);
-  if (opening && scrub === undefined) {
-    // The flat logo glides into place in CSS from the first paint. The 3D logo's first frame is that
-    // logo at rest, so it takes over once the glide has ended, and the swap is not seen.
-    const glide = host.querySelector(".core-fallback")?.getAnimations() ?? [];
-    await Promise.all(glide.map(animation => animation.finished.catch(() => undefined)));
-    if (signal.aborted || !host.isConnected) { releaseResources(); return null; }
-  }
   let started: number | undefined;
   let renderedWidth = 0, renderedHeight = 0;
   let tiltX = targetX, tiltY = targetY;

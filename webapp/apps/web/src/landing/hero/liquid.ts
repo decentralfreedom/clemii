@@ -172,7 +172,7 @@ export function createLiquidOpening(orbit: number, capes: number[]) {
       played = true;
       group.visible = true;
       // The ribbons run off from their tips, the big brother's a moment before clemii's.
-      const runs = parts.map((_, index) => smooth((arrival - 0.14 - index * 0.03) / 0.26));
+      const runs = parts.map((_, index) => smooth((arrival - 0.03 - index * 0.03) / 0.3));
       ribbons.forEach(({ mesh, lay }, index) => {
         const { me } = parts[index]!, run = runs[index]!;
         mesh.visible = run < 0.995;
@@ -241,7 +241,7 @@ export function createLiquidOpening(orbit: number, capes: number[]) {
       for (const item of disposables) item.dispose();
     },
     /** How much the opening is still the logo, from 1 at its start to 0 once it has turned. */
-    logo(arrival: number) { return arrival >= 1 ? 0 : 1 - smooth((arrival - 0.12) / 0.36); },
+    logo(arrival: number) { return arrival >= 1 ? 0 : 1 - smooth((arrival - 0.02) / 0.4); },
   };
 }
 export type LiquidOpening = ReturnType<typeof createLiquidOpening>;
