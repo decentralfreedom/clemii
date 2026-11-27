@@ -14,7 +14,7 @@ const formerStorageKey = "hush-cms-appearance";
 function stored(): ThemeMode {
   try {
     const value = localStorage.getItem(storageKey) ?? localStorage.getItem(formerStorageKey);
-    return value === "light || value === "dark" ? value : "system";
+    return value === "light" || value === "dark" ? value : "system";
   } catch {
     return "system";
   }
