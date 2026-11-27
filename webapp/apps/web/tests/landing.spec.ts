@@ -177,7 +177,7 @@ test("keeps download colors and position on hover and press", async ({ page }, t
   }
 });
 
-test("downloads the notarized alpha and opens its release notes", async ({
+test("downloads the notarized alpha and stays on the page", async ({
   browserName, context, page, isMobile,
 }, testInfo) => {
   const downloadURL = "https://updates.clemii.com/downloads/clemii-0.1.0-alpha.10-build.19.dmg";
@@ -204,7 +204,7 @@ test("downloads the notarized alpha and opens its release notes", async ({
   // download manager makes that first request, so the page does not report it.)
   await expect(page.getByRole("link", { name: "Download for Mac" }).first()).toHaveAttribute("href", "/download?from=%2F");
   const requestPromise = page.waitForRequest(downloadURL);
-  // No new tab: Safari asks "Allow downloads?" in the tab that started the download.
+  // The visitor stays on this page: Safari asks "Allow downloads?" in the tab that started the download.
   let newTabs = 0;
   context.on("page", () => newTabs++);
   const downloadPromise = browserName === "webkit" ? undefined : page.waitForEvent("download");
@@ -219,9 +219,11 @@ test("downloads the notarized alpha and opens its release notes", async ({
     expect(download.suggestedFilename()).toBe("clemii-0.1.0-alpha.10-build.19.dmg");
     await download.cancel();
   }
-  const releasePage = page;
-  await expect(releasePage).toHaveURL(/\/releases\/0\.1\.0-alpha\.10$/);
+  await expect(page).toHaveURL(/\/$/);
   expect(newTabs).toBe(0);
+  // The matching release notes, reached from the release index.
+  const releasePage = page;
+  await releasePage.goto("/releases/0.1.0-alpha.10");
   await expect(releasePage.getByRole("heading", { level: 1, name: "hush is now clemii." })).toBeVisible();
   await expect(releasePage.getByText(/I'd like to open-source the app in the future/)).toBeVisible();
   await expect(releasePage.getByText(/full public release/).first()).toBeVisible();
