@@ -1,6 +1,5 @@
 import {
   type ComponentProps,
-  type MouseEventHandler,
   type ReactNode,
   useRef,
   useState,
@@ -10,7 +9,6 @@ import { siApple } from "simple-icons";
 import {
   downloadPath,
   latestRelease,
-  releasePath,
 } from "../../shared/releases";
 import { ButtonLink, buttonClassName } from "./ButtonLink";
 import { DownloadHandoff } from "./DownloadHandoff";
@@ -48,26 +46,12 @@ export function DownloadLink({ mobileLabel = m.download_mobile(), ...props }: Do
     {handoffOpen && <DownloadHandoff onClose={() => { setHandoffOpen(false); trigger.current?.focus({ preventScroll: true }); }} />}
   </>;
 
-  const startDownload: MouseEventHandler<HTMLAnchorElement> = (event) => {
-    if (
-      event.button !== 0 ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.shiftKey ||
-      event.altKey
-    ) {
-      return;
-    }
-
-    window.open(releasePath(release), "_blank", "noopener,noreferrer");
-  };
-
+  // A plain download link: the visitor stays on the page, where Safari asks "Allow downloads?".
   return (
     <ButtonLink
       {...props}
       href={downloadPath(page, campaign)}
       download={release.downloadName}
-      onClick={startDownload}
     />
   );
 }

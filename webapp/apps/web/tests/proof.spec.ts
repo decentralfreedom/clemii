@@ -246,7 +246,8 @@ test("downloads clemii from the recipient invitation without losing the private 
     return;
   }
   const request = page.waitForRequest(release.downloadURL);
-  const popup = page.waitForEvent("popup");
+  let newTabs = 0;
+  context.on("page", () => newTabs++);
   const download = browserName === "webkit" ? undefined : page.waitForEvent("download");
   await page.getByRole("link", { name: "Download for Mac", exact: true }).click();
   await request;
@@ -255,10 +256,11 @@ test("downloads clemii from the recipient invitation without losing the private 
     expect(file.suggestedFilename()).toBe(release.downloadName);
     await file.cancel();
   }
-  const notes = await popup;
-  await expect(notes).toHaveURL(new RegExp(`/releases/${release.version.replaceAll(".", "\\.")}$`));
-  await expect.poll(() => page.evaluate(() => location.hash)).toBe(`#k=${fixture.key}`);
-  await notes.close();
+  // The recipient stays with their message: no new tab (Safari would ask "Allow downloads?" behind
+  // it) and no release notes in its place.
+  await expect(page).toHaveURL(new RegExp(`/p/${fixture.slug}#k=`));
+  await expect(page.getByRole("heading", { name: "Verified clemii message", exact: true })).toBeVisible();
+  expect(newTabs).toBe(0);
 });
 
 test("preserves the private key through a real short proof redirect", async ({
