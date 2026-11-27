@@ -64,16 +64,12 @@ def workspace_dependents(root=REPOSITORY):
     return dependents
 
 
-def classify(paths, dependents=None, workflow="ci"):
-    """The checks a change needs. For the CodeQL workflow, other GitHub
-    configuration (CI jobs, selection, Dependabot) cannot change what the
-    code analysis finds, so only its own workflow file runs everything."""
+def classify(paths, dependents=None):
+    """The checks a change needs."""
     scope = dict.fromkeys(full_scope(), False)
     for path in paths:
         # Encrypted deployment secrets (webapp/deploy/README.md) build and test nothing.
         if path == "webapp/.sops.yaml" or path.startswith("webapp/deploy/"):
-            continue
-        if workflow == "codeql" and path.startswith(".github/") and path != ".github/workflows/codeql.yml":
             continue
         if path in NO_COMPONENT:
             continue
@@ -115,7 +111,7 @@ def classify(paths, dependents=None, workflow="ci"):
     return scope
 
 
-def scope_for_event(event_name, event, cwd=None, workflow="ci"):
+def scope_for_event(event_name, event, cwd=None):
     if event_name == "pull_request":
         base = event.get("pull_request", {}).get("base", {}).get("sha", "")
         head = event.get("pull_request", {}).get("head", {}).get("sha", "")
@@ -141,15 +137,12 @@ def scope_for_event(event_name, event, cwd=None, workflow="ci"):
     except (subprocess.CalledProcessError, UnicodeError):
         return full_scope(), "Comparison unavailable (for example, rewritten history): all checks."
     paths = [path for path in changed if path]
-    return classify(paths, workflow=workflow), f"Compared {len(paths)} changed paths, including deletions."
+    return classify(paths), f"Compared {len(paths)} changed paths, including deletions."
 
 
 def main():
     event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
-    workflow = os.environ.get("CI_SCOPE_WORKFLOW", "ci")
-    if workflow not in {"ci", "codeql"}:
-        raise SystemExit(f"CI_SCOPE_WORKFLOW must be ci or codeql, not {workflow}")
-    scope, reason = scope_for_event(os.environ["GITHUB_EVENT_NAME"], event, workflow=workflow)
+    scope, reason = scope_for_event(os.environ["GITHUB_EVENT_NAME"], event)
     with open(os.environ["GITHUB_OUTPUT"], "a") as output:
         for name, enabled in scope.items():
             output.write(f"{name}={str(enabled).lower()}\n")
