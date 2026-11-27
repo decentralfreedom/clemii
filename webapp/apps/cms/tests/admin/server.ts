@@ -4,7 +4,7 @@
 // A local CMS for the admin: its browser journeys (playwright.config.ts) and
 // development (bun run dev in apps/cms-admin). It serves the built admin when
 // apps/cms-admin/dist exists, and uses a fresh database
-// (HUSH_TEST_DATABASE_URL), media on disk and two seeded posts. GET
+// (CLEMII_TEST_DATABASE_URL), media on disk and two seeded posts. GET
 // /__e2e/sign-in signs the browser in through the CMS's own session code; that
 // route exists only in this test server, never in the CMS.
 import { mkdtemp } from "node:fs/promises";

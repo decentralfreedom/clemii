@@ -13,11 +13,11 @@ skill) and scripts use to draft, check, schedule and publish articles.
 - A pushed file is content only. Going live is always an explicit `schedule`
   or `publish`, which the CMS allows a token only for what the owner approved.
 - Tokens never appear in arguments or output; they come from the Keychain or
-  `HUSH_CMS_TOKEN`.
+  `CLEMII_CMS_TOKEN`.
 - Never import from `apps/cms`; the journeys start it as a separate process.
 
 ## Required verification
 
 - `bun run lint`, `bun run api:check` and `bun run build`
 - Journeys (CMS-CLI-001 to CMS-CLI-007 in `apps/cms/docs/user-journeys/cms.md`)
-  against a real CMS: `HUSH_TEST_DATABASE_URL=postgresql://... bun test`
+  against a real CMS: `CLEMII_TEST_DATABASE_URL=postgresql://... bun test`

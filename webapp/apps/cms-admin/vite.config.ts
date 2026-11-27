@@ -10,7 +10,7 @@ import { defineConfig } from "vite";
 // development, Vite serves the admin with hot reload on http://localhost:5174
 // and forwards the API to the local CMS of bun run dev (apps/cms
 // admin:server, HTTPS with a throwaway certificate).
-const cms = { target: process.env.HUSH_CMS_DEV_URL ?? "https://localhost:4310", changeOrigin: true, secure: false };
+const cms = { target: process.env.CLEMII_CMS_DEV_URL ?? "https://localhost:4310", changeOrigin: true, secure: false };
 
 export default defineConfig({
   // File-based routes (src/routes); the plugin must come before React's.

@@ -45,8 +45,8 @@ For a development launch, endpoints can be overridden through the Xcode scheme
 or environment:
 
 ```sh
-HUSH_PROOF_SERVICE_URL=http://127.0.0.1:4000 \
-HUSH_PROOF_SHORT_URL=http://127.0.0.1:4000/s/ \
+CLEMII_PROOF_SERVICE_URL=http://127.0.0.1:4000 \
+CLEMII_PROOF_SHORT_URL=http://127.0.0.1:4000/s/ \
   /path/to/clemii.app/Contents/MacOS/clemii
 ```
 
@@ -63,7 +63,7 @@ swift test --package-path Packages/ClemiiProvenance
 With the sibling web service running on port 3000, run the integration journey:
 
 ```sh
-HUSH_PROVENANCE_E2E_BASE_URL=http://127.0.0.1:3000 \
+CLEMII_PROVENANCE_E2E_BASE_URL=http://127.0.0.1:3000 \
   swift test --package-path Packages/ClemiiProvenance \
   --filter enrollsAndPublishesWithHonoService
 ```

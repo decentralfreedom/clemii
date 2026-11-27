@@ -4,7 +4,7 @@ import Testing
 @testable import Clemii
 
 nonisolated private let liveWebsiteIconHost =
-    ProcessInfo.processInfo.environment["HUSH_FAVICON_E2E_HOST"]
+    ProcessInfo.processInfo.environment["CLEMII_FAVICON_E2E_HOST"]
 
 @Suite("Website exception icons")
 struct WebsiteIconLoaderTests {

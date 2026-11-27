@@ -10,7 +10,7 @@ import Testing
 @Suite(
     "Vocabulary boost on real audio",
     .serialized,
-    .enabled(if: ProcessInfo.processInfo.environment["HUSH_PARAKEET_E2E"] == "1")
+    .enabled(if: ProcessInfo.processInfo.environment["CLEMII_PARAKEET_E2E"] == "1")
 )
 struct VocabularyBoostIntegrationTests {
     struct Case: Sendable {

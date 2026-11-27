@@ -40,7 +40,7 @@ final class AssistantJourneyTests: XCTestCase {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("hush-diagnostic-journey-\(UUID())")
         let app = XCUIApplication()
         defer { app.terminate(); try? FileManager.default.removeItem(at: root) }
-        app.launchEnvironment["HUSH_ASSISTANT_TRACE_ROOT"] = root.path
+        app.launchEnvironment["CLEMII_ASSISTANT_TRACE_ROOT"] = root.path
         app.launchArguments = ["--preview-assistant-global", "--preview-assistant-missing-target", "--assistant-diagnostics"]
         app.launch()
         let microphone = app.buttons["clemii.companion.microphone"]
@@ -207,7 +207,7 @@ final class AssistantJourneyTests: XCTestCase {
     private func verifySpokenFollowUp(misclassifiedAsWrite: Bool) throws {
         let app = XCUIApplication()
         let traceRoot = FileManager.default.temporaryDirectory.appendingPathComponent("hush-followup-test-\(UUID())")
-        app.launchEnvironment["HUSH_ASSISTANT_TRACE_ROOT"] = traceRoot.path
+        app.launchEnvironment["CLEMII_ASSISTANT_TRACE_ROOT"] = traceRoot.path
         defer {
             if let files = try? FileManager.default.contentsOfDirectory(at: traceRoot, includingPropertiesForKeys: nil) {
                 for directory in files {

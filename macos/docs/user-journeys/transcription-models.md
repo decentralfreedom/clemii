@@ -98,4 +98,4 @@ Given the user has words in Vocabulary:
 | TM-010 | Manual control center journey |
 | TM-011 | `VocabularyTests` (replacement, heard spellings, model tags, persistence, prompt line), `SpeechEndpointTests` (pause detection); manual voice journey in a team-signed build |
 | Storage | `SpeechEngineTests.parakeetStorage`, `SpeechEngineTests.matchesFluidAudioContract`, `ModelStorageTests.usesApplicationSupport` |
-| TM-012 | `VocabularyBoostTests` (timings, parts, ordinary words); opt-in `VocabularyBoostIntegrationTests` (`HUSH_PARAKEET_E2E=1`, synthetic sentences and decoys) and `VocabularyBoostBenchmark` (`HUSH_VOCAB_BENCH_DIR`, earnings22 real speech) |
+| TM-012 | `VocabularyBoostTests` (timings, parts, ordinary words); opt-in `VocabularyBoostIntegrationTests` (`CLEMII_PARAKEET_E2E=1`, synthetic sentences and decoys) and `VocabularyBoostBenchmark` (`CLEMII_VOCAB_BENCH_DIR`, earnings22 real speech) |

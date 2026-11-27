@@ -23,7 +23,7 @@ test("a failed social preview render leaves the previously generated site untouc
       cwd: dir,
       env: {
         ...Bun.env,
-        HUSH_BLOG_CONTENT_DIR: join(import.meta.dir, "fixtures/content"),
+        CLEMII_BLOG_CONTENT_DIR: join(import.meta.dir, "fixtures/content"),
         PLAYWRIGHT_BROWSERS_PATH: join(dir, "missing-browsers"),
       },
       stdout: "pipe", stderr: "pipe",

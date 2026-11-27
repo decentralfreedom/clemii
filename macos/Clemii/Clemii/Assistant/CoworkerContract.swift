@@ -146,7 +146,7 @@ struct CoworkerReply: Codable, Sendable, Equatable {
     // installed contract as the default until the replacement is qualified.
     static var bundledBrowserOperationsEnabled: Bool {
         #if DEBUG
-        ProcessInfo.processInfo.environment["HUSH_BUNDLED_BROWSER_ACTIONS"] == "1"
+        ProcessInfo.processInfo.environment["CLEMII_BUNDLED_BROWSER_ACTIONS"] == "1"
         #else
         false
         #endif

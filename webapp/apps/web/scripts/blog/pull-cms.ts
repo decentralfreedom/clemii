@@ -6,7 +6,8 @@
 // the blog generator builds them exactly as it builds files from the repo.
 // Fails on any problem: a build must never ship an empty or partial blog.
 //
-//   HUSH_CMS_URL=http://127.0.0.1:3100 HUSH_CMS_TOKEN=... bun scripts/blog/pull-cms.ts <dir>
+//   CLEMII_CMS_URL=http://127.0.0.1:3100 CLEMII_CMS_TOKEN=... bun scripts/blog/pull-cms.ts <dir>
+import { withFormerNames } from "../../shared/former-names";
 import { createHash } from "node:crypto";
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { dirname, join, normalize } from "node:path";
@@ -58,10 +59,11 @@ export async function pullFromCms(options: { url: string; token: string; dir: st
 
 if (import.meta.main) {
   const dir = Bun.argv[2];
-  const url = process.env.HUSH_CMS_URL;
-  const token = process.env.HUSH_CMS_TOKEN;
+  const env = withFormerNames(process.env);
+  const url = env.CLEMII_CMS_URL;
+  const token = env.CLEMII_CMS_TOKEN;
   if (!dir || !url || !token) {
-    console.error("Usage: HUSH_CMS_URL=... HUSH_CMS_TOKEN=... bun scripts/blog/pull-cms.ts <empty directory>");
+    console.error("Usage: CLEMII_CMS_URL=... CLEMII_CMS_TOKEN=... bun scripts/blog/pull-cms.ts <empty directory>");
     process.exit(1);
   }
   const result = await pullFromCms({ url, token, dir });

@@ -4,12 +4,12 @@ import Testing
 @testable import Clemii
 
 @Suite("Search continuation regression", .serialized,
-       .enabled(if: ProcessInfo.processInfo.environment["HUSH_SEARCH_REPLAY"] != nil))
+       .enabled(if: ProcessInfo.processInfo.environment["CLEMII_SEARCH_REPLAY"] != nil))
 @MainActor
 struct CoworkerSearchEvaluation {
     @Test("Recorded search submission and fresh result selection retain the full goal")
     func continuation() async throws {
-        let path = try #require(ProcessInfo.processInfo.environment["HUSH_SEARCH_REPLAY"])
+        let path = try #require(ProcessInfo.processInfo.environment["CLEMII_SEARCH_REPLAY"])
         let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
         let snapshot = try decoder.decode(CoworkerReplaySnapshot.self, from: Data(contentsOf: URL(fileURLWithPath: path)))
         let recorded = try snapshot.input(screenshot: nil)
@@ -29,7 +29,7 @@ struct CoworkerSearchEvaluation {
             history: [], now: recorded.now, timeZone: recorded.timeZone,
             checkpoints: [.init(action: .fill, result: "Filled the search field with Martin Garrix and checked its value.")])
         var cases = [("recorded-submit", recorded), ("fresh-result", fresh), ("search-only", searchOnly)]
-        if let linkPath = ProcessInfo.processInfo.environment["HUSH_LINK_REPLAY"] {
+        if let linkPath = ProcessInfo.processInfo.environment["CLEMII_LINK_REPLAY"] {
             let linkSnapshot = try decoder.decode(CoworkerReplaySnapshot.self, from: Data(contentsOf: URL(fileURLWithPath: linkPath)))
             cases.append(("recorded-link", try linkSnapshot.input(screenshot: nil)))
         }

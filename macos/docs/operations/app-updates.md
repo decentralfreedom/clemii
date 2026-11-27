@@ -88,15 +88,15 @@ chmod 600 .env.update.local
 Fill `.env.update.local` with the S3 endpoint and the scoped R2 API-token
 credentials. `publish-update-r2.sh` loads this file automatically. CI can use
 secret environment variables without creating this file. Select a different
-file with `HUSH_UPDATE_ENV_FILE`, or set it to a nonexistent path when every
+file with `CLEMII_UPDATE_ENV_FILE`, or set it to a nonexistent path when every
 value comes from the CI environment.
 
 The endpoint contains the Cloudflare account ID only. Do not append the bucket
 name:
 
 ```dotenv
-HUSH_R2_ENDPOINT=https://ACCOUNT_ID.r2.cloudflarestorage.com
-HUSH_R2_BUCKET=clemii
+CLEMII_R2_ENDPOINT=https://ACCOUNT_ID.r2.cloudflarestorage.com
+CLEMII_R2_BUCKET=clemii
 AWS_ACCESS_KEY_ID=YOUR_R2_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY=YOUR_R2_SECRET_ACCESS_KEY
 AWS_DEFAULT_REGION=auto
@@ -134,7 +134,7 @@ labels and Sparkle ordering:
 | Purpose | Source | Example |
 | --- | --- | --- |
 | Product milestone | `MARKETING_VERSION` / `CFBundleShortVersionString` | `0.1.0` |
-| Tester maturity | `HUSH_RELEASE_SLUG` / `ClemiiReleaseSlug` | `alpha.1` |
+| Tester maturity | `CLEMII_RELEASE_SLUG` / `ClemiiReleaseSlug` | `alpha.1` |
 | Update order | `CURRENT_PROJECT_VERSION` / `CFBundleVersion` | `10` |
 
 Together these identify the release as `0.1.0-alpha.1 (10)`. Artifacts use the
@@ -184,7 +184,7 @@ restored the Finder layout; alpha.4 was the first notarized download. The next
 tester release must use a build number greater than 19.
 
 Release notes for the update dialog are a Markdown file passed as
-`HUSH_RELEASE_NOTES_FILE`; Sparkle shows them before the user installs. Alpha.8
+`CLEMII_RELEASE_NOTES_FILE`; Sparkle shows them before the user installs. Alpha.8
 is the first release with them.
 
 If downloading the existing channel from R2 fails with `IncompleteRead`, the
@@ -204,22 +204,22 @@ Apple or publish anything:
 The outputs are `artifacts/release/export/clemii.app` and a versioned DMG under
 `artifacts/release/dist`. Reports and build logs are under
 `artifacts/release/reports`. The script refuses to overwrite an existing export;
-use a new `HUSH_RELEASE_DIRECTORY` for another candidate. Set
-`HUSH_TRUST_PINNED_BUILD_TOOLS=1` only after reviewing the pinned Swift macro and
+use a new `CLEMII_RELEASE_DIRECTORY` for another candidate. Set
+`CLEMII_TRUST_PINNED_BUILD_TOOLS=1` only after reviewing the pinned Swift macro and
 build-plugin packages when Xcode's interactive trust validation is unavailable.
 Release packaging requires a logged-in macOS desktop and Finder automation so
 `create-dmg` can save the window background, icon positions and size. Packaging
 and publishing verify the layout assets and the embedded app's release identity.
 Open the final DMG in Finder to review the drag-and-drop layout before submission.
-`HUSH_DMG_HEADLESS=1` is allowed only with `release-dmg.sh --local`; those plain
+`CLEMII_DMG_HEADLESS=1` is allowed only with `release-dmg.sh --local`; those plain
 development images cannot pass the public publisher's layout check.
 
 Package, sign, and publish the Sparkle update. Pass the DMG path to also update
 the stable website download URL:
 
 ```sh
-HUSH_RELEASE_DIRECTORY="artifacts/release-alpha6" \
-HUSH_DMG_PATH="artifacts/release-alpha6/final/hush-0.1.0-alpha.6-build.15.dmg" \
+CLEMII_RELEASE_DIRECTORY="artifacts/release-alpha6" \
+CLEMII_DMG_PATH="artifacts/release-alpha6/final/hush-0.1.0-alpha.6-build.15.dmg" \
   ./scripts/publish-update-r2.sh
 ```
 
@@ -258,7 +258,7 @@ Build a local development app against that feed. Its `alpha.1-local` identity
 and unnotarized signature deliberately cannot enter the public packaging path:
 
 ```sh
-HUSH_UPDATE_FEED_URL=http://127.0.0.1:8088/alpha/appcast.xml \
+CLEMII_UPDATE_FEED_URL=http://127.0.0.1:8088/alpha/appcast.xml \
   ./scripts/build-local-dmg.sh
 ```
 
@@ -279,14 +279,14 @@ once; Apple checks the nested app too. Use a new output path so the reviewed
 candidate remains available:
 
 ```sh
-export HUSH_NOTARIZE=1
-export HUSH_NOTARY_KEYCHAIN_PROFILE=HushNotary
+export CLEMII_NOTARIZE=1
+export CLEMII_NOTARY_KEYCHAIN_PROFILE=HushNotary
 ./scripts/release-dmg.sh --app artifacts/release/export/clemii.app \
   --output artifacts/release/final/hush-0.1.0-alpha.4-build.13.dmg
 ```
 
 Use the actual version, slug and build number in the filename. For another
-developer team, set `HUSH_DEVELOPMENT_TEAM` before building; the default is clemii's
+developer team, set `CLEMII_DEVELOPMENT_TEAM` before building; the default is clemii's
 team. Signing follows Xcode's direct distribution: the archive and the Developer ID
 export use automatic signing with `-allowProvisioningUpdates`, so Xcode picks the
 Developer ID Application certificate and creates or renews the provisioning profile
@@ -295,8 +295,8 @@ the team's Apple Account signed in under Xcode > Settings > Accounts on the rele
 Mac.
 
 Submission IDs, Apple logs and postflight reports stay in
-`artifacts/notarization` (override with `HUSH_NOTARY_REPORTS`). Waiting defaults
-to 15 minutes (`HUSH_NOTARY_TIMEOUT`). A timeout does not cancel Apple's work.
+`artifacts/notarization` (override with `CLEMII_NOTARY_REPORTS`). Waiting defaults
+to 15 minutes (`CLEMII_NOTARY_TIMEOUT`). A timeout does not cancel Apple's work.
 Resume the unchanged artifact with `--resume SUBMISSION_ID`; do not rebuild or
 upload it again. An invalid submission requires inspecting Apple's log and
 fixing the candidate before a new submission.

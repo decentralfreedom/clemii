@@ -2,7 +2,7 @@ import XCTest
 
 final class VerifiedMessageDestinationJourneyTests: XCTestCase {
     func testSmartDestinationExceptionsStayCompactAndManageWebsites() throws {
-        let usesLiveWebsiteIcon = ProcessInfo.processInfo.environment["HUSH_LIVE_FAVICON_E2E"] == "1"
+        let usesLiveWebsiteIcon = ProcessInfo.processInfo.environment["CLEMII_LIVE_FAVICON_E2E"] == "1"
         let websiteHost = usesLiveWebsiteIcon ? "apple.com" : "hush-destination-test.example"
         let app = XCUIApplication()
         app.launchArguments = [

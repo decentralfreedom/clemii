@@ -80,10 +80,10 @@ approved it as it is now, in the admin, and it changes drafts only.
 
 Options
   --json                             Prints the CMS's JSON answer, errors included
-  --url <url>                        The CMS (default: HUSH_CMS_URL, else ${defaultUrl})
+  --url <url>                        The CMS (default: CLEMII_CMS_URL, else ${defaultUrl})
   -h, --help
 
-HUSH_CMS_TOKEN, when set, is used instead of the stored token.
+CLEMII_CMS_TOKEN, when set, is used instead of the stored token.
 `;
 
 class Failure extends Error {
@@ -404,7 +404,7 @@ async function authCommand(action: string | undefined, origin: string, values: R
   switch (action) {
     case "login": {
       // Fail before the browser opens, not after the owner approved.
-      if (process.platform !== "darwin") throw new CredentialError("Only macOS has a Keychain here; set HUSH_CMS_TOKEN instead.");
+      if (process.platform !== "darwin") throw new CredentialError("Only macOS has a Keychain here; set CLEMII_CMS_TOKEN instead.");
       const token = values["with-token"] ? await promptToken() : await deviceSignIn(origin, values["no-browser"] !== true && !process.env.CI);
       connect(origin, token);
       const caller = ok(await getCaller());
@@ -416,7 +416,7 @@ async function authCommand(action: string | undefined, origin: string, values: R
     }
     case "status": {
       const stored = await readToken(origin);
-      if (!stored) throw new Failure(`No token for ${origin}. Run hush-cms auth login, or set HUSH_CMS_TOKEN.`);
+      if (!stored) throw new Failure(`No token for ${origin}. Run hush-cms auth login, or set CLEMII_CMS_TOKEN.`);
       connect(origin, stored.token);
       const caller = ok(await getCaller());
       const expiry = caller.expiresAt ? `expires ${when(caller.expiresAt)}` : "does not expire";
@@ -459,13 +459,13 @@ export async function run(argv: string[]): Promise<number> {
       process.stdout.write(usage);
       return values.help ? 0 : 2;
     }
-    const origin = new URL(values.url ?? process.env.HUSH_CMS_URL ?? defaultUrl).origin;
+    const origin = new URL(values.url ?? process.env.CLEMII_CMS_URL ?? process.env.HUSH_CMS_URL ?? defaultUrl).origin;
     let output: Output;
     if (group === "auth") {
       output = await authCommand(action, origin, values);
     } else if (group === "posts" || group === "links" || group === "goals") {
       const stored = await readToken(origin);
-      if (!stored) throw new Failure(`No token for ${origin}. Run hush-cms auth login, or set HUSH_CMS_TOKEN.`);
+      if (!stored) throw new Failure(`No token for ${origin}. Run hush-cms auth login, or set CLEMII_CMS_TOKEN.`);
       connect(origin, stored.token);
       output = group === "posts" ? await postsCommand(action, args, values)
         : group === "links" ? await linksCommand(action, args, values) : await goalsCommand(action, args, values);

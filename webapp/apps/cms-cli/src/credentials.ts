@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Clemens Kressmann
 //
 // Where the CLI keeps its token: the macOS Keychain, one item per CMS origin.
-// HUSH_CMS_TOKEN overrides it, for CI and machines without a Keychain. The
+// CLEMII_CMS_TOKEN overrides it, for CI and machines without a Keychain. The
 // token never appears in arguments, so it stays out of shell history and `ps`.
 const service = "hush-cms";
 
@@ -12,15 +12,16 @@ export class CredentialError extends Error {}
 
 const hasKeychain = () => process.platform === "darwin";
 
-/** The token for `origin`: HUSH_CMS_TOKEN, else the Keychain item, else undefined. */
+/** The token for `origin`: CLEMII_CMS_TOKEN, else the Keychain item, else undefined. */
 export async function readToken(origin: string): Promise<{ token: string; source: "environment" | "keychain" } | undefined> {
-  const fromEnvironment = process.env.HUSH_CMS_TOKEN;
+  // HUSH_CMS_TOKEN is the name before the rename, read until it is set as CLEMII_CMS_TOKEN.
+  const fromEnvironment = process.env.CLEMII_CMS_TOKEN ?? process.env.HUSH_CMS_TOKEN;
   if (fromEnvironment) return { token: fromEnvironment, source: "environment" };
   const stored = storedToken(origin);
   return stored ? { token: stored, source: "keychain" } : undefined;
 }
 
-/** The Keychain item alone, whatever HUSH_CMS_TOKEN says. */
+/** The Keychain item alone, whatever CLEMII_CMS_TOKEN says. */
 export function storedToken(origin: string) {
   if (!hasKeychain()) return undefined;
   const found = Bun.spawnSync(["security", "find-generic-password", "-s", service, "-a", origin, "-w"], { stderr: "ignore" });
@@ -31,7 +32,7 @@ export function storedToken(origin: string) {
 }
 
 export async function saveToken(origin: string, token: string) {
-  if (!hasKeychain()) throw new CredentialError("Only macOS has a Keychain here; set HUSH_CMS_TOKEN instead.");
+  if (!hasKeychain()) throw new CredentialError("Only macOS has a Keychain here; set CLEMII_CMS_TOKEN instead.");
   if (!tokenPattern.test(token)) throw new CredentialError("That is not a CMS token (they start with hcms_).");
   // `security -i` reads the command from stdin, so the token is never an argument.
   const saved = Bun.spawnSync(["security", "-i"], {

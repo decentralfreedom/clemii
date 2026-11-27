@@ -77,7 +77,7 @@ describe("graceful shutdown of the real server process", () => {
     const port = 41_000 + Math.floor(Math.random() * 1_000);
     const base = `http://127.0.0.1:${port}`;
     const child = Bun.spawn(["bun", "server/index.ts"], {
-      env: { ...process.env, NODE_ENV: "test", PORT: String(port), HUSH_SHUTDOWN_DRAIN_MS: "1500" },
+      env: { ...process.env, NODE_ENV: "test", PORT: String(port), CLEMII_SHUTDOWN_DRAIN_MS: "1500" },
       stdout: "pipe",
       stderr: "pipe",
     });

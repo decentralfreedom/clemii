@@ -14,14 +14,14 @@ import Testing
 ///
 /// Opt-in, because it needs clips and the Parakeet model:
 ///   scripts/speech-benchmark-clips.sh /tmp/clips
-///   TEST_RUNNER_HUSH_SPEECH_BENCH_CLIPS=/tmp/clips \
+///   TEST_RUNNER_CLEMII_SPEECH_BENCH_CLIPS=/tmp/clips \
 ///   xcodebuild test ... -only-testing:ClemiiTests/SpeechRoundsBenchmark
-/// HUSH_SPEECH_ROUNDS_MODEL picks the model (default parakeet-ultra); HUSH_SPEECH_BENCH_OUT
+/// CLEMII_SPEECH_ROUNDS_MODEL picks the model (default parakeet-ultra); CLEMII_SPEECH_BENCH_OUT
 /// writes every recording's result as JSON.
 @Suite(
     "Speech rounds benchmark",
     .serialized,
-    .enabled(if: ProcessInfo.processInfo.environment["HUSH_SPEECH_BENCH_CLIPS"] != nil)
+    .enabled(if: ProcessInfo.processInfo.environment["CLEMII_SPEECH_BENCH_CLIPS"] != nil)
 )
 struct SpeechRoundsBenchmark {
     typealias Clip = SpeechFillerBenchmark.Clip
@@ -56,8 +56,8 @@ struct SpeechRoundsBenchmark {
         let corpusURL = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
             .appendingPathComponent("Fixtures/Speech/filler-clips.json")
         let corpus = try JSONDecoder().decode(SpeechFillerBenchmark.Corpus.self, from: Data(contentsOf: corpusURL))
-        let folder = URL(fileURLWithPath: try #require(Self.environment["HUSH_SPEECH_BENCH_CLIPS"]))
-        let model = Self.environment["HUSH_SPEECH_ROUNDS_MODEL"] ?? ParakeetModel.ultra.rawValue
+        let folder = URL(fileURLWithPath: try #require(Self.environment["CLEMII_SPEECH_BENCH_CLIPS"]))
+        let model = Self.environment["CLEMII_SPEECH_ROUNDS_MODEL"] ?? ParakeetModel.ultra.rawValue
         try #require(ModelManager.isAvailable(model), "\(model) is not on this Mac")
         let transcriber = FluidAudioTranscriber()
         try await transcriber.prepare(modelID: model) { _ in }
@@ -73,7 +73,7 @@ struct SpeechRoundsBenchmark {
             results.append(try await Self.run(recording, transcriber: transcriber))
         }
         print(Self.report(results))
-        if let out = Self.environment["HUSH_SPEECH_BENCH_OUT"] {
+        if let out = Self.environment["CLEMII_SPEECH_BENCH_OUT"] {
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             try encoder.encode(results).write(to: URL(fileURLWithPath: out))

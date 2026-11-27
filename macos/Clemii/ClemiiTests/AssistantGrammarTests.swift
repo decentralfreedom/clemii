@@ -9,7 +9,7 @@ import Testing
 @MainActor
 struct AssistantGrammarTests {
     @Test("Profile grammar preparation with the installed tokenizer, without loading model weights",
-          .enabled(if: ProcessInfo.processInfo.environment["HUSH_GRAMMAR_PROFILE"] == "1"))
+          .enabled(if: ProcessInfo.processInfo.environment["CLEMII_GRAMMAR_PROFILE"] == "1"))
     func installedTokenizerPreparation() async throws {
         let directory = try #require(LLMRuntime.cachedQwenSnapshotURL(for: .qwen35_4b))
         let configuration = ModelConfiguration(directory: directory)

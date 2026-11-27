@@ -13,7 +13,7 @@
     "test:seo": "bun run build && lhci collect && lhci assert",
     "build": "bun run blog:generate && bun run site:generate && bun run i18n:compile && tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && bun scripts/prerender.ts",
     "build:api": "bun run blog:generate && bun build server/index.ts --target=bun --outdir=dist-server",
-    "serve:e2e": "NODE_ENV=test PORT=4173 HUSH_PUBLIC_BASE_URL=http://127.0.0.1:4173 bun server/index.ts",
+    "serve:e2e": "NODE_ENV=test PORT=4173 CLEMII_PUBLIC_BASE_URL=http://127.0.0.1:4173 bun server/index.ts",
     "api:openapi": "bun server/export-openapi.ts",
     "api:check": "bun run api:openapi && git diff --exit-code -- openapi/hush-provenance.json",
     "db:generate": "drizzle-kit generate",

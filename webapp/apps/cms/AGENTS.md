@@ -7,7 +7,7 @@ Verified Messages.
 ## Required verification
 
 - Type checking: `bun run lint`
-- Journeys against PostgreSQL: `HUSH_TEST_DATABASE_URL=postgresql://... bun test`
+- Journeys against PostgreSQL: `CLEMII_TEST_DATABASE_URL=postgresql://... bun test`
   (each test file creates and drops its own database; CI refuses to skip them)
 - OpenAPI drift check: `bun run api:check`
 - Admin browser journeys (CMS-001 to CMS-010): `bun run test:admin`, which
@@ -17,7 +17,7 @@ Verified Messages.
 ## Rules
 
 - Never import from `apps/web` or read `DATABASE_URL` or
-  `HUSH_SERVICE_PRIVATE_JWK`; `tests/boundary.test.ts` enforces it.
+  `CLEMII_SERVICE_PRIVATE_JWK`; `tests/boundary.test.ts` enforces it.
 - Article rules come from `@clemii/article`. Do not re-implement them here.
 - Keep the schema in third normal form. Change it with `bun run db:generate`;
   migrations stay additive so the previous release keeps running during deploys.

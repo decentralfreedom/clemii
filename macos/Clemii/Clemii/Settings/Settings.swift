@@ -40,7 +40,7 @@ final class Settings {
     /// test reads or writes what the user set (as the timing store and recording journal do).
     private static var sharedDefaults: UserDefaults {
         let environment = ProcessInfo.processInfo.environment
-        guard environment["HUSH_TEST_HOST"] == "1" || environment["XCTestConfigurationFilePath"] != nil else {
+        guard environment["CLEMII_TEST_HOST"] == "1" || environment["XCTestConfigurationFilePath"] != nil else {
             FormerIdentity.adoptPreferences(into: .standard)
             return .standard
         }

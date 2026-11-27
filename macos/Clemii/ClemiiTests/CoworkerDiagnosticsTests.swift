@@ -98,12 +98,12 @@ struct CoworkerDiagnosticsTests {
 
 /// Explicit developer command only. Regenerates a response, never applies it.
 @Suite("Recorded coworker model replay", .serialized,
-       .enabled(if: ProcessInfo.processInfo.environment["HUSH_REPLAY_DIRECTORY"] != nil))
+       .enabled(if: ProcessInfo.processInfo.environment["CLEMII_REPLAY_DIRECTORY"] != nil))
 @MainActor
 struct CoworkerReplayTests {
     @Test("Replay a recorded model request without any desktop action")
     func modelOnly() async throws {
-        let root = URL(fileURLWithPath: try #require(ProcessInfo.processInfo.environment["HUSH_REPLAY_DIRECTORY"]))
+        let root = URL(fileURLWithPath: try #require(ProcessInfo.processInfo.environment["CLEMII_REPLAY_DIRECTORY"]))
         let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
         let snapshot = try decoder.decode(CoworkerReplaySnapshot.self, from: Data(contentsOf: root.appendingPathComponent("replay.json")))
         let image = snapshot.hasScreenshot ? try Data(contentsOf: root.appendingPathComponent("model-screen.png")) : nil

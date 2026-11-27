@@ -8,13 +8,13 @@ services:
     environment:
       NODE_ENV: development
       PORT: "3000"
-      HUSH_PUBLIC_BASE_URL: http://127.0.0.1:3000
-      HUSH_SHORT_BASE_URL: http://127.0.0.1:3000
-      HUSH_ALLOWED_ORIGIN: http://127.0.0.1:3000
-      HUSH_DATA_DIR: /app/data
+      CLEMII_PUBLIC_BASE_URL: http://127.0.0.1:3000
+      CLEMII_SHORT_BASE_URL: http://127.0.0.1:3000
+      CLEMII_ALLOWED_ORIGIN: http://127.0.0.1:3000
+      CLEMII_DATA_DIR: /app/data
       DATABASE_URL: postgresql://hush:hush-local@postgres:5432/hush
     ports:
-      - "${HUSH_COMPOSE_PORT:-3000}:3000"
+      - "${CLEMII_COMPOSE_PORT:-3000}:3000"
     volumes:
       - hush_local_objects:/app/data
     depends_on:

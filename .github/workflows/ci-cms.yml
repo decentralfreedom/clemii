@@ -34,7 +34,7 @@ jobs:
           --health-cmd "pg_isready -U hush -d hush_test"
           --health-interval 5s --health-timeout 5s --health-retries 10
     env:
-      HUSH_TEST_DATABASE_URL: postgresql://hush:hush-test@127.0.0.1:5432/hush_test
+      CLEMII_TEST_DATABASE_URL: postgresql://hush:hush-test@127.0.0.1:5432/hush_test
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -118,7 +118,7 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 10
     env:
       # Inside a container job a service is reached by its name.
-      HUSH_TEST_DATABASE_URL: postgresql://hush:hush-test@postgres:5432/hush_test
+      CLEMII_TEST_DATABASE_URL: postgresql://hush:hush-test@postgres:5432/hush_test
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -173,7 +173,7 @@ jobs:
           --health-cmd "pg_isready -U hush -d hush_test"
           --health-interval 5s --health-timeout 5s --health-retries 10
     env:
-      HUSH_TEST_DATABASE_URL: postgresql://hush:hush-test@127.0.0.1:5432/hush_test
+      CLEMII_TEST_DATABASE_URL: postgresql://hush:hush-test@127.0.0.1:5432/hush_test
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

@@ -5,7 +5,7 @@ import Testing
 /// Explicit opt-in: reads only the currently focused Mail compose window.
 /// Never resolves recipients, sends mail, or writes into the user's draft.
 @Suite("Coworker real Mail diagnostics", .serialized,
-       .enabled(if: ProcessInfo.processInfo.environment["HUSH_MAIL_LIVE"] == "1"))
+       .enabled(if: ProcessInfo.processInfo.environment["CLEMII_MAIL_LIVE"] == "1"))
 @MainActor
 struct CoworkerMailLiveTests {
     @Test("The actual focused Mail body can be bound as a writing destination")

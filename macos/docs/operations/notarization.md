@@ -227,7 +227,7 @@ ChatGPT plan (#100, #101, #122), speech rounds (#105), recording safety (#102,
 
 - The first archive stopped at Xcode's interactive package-plugin validation. All 29
   `Package.resolved` pins were compared with alpha.6's revision and found identical
-  in version and revision, so the build reran with `HUSH_TRUST_PINNED_BUILD_TOOLS=1`
+  in version and revision, so the build reran with `CLEMII_TRUST_PINNED_BUILD_TOOLS=1`
   into a fresh `artifacts/release-alpha7-b`.
 - Preflight: Developer ID Application (team `3A22UK7C9L`), secure timestamp, hardened
   runtime, `keychain-access-groups` = `3A22UK7C9L.com.decentralfreedom.clemii`, no
@@ -258,7 +258,7 @@ built with Xcode 26.6. The assistant says it is an AI (#125) and talks in Englis
 download shows its progress (#127).
 
 - `Package.resolved` is unchanged since alpha.7, so the build used
-  `HUSH_TRUST_PINNED_BUILD_TOOLS=1` into `artifacts/release-alpha8`.
+  `CLEMII_TRUST_PINNED_BUILD_TOOLS=1` into `artifacts/release-alpha8`.
 - Preflight: Developer ID Application (team `3A22UK7C9L`), secure timestamp,
   hardened runtime, `keychain-access-groups`, no `get-task-allow`.
 - Only submission: DMG `7be0a512-4119-435e-b032-009cdcefa9a9`, Accepted, "Ready
@@ -285,7 +285,7 @@ conversation, local models leave memory while unused (#133), and the app writes
 clemii in lowercase (#134).
 
 - `Package.resolved` is unchanged since alpha.8, so the build used
-  `HUSH_TRUST_PINNED_BUILD_TOOLS=1` into `artifacts/release-alpha9`.
+  `CLEMII_TRUST_PINNED_BUILD_TOOLS=1` into `artifacts/release-alpha9`.
 - Preflight and postflight passed.
 - Only submission: DMG `bdaa5138-14f3-4e04-8c50-5129d277bf3f`, Accepted, "Ready
   for distribution", no issues, 39 files in the ticket. The DMG and the exported
@@ -315,7 +315,7 @@ except `package-update.sh`, which makes the update informational for hush builds
 
 - `Package.resolved` differs from alpha.9 only in FluidAudio, pinned to main
   `e2ea498` (#179). Neither revision declares build plugins or macros, so the
-  build used `HUSH_TRUST_PINNED_BUILD_TOOLS=1` into `artifacts/release-alpha10`.
+  build used `CLEMII_TRUST_PINNED_BUILD_TOOLS=1` into `artifacts/release-alpha10`.
 - The first export failed with no Xcode account signed in after the update to
   Xcode 27.2. After the owner signed in, the export and the following steps ran
   with the script's own commands into the same release directory, and Xcode

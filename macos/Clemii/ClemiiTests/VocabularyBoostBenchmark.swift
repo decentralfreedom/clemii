@@ -6,11 +6,11 @@ import Testing
 #if canImport(FluidAudio)
 /// PRD R13: the Parakeet boost on real speech. Reads earnings22 keyword clips (Argmax's
 /// `contextual-earnings22`, dev split, CC BY-SA 4.0) exported as `clip-NNN.wav` plus
-/// `clips.json` into `HUSH_VOCAB_BENCH_DIR`; the data never enters the repository.
+/// `clips.json` into `CLEMII_VOCAB_BENCH_DIR`; the data never enters the repository.
 /// Each clip's vocabulary is its call's keyword list, so names that are not said in the
 /// clip are natural decoys. It runs the production path: timed words, then the boost.
 @Suite("Vocabulary boost benchmark", .serialized,
-       .enabled(if: ProcessInfo.processInfo.environment["HUSH_VOCAB_BENCH_DIR"] != nil))
+       .enabled(if: ProcessInfo.processInfo.environment["CLEMII_VOCAB_BENCH_DIR"] != nil))
 struct VocabularyBoostBenchmark {
     struct Clip: Decodable {
         let file: String
@@ -20,7 +20,7 @@ struct VocabularyBoostBenchmark {
 
     @Test("Recall, false insertions, word errors and time on real speech")
     func benchmark() async throws {
-        let root = URL(fileURLWithPath: ProcessInfo.processInfo.environment["HUSH_VOCAB_BENCH_DIR"]!)
+        let root = URL(fileURLWithPath: ProcessInfo.processInfo.environment["CLEMII_VOCAB_BENCH_DIR"]!)
         let clips = try JSONDecoder().decode([Clip].self, from: Data(contentsOf: root.appendingPathComponent("clips.json")))
         let directory = root.appendingPathComponent("ctc").appendingPathComponent(ParakeetVocabularyBoost.variant.repo.folderName)
         if !ParakeetVocabularyBoost.isInstalled(at: directory) { try await ParakeetVocabularyBoost.install(at: directory) }

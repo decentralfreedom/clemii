@@ -114,7 +114,7 @@ enum CoworkerMailDebugCheck {
                     report["repeat_write_no_duplicate"] = final.capturedBody.components(separatedBy: "clemii development check").count == 2
                 }
             } catch { report["error"] = String(describing: error); report["description"] = error.localizedDescription }
-            let path = ProcessInfo.processInfo.environment["HUSH_MAIL_PROBE_PATH"] ?? "/private/tmp/hush-mail-editor-check.json"
+            let path = ProcessInfo.processInfo.environment["CLEMII_MAIL_PROBE_PATH"] ?? "/private/tmp/hush-mail-editor-check.json"
             if JSONSerialization.isValidJSONObject(report), let data = try? JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys]) {
                 try? data.write(to: URL(fileURLWithPath: path), options: .atomic)
                 try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)

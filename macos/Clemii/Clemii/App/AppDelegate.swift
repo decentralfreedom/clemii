@@ -41,8 +41,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         #if DEBUG
         // The opt-in model evaluation is text-only. Do not register hotkeys,
         // preload audio, show onboarding, or start background app services.
-        if ProcessInfo.processInfo.environment["HUSH_TEST_HOST"] == "1"
-            || ProcessInfo.processInfo.environment["HUSH_OPERATION_AB"] == "1" { return }
+        if ProcessInfo.processInfo.environment["CLEMII_TEST_HOST"] == "1"
+            || ProcessInfo.processInfo.environment["CLEMII_OPERATION_AB"] == "1" { return }
         if showPersonaWheelJourneyIfRequested() { return }
         if showNativeHUDGlassJourneyIfRequested() { return }
         if showSelectionEditorJourneyIfRequested() { return }

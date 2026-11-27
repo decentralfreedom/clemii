@@ -5,7 +5,7 @@ import Testing
 
 /// Opt-in: runs clemii's Kokoro voice from its permanent cache on this Mac.
 @Suite("Coworker voice on this Mac", .serialized,
-       .enabled(if: ProcessInfo.processInfo.environment["HUSH_COWORKER_LIVE"] == "1"))
+       .enabled(if: ProcessInfo.processInfo.environment["CLEMII_COWORKER_LIVE"] == "1"))
 struct CoworkerVoiceLiveTests {
     /// These sentences come to 48 tokens, the Alignment graph's default shape, which trapped the
     /// whole app in BNNS on the Neural Engine route (FluidAudio #1172). The first is the voice's

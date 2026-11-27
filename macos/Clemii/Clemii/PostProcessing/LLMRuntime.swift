@@ -936,7 +936,7 @@ final class LLMRuntime {
         }
         try Task.checkCancellation()
         #if DEBUG
-        if ProcessInfo.processInfo.environment["HUSH_COWORKER_LIVE"] == "1" {
+        if ProcessInfo.processInfo.environment["CLEMII_COWORKER_LIVE"] == "1" {
             print("[coworker-live] synthetic fixture raw reply: \(raw)")
         }
         #endif

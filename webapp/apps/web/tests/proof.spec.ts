@@ -7,7 +7,7 @@ import {
   canonicalReceipt,
 } from "../shared/provenance/canonical";
 
-const e2eBaseUrl = process.env.HUSH_E2E_BASE_URL ?? "http://127.0.0.1:4173";
+const e2eBaseUrl = process.env.CLEMII_E2E_BASE_URL ?? "http://127.0.0.1:4173";
 
 test("verifies and decrypts a complete signed message proof", async ({ page, isMobile }, testInfo) => {
   const fixture = await makeProofFixture();

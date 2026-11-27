@@ -36,7 +36,7 @@ hush-cms posts pull dictate-without-cloud --out content
 
 `hush-cms --help` lists every command. `--json` prints the CMS's answers for
 scripts; exit codes are 0 (done), 1 (refused or failed) and 2 (wrong usage).
-`HUSH_CMS_URL` points at another CMS (default `https://cms.clemii.com`) and
-`HUSH_CMS_TOKEN` overrides the stored token.
+`CLEMII_CMS_URL` points at another CMS (default `https://cms.clemii.com`) and
+`CLEMII_CMS_TOKEN` overrides the stored token.
 
 Licensed [AGPL-3.0-only](../../../LICENSE).

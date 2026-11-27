@@ -10,6 +10,13 @@ import re
 import subprocess
 import sys
 
+# Settings were named HUSH_* before clemii's rename. Until every command uses the CLEMII_* names, a
+# HUSH_ value stands in for its missing CLEMII_ twin (docs/reference/former-name.md); notarize_artifact
+# imports this module, so both read only CLEMII_.
+for _name, _value in list(os.environ.items()):
+    if _name.startswith("HUSH_"):
+        os.environ.setdefault("CLEMII_" + _name[len("HUSH_"):], _value)
+
 
 def run(*args, required=True):
     result = subprocess.run(args, capture_output=True, text=True)
@@ -127,7 +134,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("artifact", type=Path)
     parser.add_argument("--phase", choices=("preflight", "postflight"), default="preflight")
-    parser.add_argument("--team", default=os.environ.get("HUSH_DEVELOPMENT_TEAM", "3A22UK7C9L"))
+    parser.add_argument("--team", default=os.environ.get("CLEMII_DEVELOPMENT_TEAM", "3A22UK7C9L"))
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
     try:

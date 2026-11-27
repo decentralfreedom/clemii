@@ -53,7 +53,7 @@ final class DictationTimingStore {
     /// Tests and previews run inside the app; they never write into the user's own timings.
     nonisolated static var defaultURL: URL {
         let environment = ProcessInfo.processInfo.environment
-        if environment["HUSH_TEST_HOST"] == "1" || environment["XCTestConfigurationFilePath"] != nil
+        if environment["CLEMII_TEST_HOST"] == "1" || environment["XCTestConfigurationFilePath"] != nil
             || ProcessInfo.processInfo.arguments.contains(where: { $0.hasPrefix("--preview-") }) {
             return FileManager.default.temporaryDirectory.appendingPathComponent("hush-dictation-timings-\(ProcessInfo.processInfo.processIdentifier).json")
         }

@@ -5,7 +5,7 @@ import Testing
 
 /// Paired decision evaluation, not a desktop success-rate benchmark. All data is synthetic.
 @Suite("Sequence contract A/B", .serialized,
-       .enabled(if: ProcessInfo.processInfo.environment["HUSH_SEQUENCE_AB"] == "1"))
+       .enabled(if: ProcessInfo.processInfo.environment["CLEMII_SEQUENCE_AB"] == "1"))
 @MainActor
 struct CoworkerSequenceEvaluation {
     struct Case {

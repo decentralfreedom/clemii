@@ -7,7 +7,7 @@
 # the website in a real browser (apps/web tests/funnel.spec.ts), then has the
 # CMS import them (tests/funnel-e2e.test.ts): both halves must see exactly the
 # visits and downloads that count, and none of the noise. Nothing reaches
-# production. Needs Docker, the CMS test database (HUSH_TEST_DATABASE_URL) and
+# production. Needs Docker, the CMS test database (CLEMII_TEST_DATABASE_URL) and
 # Playwright's Chromium. Run from anywhere:
 #   apps/cms/scripts/funnel-e2e.sh
 set -euo pipefail
@@ -45,15 +45,15 @@ key=$(curl -sf -X POST "$umami/api/me/api-keys" -H "authorization: Bearer $token
 # The website half: fixture articles, the production build, then the journey.
 (
   cd apps/web
-  HUSH_BLOG_CONTENT_DIR=scripts/blog/fixtures/content bun run build >/dev/null
-  HUSH_UMAMI_URL="$umami" HUSH_UMAMI_WEBSITE_ID="$website" HUSH_FUNNEL_UMAMI_API_KEY="$key" \
+  CLEMII_BLOG_CONTENT_DIR=scripts/blog/fixtures/content bun run build >/dev/null
+  CLEMII_UMAMI_URL="$umami" CLEMII_UMAMI_WEBSITE_ID="$website" CLEMII_FUNNEL_UMAMI_API_KEY="$key" \
     bunx playwright test tests/funnel.spec.ts --project desktop
 )
 
 # The CMS half: import what Umami counted and compare.
 (
   cd apps/cms
-  HUSH_FUNNEL_UMAMI_URL="$umami" HUSH_FUNNEL_UMAMI_WEBSITE_ID="$website" HUSH_FUNNEL_UMAMI_API_KEY="$key" \
+  CLEMII_FUNNEL_UMAMI_URL="$umami" CLEMII_FUNNEL_UMAMI_WEBSITE_ID="$website" CLEMII_FUNNEL_UMAMI_API_KEY="$key" \
     bun test tests/funnel-e2e.test.ts
 )
 echo "FUNNEL-001 passed: the website counted, Umami stored and the CMS imported exactly the expected visits and downloads."

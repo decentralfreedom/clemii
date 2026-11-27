@@ -12,7 +12,7 @@ import tempfile
 def check_volume(volume: Path, background: Path, expected_app: Path | None = None):
     layout = volume / ".DS_Store"
     if not layout.is_file() or layout.stat().st_size == 0:
-        raise ValueError("Finder layout is missing; rebuild without HUSH_DMG_HEADLESS=1")
+        raise ValueError("Finder layout is missing; rebuild without CLEMII_DMG_HEADLESS=1")
     packaged_background = volume / ".background" / background.name
     if not packaged_background.is_file():
         raise ValueError("Installer background is missing")

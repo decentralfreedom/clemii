@@ -60,9 +60,9 @@ async function startApp(name: string, extraEnv: Record<string, string> = {}) {
   const env = {
     NODE_ENV: "production",
     PORT: "3000",
-    HUSH_PUBLIC_BASE_URL: "https://behu.test",
-    HUSH_DATA_DIR: "/app/data",
-    HUSH_SERVICE_KEY_ID: "hush-e2e-1",
+    CLEMII_PUBLIC_BASE_URL: "https://behu.test",
+    CLEMII_DATA_DIR: "/app/data",
+    CLEMII_SERVICE_KEY_ID: "hush-e2e-1",
     DATABASE_URL: `postgresql://hush:hush@${prefix}-postgres:5432/hush`,
     ...extraEnv,
   };

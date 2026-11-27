@@ -2,14 +2,14 @@
 // Copyright (c) 2026 Clemens Kressmann
 //
 // Each test file gets its own database on the PostgreSQL server named by
-// HUSH_TEST_DATABASE_URL, migrated with the real migrations and dropped after.
+// CLEMII_TEST_DATABASE_URL, migrated with the real migrations and dropped after.
 import postgres from "postgres";
 import { connectDatabase } from "../src/db/client";
 import { migrateDatabase } from "../src/db/migrate";
 
-export const serverUrl = process.env.HUSH_TEST_DATABASE_URL;
+export const serverUrl = process.env.CLEMII_TEST_DATABASE_URL;
 // CI provides PostgreSQL; never let the CMS contract skip there.
-if (process.env.CI && !serverUrl) throw new Error("HUSH_TEST_DATABASE_URL is required in CI");
+if (process.env.CI && !serverUrl) throw new Error("CLEMII_TEST_DATABASE_URL is required in CI");
 
 export async function createTestDatabase() {
   const name = `hush_cms_test_${crypto.randomUUID().replaceAll("-", "")}`;

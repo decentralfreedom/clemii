@@ -37,7 +37,7 @@ articles they skip, so they never depend on real articles.
   blog once it exists.
 - Nothing generated from articles is committed: the blog output, `sitemap.xml`
   and `llms.txt` are built by `bun run build` (and before `dev`, `lint` and
-  `test`) from `HUSH_BLOG_CONTENT_DIR`, by default `content/blog`.
+  `test`) from `CLEMII_BLOG_CONTENT_DIR`, by default `content/blog`.
 - Production builds the blog from the clemii CMS (Dockerfile target
   `runtime-cms`): `scripts/blog/pull-cms.ts` writes the published posts and
   their hash-verified images in the same layout as `content/blog`, and the

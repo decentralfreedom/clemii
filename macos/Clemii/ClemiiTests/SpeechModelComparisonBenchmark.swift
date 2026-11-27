@@ -6,8 +6,8 @@ import Testing
 import FluidAudio
 
 /// Compares a candidate Parakeet-family model with Parakeet Ultra on real speech, through
-/// clemii's own FluidAudio path. Opt-in: `HUSH_VOCAB_BENCH_DIR` holds the earnings22 clips
-/// (see `VocabularyBoostBenchmark`), `HUSH_MODEL_BENCH_DIR` a Core ML package in a folder
+/// clemii's own FluidAudio path. Opt-in: `CLEMII_VOCAB_BENCH_DIR` holds the earnings22 clips
+/// (see `VocabularyBoostBenchmark`), `CLEMII_MODEL_BENCH_DIR` a Core ML package in a folder
 /// named `parakeet-ultra` (FluidAudio's folder name for `.ultra`), with the joint model as
 /// `JointDecisionv3.mlmodelc`. Under any other name FluidAudio silently downloads Ultra next
 /// to it and the "candidate" is Ultra again. Nothing is written to the user's models.
@@ -17,20 +17,20 @@ import FluidAudio
 /// Swift path needs FluidVoice's FluidAudio fork, so clemii stays on Ultra until FluidAudio
 /// supports it.
 @Suite("Speech model comparison", .serialized,
-       .enabled(if: ProcessInfo.processInfo.environment["HUSH_MODEL_BENCH_DIR"] != nil
-                && ProcessInfo.processInfo.environment["HUSH_VOCAB_BENCH_DIR"] != nil))
+       .enabled(if: ProcessInfo.processInfo.environment["CLEMII_MODEL_BENCH_DIR"] != nil
+                && ProcessInfo.processInfo.environment["CLEMII_VOCAB_BENCH_DIR"] != nil))
 struct SpeechModelComparisonBenchmark {
     @Test("Candidate against Parakeet Ultra: word errors, names and time")
     func compare() async throws {
         let environment = ProcessInfo.processInfo.environment
-        let root = URL(fileURLWithPath: environment["HUSH_VOCAB_BENCH_DIR"]!)
+        let root = URL(fileURLWithPath: environment["CLEMII_VOCAB_BENCH_DIR"]!)
         let clips = try JSONDecoder().decode([VocabularyBoostBenchmark.Clip].self,
                                              from: Data(contentsOf: root.appendingPathComponent("clips.json")))
         let audio = try clips.map { try VocabularyBoostIntegrationTests.load(root.appendingPathComponent($0.file)) }
 
         // FluidAudio keeps loaded models per repository folder, so each model is measured in
-        // its own test process: `HUSH_MODEL_BENCH_RUN` is `ultra` or `candidate`.
-        let run = environment["HUSH_MODEL_BENCH_RUN"] ?? "candidate"
+        // its own test process: `CLEMII_MODEL_BENCH_RUN` is `ultra` or `candidate`.
+        let run = environment["CLEMII_MODEL_BENCH_RUN"] ?? "candidate"
         if run == "ultra" {
             let ultra = FluidAudioTranscriber()
             try await ultra.prepare(modelID: ParakeetModel.ultra.id) { _ in }
@@ -43,7 +43,7 @@ struct SpeechModelComparisonBenchmark {
         }
 
         let loadStart = CFAbsoluteTimeGetCurrent()
-        let models = try await AsrModels.load(from: URL(fileURLWithPath: environment["HUSH_MODEL_BENCH_DIR"]!), version: .ultra)
+        let models = try await AsrModels.load(from: URL(fileURLWithPath: environment["CLEMII_MODEL_BENCH_DIR"]!), version: .ultra)
         let candidate = AsrManager(config: .default)
         try await candidate.loadModels(models)
         print("[models] candidate load \(String(format: "%.1f", CFAbsoluteTimeGetCurrent() - loadStart))s")

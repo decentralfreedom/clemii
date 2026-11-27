@@ -895,7 +895,7 @@ private struct HeroFilm: View {
 
     private var isStill: Bool {
         reduceMotion || ProcessInfo.processInfo.arguments.contains("--onboarding-ui-test")
-            || ProcessInfo.processInfo.environment["HUSH_TEST_HOST"] == "1"
+            || ProcessInfo.processInfo.environment["CLEMII_TEST_HOST"] == "1"
     }
 
     var body: some View {
