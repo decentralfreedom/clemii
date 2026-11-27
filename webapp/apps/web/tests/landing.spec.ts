@@ -141,6 +141,10 @@ test("keeps the mascot cameo within the artwork as the page scrolls", async ({ p
 
 test("keeps download colors and position on hover and press", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === "mobile", "Touch has no hover state");
+  // The hero draws every frame while it is on screen, and CI renders WebGL in software:
+  // each hover and press then took up to two seconds and the journey ran out of time.
+  // These buttons look the same with less motion, where the hero stands still.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await expect(page.locator(".clemii-landing")).not.toHaveAttribute("data-opening", /pending|playing/, { timeout: 15000 });
   for (const button of await page.locator(".site-header-download, .landing-download").all()) {
