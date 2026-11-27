@@ -109,7 +109,7 @@ export const organizationData = {
   alternateName,
   url: `${siteOrigin}/`,
   logo: { "@type": "ImageObject", url: `${siteOrigin}/logo.png`, width: 512, height: 512 },
-  sameAs: ["https://github.com/decentralfreedom/hush"],
+  sameAs: ["https://github.com/decentralfreedom/clemii"],
 };
 
 /** The site's name in search results (https://developers.google.com/search/docs/appearance/site-names). */
@@ -136,8 +136,8 @@ export const softwareDescription = (page: PageMetadata) => ({
   processorRequirements: "Apple silicon (M1 or later)",
   isAccessibleForFree: true,
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  license: "https://github.com/decentralfreedom/hush/blob/main/LICENSING.md",
-  sameAs: ["https://github.com/decentralfreedom/hush"],
+  license: "https://github.com/decentralfreedom/clemii/blob/main/LICENSING.md",
+  sameAs: ["https://github.com/decentralfreedom/clemii"],
   publisher: { "@id": organizationData["@id"] },
 });
 

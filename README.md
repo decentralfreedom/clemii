@@ -89,8 +89,8 @@ handle speech; MLX runs the downloaded language and vision models. The assistant
 uses macOS Accessibility and ScreenCaptureKit, with Kokoro for local speech.
 
 ```sh
-git clone https://github.com/decentralfreedom/hush.git
-cd hush
+git clone https://github.com/decentralfreedom/clemii.git
+cd clemii
 open macos/Clemii/Clemii.xcodeproj
 ```
 
@@ -121,7 +121,7 @@ the clean baseline and preservation of the earlier histories.
 
 Good bug reports, accessibility improvements, documentation, and focused pull
 requests all help. Start with the [contribution guide](CONTRIBUTING.md) or
-[open an issue](https://github.com/decentralfreedom/hush/issues).
+[open an issue](https://github.com/decentralfreedom/clemii/issues).
 
 Find your area in the [journey map](docs/reference/user-journeys.md), or learn
 [how the pieces fit together](docs/explanation/architecture.md). We welcome
@@ -133,8 +133,8 @@ If clemii is useful to you, **star the repository** to help others discover it.
 
 <a href="https://www.star-history.com/?repos=decentralfreedom%2Fhush&amp;type=date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=decentralfreedom/hush&amp;type=date&amp;theme=dark">
-    <img src="https://api.star-history.com/chart?repos=decentralfreedom/hush&amp;type=date" alt="GitHub star history for clemii. The graph grows as people star the repository." width="800" height="533">
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=decentralfreedom/clemii&amp;type=date&amp;theme=dark">
+    <img src="https://api.star-history.com/chart?repos=decentralfreedom/clemii&amp;type=date" alt="GitHub star history for clemii. The graph grows as people star the repository." width="800" height="533">
   </picture>
 </a>
 

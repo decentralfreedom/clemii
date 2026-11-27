@@ -36,9 +36,9 @@ await Bun.write("public/llms.txt", [
   "## Product", "",
   ...publicPages.map(page => `- [${page.title}](${siteOrigin}${page.canonicalPath}): ${page.description}`), "",
   "## Source and contribution", "",
-  "- [clemii on GitHub](https://github.com/decentralfreedom/hush): macOS app and website monorepo.",
-  "- [Licensing](https://github.com/decentralfreedom/hush/blob/main/LICENSING.md): AGPL-3.0-only for original code; separately licensed components and assets retain their terms.",
-  "- [Contributing](https://github.com/decentralfreedom/hush/blob/main/CONTRIBUTING.md): development and contribution workflow.", "",
+  "- [clemii on GitHub](https://github.com/decentralfreedom/clemii): macOS app and website monorepo.",
+  "- [Licensing](https://github.com/decentralfreedom/clemii/blob/main/LICENSING.md): AGPL-3.0-only for original code; separately licensed components and assets retain their terms.",
+  "- [Contributing](https://github.com/decentralfreedom/clemii/blob/main/CONTRIBUTING.md): development and contribution workflow.", "",
   "## Optional", "",
   `- [Sitemap](${siteOrigin}/sitemap.xml): Public URLs intended for indexing.`, "",
 ].join("\n"));
