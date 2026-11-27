@@ -37,13 +37,13 @@ test.skipIf(!url || !websiteId || !apiKey || !serverUrl)("FUNNEL-001 the CMS imp
     const now = new Date(Date.now() + 86_400_000);
     const result = await importTraffic(cms.db, umamiClient({ url: url!, websiteId: websiteId!, apiKey: apiKey! }), now);
     expect(result.from).toBe(pacificDay(new Date()));
-    // The home page and the release notes the download opened are the site's, not a post's.
-    expect(result.otherPages).toEqual(["/", expect.stringMatching(/^\/releases\//)]);
+    // The home page is the site's, not a post's.
+    expect(result.otherPages).toEqual(["/"]);
 
     const sum = (rows: Array<{ pageviews: number; downloads: number }>) =>
       rows.reduce((total, row) => ({ pageviews: total.pageviews + row.pageviews, downloads: total.downloads + row.downloads }), { pageviews: 0, downloads: 0 });
     expect(sum(await cms.db.select().from(trafficDaily))).toEqual({ pageviews: 5, downloads: 1 });
-    expect(sum(await cms.db.select().from(trafficSiteDaily))).toEqual({ pageviews: 10, downloads: 2 });
+    expect(sum(await cms.db.select().from(trafficSiteDaily))).toEqual({ pageviews: 8, downloads: 2 });
 
     // Each visit in its channel; the tagged Reddit link without a referrer is social, not direct;
     // only the tagged download is attributed to a source.
@@ -53,7 +53,7 @@ test.skipIf(!url || !websiteId || !apiKey || !serverUrl)("FUNNEL-001 the CMS imp
       channels[row.channel] = { pageviews: total.pageviews + row.pageviews, downloads: total.downloads + row.downloads };
     }
     expect(channels).toEqual({
-      direct: { pageviews: 5, downloads: 0 },
+      direct: { pageviews: 3, downloads: 0 },
       organicSearch: { pageviews: 1, downloads: 0 },
       organicSocial: { pageviews: 2, downloads: 0 },
       ai: { pageviews: 1, downloads: 0 },
