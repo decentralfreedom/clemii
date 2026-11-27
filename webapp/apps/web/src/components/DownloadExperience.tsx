@@ -5,7 +5,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useRouterState } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { siApple } from "simple-icons";
 import {
   downloadPath,
@@ -32,6 +32,7 @@ export function DownloadLink({ mobileLabel = m.download_mobile(), ...props }: Do
   const page = useRouterState({ select: (state) => state.location.pathname });
   // The page's campaign tags travel with the download, so a newsletter's downloads count for it.
   const campaign = useBrowserValue(() => campaignOf(window.location.href), "");
+  const navigate = useNavigate();
   const [handoffOpen, setHandoffOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const release = latestRelease;
@@ -54,12 +55,16 @@ export function DownloadLink({ mobileLabel = m.download_mobile(), ...props }: Do
       event.metaKey ||
       event.ctrlKey ||
       event.shiftKey ||
-      event.altKey
+      event.altKey ||
+      // A recipient keeps reading their private message; its key lives only in this page's address.
+      page.startsWith("/p/")
     ) {
       return;
     }
 
-    window.open(releasePath(release), "_blank", "noopener,noreferrer");
+    // The release notes open in this tab, not a new one: Safari asks "Allow downloads?" in the tab
+    // that started the download, and a new tab in front would hide that question.
+    void navigate({ to: releasePath(release) });
   };
 
   return (
