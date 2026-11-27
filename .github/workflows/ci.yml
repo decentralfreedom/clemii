@@ -51,10 +51,14 @@ jobs:
     if: needs.changes.outputs.cms == 'true'
     uses: ./.github/workflows/ci-cms.yml
 
+  # The Mac jobs wait for scarce macOS runners and the Release build takes about
+  # 25 minutes. Native changes are built and tested on a Mac before they are pushed,
+  # so pull requests skip them; the merge queue runs them before anything reaches
+  # main, and main runs them again to keep the build caches warm for the queue.
   macos:
     name: Native
     needs: changes
-    if: needs.changes.outputs.native == 'true' || needs.changes.outputs.integration == 'true'
+    if: github.event_name != 'pull_request' && (needs.changes.outputs.native == 'true' || needs.changes.outputs.integration == 'true')
     uses: ./.github/workflows/ci-macos.yml
     with:
       native: ${{ needs.changes.outputs.native == 'true' }}
@@ -69,6 +73,7 @@ jobs:
       - name: Require all selected checks to pass
         env:
           SCOPE_RESULT: ${{ needs.changes.result }}
+          EVENT_NAME: ${{ github.event_name }}
           WEB_REQUIRED: ${{ needs.changes.outputs.web }}
           CMS_REQUIRED: ${{ needs.changes.outputs.cms }}
           NATIVE_REQUIRED: ${{ needs.changes.outputs.native }}
@@ -86,7 +91,9 @@ jobs:
           expected = {
               'WEB_RESULT': os.environ['WEB_REQUIRED'] == 'true',
               'CMS_RESULT': os.environ['CMS_REQUIRED'] == 'true',
-              'NATIVE_RESULT': any(os.environ[key] == 'true' for key in ('NATIVE_REQUIRED', 'INTEGRATION_REQUIRED')),
+              # Pull requests leave the Mac checks to the merge queue (see the macos job).
+              'NATIVE_RESULT': os.environ['EVENT_NAME'] != 'pull_request'
+              and any(os.environ[key] == 'true' for key in ('NATIVE_REQUIRED', 'INTEGRATION_REQUIRED')),
           }
           for key, required in expected.items():
               allowed = {'success'} if required else {'skipped'}

@@ -3,8 +3,8 @@
 
 # CI checks the components a change can affect
 
-Ready pull requests and pushes to `main` run checks selected from the complete
-Git diff. Draft pull requests do not allocate product build runners. Marking a
+Ready pull requests, merge-queue runs and pushes to `main` run checks selected
+from the complete Git diff. Draft pull requests do not allocate product build runners. Marking a
 draft ready starts its checks; converting it back to a draft cancels older work.
 Manual workflow runs always check both components.
 
@@ -19,10 +19,16 @@ Manual workflow runs always check both components.
 | Documentation, licenses or issue forms only | No | No | No | No |
 | CI configuration, an unknown app, package or root component, or an unavailable comparison | Yes | Yes | Yes | Yes |
 
-CodeQL uses the same selection for its Swift analysis, which builds the Xcode
-project on a Mac: it runs on pull requests that change native code or the CodeQL
-workflow itself. Other GitHub configuration, such as CI jobs or this selection,
-cannot change what the code analysis finds, so it does not start it.
+The two right-hand columns run on macOS runners, which GitHub has few of, and
+the Release build takes about 25 minutes. Native changes are built and tested on
+a Mac before they are pushed, so pull requests skip these checks: the merge
+queue runs them before anything reaches `main`, and the push to `main` runs them
+once more so the build caches the queue restores stay warm. Nobody waits for
+that last run. "CI result" expects them only outside pull requests.
+
+CodeQL's Swift analysis builds the Xcode project on a macOS runner as well. It
+runs on every push to `main`, weekly and by hand, not on pull requests; CodeQL is
+not a required check.
 
 Each component's checks live in its own reusable workflow
 (`ci-web.yml`, `ci-cms.yml`, `ci-macos.yml`), which `ci.yml` calls when the
@@ -38,7 +44,8 @@ title check and Dependabot's settings select no product checks.
 Which apps a shared package affects is read from the workspace manifests
 (`workspace:*` dependencies, including packages that depend on packages), so a
 new package or app needs no CI change to be scoped correctly. A merge-queue run
-(`merge_group`) always checks everything.
+(`merge_group`) selects from the queue's whole range: the base branch plus every
+queued pull request.
 
 Component selection itself has tests, including real Git histories with
 multi-commit pushes, divergent PR branches, renamed/deleted files and rewritten
