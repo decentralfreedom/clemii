@@ -95,8 +95,8 @@ test("SEARCH-004 names the site and shows its icon and logo wherever search engi
     if (size) expect((await response.body()).readUInt32BE(16), path).toBe(size);
   }
   const data = (await page.locator('script[type="application/ld+json"]').allInnerTexts()).map((text) => JSON.parse(text));
-  expect(data.find((item) => item["@type"] === "WebSite")).toMatchObject({ name: "clemii", url: "https://clemii.com/" });
+  expect(data.find((item) => item["@type"] === "WebSite")).toMatchObject({ name: "clemii", alternateName: ["clemii for Mac"], url: "https://clemii.com/" });
   expect(data.find((item) => item["@type"] === "Organization")).toMatchObject({
-    name: "clemii", logo: { url: "https://clemii.com/logo.png", width: 512, height: 512 },
+    name: "clemii", alternateName: ["clemii for Mac"], logo: { url: "https://clemii.com/logo.png", width: 512, height: 512 },
   });
 });
