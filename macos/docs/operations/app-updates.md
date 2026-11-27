@@ -171,13 +171,17 @@ labels and a DMG whose filename disagrees with the embedded bundle identity.
 This prevents retries or parallel release work from replacing an immutable
 tester build.
 
-The current public alpha is `0.1.0-alpha.9 (18)`, in which the assistant switch
-also stops ⌃ Fn and local models leave memory while no switched-on feature uses
-them. Alpha.8 made the assistant say it is an AI, talk in English and start with
+The current public alpha is `0.1.0-alpha.10 (19)`, the first clemii build:
+the app's new name, bundle identifier and icon, the assistant's voice set up on
+M5 Macs and meetings on the day named. hush builds (18 and older) see it as an
+informational update with a link to clemii.com and install nothing; every later
+clemii publish keeps that for builds below 19 (`package-update.sh`). Alpha.9 made
+the assistant switch also stop ⌃ Fn and let local models leave memory while no
+switched-on feature uses them. Alpha.8 made the assistant say it is an AI, talk in English and start with
 ⌃ Fn on the ChatGPT plan; alpha.7 added vocabulary taught by voice, Live Write's app list and the optional ChatGPT
 plan; alpha.6 made the persona editor follow Light and Dark mode; alpha.5
 restored the Finder layout; alpha.4 was the first notarized download. The next
-tester release must use a build number greater than 18.
+tester release must use a build number greater than 19.
 
 Release notes for the update dialog are a Markdown file passed as
 `HUSH_RELEASE_NOTES_FILE`; Sparkle shows them before the user installs. Alpha.8

@@ -304,3 +304,37 @@ clemii in lowercase (#134).
   ⌃ Fn only showed the notice, and launch memory was 32 MB with Live Write off
   against 3.1 GB with it on (Qwen 3.5 4B).
 - A clean-Mac offline installation remains untested.
+
+## Alpha.10 distribution record
+
+Published 2026-11-27 (UTC) as `0.1.0-alpha.10 (19)`, the first clemii build,
+bundle identifier `com.decentralfreedom.clemii`. Built from revision
+`96e739ff149aecd52c87fcd3f296c43d9f0402c7` (the top of the rebrand stack before
+it merged as #189), with Xcode 27.2. `macos/` on main after #189 is identical
+except `package-update.sh`, which makes the update informational for hush builds.
+
+- `Package.resolved` differs from alpha.9 only in FluidAudio, pinned to main
+  `e2ea498` (#179). Neither revision declares build plugins or macros, so the
+  build used `HUSH_TRUST_PINNED_BUILD_TOOLS=1` into `artifacts/release-alpha10`.
+- The first export failed with no Xcode account signed in after the update to
+  Xcode 27.2. After the owner signed in, the export and the following steps ran
+  with the script's own commands into the same release directory, and Xcode
+  created the Developer ID profile for the new identifier.
+- Preflight passed for the app and the DMG; Apple's local assessment reported
+  only the expected missing ticket.
+- Only submission: DMG `f905a2c1-8626-47b0-a7cd-ed088219e2b1`, Accepted, "Ready
+  for distribution", no issues, 39 files in the ticket. The DMG and the exported
+  app are stapled; the postflight passed.
+- Finder layout: the candidate and the final DMG were mounted and their windows
+  viewed.
+- Public DMG SHA-256 starts `29cdafd66b596217ae06`. The versioned download and
+  `hush-latest.dmg` match the accepted artifact byte for byte; a quarantined
+  download passes Gatekeeper (`Notarized Developer ID`) and staple validation.
+  `verify-update-feed.sh` passed against `updates.clemii.com`; the feed offers
+  build 19 for arm64, macOS 15 or later, informational below 19, with release
+  notes and deltas from builds 14 to 18. `updates.behu.sh` serves the same feed.
+- Pre-release checks: 293 app unit tests passed; the voice, vocabulary boost and
+  coworker live tests passed on an M5 with macOS 27.2.1. The owner installed the
+  notarized DMG from a quarantined download and ran the onboarding and the
+  assistant's voice setup.
+- A clean-Mac offline installation remains untested.
