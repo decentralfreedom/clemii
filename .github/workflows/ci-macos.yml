@@ -33,9 +33,13 @@ jobs:
         with:
           bun-version: 1.3.9
       - name: Confirm the native toolchain
+        id: toolchain
         run: |
           xcodebuild -version
           swift --version
+          # The same Xcode path can hold another build after a runner image update; its
+          # precompiled modules would not load, so caches are keyed on the builds themselves.
+          echo "id=$(xcodebuild -version | awk '/Build version/ {print $3}')-$(xcrun --show-sdk-build-version)-$(sw_vers -buildVersion)" >> "$GITHUB_OUTPUT"
       - name: Keep dictated text out of the system log
         working-directory: macos
         run: |
@@ -48,8 +52,8 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: macos/Packages/ClemiiProvenance/.build
-          key: proof-${{ runner.os }}-${{ env.DEVELOPER_DIR }}-${{ hashFiles('macos/Packages/ClemiiProvenance/Package.resolved', 'macos/Packages/ClemiiProvenance/Package.swift') }}-${{ github.sha }}
-          restore-keys: proof-${{ runner.os }}-${{ env.DEVELOPER_DIR }}-${{ hashFiles('macos/Packages/ClemiiProvenance/Package.resolved', 'macos/Packages/ClemiiProvenance/Package.swift') }}-
+          key: proof-${{ runner.os }}-${{ steps.toolchain.outputs.id }}-${{ hashFiles('macos/Packages/ClemiiProvenance/Package.resolved', 'macos/Packages/ClemiiProvenance/Package.swift') }}-${{ github.sha }}
+          restore-keys: proof-${{ runner.os }}-${{ steps.toolchain.outputs.id }}-${{ hashFiles('macos/Packages/ClemiiProvenance/Package.resolved', 'macos/Packages/ClemiiProvenance/Package.swift') }}-
       - name: Test the proof package
         run: swift test --package-path macos/Packages/ClemiiProvenance --force-resolved-versions
       # Bun's package cache: every run reads it, only main writes it, so a pull
@@ -94,8 +98,8 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/hush-derived-data
-          key: native-${{ runner.os }}-${{ env.DEVELOPER_DIR }}-${{ hashFiles('macos/Clemii/Clemii.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-${{ github.sha }}
-          restore-keys: native-${{ runner.os }}-${{ env.DEVELOPER_DIR }}-${{ hashFiles('macos/Clemii/Clemii.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-
+          key: native-${{ runner.os }}-${{ steps.toolchain.outputs.id }}-${{ hashFiles('macos/Clemii/Clemii.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-${{ github.sha }}
+          restore-keys: native-${{ runner.os }}-${{ steps.toolchain.outputs.id }}-${{ hashFiles('macos/Clemii/Clemii.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-
       - name: Compile the native Release configuration
         if: inputs.native
         working-directory: macos
