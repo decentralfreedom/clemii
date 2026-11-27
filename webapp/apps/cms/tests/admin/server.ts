@@ -111,7 +111,7 @@ app.get("/__e2e/sign-in", async (context) => {
 const adminDir = join(import.meta.dir, "../../../cms-admin/dist");
 app.route("/", createApp(cms, { admin, adminDir: await Bun.file(join(adminDir, "index.html")).exists() ? adminDir : undefined }));
 // HTTPS with a throwaway self-signed certificate: every browser, WebKit too,
-// then keeps the __Host- session cookie exactly as on cms.behu.sh.
+// then keeps the __Host- session cookie exactly as on cms.clemii.com.
 const certificateDir = await mkdtemp(join(tmpdir(), "hush-cms-admin-tls-"));
 const openssl = Bun.spawnSync(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "1", "-subj", "/CN=localhost",
   "-addext", "subjectAltName=DNS:localhost", "-keyout", join(certificateDir, "key.pem"), "-out", join(certificateDir, "cert.pem")]);

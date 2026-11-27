@@ -11,7 +11,7 @@ import { githubClientCheck, storeCheck, watchConfiguration } from "../src/config
 import { healthRoutes } from "../src/routes/health";
 import { LocalObjectStore, type ObjectStore } from "../src/storage/object-store";
 
-const admin = { publicUrl: "https://cms.behu.sh", github: { clientId: "id", clientSecret: "secret" }, allowedGithubIds: new Set([1]) };
+const admin = { publicUrl: "https://cms.clemii.com", github: { clientId: "id", clientSecret: "secret" }, allowedGithubIds: new Set([1]) };
 const github = (answer: unknown) => (async () => Response.json(answer)) as unknown as typeof fetch;
 
 test("CMS-CONFIG-001 a bucket that refuses the credentials keeps the CMS not ready, and it becomes ready once they work", async () => {

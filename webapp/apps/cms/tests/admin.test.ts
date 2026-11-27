@@ -20,7 +20,7 @@ import { createTestDatabase, serverUrl } from "./database";
 import { validPost } from "./fixtures";
 
 const admin: AdminConfig = {
-  publicUrl: "https://cms.behu.sh",
+  publicUrl: "https://cms.clemii.com",
   github: { clientId: "client-id", clientSecret: "client-secret" },
   allowedGithubIds: new Set([4242]),
 };
@@ -78,7 +78,7 @@ describe.skipIf(!serverUrl)("CMS admin", () => {
     expect(start.status).toBe(302);
     const location = new URL(start.headers.get("location")!);
     expect(location.origin + location.pathname).toBe("https://github.com/login/oauth/authorize");
-    expect(location.searchParams.get("redirect_uri")).toBe("https://cms.behu.sh/auth/github/callback");
+    expect(location.searchParams.get("redirect_uri")).toBe("https://cms.clemii.com/auth/github/callback");
     expect(location.searchParams.get("scope")).toBeNull();
     // PKCE (RFC 7636, S256), as RFC 9700 recommends for confidential clients.
     expect(location.searchParams.get("code_challenge_method")).toBe("S256");
@@ -196,10 +196,10 @@ describe.skipIf(!serverUrl)("CMS admin", () => {
   test("CMS-ADMIN-007 sign-in is configured completely or not at all", () => {
     const base = { CMS_DATABASE_URL: "postgresql://x", NODE_ENV: "test" };
     expect(loadConfig(base).admin).toBeUndefined();
-    expect(() => loadConfig({ ...base, CMS_PUBLIC_URL: "https://cms.behu.sh" })).toThrow("CMS_ADMIN_GITHUB_IDS");
-    expect(() => loadConfig({ ...base, CMS_PUBLIC_URL: "https://cms.behu.sh", CMS_ADMIN_GITHUB_IDS: "owner" })).toThrow("numeric");
-    expect(() => loadConfig({ ...base, CMS_PUBLIC_URL: "http://cms.behu.sh", CMS_ADMIN_GITHUB_IDS: "1", CMS_GITHUB_CLIENT_ID: "a", CMS_GITHUB_CLIENT_SECRET: "b" })).toThrow("HTTPS");
-    expect(loadConfig({ ...base, CMS_PUBLIC_URL: "https://cms.behu.sh/x", CMS_ADMIN_GITHUB_IDS: "1, 2", CMS_GITHUB_CLIENT_ID: "a", CMS_GITHUB_CLIENT_SECRET: "b" }).admin)
-      .toMatchObject({ publicUrl: "https://cms.behu.sh", allowedGithubIds: new Set([1, 2]) });
+    expect(() => loadConfig({ ...base, CMS_PUBLIC_URL: "https://cms.clemii.com" })).toThrow("CMS_ADMIN_GITHUB_IDS");
+    expect(() => loadConfig({ ...base, CMS_PUBLIC_URL: "https://cms.clemii.com", CMS_ADMIN_GITHUB_IDS: "owner" })).toThrow("numeric");
+    expect(() => loadConfig({ ...base, CMS_PUBLIC_URL: "http://cms.clemii.com", CMS_ADMIN_GITHUB_IDS: "1", CMS_GITHUB_CLIENT_ID: "a", CMS_GITHUB_CLIENT_SECRET: "b" })).toThrow("HTTPS");
+    expect(loadConfig({ ...base, CMS_PUBLIC_URL: "https://cms.clemii.com/x", CMS_ADMIN_GITHUB_IDS: "1, 2", CMS_GITHUB_CLIENT_ID: "a", CMS_GITHUB_CLIENT_SECRET: "b" }).admin)
+      .toMatchObject({ publicUrl: "https://cms.clemii.com", allowedGithubIds: new Set([1, 2]) });
   });
 });

@@ -10,7 +10,7 @@ operations the admin uses. Articles are Markdown files in the hush-seo format
 ```sh
 cd webapp/apps/cms-cli
 bun run install:cli          # builds one binary into ~/.local/bin/hush-cms
-hush-cms auth login          # opens cms.behu.sh/device; approve the code, done
+hush-cms auth login          # opens cms.clemii.com/device; approve the code, done
 hush-cms auth status
 ```
 
@@ -36,7 +36,7 @@ hush-cms posts pull dictate-without-cloud --out content
 
 `hush-cms --help` lists every command. `--json` prints the CMS's answers for
 scripts; exit codes are 0 (done), 1 (refused or failed) and 2 (wrong usage).
-`HUSH_CMS_URL` points at another CMS (default `https://cms.behu.sh`) and
+`HUSH_CMS_URL` points at another CMS (default `https://cms.clemii.com`) and
 `HUSH_CMS_TOKEN` overrides the stored token.
 
 Licensed [AGPL-3.0-only](../../../LICENSE).
