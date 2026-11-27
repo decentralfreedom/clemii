@@ -8,21 +8,21 @@ final class TypingBenchmarkJourneyTests: XCTestCase {
         app.activate()
 
         XCTAssertTrue(app.staticTexts["Typing benchmark"].waitForExistence(timeout: 6))
-        let passage = app.staticTexts["hush.typing.passage"]
+        let passage = app.staticTexts["clemii.typing.passage"]
         XCTAssertTrue(passage.waitForExistence(timeout: 2))
         XCTAssertGreaterThan(passage.frame.width, 700)
-        let currentWord = app.staticTexts["hush.typing.current-word"]
+        let currentWord = app.staticTexts["clemii.typing.current-word"]
         XCTAssertTrue(currentWord.waitForExistence(timeout: 2))
         let firstWord = textValue(of: currentWord)
         XCTAssertFalse(firstWord.isEmpty)
-        let input = app.textFields["hush.typing.input"]
+        let input = app.textFields["clemii.typing.input"]
         XCTAssertTrue(input.exists)
         keepScreenshot(named: "Typing Benchmark 01 Ready")
 
         input.typeText(firstWord)
         XCTAssertTrue(app.staticTexts["Correct mistakes as you go for a more realistic result."].waitForExistence(timeout: 2))
         XCTAssertNotEqual(textValue(of: currentWord), firstWord)
-        let characterFeedback = app.staticTexts["hush.typing.character-feedback"]
+        let characterFeedback = app.staticTexts["clemii.typing.character-feedback"]
         XCTAssertEqual(textValue(of: characterFeedback), "\(firstWord.count) correct · 0 mistakes")
         keepScreenshot(named: "Typing Benchmark 02 Space Marker")
 

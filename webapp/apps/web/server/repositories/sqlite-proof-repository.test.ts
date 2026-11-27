@@ -7,7 +7,7 @@ import { SQLiteProofRepository } from "./sqlite-proof-repository";
 
 test("upgrades local timestamp storage to milliseconds exactly once", async () => {
   const directory = mkdtempSync(join(tmpdir(), "hush-sqlite-migration-"));
-  const path = join(directory, "hush.sqlite");
+  const path = join(directory, "clemii.sqlite");
 
   try {
     const initial = new SQLiteProofRepository(path);

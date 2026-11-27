@@ -8,7 +8,7 @@ import Testing
 struct AssistantChatGPTTests {
     /// Runs with throwaway defaults and an account that never touches the Keychain or network.
     private func isolated(_ body: (ChatGPTAccount) throws -> Void) rethrows {
-        let suite = "hush.tests.assistant.chatgpt.\(UUID().uuidString)"
+        let suite = "clemii.tests.assistant.chatgpt.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suite)!
         let account = ChatGPTAccount(
             connection: ChatGPTConnection(store: ChatGPTCredentialStore(service: "com.decentralfreedom.hush.tests.\(UUID().uuidString)")),
@@ -107,7 +107,7 @@ struct AssistantChatGPTTests {
     @Test("A model that rejects images is remembered, so the next turn sends text only")
     func imageRejection() {
         let account = ChatGPTAccount(connection: ChatGPTConnection(store: ChatGPTCredentialStore(service: "com.decentralfreedom.hush.tests.\(UUID().uuidString)")),
-                                     defaults: UserDefaults(suiteName: "hush.tests.\(UUID().uuidString)")!, loads: false)
+                                     defaults: UserDefaults(suiteName: "clemii.tests.\(UUID().uuidString)")!, loads: false)
         #expect(account.acceptsImages("m"))
         account.rejectImages("m")
         #expect(!account.acceptsImages("m"))

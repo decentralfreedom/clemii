@@ -100,7 +100,7 @@ struct ProvenanceAPITests {
             expiresAt: "2026-09-01T20:01:00.000Z",
             author: nil,
             capture: .init(
-                source: .hushHistory,
+                source: .clemiiHistory,
                 durationMs: nil,
                 sampleRate: nil,
                 audioSha256: nil

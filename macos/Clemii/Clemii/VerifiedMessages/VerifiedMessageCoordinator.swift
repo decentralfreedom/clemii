@@ -157,7 +157,7 @@ final class VerifiedMessageCoordinator {
             transcription = nil
         case .recentClemiiOutput:
             capture = .init(
-                source: .hushHistory,
+                source: .clemiiHistory,
                 durationMs: nil,
                 sampleRate: nil,
                 audioSha256: nil

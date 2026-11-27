@@ -61,7 +61,7 @@ final class AssistantWindowController: NSObject, NSWindowDelegate {
         let frame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1000, height: 800)
         let panel = AssistantPanel(contentRect: NSRect(x: 0, y: 0, width: 420, height: min(640, frame.height - 100)),
                             styleMask: [.titled, .closable, .resizable, .utilityWindow], backing: .buffered, defer: false)
-        panel.title = "Hey Hush"
+        panel.title = "Hey clemii"
         panel.titleVisibility = .hidden
         panel.titlebarAppearsTransparent = true
         panel.isReleasedWhenClosed = false
@@ -75,7 +75,7 @@ final class AssistantWindowController: NSObject, NSWindowDelegate {
             if let session = self.session { session.stop() }
             else { self.close() }
         }
-        panel.setAccessibilityIdentifier("hush.assistant.window")
+        panel.setAccessibilityIdentifier("clemii.assistant.window")
         panel.setFrameTopLeftPoint(NSPoint(x: frame.maxX - 448, y: frame.maxY - 56))
         self.panel = panel
         panel.makeKeyAndOrderFront(nil)
@@ -117,9 +117,9 @@ private struct AssistantView: View {
             HStack(spacing: 10) {
                 Image(systemName: "cursorarrow.rays").font(.system(size: 23, weight: .medium)).foregroundStyle(Color(nsColor: DesignTokens.brand500))
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("Hey Hush").font(.system(size: 21, weight: .semibold))
+                    Text("Hey clemii").font(.system(size: 21, weight: .semibold))
                     Text("clemii\u{2019}s AI assistant, right here.").font(.system(size: 12)).foregroundStyle(.secondary)
-                        .accessibilityIdentifier("hush.assistant.ai-disclosure")
+                        .accessibilityIdentifier("clemii.assistant.ai-disclosure")
                 }
                 Spacer()
                 Text("PREVIEW").font(.system(size: 9, weight: .semibold, design: .monospaced)).foregroundStyle(.secondary)
@@ -143,13 +143,13 @@ private struct AssistantView: View {
                     .lineLimit(2...5).textFieldStyle(.plain).padding(11)
                     .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 9))
                     .overlay(RoundedRectangle(cornerRadius: 9).stroke(.primary.opacity(0.13), lineWidth: 1))
-                    .focused($requestFocused).accessibilityIdentifier("hush.assistant.request")
+                    .focused($requestFocused).accessibilityIdentifier("clemii.assistant.request")
                     .disabled(!session.canSubmit)
                 HStack {
                     Text("Type, or use your dictation shortcut.").font(.system(size: 11)).foregroundStyle(.secondary)
                     Spacer()
                     Button(session.proposal == nil ? "Write draft" : "Revise") { copied = false; session.submit(session.request) }
-                        .accessibilityIdentifier("hush.assistant.generate")
+                        .accessibilityIdentifier("clemii.assistant.generate")
                         .disabled(session.request.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !session.canSubmit)
                 }
             }
@@ -158,7 +158,7 @@ private struct AssistantView: View {
                 ScrollView {
                     Text(draft.plainText).textSelection(.enabled).font(.system(size: 14)).lineSpacing(4)
                         .frame(maxWidth: .infinity, alignment: .leading).padding(14)
-                        .accessibilityIdentifier("hush.assistant.draft")
+                        .accessibilityIdentifier("clemii.assistant.draft")
                 }
                 .frame(minHeight: 100, maxHeight: .infinity)
                 .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 10))
@@ -171,7 +171,7 @@ private struct AssistantView: View {
                 if session.isBusy { ProgressView().controlSize(.small) }
                 else { Image(systemName: session.phase == .complete ? "checkmark.circle" : "info.circle").foregroundStyle(.secondary) }
                 Text(session.status).font(.system(size: 12)).fixedSize(horizontal: false, vertical: true)
-                    .accessibilityIdentifier("hush.assistant.status")
+                    .accessibilityIdentifier("clemii.assistant.status")
             }
             HStack {
                 if let proposal = session.proposal, proposal.decision == .draft {
@@ -180,15 +180,15 @@ private struct AssistantView: View {
                             NSPasteboard.general.clearContents()
                             copied = NSPasteboard.general.writeObjects([item])
                         }
-                    }.accessibilityIdentifier("hush.assistant.copy")
+                    }.accessibilityIdentifier("clemii.assistant.copy")
                         .disabled(session.phase == .applying)
                 }
                 Spacer()
                 if session.isBusy {
-                    Button("Stop", role: .cancel) { session.stop() }.accessibilityIdentifier("hush.assistant.stop")
+                    Button("Stop", role: .cancel) { session.stop() }.accessibilityIdentifier("clemii.assistant.stop")
                 } else {
                     Button("Insert into Mail") { session.insert() }.buttonStyle(.borderedProminent)
-                        .disabled(!session.canInsert).accessibilityIdentifier("hush.assistant.insert")
+                        .disabled(!session.canInsert).accessibilityIdentifier("clemii.assistant.insert")
                 }
             }
             Divider()
@@ -212,10 +212,10 @@ private struct AssistantUnavailableView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             Image(systemName: "cursorarrow.rays").font(.system(size: 32)).foregroundStyle(Color(nsColor: DesignTokens.brand500))
-            Text("Hey Hush").font(.system(size: 25, weight: .semibold))
+            Text("Hey clemii").font(.system(size: 25, weight: .semibold))
             Text("Start in your email").font(.headline)
             Text(message).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-                .accessibilityIdentifier("hush.assistant.unavailable")
+                .accessibilityIdentifier("clemii.assistant.unavailable")
             Text("This preview writes and inserts email drafts in Apple Mail. Open it with Control + Fn while the email body is focused.")
                 .font(.system(size: 13)).foregroundStyle(.secondary)
             Button("Open clemii settings", action: onSettings)

@@ -128,7 +128,7 @@ final class AIModelControlsView: NSStackView {
             }
             control = button
         }
-        control.setAccessibilityIdentifier("hush.ai.model.\(item.id)")
+        control.setAccessibilityIdentifier("clemii.ai.model.\(item.id)")
         control.isEnabled = !library.isRemoving && !AssistantSetupFlow.shared.isRunning
         controls.addArrangedSubview(control)
     }
@@ -148,7 +148,7 @@ final class AIModelControlsView: NSStackView {
         case .disconnected, .failed:
             if case .failed(let message) = account.state { detail = message }
             let connect = AIModelActionButton(title: "Continue with ChatGPT", inline: true, symbol: "cloud")
-            connect.setAccessibilityIdentifier("hush.ai.model.chatgpt")
+            connect.setAccessibilityIdentifier("clemii.ai.model.chatgpt")
             connect.onPress = choose
             controls.addArrangedSubview(connect)
         case .connecting:
@@ -166,7 +166,7 @@ final class AIModelControlsView: NSStackView {
                 } else {
                     let use = AIModelActionButton(title: "Use", inline: true)
                     use.setAccessibilityLabel("Use ChatGPT")
-                    use.setAccessibilityIdentifier("hush.ai.model.chatgpt")
+                    use.setAccessibilityIdentifier("clemii.ai.model.chatgpt")
                     use.isEnabled = !AssistantSetupFlow.shared.isRunning
                     use.onPress = choose
                     controls.addArrangedSubview(use)
@@ -174,7 +174,7 @@ final class AIModelControlsView: NSStackView {
             } else {
                 detail = "\(email ?? "Signed in") · Plan use not allowed yet"
                 let allow = AIModelActionButton(title: "Continue with ChatGPT", inline: true, symbol: "cloud")
-                allow.setAccessibilityIdentifier("hush.ai.model.chatgpt")
+                allow.setAccessibilityIdentifier("clemii.ai.model.chatgpt")
                 allow.onPress = { [weak self] in
                     guard let self else { return }
                     account.requestConsent(for: self.purpose, in: self.window) { [weak self] in self?.select(.chatGPT) }
@@ -213,7 +213,7 @@ final class AIModelControlsView: NSStackView {
                 ? NSColor(srgbRed: 0.48, green: 0.85, blue: 0.64, alpha: 1)
                 : NSColor(srgbRed: 0.12, green: 0.40, blue: 0.25, alpha: 1)
         } : .secondaryLabelColor
-        label.setAccessibilityIdentifier("hush.ai.model.status.\(name)")
+        label.setAccessibilityIdentifier("clemii.ai.model.status.\(name)")
         label.setAccessibilityLabel("\(name), \(title.lowercased())")
         return label
     }

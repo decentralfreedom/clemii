@@ -12,7 +12,7 @@ final class PersonaWheelJourneyTests: XCTestCase {
 
         app.typeKey("p", modifierFlags: .option)
 
-        let wheel = app.descendants(matching: .any)["hush.personaWheel"]
+        let wheel = app.descendants(matching: .any)["clemii.personaWheel"]
         XCTAssertTrue(
             wheel.waitForExistence(timeout: 3),
             "The registered default persona shortcut did not reveal the persona wheel"
@@ -35,7 +35,7 @@ final class PersonaWheelJourneyTests: XCTestCase {
             "The persona shortcut should open the Live Write page when the writing engine is off"
         )
         XCTAssertFalse(
-            app.descendants(matching: .any)["hush.personaWheel"].exists,
+            app.descendants(matching: .any)["clemii.personaWheel"].exists,
             "The selector should not open while Persona AI is off"
         )
     }
@@ -72,7 +72,7 @@ final class PersonaWheelJourneyTests: XCTestCase {
 
         edit.click()
         XCTAssertTrue(app.staticTexts["Make this persona yours"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.textFields["hush.personaEditor.name"].exists)
+        XCTAssertTrue(app.textFields["clemii.personaEditor.name"].exists)
         XCTAssertTrue(app.buttons["Persona icon"].exists)
         XCTAssertTrue(app.buttons["Try Persona"].exists)
         XCTAssertTrue(app.buttons["Save Changes"].exists)
@@ -106,7 +106,7 @@ final class PersonaWheelJourneyTests: XCTestCase {
         app.launch()
 
         XCTAssertTrue(
-            app.descendants(matching: .any)["hush.personaWheel"].waitForExistence(timeout: 3),
+            app.descendants(matching: .any)["clemii.personaWheel"].waitForExistence(timeout: 3),
             "Clicking the Persona toolbar row did not reveal the selector"
         )
     }
@@ -124,7 +124,7 @@ final class PersonaWheelJourneyTests: XCTestCase {
             app.staticTexts["What it does"].waitForExistence(timeout: 5),
             "Clicking Persona should open the Live Write page while the writing engine is off"
         )
-        XCTAssertFalse(app.descendants(matching: .any)["hush.personaWheel"].exists)
+        XCTAssertFalse(app.descendants(matching: .any)["clemii.personaWheel"].exists)
     }
 
     func testDedicatedShortcutPersonaJourney() throws {
@@ -132,7 +132,7 @@ final class PersonaWheelJourneyTests: XCTestCase {
         app.launchArguments = ["--preview-persona-wheel"]
         app.launch()
 
-        let wheel = app.descendants(matching: .any)["hush.personaWheel"]
+        let wheel = app.descendants(matching: .any)["clemii.personaWheel"]
         XCTAssertTrue(
             wheel.waitForExistence(timeout: 5),
             "The persona shortcut did not reveal the persona wheel"
@@ -186,7 +186,7 @@ final class PersonaWheelJourneyTests: XCTestCase {
         app.launchArguments = ["--preview-persona-wheel-small"]
         app.launch()
 
-        let wheel = app.descendants(matching: .any)["hush.personaWheel"]
+        let wheel = app.descendants(matching: .any)["clemii.personaWheel"]
         XCTAssertTrue(wheel.waitForExistence(timeout: 5))
         XCTAssertEqual(
             wheel.frame.width,
@@ -207,7 +207,7 @@ final class PersonaWheelJourneyTests: XCTestCase {
         app.launchArguments = ["--preview-persona-wheel-overflow"]
         app.launch()
 
-        let wheel = app.descendants(matching: .any)["hush.personaWheel"]
+        let wheel = app.descendants(matching: .any)["clemii.personaWheel"]
         XCTAssertTrue(wheel.waitForExistence(timeout: 5))
         XCTAssertEqual(wheel.frame.width, wheel.frame.height, accuracy: 1)
         let product = app.buttons["Product"]
@@ -239,7 +239,7 @@ final class PersonaWheelJourneyTests: XCTestCase {
 
         more.click()
 
-        let search = app.textFields["hush.personaWheel.moreSearch"]
+        let search = app.textFields["clemii.personaWheel.moreSearch"]
         XCTAssertTrue(
             search.waitForExistence(timeout: 2),
             "More should open a searchable persona library"

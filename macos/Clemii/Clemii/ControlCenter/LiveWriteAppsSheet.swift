@@ -42,10 +42,10 @@ final class LiveWriteAppsViewController: NSViewController {
 
         let add = NSButton(title: "Add Apps\u{2026}", target: self, action: #selector(addApps(_:)))
         add.bezelStyle = .rounded
-        add.setAccessibilityIdentifier("hush.livewrite.apps.add")
+        add.setAccessibilityIdentifier("clemii.livewrite.apps.add")
         let reset = NSButton(title: "Reset to Standard", target: self, action: #selector(resetToStandard(_:)))
         reset.bezelStyle = .rounded
-        reset.setAccessibilityIdentifier("hush.livewrite.apps.reset")
+        reset.setAccessibilityIdentifier("clemii.livewrite.apps.reset")
         let done = NSButton(title: "Done", target: self, action: #selector(finish(_:)))
         done.bezelStyle = .rounded
         done.keyEquivalent = "\r"

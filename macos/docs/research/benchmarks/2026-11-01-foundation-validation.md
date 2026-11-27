@@ -1,6 +1,6 @@
 # Hey Hush foundation validation - 2026-11-01
 
-This record concerns the native implementation, not a model-quality benchmark. See the [journey contract](../../user-journeys/hey-hush.md) for evidence boundaries and release gates.
+This record concerns the native implementation, not a model-quality benchmark. See the [journey contract](../../user-journeys/hey-clemii.md) for evidence boundaries and release gates.
 
 ## Completed checks
 

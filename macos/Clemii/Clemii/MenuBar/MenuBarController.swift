@@ -50,7 +50,7 @@ final class MenuBarController: NSObject {
 
     func install() {
         applyAsset(named: "MenuBar-idle", template: true)
-        statusItem.button?.setAccessibilityIdentifier("hush.menuBar")
+        statusItem.button?.setAccessibilityIdentifier("clemii.menuBar")
         statusItem.button?.setAccessibilityLabel("clemii menu")
         menu.delegate = self
         menu.minimumWidth = MenuBarPanelView.panelWidth

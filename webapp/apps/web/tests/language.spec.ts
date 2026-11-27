@@ -66,6 +66,19 @@ test("LANG-003 remembers the language chosen in the footer over the device langu
   await german.close();
 });
 
+test("LANG-003 keeps a language chosen before the rename, and stores the next choice under the new name", async ({ browser }) => {
+  const german = await browser.newContext({ locale: "de-DE" });
+  const page = await german.newPage();
+  // A visitor who chose English while the site was hush.
+  await page.addInitScript(() => { if (!sessionStorage.getItem("seeded")) { localStorage.setItem("hush.language", "en"); sessionStorage.setItem("seeded", "1"); } });
+  await page.goto("/");
+  await expect(page.locator("h1")).toHaveText("The voice layer for your Mac.");
+  await page.locator("footer").getByRole("navigation", { name: "Language" }).getByRole("link", { name: "Deutsch" }).click();
+  await page.waitForURL(/\/de$/, { waitUntil: "load" });
+  expect(await page.evaluate(() => [localStorage.getItem("clemii.language"), localStorage.getItem("hush.language")])).toEqual(["de", null]);
+  await german.close();
+});
+
 test("LANG-004 offers the other language in a dismissible bar", async ({ page }) => {
   await page.goto("/de");
   const hint = page.locator(".language-hint");

@@ -3,7 +3,7 @@ import Foundation
 import Network
 import os
 
-/// The one ChatGPT account connected to hush: signs in through the system browser,
+/// The one ChatGPT account connected to clemii: signs in through the system browser,
 /// keeps the session fresh, writes through the Responses API on the user's plan, and
 /// signs out with revocation. Refreshes are serialized, as the documentation requires.
 actor ChatGPTConnection {

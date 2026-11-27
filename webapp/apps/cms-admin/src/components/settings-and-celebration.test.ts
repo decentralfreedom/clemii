@@ -46,6 +46,14 @@ describe("the settings panel's memory", () => {
     expect(readSettingsOpen(source)).toBe(false);
   });
 
+  test("keeps the state stored before the rename until the next toggle replaces it", () => {
+    const { map, source } = memoryStorage();
+    map.set("hush-editor-settings-open", "open");
+    expect(readSettingsOpen(source)).toBe(true);
+    writeSettingsOpen(false, source);
+    expect([map.get(settingsOpenKey), map.has("hush-editor-settings-open")]).toEqual(["closed", false]);
+  });
+
   test("blocked storage starts the panel closed and costs only the memory", () => {
     expect(readSettingsOpen(blocked)).toBe(false);
     expect(() => writeSettingsOpen(true, blocked)).not.toThrow();
@@ -76,10 +84,10 @@ describe("the publish celebration", () => {
 
   test("a damaged key or blocked storage celebrates nothing and never throws", () => {
     const { map, source } = memoryStorage();
-    map.set("hush-last-published-post", "{not json");
+    map.set("clemii-last-published-post", "{not json");
     expect(readPublishCelebration(source)).toBeNull();
     expect(map.size).toBe(0);
-    map.set("hush-last-published-post", JSON.stringify({ id: "" }));
+    map.set("clemii-last-published-post", JSON.stringify({ id: "" }));
     expect(readPublishCelebration(source)).toBeNull();
     expect(readPublishCelebration(blocked)).toBeNull();
     expect(() => writePublishCelebration({ id: "a", scheduled: false }, blocked)).not.toThrow();

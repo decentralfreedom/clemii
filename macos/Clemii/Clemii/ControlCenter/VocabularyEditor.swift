@@ -33,7 +33,7 @@ struct VocabularySection: View {
                 }
                 Spacer()
                 Button(count == 0 ? "Add Words\u{2026}" : "Manage\u{2026}") { isOpen = true }
-                    .accessibilityIdentifier("hush.vocabulary.open")
+                    .accessibilityIdentifier("clemii.vocabulary.open")
             }
         } footer: {
             Text("Applied to every dictation on this Mac, with or without Live Write.")
@@ -79,7 +79,7 @@ struct VocabularySheet: View {
                 if !terms.isEmpty {
                     Button { open(nil) } label: { Label("Add Word", systemImage: "plus") }
                         .buttonStyle(.borderedProminent)
-                        .accessibilityIdentifier("hush.vocabulary.add")
+                        .accessibilityIdentifier("clemii.vocabulary.add")
                 }
             }
             .padding([.horizontal, .top], 24)
@@ -99,7 +99,7 @@ struct VocabularySheet: View {
                 .scrollContentBackground(.hidden)
                 // The inset list draws rows 16 pt in; this lines them up with the title.
                 .padding(.horizontal, 8)
-                .accessibilityIdentifier("hush.vocabulary.list")
+                .accessibilityIdentifier("clemii.vocabulary.list")
             }
 
             RecognitionBoostCard()
@@ -134,7 +134,7 @@ struct VocabularySheet: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .padding(.top, 6)
-                .accessibilityIdentifier("hush.vocabulary.add")
+                .accessibilityIdentifier("clemii.vocabulary.add")
             Spacer()
         }
         .frame(maxWidth: .infinity)
@@ -283,17 +283,17 @@ private struct RecognitionBoostCard: View {
         switch boost.state {
         case .installed:
             Button("Remove\u{2026}") { confirmingRemoval = true }
-                .accessibilityIdentifier("hush.vocabulary.boost.remove")
+                .accessibilityIdentifier("clemii.vocabulary.boost.remove")
         case .downloading(let fraction):
             Button { boost.cancelDownload() } label: { ProgressRing(progress: fraction, showsStop: true) }
                 .buttonStyle(.borderless)
                 .help("Stop downloading and remove the partial download")
                 .accessibilityLabel("Cancel downloading the recognition boost")
                 .accessibilityValue("\(Int((fraction * 100).rounded())) percent")
-                .accessibilityIdentifier("hush.vocabulary.boost.cancel")
+                .accessibilityIdentifier("clemii.vocabulary.boost.cancel")
         case .notInstalled, .failed:
             Button("Download\u{2026}") { confirmingDownload = true }
-                .accessibilityIdentifier("hush.vocabulary.boost.download")
+                .accessibilityIdentifier("clemii.vocabulary.boost.download")
         }
     }
 }
@@ -376,7 +376,7 @@ private struct WordStep: View {
                 .focused($focused)
                 .onSubmit(next)
                 .padding(.top, 8)
-                .accessibilityIdentifier("hush.vocabulary.word")
+                .accessibilityIdentifier("clemii.vocabulary.word")
             if teacher.isDuplicate {
                 Label("\u{201C}\(teacher.trimmedWord)\u{201D} is already in your vocabulary. Continuing teaches it again.", systemImage: "info.circle")
                     .font(.callout)
@@ -393,7 +393,7 @@ private struct WordStep: View {
                     .controlSize(.large)
                     .keyboardShortcut(.defaultAction)
                     .disabled(teacher.trimmedWord.isEmpty)
-                    .accessibilityIdentifier("hush.vocabulary.continue")
+                    .accessibilityIdentifier("clemii.vocabulary.continue")
             }
             .padding(.bottom, 24)
         }
@@ -436,7 +436,7 @@ private struct ListenStep: View {
                 .foregroundStyle(sampler.phase == .listening ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
                 .contentTransition(.opacity)
                 .animation(.default, value: status)
-                .accessibilityIdentifier("hush.vocabulary.status")
+                .accessibilityIdentifier("clemii.vocabulary.status")
 
             HStack(spacing: 10) {
                 ForEach(0..<teacher.target, id: \.self) { index in
@@ -613,7 +613,7 @@ private struct ReviewStep: View {
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
                     .keyboardShortcut(.defaultAction)
-                    .accessibilityIdentifier("hush.vocabulary.save")
+                    .accessibilityIdentifier("clemii.vocabulary.save")
             }
             .padding(.bottom, 24)
         }
@@ -707,7 +707,7 @@ private struct SavedStep: View {
             Button { teacher.tryIt() } label: { Label("Try It", systemImage: "mic.fill") }
                 .controlSize(.large)
                 .disabled(!teacher.sampler.isAvailable)
-                .accessibilityIdentifier("hush.vocabulary.try")
+                .accessibilityIdentifier("clemii.vocabulary.try")
         case .listening:
             VStack(spacing: 8) {
                 TrialMeter(sampler: teacher.sampler).frame(height: 36).padding(.horizontal, 60)

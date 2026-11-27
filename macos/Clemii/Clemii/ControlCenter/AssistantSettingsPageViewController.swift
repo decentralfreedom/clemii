@@ -124,7 +124,7 @@ final class AssistantSettingsPageViewController: ControlCenterPageViewController
         symbol: "cursorarrow.rays",
         colors: AIFeatureIcon.assistant,
         badge: "BETA",
-        identifier: "hush.assistant"
+        identifier: "clemii.assistant"
     )
     private let intelligenceModels = AIModelControlsView(scope: .assistantIntelligence)
     private let requiredModels = AIModelControlsView(scope: .assistantSupport)
@@ -163,18 +163,18 @@ final class AssistantSettingsPageViewController: ControlCenterPageViewController
         feature.onSecondaryAction = { [weak self] in self?.flow.cancel(); self?.refresh() }
         addFullWidth(feature)
         let usage = subtitle("Hold Control + Fn in the app you want help with and release to send. Press Escape to stop and start a fresh conversation.")
-        usage.setAccessibilityIdentifier("hush.assistant.local-processing")
+        usage.setAccessibilityIdentifier("clemii.assistant.local-processing")
         addFullWidth(usage)
 
         stack.setCustomSpacing(22, after: usage)
         addFullWidth(sectionHeading("AI model"))
-        intelligenceModels.setAccessibilityIdentifier("hush.assistant.models.intelligence")
+        intelligenceModels.setAccessibilityIdentifier("clemii.assistant.models.intelligence")
         addFullWidth(makeCard(content: intelligenceModels))
         addFullWidth(subtitle("Qwen 3.5 4B understands screens best on this Mac. Models here are shared with Live Write."))
 
         stack.setCustomSpacing(22, after: stack.arrangedSubviews.last!)
         addFullWidth(sectionHeading("Required models"))
-        requiredModels.setAccessibilityIdentifier("hush.assistant.models.required")
+        requiredModels.setAccessibilityIdentifier("clemii.assistant.models.required")
         addFullWidth(makeCard(content: requiredModels))
 
         let permissionsHeading = sectionHeading("Permissions")
@@ -190,14 +190,14 @@ final class AssistantSettingsPageViewController: ControlCenterPageViewController
         for (index, entry) in entries.enumerated() {
             let status = NSTextField(labelWithString: "")
             status.font = .systemFont(ofSize: 12, weight: .medium); statuses[entry.0] = status
-            status.setAccessibilityIdentifier("hush.assistant.\(entry.0.rawValue).status")
+            status.setAccessibilityIdentifier("clemii.assistant.\(entry.0.rawValue).status")
             let row = ControlCenterKeyValueRow(title: entry.1, subtitle: entry.2, trailing: status, showsSeparator: index < entries.count - 1)
             rows.addArrangedSubview(row); row.widthAnchor.constraint(equalTo: rows.widthAnchor).isActive = true
         }
         addFullWidth(makeCard(content: rows))
         privacyNote.font = .systemFont(ofSize: 12)
         privacyNote.textColor = .secondaryLabelColor
-        privacyNote.setAccessibilityIdentifier("hush.assistant.privacy")
+        privacyNote.setAccessibilityIdentifier("clemii.assistant.privacy")
         addFullWidth(privacyNote)
         library.changes.receive(on: RunLoop.main).sink { [weak self] in self?.refresh() }.store(in: &subscriptions)
         flow.changes.receive(on: RunLoop.main).sink { [weak self] in self?.refresh() }.store(in: &subscriptions)

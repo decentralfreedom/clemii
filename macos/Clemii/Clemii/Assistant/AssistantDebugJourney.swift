@@ -56,11 +56,11 @@ private final class CoworkerDebugJourney: NSObject {
         if ProcessInfo.processInfo.arguments.contains("--preview-assistant-reset") {
             let note = NSButton(title: "New note", target: self, action: #selector(newNote))
             note.frame = NSRect(x: 20, y: 10, width: 120, height: 28)
-            note.setAccessibilityIdentifier("hush.fixture.new-note")
+            note.setAccessibilityIdentifier("clemii.fixture.new-note")
             root.addSubview(note)
             let talk = NSButton(title: "Simulate voice turn", target: self, action: #selector(talk))
             talk.frame = NSRect(x: 160, y: 10, width: 180, height: 28)
-            talk.setAccessibilityIdentifier("hush.fixture.voice")
+            talk.setAccessibilityIdentifier("clemii.fixture.voice")
             root.addSubview(talk)
         }
         window.contentView = root
@@ -251,7 +251,7 @@ private final class AssistantDebugJourney {
         let change = NSButton(title: "Change destination", target: self, action: #selector(changeDestination))
         change.bezelStyle = .rounded
         change.frame = NSRect(x: 22, y: 23, width: 160, height: 32)
-        change.setAccessibilityIdentifier("hush.assistant.fixture.change")
+        change.setAccessibilityIdentifier("clemii.assistant.fixture.change")
         content.addSubview(change)
         window.contentView = content
     }
@@ -285,7 +285,7 @@ private final class AssistantDebugDestination: AssistantDestination {
         textView.isRichText = true
         textView.textContainerInset = NSSize(width: 12, height: 12)
         textView.setSelectedRange(NSRange(location: 0, length: 0))
-        textView.setAccessibilityIdentifier("hush.assistant.fixture.body")
+        textView.setAccessibilityIdentifier("clemii.assistant.fixture.body")
     }
 
     func validate() throws {

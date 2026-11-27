@@ -49,7 +49,7 @@ final class VerifiedMessagesSettingsPageViewController: ControlCenterPageViewCon
         destinationModePopUp.addItems(
             withTitles: VerifiedMessageDestinationMode.allCases.map(\.displayName)
         )
-        destinationModePopUp.setAccessibilityIdentifier("hush.verified.destinationMode")
+        destinationModePopUp.setAccessibilityIdentifier("clemii.verified.destinationMode")
         rows.addArrangedSubview(ControlCenterKeyValueRow(
             title: "Signature destinations",
             subtitle: "Smart hides signatures in terminal apps and your personal exceptions.",
@@ -59,7 +59,7 @@ final class VerifiedMessagesSettingsPageViewController: ControlCenterPageViewCon
         destinationExceptionsButton.title = "Manage\u{2026}"
         destinationExceptionsButton.bezelStyle = .rounded
         destinationExceptionsButton.controlSize = .small
-        destinationExceptionsButton.setAccessibilityIdentifier("hush.verified.destinationExceptions")
+        destinationExceptionsButton.setAccessibilityIdentifier("clemii.verified.destinationExceptions")
         rows.addArrangedSubview(ControlCenterKeyValueRow(
             title: "App & website exceptions",
             subtitle: "Never publish or append a proof in selected apps or on selected websites.",
@@ -412,7 +412,7 @@ private final class VerifiedMessageDestinationExceptionsViewController: NSViewCo
 
         websiteField.placeholderString = "example.com"
         websiteField.controlSize = .regular
-        websiteField.setAccessibilityIdentifier("hush.verified.websiteField")
+        websiteField.setAccessibilityIdentifier("clemii.verified.websiteField")
         websiteField.target = self
         websiteField.action = #selector(addWebsite(_:))
         let addWebsiteButton = NSButton(
@@ -422,7 +422,7 @@ private final class VerifiedMessageDestinationExceptionsViewController: NSViewCo
         )
         addWebsiteButton.bezelStyle = .rounded
         addWebsiteButton.controlSize = .regular
-        addWebsiteButton.setAccessibilityIdentifier("hush.verified.addWebsite")
+        addWebsiteButton.setAccessibilityIdentifier("clemii.verified.addWebsite")
         let websiteEntry = NSStackView(views: [websiteField, addWebsiteButton])
         websiteEntry.orientation = .horizontal
         websiteEntry.alignment = .centerY
@@ -473,7 +473,7 @@ private final class VerifiedMessageDestinationExceptionsViewController: NSViewCo
         )
         addButton.bezelStyle = .rounded
         addButton.controlSize = .regular
-        addButton.setAccessibilityIdentifier("hush.verified.addException")
+        addButton.setAccessibilityIdentifier("clemii.verified.addException")
         addButton.setAccessibilityLabel("Add Apps\u{2026}")
         let doneButton = NSButton(title: "Done", target: self, action: #selector(done(_:)))
         doneButton.bezelStyle = .rounded
@@ -641,7 +641,7 @@ private final class VerifiedMessageDestinationExceptionsViewController: NSViewCo
             icon.contentTintColor = .secondaryLabelColor
             icon.imageScaling = .scaleProportionallyUpOrDown
             icon.setAccessibilityElement(true)
-            icon.setAccessibilityIdentifier("hush.verified.websiteIconFallback.\(exception.host)")
+            icon.setAccessibilityIdentifier("clemii.verified.websiteIconFallback.\(exception.host)")
             icon.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
                 icon.widthAnchor.constraint(equalToConstant: 20),
@@ -654,7 +654,7 @@ private final class VerifiedMessageDestinationExceptionsViewController: NSViewCo
                 image.isTemplate = false
                 icon.image = image
                 icon.contentTintColor = nil
-                icon.setAccessibilityIdentifier("hush.verified.websiteIcon.\(exception.host)")
+                icon.setAccessibilityIdentifier("clemii.verified.websiteIcon.\(exception.host)")
                 icon.setAccessibilityLabel("\(exception.host) website icon")
             }
             let hostLabel = NSTextField(labelWithString: exception.host)

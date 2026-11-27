@@ -295,7 +295,7 @@ private struct PersonaWheelView: View {
         }
         .frame(width: PersonaWheelLayout.panelSize.width, height: PersonaWheelLayout.panelSize.height)
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("hush.personaWheel")
+        .accessibilityIdentifier("clemii.personaWheel")
         .accessibilityLabel("Persona selector")
         .accessibilityValue("Full circle")
     }
@@ -453,7 +453,7 @@ private struct PersonaAllPersonasPopover: View {
 
             TextField("Search personas", text: $searchText)
                 .textFieldStyle(.roundedBorder)
-                .accessibilityIdentifier("hush.personaWheel.moreSearch")
+                .accessibilityIdentifier("clemii.personaWheel.moreSearch")
 
             if filteredOptions.isEmpty {
                 ContentUnavailableView(

@@ -18,7 +18,7 @@ final class HUDNativeMaterialView: NSView {
         wantsLayer = true
         layer?.backgroundColor = NSColor.clear.cgColor
         setAccessibilityElement(true)
-        setAccessibilityIdentifier("hush.nativeGlassSurface")
+        setAccessibilityIdentifier("clemii.nativeGlassSurface")
 
         hostingView.frame = bounds
         hostingView.autoresizingMask = [.width, .height]

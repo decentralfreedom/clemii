@@ -28,7 +28,7 @@ struct ChatGPTConnectionTests {
         #expect(url.absoluteString.hasPrefix("https://auth.openai.com/api/accounts/authorize?"))
         let query = parameters(url)
         #expect(query["client_id"] == "dynamic_agent_client")
-        #expect(query["agent_name_hint"] == "hush")
+        #expect(query["agent_name_hint"] == "clemii")
         #expect(query["ext_agent_host_id"] == "urn:uuid:host")
         #expect(query["redirect_uri"] == "http://127.0.0.1:1455/auth/callback")
         #expect(query["response_type"] == "code")
@@ -45,10 +45,10 @@ struct ChatGPTConnectionTests {
     @Test("A returning sign-in uses the issued client ID and leaves out the app name")
     func reauthorizationRequest() {
         let attempt = ChatGPTOAuth.Attempt.fresh(redirectURI: ChatGPTOAuth.redirectURI(port: 54321), clientID: "oaiapp_123")
-        let query = parameters(ChatGPTOAuth.authorizationURL(for: attempt, hostID: "urn:uuid:host", loginHint: "me+hush@example.com"))
+        let query = parameters(ChatGPTOAuth.authorizationURL(for: attempt, hostID: "urn:uuid:host", loginHint: "me+clemii@example.com"))
         #expect(query["client_id"] == "oaiapp_123")
         #expect(query["agent_name_hint"] == nil)
-        #expect(query["login_hint"] == "me+hush@example.com")
+        #expect(query["login_hint"] == "me+clemii@example.com")
         #expect(query["redirect_uri"] == "http://127.0.0.1:54321/auth/callback")
     }
 

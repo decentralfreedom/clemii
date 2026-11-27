@@ -512,7 +512,7 @@ private struct TimeSavedInsightsRootView: View {
                             .font(.system(size: 9.5, weight: .bold))
                             .tracking(0.7)
                             .foregroundStyle(.secondary)
-                        Text(model.metrics.estimatedTimeSaved.hushCompactDuration)
+                        Text(model.metrics.estimatedTimeSaved.clemiiCompactDuration)
                             .font(.system(size: 28, weight: .bold, design: .rounded))
                             .contentTransition(.numericText())
                             .fixedSize(horizontal: true, vertical: false)
@@ -538,7 +538,7 @@ private struct TimeSavedInsightsRootView: View {
                     label: "words spoken"
                 )
                 DashboardMetricDivider()
-                DashboardInlineMetric(value: model.metrics.speechDuration.hushCompactDuration, label: "recorded")
+                DashboardInlineMetric(value: model.metrics.speechDuration.clemiiCompactDuration, label: "recorded")
                 DashboardMetricDivider()
                 DashboardInlineMetric(
                     value: "\(model.metrics.dictations)",
@@ -921,7 +921,7 @@ private struct ActivityBreakdownRootView: View {
                         .font(.system(size: 10.5, weight: .bold))
                         .tracking(0.8)
                         .foregroundStyle(Color(nsColor: DesignTokens.peach))
-                    Text(model.metrics.estimatedTimeSaved.hushCompactDuration)
+                    Text(model.metrics.estimatedTimeSaved.clemiiCompactDuration)
                         .font(.system(size: 34, weight: .bold, design: .rounded))
                         .tracking(-0.8)
                         .contentTransition(.numericText())
@@ -930,7 +930,7 @@ private struct ActivityBreakdownRootView: View {
 
                 DashboardMetricDivider()
                 DashboardInlineMetric(
-                    value: model.metrics.speechDuration.hushCompactDuration,
+                    value: model.metrics.speechDuration.clemiiCompactDuration,
                     label: "recorded"
                 )
                 DashboardMetricDivider()
@@ -999,7 +999,7 @@ private struct DashboardHero: View {
                             .tracking(0.8)
                             .foregroundStyle(Color(nsColor: DesignTokens.peach))
                         HStack(alignment: .firstTextBaseline, spacing: 9) {
-                            Text(model.metrics.estimatedTimeSaved.hushCompactDuration)
+                            Text(model.metrics.estimatedTimeSaved.clemiiCompactDuration)
                                 .font(.system(size: 48, weight: .bold, design: .rounded))
                                 .tracking(-1.7)
                                 .contentTransition(.numericText())
@@ -1186,7 +1186,7 @@ private struct TypingSpeedTestView: View {
                     Text(activeWord)
                         .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundStyle(.primary)
-                        .accessibilityIdentifier("hush.typing.current-word")
+                        .accessibilityIdentifier("clemii.typing.current-word")
                         .accessibilityLabel(activeWord)
                     Spacer()
                     Text(typingGuidance)
@@ -1208,7 +1208,7 @@ private struct TypingSpeedTestView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                         .contentShape(Rectangle())
                         .onTapGesture { isTypingFocused = result == nil }
-                        .accessibilityIdentifier("hush.typing.passage")
+                        .accessibilityIdentifier("clemii.typing.passage")
 
                     TextField("", text: $typedText)
                         .textFieldStyle(.plain)
@@ -1216,7 +1216,7 @@ private struct TypingSpeedTestView: View {
                         .disabled(result != nil)
                         .opacity(0.01)
                         .frame(width: 1, height: 1)
-                        .accessibilityIdentifier("hush.typing.input")
+                        .accessibilityIdentifier("clemii.typing.input")
                         .onChange(of: typedText) { _, newValue in
                             handleTyping(newValue)
                         }
@@ -1246,7 +1246,7 @@ private struct TypingSpeedTestView: View {
                     Text(characterFeedback)
                         .font(.system(size: 10.5))
                         .foregroundStyle(.tertiary)
-                        .accessibilityIdentifier("hush.typing.character-feedback")
+                        .accessibilityIdentifier("clemii.typing.character-feedback")
                         .accessibilityLabel(characterFeedback)
                 }
             }
@@ -1665,7 +1665,7 @@ private struct DashboardDestinationRow: View {
                         .font(.system(size: 12.5, weight: .semibold))
                         .lineLimit(1)
                     Spacer()
-                    Text(activity.estimatedTimeSaved.hushCompactDuration + " saved")
+                    Text(activity.estimatedTimeSaved.clemiiCompactDuration + " saved")
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
                         .foregroundStyle(colors[rank % colors.count])
                 }

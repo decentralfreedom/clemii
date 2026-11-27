@@ -77,7 +77,7 @@ export function ArticleEditor({ handle, initialBlocks, summaryTitle, dark, onCha
 }) {
   const frame = useRef<HTMLDivElement>(null);
   const config = useMemo((): InitialConfigType => ({
-    namespace: "hush-article",
+    namespace: "clemii-article",
     nodes: articleNodes,
     editorState: () => $setBlocks(initialBlocks),
     onError: (error) => { throw error; },

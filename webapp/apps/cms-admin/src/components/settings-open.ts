@@ -9,7 +9,9 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 /** One state for all posts, stored as `open` or `closed`. */
-export const settingsOpenKey = "hush-editor-settings-open";
+export const settingsOpenKey = "clemii-editor-settings-open";
+/** Where the state was kept before the rename; read until the next toggle replaces it. */
+const formerSettingsOpenKey = "hush-editor-settings-open";
 
 /** Below Shade's `lg` breakpoint the panel overlays the editor instead of sitting beside it. */
 const overlayScreen = "(width < 1024px)";
@@ -21,7 +23,7 @@ const browserStorage: StorageSource = () => window.localStorage;
 /** Whether the writer last left the panel open; missing, unreadable or unknown values read as closed. */
 export function readSettingsOpen(storage: StorageSource = browserStorage) {
   try {
-    return storage().getItem(settingsOpenKey) === "open";
+    return (storage().getItem(settingsOpenKey) ?? storage().getItem(formerSettingsOpenKey)) === "open";
   } catch {
     return false;
   }
@@ -30,6 +32,7 @@ export function readSettingsOpen(storage: StorageSource = browserStorage) {
 export function writeSettingsOpen(open: boolean, storage: StorageSource = browserStorage) {
   try {
     storage().setItem(settingsOpenKey, open ? "open" : "closed");
+    storage().removeItem(formerSettingsOpenKey);
   } catch {
     // A full or blocked localStorage costs the memory, not the toggle.
   }

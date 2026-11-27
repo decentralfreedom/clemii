@@ -7,7 +7,7 @@ final class HUDNativeGlassJourneyTests: XCTestCase {
         app.launchArguments = ["--preview-native-hud-glass", "--hud-spaces"]
         app.launch()
         defer { app.terminate() }
-        let status = app.staticTexts["hush.hudSpaceStatus"]
+        let status = app.staticTexts["clemii.hudSpaceStatus"]
         XCTAssertTrue(status.waitForExistence(timeout: 5))
         let visible = NSPredicate(format: "value CONTAINS 'HUD visible'")
         expectation(for: visible, evaluatedWith: status)
@@ -30,7 +30,7 @@ final class HUDNativeGlassJourneyTests: XCTestCase {
         app.launchArguments = ["--preview-native-hud-glass"]
         app.launch()
 
-        let surface = app.descendants(matching: .any)["hush.nativeGlassSurface"]
+        let surface = app.descendants(matching: .any)["clemii.nativeGlassSurface"]
         XCTAssertTrue(surface.waitForExistence(timeout: 5), "The real native HUD surface did not appear")
 
         let firstFrame = surface.screenshot()

@@ -5,7 +5,7 @@ import Testing
 @Suite("Preferences from the app's former identity")
 struct FormerIdentityTests {
     private func emptyDefaults() -> UserDefaults {
-        let suite = "hush.tests.former-identity.\(UUID().uuidString)"
+        let suite = "clemii.tests.former-identity.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suite)!
         defaults.removePersistentDomain(forName: suite)
         return defaults

@@ -9,7 +9,7 @@ final class LiveWritePageViewController: ControlCenterPageViewController {
         description: "Talk naturally. Ask for a text and clemii writes it; anything else is cleaned up in your words.",
         symbol: "text.bubble.fill",
         colors: AIFeatureIcon.liveWrite,
-        identifier: "hush.livewrite"
+        identifier: "clemii.livewrite"
     )
     private let engineModels = AIModelControlsView(scope: .liveWrite)
     private var subscriptions = Set<AnyCancellable>()
@@ -104,7 +104,7 @@ final class LiveWritePageViewController: ControlCenterPageViewController {
     private func buildEngines() {
         stack.setCustomSpacing(22, after: stack.arrangedSubviews.last!)
         addFullWidth(sectionHeading("Writing engine"))
-        engineModels.setAccessibilityIdentifier("hush.livewrite.engines")
+        engineModels.setAccessibilityIdentifier("clemii.livewrite.engines")
         addFullWidth(makeCard(content: engineModels))
         addFullWidth(subtitle("Qwen 3.5 4B wrote best in clemii\u{2019}s tests. Engines on this Mac keep your words here and are shared with Assistant; with ChatGPT, what you dictate is sent to OpenAI."))
     }
@@ -116,8 +116,8 @@ final class LiveWritePageViewController: ControlCenterPageViewController {
         let manage = NSButton(title: "Manage\u{2026}", target: self, action: #selector(manageApps(_:)))
         manage.bezelStyle = .rounded
         manage.controlSize = .small
-        manage.setAccessibilityIdentifier("hush.livewrite.apps.manage")
-        appsSummary.setAccessibilityIdentifier("hush.livewrite.apps.summary")
+        manage.setAccessibilityIdentifier("clemii.livewrite.apps.manage")
+        appsSummary.setAccessibilityIdentifier("clemii.livewrite.apps.summary")
         let row = ControlCenterKeyValueRow(
             title: "Off in some apps and websites",
             subtitle: "Terminals, code editors, AI chats and password managers get your words as spoken.",
@@ -409,7 +409,7 @@ final class PersonaEditorSheetController: NSViewController, NSTextViewDelegate {
         title.font = .systemFont(ofSize: 22, weight: .bold)
         title.textColor = .labelColor
         detail.font = .systemFont(ofSize: 11.5)
-        detail.setAccessibilityIdentifier("hush.personaEditor.purpose")
+        detail.setAccessibilityIdentifier("clemii.personaEditor.purpose")
         detail.textColor = .secondaryLabelColor
         let heading = NSStackView(views: [title, detail])
         heading.orientation = .vertical
@@ -440,7 +440,7 @@ final class PersonaEditorSheetController: NSViewController, NSTextViewDelegate {
         nameField.placeholderString = "Persona name"
         nameField.font = .systemFont(ofSize: 14, weight: .semibold)
         nameField.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        nameField.setAccessibilityIdentifier("hush.personaEditor.name")
+        nameField.setAccessibilityIdentifier("clemii.personaEditor.name")
         let identity = NSStackView(views: [iconButton, nameField])
         identity.orientation = .horizontal
         identity.alignment = .centerY
@@ -463,7 +463,7 @@ final class PersonaEditorSheetController: NSViewController, NSTextViewDelegate {
         promptTextView.isAutomaticDashSubstitutionEnabled = false
         promptTextView.textContainerInset = .init(width: 9, height: 9)
         promptTextView.delegate = self
-        promptTextView.setAccessibilityIdentifier("hush.personaEditor.instructions")
+        promptTextView.setAccessibilityIdentifier("clemii.personaEditor.instructions")
         promptTextView.drawsBackground = false
         promptScroll.hasVerticalScroller = true
         promptScroll.autohidesScrollers = true

@@ -8,7 +8,7 @@ import Testing
 struct CoworkerDiagnosticsTests {
     @Test("Each sequence step preserves its own inputs under the same storage limit")
     func stepEvidence() async throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("hush-trace-test-\(UUID())")
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("clemii-trace-test-\(UUID())")
         defer { try? FileManager.default.removeItem(at: root) }
         let trace = CoworkerTrace(id: UUID(), root: root)
         trace.artifact(.context, text: "first observation")
@@ -28,7 +28,7 @@ struct CoworkerDiagnosticsTests {
 
     @Test("A trace preserves inputs, exact failure, event order, and restrictive file permissions")
     func failureEvidence() async throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("hush-trace-test-\(UUID())")
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("clemii-trace-test-\(UUID())")
         defer { try? FileManager.default.removeItem(at: root) }
         let trace = CoworkerTrace(id: UUID(), root: root)
         trace.event("turn.started")
@@ -50,7 +50,7 @@ struct CoworkerDiagnosticsTests {
 
     @Test("Retention bounds turn count and oversized artifacts are explicitly omitted")
     func retention() async throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("hush-trace-test-\(UUID())")
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("clemii-trace-test-\(UUID())")
         defer { try? FileManager.default.removeItem(at: root) }
         for _ in 0..<7 {
             let trace = CoworkerTrace(id: UUID(), root: root)
@@ -67,7 +67,7 @@ struct CoworkerDiagnosticsTests {
 
     @Test("Turning diagnostics off rejects late model output")
     func disabling() async throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("hush-trace-test-\(UUID())")
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("clemii-trace-test-\(UUID())")
         defer { try? FileManager.default.removeItem(at: root) }
         let trace = CoworkerTrace(id: UUID(), root: root)
         trace.event("turn.started")

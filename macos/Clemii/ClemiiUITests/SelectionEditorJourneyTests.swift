@@ -8,12 +8,12 @@ final class SelectionEditorJourneyTests: XCTestCase {
         app.activate()
 
         XCTAssertTrue(app.staticTexts["Editing in Slack"].waitForExistence(timeout: 6))
-        XCTAssertTrue(app.textViews["hush.editor.compose.text"].exists)
+        XCTAssertTrue(app.textViews["clemii.editor.compose.text"].exists)
         keepScreenshot(named: "Selection Editor Light 01 Compose")
 
         app.buttons["Edit with AI"].click()
         XCTAssertTrue(app.staticTexts["What would you like to do with this text?"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.textViews["hush.editor.ai.prompt"].exists)
+        XCTAssertTrue(app.textViews["clemii.editor.ai.prompt"].exists)
         keepScreenshot(named: "Selection Editor Light 02 AI")
     }
 
@@ -24,12 +24,12 @@ final class SelectionEditorJourneyTests: XCTestCase {
         app.activate()
 
         XCTAssertTrue(app.staticTexts["Editing in Slack"].waitForExistence(timeout: 6))
-        XCTAssertTrue(app.textViews["hush.editor.compose.text"].exists)
+        XCTAssertTrue(app.textViews["clemii.editor.compose.text"].exists)
         keepScreenshot(named: "Selection Editor Dark 01 Compose")
 
         app.buttons["Edit with AI"].click()
         XCTAssertTrue(app.staticTexts["What would you like to do with this text?"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.textViews["hush.editor.ai.prompt"].exists)
+        XCTAssertTrue(app.textViews["clemii.editor.ai.prompt"].exists)
         keepScreenshot(named: "Selection Editor Dark 02 AI")
     }
 
@@ -41,27 +41,27 @@ final class SelectionEditorJourneyTests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["Editing in Slack"].waitForExistence(timeout: 6))
         XCTAssertTrue(app.buttons["Edit with AI"].exists)
-        XCTAssertTrue(app.textViews["hush.editor.compose.text"].exists)
+        XCTAssertTrue(app.textViews["clemii.editor.compose.text"].exists)
         keepScreenshot(named: "Selection Editor 01 Compose")
 
         app.buttons["Edit with AI"].click()
         XCTAssertTrue(app.staticTexts["What would you like to do with this text?"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.descendants(matching: .any)["hush.editor.ai.persona.none"].exists)
-        let modelSelector = app.buttons["hush.editor.ai.model"]
+        XCTAssertTrue(app.descendants(matching: .any)["clemii.editor.ai.persona.none"].exists)
+        let modelSelector = app.buttons["clemii.editor.ai.model"]
         XCTAssertTrue(modelSelector.exists)
         XCTAssertTrue(modelSelector.label.contains("AI model"))
         modelSelector.click()
         XCTAssertTrue(app.menuItems.firstMatch.waitForExistence(timeout: 2))
         app.typeKey(.escape, modifierFlags: [])
-        XCTAssertFalse(app.popUpButtons["hush.editor.persona"].exists)
-        let contextualSuggestion = app.descendants(matching: .any)["hush.editor.ai.context"]
+        XCTAssertFalse(app.popUpButtons["clemii.editor.persona"].exists)
+        let contextualSuggestion = app.descendants(matching: .any)["clemii.editor.ai.context"]
         XCTAssertTrue(contextualSuggestion.waitForExistence(timeout: 2))
         keepScreenshot(named: "Selection Editor 02 AI Composer Empty")
 
-        let microphone = app.buttons["hush.editor.ai.microphone"]
+        let microphone = app.buttons["clemii.editor.ai.microphone"]
         XCTAssertTrue(microphone.exists)
         microphone.click()
-        let voiceStatus = app.staticTexts["hush.editor.ai.voice.status"]
+        let voiceStatus = app.staticTexts["clemii.editor.ai.voice.status"]
         XCTAssertTrue(voiceStatus.waitForExistence(timeout: 2))
         XCTAssertEqual(voiceStatus.label, "Listening…")
         keepScreenshot(named: "Selection Editor 03 Inline Voice Listening")
@@ -69,11 +69,11 @@ final class SelectionEditorJourneyTests: XCTestCase {
         XCTAssertTrue(waitForLabel("Transcribing on this Mac…", on: voiceStatus, timeout: 2))
         keepScreenshot(named: "Selection Editor 04 Inline Voice Processing")
 
-        let prompt = app.textViews["hush.editor.ai.prompt"]
+        let prompt = app.textViews["clemii.editor.ai.prompt"]
         XCTAssertTrue(prompt.waitForExistence(timeout: 2))
         prompt.click()
         prompt.typeText("Make it shorter")
-        XCTAssertFalse(app.buttons["hush.editor.ai.send"].exists)
+        XCTAssertFalse(app.buttons["clemii.editor.ai.send"].exists)
         keepScreenshot(named: "Selection Editor 05 AI Composer Typed")
         let compactPromptHeight = prompt.frame.height
         prompt.typeKey(.return, modifierFlags: [.shift])
@@ -86,7 +86,7 @@ final class SelectionEditorJourneyTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["I made it shorter while keeping the original meaning."].waitForExistence(timeout: 2))
         let thinking = app.buttons.matching(NSPredicate(
             format: "identifier BEGINSWITH %@",
-            "hush.editor.ai.thinking."
+            "clemii.editor.ai.thinking."
         )).firstMatch
         XCTAssertTrue(thinking.waitForExistence(timeout: 2))
         XCTAssertTrue(thinking.label.contains("Thought for"))
@@ -99,7 +99,7 @@ final class SelectionEditorJourneyTests: XCTestCase {
                 .waitForExistence(timeout: 5)
         )
         XCTAssertFalse(app.staticTexts["What would you like to do with this text?"].exists)
-        let firstMetadata = app.staticTexts["hush.editor.ai.artifact.1.metadata"]
+        let firstMetadata = app.staticTexts["clemii.editor.ai.artifact.1.metadata"]
         XCTAssertTrue(firstMetadata.waitForExistence(timeout: 2))
         XCTAssertTrue(firstMetadata.label.contains("tokens"))
         XCTAssertTrue(firstMetadata.label.contains("s · On this Mac"))
@@ -112,7 +112,7 @@ final class SelectionEditorJourneyTests: XCTestCase {
             "I would make the opening more direct, shorten the middle sentence, and end with the user benefit so the idea feels more confident."
         )).firstMatch
         XCTAssertTrue(advice.waitForExistence(timeout: 5))
-        XCTAssertFalse(app.staticTexts["hush.editor.ai.artifact.2"].exists)
+        XCTAssertFalse(app.staticTexts["clemii.editor.ai.artifact.2"].exists)
 
         prompt.click()
         prompt.typeText("Make it friendly")
@@ -122,15 +122,15 @@ final class SelectionEditorJourneyTests: XCTestCase {
             app.staticTexts["People can try the microphone during onboarding, so clemii feels natural from the very first moment."]
                 .waitForExistence(timeout: 5)
         )
-        XCTAssertTrue(app.staticTexts["hush.editor.ai.artifact.2"].exists)
-        XCTAssertTrue(app.buttons["hush.editor.accept"].label.contains("Accept current text"))
+        XCTAssertTrue(app.staticTexts["clemii.editor.ai.artifact.2"].exists)
+        XCTAssertTrue(app.buttons["clemii.editor.accept"].label.contains("Accept current text"))
 
         prompt.click()
         prompt.typeText("Translate to English")
         prompt.typeKey(.return, modifierFlags: [])
         let incompleteResponseSheet = app.sheets.firstMatch
         XCTAssertTrue(incompleteResponseSheet.waitForExistence(timeout: 5))
-        XCTAssertFalse(app.staticTexts["hush.editor.ai.artifact.3"].exists)
+        XCTAssertFalse(app.staticTexts["clemii.editor.ai.artifact.3"].exists)
         XCTAssertFalse(app.staticTexts.matching(NSPredicate(
             format: "label CONTAINS %@",
             "<output>"

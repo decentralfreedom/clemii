@@ -16,7 +16,7 @@ nonisolated enum ChatGPTOAuth {
     static let resource = "https://api.openai.com/v1"
     static let registrationClientID = "dynamic_agent_client"
     /// The app's actual name, the same on every installation; display metadata only.
-    static let agentName = "hush"
+    static let agentName = "clemii"
     static let planScope = "chatgpt.tokens.use.direct"
     static let scopes = ["openid", "profile", "email", "offline_access", "resource.invoke", planScope]
     /// The documented callback; only the port may vary between sign-ins.

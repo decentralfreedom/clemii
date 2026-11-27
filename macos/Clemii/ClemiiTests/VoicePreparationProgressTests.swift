@@ -28,7 +28,7 @@ struct VoicePreparationProgressTests {
         func labels(_ view: NSView) -> [String] {
             (view as? NSTextField).map { [$0.stringValue] } ?? view.subviews.flatMap(labels)
         }
-        #expect(!labels(panel).contains("Hey Hush"))
+        #expect(!labels(panel).contains("Hey clemii"))
         #expect(labels(panel).contains("Settings..."))
         #expect(labels(panel).contains("Quit clemii"))
         #expect(panel.subviews.allSatisfy { $0.frame.maxY <= panel.bounds.height })

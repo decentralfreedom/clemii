@@ -35,8 +35,8 @@ async function umami(path: string) {
 }
 
 test("FUNNEL-001 counts real visits and downloads per page, and nothing that is noise", async ({ browser, baseURL }) => {
-  // Counted: two visitors read the article, one of them downloads from it, which also opens the
-  // release notes in a new tab (DownloadExperience); that visitor then opens the home page.
+  // Counted: two visitors read the article, one of them downloads from it and stays on the page
+  // (DownloadExperience); that visitor then opens the home page.
   const reader = await visitor(browser, "203.0.113.10");
   const page = await reader.newPage();
   await page.goto(article);
@@ -89,13 +89,11 @@ test("FUNNEL-001 counts real visits and downloads per page, and nothing that is 
 
   // The server sends events after answering: wait until Umami has all that should arrive, then a little longer for any that should not.
   const range = `startAt=${Date.now() - 3_600_000}&endAt=${Date.now() + 3_600_000}`;
-  await expect.poll(async () => (await umami(`/stats?${range}`)).pageviews, { timeout: 15_000 }).toBe(10);
+  await expect.poll(async () => (await umami(`/stats?${range}`)).pageviews, { timeout: 15_000 }).toBe(8);
   await new Promise((resolve) => setTimeout(resolve, 2_000));
   const pages = await umami(`/metrics/expanded?type=path&${range}`) as Array<{ name: string; pageviews: string }>;
   const views = Object.fromEntries(pages.map((row) => [row.name, Number(row.pageviews)]));
-  const releaseNotes = Object.keys(views).filter((path) => path.startsWith("/releases/"));
-  expect(releaseNotes).toHaveLength(1);
-  expect(views).toEqual({ [article]: 5, "/": 3, [releaseNotes[0]!]: 2 });
+  expect(views).toEqual({ [article]: 5, "/": 3 });
   const { data: downloads } = await umami(`/events?event=download&pageSize=100&${range}`) as { data: Array<{ urlPath: string }> };
   expect(downloads.map((event) => event.urlPath).sort()).toEqual(["/", article]);
 });

@@ -61,7 +61,7 @@ def notarize(artifact, profile, team, reports, resume=None):
         with tempfile.TemporaryDirectory(prefix="hush-notary-") as temporary:
             submission = artifact
             if artifact.suffix == ".app":
-                submission = Path(temporary) / "hush.zip"
+                submission = Path(temporary) / "clemii.zip"
                 run("/usr/bin/ditto", "-c", "-k", "--sequesterRsrc", "--keepParent",
                     str(artifact), str(submission))
             result = run("/usr/bin/xcrun", "notarytool", "submit", str(submission),

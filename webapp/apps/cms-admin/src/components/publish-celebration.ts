@@ -6,7 +6,7 @@
 // scheduling in the editor writes a key and goes to the posts list, which reads
 // it once, clears it in the same breath, and celebrates the post.
 
-const keys = { published: "hush-last-published-post", scheduled: "hush-last-scheduled-post" } as const;
+const keys = { published: "clemii-last-published-post", scheduled: "clemii-last-scheduled-post" } as const;
 
 /** Reading `localStorage` can throw where storage is blocked. */
 type StorageSource = () => Storage;
