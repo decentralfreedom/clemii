@@ -22,10 +22,6 @@ export type BuildResult = { posts: BlogPost[]; errors: string[] };
  */
 export async function buildBlog(contentDir: string, staticPaths: Iterable<string>): Promise<BuildResult> {
   const errors: string[] = [];
-  const coverSeed = [
-    await readFile(coverTemplatePath, "utf8"),
-    await readFile(join(import.meta.dir, "render-covers.ts"), "utf8"),
-  ];
   const parsed: Array<{ file: string; article: ParsedArticle }> = [];
 
   for (const lang of blogLanguages) {
@@ -83,7 +79,6 @@ export async function buildBlog(contentDir: string, staticPaths: Iterable<string
 
     const context: ArticleContext = {
       knownPaths,
-      coverSeed,
       async loadImage(url) {
         const source = join(contentDir, front.lang, url);
         try { return { bytes: await readFile(source), source }; } catch { return undefined; }

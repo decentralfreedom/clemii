@@ -46,7 +46,6 @@ export async function checkPost({ db, ...cms }: Cms, id: string, fields: PostFie
   const rendered = await renderArticle({ front: front.data, body: markdown }, {
     knownPaths,
     loadImage: (url) => loadMedia({ db, ...cms }, id, fields.slug, url),
-    coverSeed: [],
   });
   return { post: rendered.post, problems: [...problems, ...rendered.problems] };
 }

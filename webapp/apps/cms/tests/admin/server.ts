@@ -109,7 +109,7 @@ app.get("/__e2e/sign-in", async (context) => {
   return context.redirect(context.req.query("to") ?? "/");
 });
 const adminDir = join(import.meta.dir, "../../../cms-admin/dist");
-app.route("/", createApp(cms, { admin, adminDir: await Bun.file(join(adminDir, "index.html")).exists() ? adminDir : undefined }));
+app.route("/", createApp(cms, { siteUrl: "https://clemii.com", admin, adminDir: await Bun.file(join(adminDir, "index.html")).exists() ? adminDir : undefined }));
 // HTTPS with a throwaway self-signed certificate: every browser, WebKit too,
 // then keeps the __Host- session cookie exactly as on cms.clemii.com.
 const certificateDir = await mkdtemp(join(tmpdir(), "hush-cms-admin-tls-"));

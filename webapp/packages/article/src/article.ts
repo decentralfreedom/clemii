@@ -20,8 +20,16 @@ export * from "./file.ts";
 export type TocEntry = { id: string; text: string };
 
 /**
+ * The version of the cover design: a digest of the website's cover template and renderer
+ * (apps/web/scripts/blog/cover-template.html and render-covers.ts). It names every cover file, so the
+ * website and the CMS address the same image. apps/web/scripts/blog/cover-design.test.ts checks it
+ * against those files: changing either fails until this is updated.
+ */
+export const coverDesign = "b138afe208340719";
+
+/**
  * The cover of an article, rendered from cover-template.html. The hash covers the
- * template, renderer and every value shown, so changes produce new file names.
+ * design and every value shown, so changes produce new file names.
  */
 export type BlogCoverPlan = {
   hash: string;
@@ -32,6 +40,13 @@ export type BlogCoverPlan = {
   /** The same artwork as an 800px WebP for article cards. */
   cardPath: string;
 };
+
+/** Where the website serves an article's cover, from its slug, language and heading. */
+export function coverPlan(slug: string, lang: BlogLanguage, title: string): BlogCoverPlan {
+  const hash = createHash("sha256").update(JSON.stringify([coverDesign, lang, title])).digest("hex").slice(0, 10);
+  const base = `/blog/covers/${slug}-${hash}`;
+  return { hash, lang, title, path: `${base}-social.png`, cardPath: `${base}-card.webp` };
+}
 
 /** One responsive rendition the generator writes to public/. */
 export type BlogImageOutput = { source: string; path: string; width: number };
@@ -139,8 +154,6 @@ export type ArticleContext = {
   knownPaths: ReadonlySet<string>;
   /** Reads an image referenced as media/<slug>/<file>; `source` is passed through to the rendition. */
   loadImage(url: string): Promise<{ bytes: Uint8Array; source: string } | undefined>;
-  /** The cover template and renderer sources: changing either renames every cover. */
-  coverSeed: readonly string[];
 };
 
 /**
@@ -279,8 +292,6 @@ export async function renderArticle({ front, body }: ParsedArticle, context: Art
   const html = unified().use(rehypeStringify).stringify(hast as never);
   const words = body.split(/\s+/).filter(Boolean).length;
 
-  const coverHash = createHash("sha256").update(JSON.stringify([...context.coverSeed, lang, heading])).digest("hex").slice(0, 10);
-  const coverBase = `/blog/covers/${front.slug}-${coverHash}`;
   const post: BlogPost = {
     slug: front.slug,
     lang,
@@ -299,11 +310,7 @@ export async function renderArticle({ front, body }: ParsedArticle, context: Art
     html,
     keyword: front.keyword,
     images: [...images.values()].flatMap((image) => image.renditions),
-    cover: {
-      hash: coverHash, lang, title: heading,
-      path: `${coverBase}-social.png`,
-      cardPath: `${coverBase}-card.webp`,
-    },
+    cover: coverPlan(front.slug, lang, heading),
   };
   return { post, problems };
 }

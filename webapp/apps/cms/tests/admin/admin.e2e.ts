@@ -12,6 +12,9 @@ type Post = { id: string; slug: string; status: string };
 
 const test = base.extend<{ signedIn: Page; draft: (overrides?: Record<string, unknown>) => Promise<Post> }>({
   signedIn: async ({ page }, use) => {
+    // The website serves published posts' thumbnails; the tests never reach it.
+    const thumbnail = await sharp({ create: { width: 800, height: 420, channels: 3, background: "#c9b8ff" } }).webp().toBuffer();
+    await page.route("https://clemii.com/blog/covers/**", (route) => route.fulfill({ contentType: "image/webp", body: thumbnail }));
     await page.goto("/__e2e/sign-in");
     // WebKit can report the sign-in loaded before its redirect to the posts list has; a test's own goto would then be cut off.
     await expect(page.getByRole("heading", { name: "Posts", exact: true })).toBeVisible();
@@ -49,6 +52,13 @@ test("CMS-001 the owner signs in with GitHub and sees every post with its status
   await expect(row).toContainText("By Clemens Kressmann - in Dictation without the cloud");
   await expect(row).toContainText("Draft");
   await expect(signedIn.getByRole("listitem").filter({ hasText: "Published" }).first()).toBeVisible();
+  // A published post shows its thumbnail from the website; a draft, which has none yet, the placeholder.
+  await expect(row.locator("img")).toHaveCount(0);
+  // Thumbnails load lazily, once their row scrolls into view.
+  const thumbnail = signedIn.getByRole("main").getByRole("listitem").filter({ hasText: /Published$/ }).first().locator("img");
+  await expect(thumbnail).toHaveAttribute("src", /^https:\/\/clemii\.com\/blog\/covers\/.+-card\.webp$/);
+  await thumbnail.scrollIntoViewIfNeeded();
+  await expect.poll(() => thumbnail.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth)).toBe(800);
 
   // Drafts come before published posts, whichever way they are sorted.
   const statuses = async () => await signedIn.getByRole("main").getByRole("listitem").evaluateAll((rows) => rows.map((item) => /Draft|Scheduled|Published/.exec(item.textContent ?? "")?.[0]));
@@ -373,6 +383,8 @@ test("CMS-009 the post settings dock beside the editor, and Cmd/Ctrl+. toggles t
 
 test("CMS-010 publishing celebrates the post on the posts list, with its link to share", async ({ signedIn, draft }) => {
   const post = await draft();
+  // The website has not built the new post's thumbnail yet.
+  await signedIn.route(`https://clemii.com/blog/covers/${post.slug}-*`, (route) => route.fulfill({ status: 404 }));
   await signedIn.goto(`/posts/${post.id}`);
   await expect(status(signedIn)).toHaveText("Draft - Saved");
   await signedIn.keyboard.press("ControlOrMeta+Shift+p");
@@ -381,7 +393,8 @@ test("CMS-010 publishing celebrates the post on the posts list, with its link to
   await flow.getByRole("button", { name: "Publish post, right now" }).click();
 
   await expect(signedIn).toHaveURL(/\/$/);
-  const celebration = signedIn.getByRole("dialog");
+  // The editor's publish dialog can still be closing as the list opens.
+  const celebration = signedIn.getByRole("dialog").filter({ hasText: "Boom! It’s out there." });
   await expect(celebration.getByRole("heading", { level: 2 })).toContainText("Boom! It’s out there.");
   await expect(celebration.getByRole("heading", { level: 2 })).toContainText(/That’s \d+ posts? published\./);
   // The post as a card, linking to it on clemii.com.
@@ -404,6 +417,12 @@ test("CMS-010 publishing celebrates the post on the posts list, with its link to
   await signedIn.reload();
   await expect(signedIn.getByRole("heading", { name: "Posts", exact: true })).toBeVisible();
   await expect(signedIn.getByRole("dialog")).toHaveCount(0);
+  // Its row shows the placeholder until the website has built the thumbnail, not a broken image.
+  const row = signedIn.getByRole("main").getByRole("listitem").filter({ has: signedIn.locator(`a[href="/posts/${post.id}"]`) });
+  await row.scrollIntoViewIfNeeded();
+  await expect(row).toContainText("Published");
+  await expect(row.locator("img")).toHaveCount(0);
+  await expect(row.locator("svg.lucide-image")).toBeVisible();
 });
 
 test("CMS-011 the owner approves a draft in its preview, for an agent to schedule or publish it as it is", async ({ signedIn, draft }) => {
@@ -846,6 +865,11 @@ test("the admin runs under its Content Security Policy without violations", asyn
   const violations: string[] = [];
   signedIn.on("console", (message) => { if (/Content.Security.Policy|Refused to/i.test(message.text())) violations.push(message.text()); });
   const post = await draft();
+  // The posts list loads thumbnails from the website.
+  await signedIn.goto("/");
+  const thumbnail = signedIn.locator("main li img").first();
+  await thumbnail.scrollIntoViewIfNeeded();
+  await expect.poll(() => thumbnail.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBe(800);
   const response = await signedIn.goto(`/posts/${post.id}`);
   expect(response!.headers()["content-security-policy"]).toContain("script-src 'self'");
   await expect(article(signedIn)).toBeVisible();
