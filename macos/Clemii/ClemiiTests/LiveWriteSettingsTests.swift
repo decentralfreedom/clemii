@@ -6,7 +6,7 @@ import Testing
 @MainActor
 struct LiveWriteSettingsTests {
     private func settings(_ configure: (UserDefaults) -> Void = { _ in }) -> Settings {
-        let suite = "hush.tests.livewrite.\(UUID().uuidString)"
+        let suite = "clemii.tests.livewrite.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suite)!
         defaults.removePersistentDomain(forName: suite)
         configure(defaults)

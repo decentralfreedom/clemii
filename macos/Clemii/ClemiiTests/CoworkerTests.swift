@@ -302,7 +302,8 @@ struct CoworkerTests {
 
     @Test("Exact navigation commands execute directly, but quoted or negated text never does")
     func directCommands() {
-        #expect(CoworkerDirectCommand.reply(to: "Hey Hush, please open a new tab.")?.action == .newTab)
+        #expect(CoworkerDirectCommand.reply(to: "Hey clemii, please open a new tab.")?.action == .newTab)
+        #expect(CoworkerDirectCommand.reply(to: "Hey hush, please open a new tab.")?.action == .newTab)
         #expect(CoworkerDirectCommand.reply(to: "Click here, please")?.action == .clickHere)
         let search = CoworkerDirectCommand.reply(to: "Can you search Google for Swift screen capture?")
         #expect(search?.action == .search)

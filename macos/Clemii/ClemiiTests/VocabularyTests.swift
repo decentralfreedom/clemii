@@ -101,7 +101,7 @@ struct VocabularyTests {
     @Test("The list persists through Settings")
     @MainActor
     func persists() {
-        let suite = "hush.tests.vocabulary.\(UUID().uuidString)"
+        let suite = "clemii.tests.vocabulary.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suite)!
         defer { defaults.removePersistentDomain(forName: suite) }
         let settings = Settings(defaults: defaults)

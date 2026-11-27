@@ -29,11 +29,11 @@ final class AudioRecorder {
     /// coordinator finish the dictation as if the key had been released.
     static let maxDurationSeconds: TimeInterval = 120
 
-    /// The cap in use. Debug builds accept `-hush.debug.recording.maxSeconds <n>` so the
+    /// The cap in use. Debug builds accept `-clemii.debug.recording.maxSeconds <n>` so the
     /// limit journey can be checked in seconds instead of minutes.
     static var maxDuration: TimeInterval {
         #if DEBUG
-        let override = UserDefaults.standard.double(forKey: "hush.debug.recording.maxSeconds")
+        let override = UserDefaults.standard.double(forKey: "clemii.debug.recording.maxSeconds")
         if override > 0 { return override }
         #endif
         return maxDurationSeconds

@@ -224,7 +224,7 @@ private final class HistoryItemRow: NSView {
         if item.isClemiiEditorOutput {
             details.append("Typed in clemii")
         } else {
-            details.append(item.duration.hushCompactDuration)
+            details.append(item.duration.clemiiCompactDuration)
         }
         details.append("\(item.wordCount) words")
         if let persona = item.personaName { details.append(persona) }

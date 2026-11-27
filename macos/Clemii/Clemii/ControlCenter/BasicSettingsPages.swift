@@ -134,7 +134,7 @@ final class GeneralSettingsPageViewController: ControlCenterPageViewController {
             let value = NSTextField(labelWithString: Self.speedText(entry.2))
             value.font = .monospacedDigitSystemFont(ofSize: 13, weight: .regular)
             value.textColor = entry.2 == nil ? .tertiaryLabelColor : .labelColor
-            value.setAccessibilityIdentifier("hush.general.speed.\(index)")
+            value.setAccessibilityIdentifier("clemii.general.speed.\(index)")
             rows.addArrangedSubview(ControlCenterKeyValueRow(
                 title: entry.0, subtitle: entry.1, trailing: value, showsSeparator: index < entries.count - 1
             ))

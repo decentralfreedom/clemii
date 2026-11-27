@@ -7,12 +7,14 @@
 import { useEffect, useState } from "react";
 
 export type ThemeMode = "light" | "dark" | "system";
-const storageKey = "hush-cms-appearance";
+const storageKey = "clemii-cms-appearance";
+/** Where the choice was kept before the rename; read until the next choice replaces it. */
+const formerStorageKey = "hush-cms-appearance";
 
 function stored(): ThemeMode {
   try {
-    const value = localStorage.getItem(storageKey);
-    return value === "light" || value === "dark" ? value : "system";
+    const value = localStorage.getItem(storageKey) ?? localStorage.getItem(formerStorageKey);
+    return value === "light || value === "dark" ? value : "system";
   } catch {
     return "system";
   }
@@ -44,7 +46,7 @@ export function useThemeMode() {
   const [mode, setMode] = useState<ThemeMode>(stored);
   useEffect(() => {
     apply(mode);
-    try { localStorage.setItem(storageKey, mode); } catch { /* private mode: keep it for this visit */ }
+    try { localStorage.setItem(storageKey, mode); localStorage.removeItem(formerStorageKey); } catch { /* private mode: keep it for this visit */ }
     if (mode !== "system") return;
     const query = window.matchMedia("(prefers-color-scheme: dark)");
     const follow = () => apply("system");

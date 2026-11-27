@@ -550,10 +550,10 @@ private struct TranscriptionEngineView: View {
                 LabeledContent("Downloaded", value: store.storageSummary(for: engine))
                 HStack {
                     Button("Show in Finder") { store.revealStorage(for: engine) }
-                        .hushGlassButton()
+                        .clemiiGlassButton()
                     if engine == .whisperKit {
                         Button("Refresh Catalog") { store.refreshCatalog() }
-                            .hushGlassButton()
+                            .clemiiGlassButton()
                     }
                 }
             } footer: {
@@ -689,7 +689,7 @@ private struct ModelRow: View {
         case .downloaded:
             HStack(spacing: 6) {
                 Button("Use", action: onUse)
-                    .hushGlassButton()
+                    .clemiiGlassButton()
                     .disabled(languageNote != nil)
                     .accessibilityLabel("Use \(name)")
                 if canDelete {
@@ -715,7 +715,7 @@ private struct ModelRow: View {
                 .symbolRenderingMode(.multicolor)
         case .failed:
             Button("Retry", action: onRetry)
-                .hushGlassButton()
+                .clemiiGlassButton()
         }
     }
 }
@@ -825,7 +825,7 @@ struct ProgressRing: View {
 private extension View {
     /// Liquid Glass buttons on macOS 26, the standard bordered style before it.
     @ViewBuilder
-    func hushGlassButton() -> some View {
+    func clemiiGlassButton() -> some View {
         if #available(macOS 26.0, *) {
             buttonStyle(.glass)
         } else {

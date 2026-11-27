@@ -29,7 +29,7 @@ final class HUDGlassDebugJourneyController {
             button.frame = NSRect(x: 48, y: 150, width: 180, height: 32)
             movingBackground.addSubview(button)
             let status = NSTextField(labelWithString: "Preparing")
-            status.setAccessibilityIdentifier("hush.hudSpaceStatus")
+            status.setAccessibilityIdentifier("clemii.hudSpaceStatus")
             status.frame = NSRect(x: 48, y: 200, width: 650, height: 30)
             movingBackground.addSubview(status)
             statusTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak window] _ in

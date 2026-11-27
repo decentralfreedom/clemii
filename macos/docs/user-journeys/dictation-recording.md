@@ -23,5 +23,5 @@ Given clemii stopped while a dictation was recorded or transcribed (a crash, a f
 
 | Journey | Coverage |
 | --- | --- |
-| DR-001 | `RecordingLimitTests` (audio kept at the cap, later audio dropped, one report), manual journey with `-hush.debug.recording.maxSeconds 5` in a debug build |
+| DR-001 | `RecordingLimitTests` (audio kept at the cap, later audio dropped, one report), manual journey with `-clemii.debug.recording.maxSeconds 5` in a debug build |
 | DR-002 | `RecordingJournalTests` (round trip, crash-cut file, active recording excluded, discard, limit, test isolation); manual journey: a partial recording in `Recordings/` appears in History as Recovered after launch |

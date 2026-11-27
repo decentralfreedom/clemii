@@ -18,6 +18,7 @@
 | Check or rebuild server firewalls and SSH | [Server hardening](reference/server-hardening.md) |
 | Move hush to another host or platform (Kubernetes, Fly.io, Railway) | [Deploy anywhere](reference/deploy-anywhere.md) |
 | Find expected behaviour and its tests | [User journeys](reference/user-journeys.md) |
+| Know which identifiers keep the old name hush, and why | [The name hush](reference/former-name.md) |
 | Diagnose a freeze | [Responsiveness checks](../macos/docs/operations/responsiveness.md) |
 | Prepare a signed release | [Notarization](../macos/docs/operations/notarization.md) and [updates](../macos/docs/operations/app-updates.md) |
 | Deploy the website | [Coolify deployment](../webapp/apps/web/docs/operations/coolify-deployment.md) |

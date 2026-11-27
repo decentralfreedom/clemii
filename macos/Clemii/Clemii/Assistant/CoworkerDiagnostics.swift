@@ -76,7 +76,7 @@ nonisolated final class CoworkerTrace: @unchecked Sendable {
         case system = "system.txt", prompt = "prompt.json", screenshot = "model-screen.png"
         case rawReply = "model-output.txt", reply = "reply.json"
     }
-    private static let queue = DispatchQueue(label: "hush.development.assistant-traces", qos: .utility)
+    private static let queue = DispatchQueue(label: "clemii.development.assistant-traces", qos: .utility)
     static let maximumTurns = 5
     static let maximumBytes = 20 * 1_024 * 1_024
     static let maximumTurnBytes = 4 * 1_024 * 1_024

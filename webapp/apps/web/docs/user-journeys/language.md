@@ -22,7 +22,7 @@ addresses readers with "du"; the German blog keeps the neutral form.
   exist in both languages, so it never delays the first paint. It reads the
   current language from the URL and the counterpart from the page's `hreflang`
   links, never redirects to the address it is on, and a stored choice
-  (`localStorage` `hush.language`) always wins.
+  (`localStorage` `clemii.language`; a choice stored before the rename under `hush.language` is still read, and replaced when the visitor next chooses) always wins.
 - Search engines crawl in English without a stored choice, so they always get
   the page they asked for and find `/de` through `hreflang`, following Google's
   guidance against redirecting by language.

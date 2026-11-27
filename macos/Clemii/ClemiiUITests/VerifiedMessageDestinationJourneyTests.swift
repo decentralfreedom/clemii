@@ -20,9 +20,9 @@ final class VerifiedMessageDestinationJourneyTests: XCTestCase {
             "Typed with clemii should expose destination controls in its existing settings page"
         )
         XCTAssertTrue(app.staticTexts["Signature destinations"].exists)
-        XCTAssertTrue(app.popUpButtons["hush.verified.destinationMode"].exists)
+        XCTAssertTrue(app.popUpButtons["clemii.verified.destinationMode"].exists)
 
-        let manage = app.buttons["hush.verified.destinationExceptions"]
+        let manage = app.buttons["clemii.verified.destinationExceptions"]
         XCTAssertTrue(manage.exists)
         manage.click()
 
@@ -31,7 +31,7 @@ final class VerifiedMessageDestinationJourneyTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Automatic"].exists)
         XCTAssertTrue(app.staticTexts["Terminal apps and browser address or search fields"].exists)
 
-        let addApps = app.buttons["hush.verified.addException"]
+        let addApps = app.buttons["clemii.verified.addException"]
         XCTAssertEqual(addApps.label, "Add Apps\u{2026}")
         addApps.click()
         XCTAssertTrue(
@@ -66,11 +66,11 @@ final class VerifiedMessageDestinationJourneyTests: XCTestCase {
         XCTAssertTrue(removeCalculator.exists)
         removeCalculator.click()
 
-        let website = app.textFields["hush.verified.websiteField"]
+        let website = app.textFields["clemii.verified.websiteField"]
         XCTAssertTrue(website.exists)
         website.click()
         website.typeText(websiteHost)
-        app.buttons["hush.verified.addWebsite"].click()
+        app.buttons["clemii.verified.addWebsite"].click()
 
         XCTAssertTrue(
             app.staticTexts[websiteHost].waitForExistence(timeout: 2),
@@ -78,7 +78,7 @@ final class VerifiedMessageDestinationJourneyTests: XCTestCase {
         )
         XCTAssertTrue(
             app.descendants(matching: .any)[
-                "hush.verified.websiteIcon.\(websiteHost)"
+                "clemii.verified.websiteIcon.\(websiteHost)"
             ].waitForExistence(timeout: usesLiveWebsiteIcon ? 10 : 2),
             "The website's fetched icon should replace the generic globe"
         )

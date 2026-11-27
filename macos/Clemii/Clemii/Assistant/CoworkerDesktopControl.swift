@@ -36,7 +36,8 @@ enum CoworkerDirectCommand {
         var words = request.lowercased().components(separatedBy: CharacterSet.letters.inverted)
             .filter { !$0.isEmpty }
         if words.first == "hey" { words.removeFirst() }
-        if words.first == "hush" { words.removeFirst() }
+        // Its name, and the name it had before, as hush.
+        if words.first == "clemii" || words.first == "hush" { words.removeFirst() }
         if words.starts(with: ["can", "you"]) || words.starts(with: ["could", "you"]) { words.removeFirst(2) }
         if words.first == "please" { words.removeFirst() }
         if words.last == "please" { words.removeLast() }

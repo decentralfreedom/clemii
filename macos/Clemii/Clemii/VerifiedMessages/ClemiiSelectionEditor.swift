@@ -414,7 +414,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         modeControl.toolTip = provider == .off
             ? "Enable a local AI engine in Personas to use conversational editing."
             : "Switch between direct editing and local AI"
-        modeControl.setAccessibilityIdentifier("hush.editor.mode")
+        modeControl.setAccessibilityIdentifier("clemii.editor.mode")
         modeControl.setAccessibilityLabel("Composer mode")
         modeControl.translatesAutoresizingMaskIntoConstraints = false
         header.addSubview(modeControl)
@@ -456,7 +456,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         primaryButton.target = self
         primaryButton.action = #selector(acceptCurrentText)
         primaryButton.keyEquivalent = "\r"
-        primaryButton.setAccessibilityIdentifier("hush.editor.accept")
+        primaryButton.setAccessibilityIdentifier("clemii.editor.accept")
         footer.addSubview(primaryButton)
 
         let separator = NSBox()
@@ -516,7 +516,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         composeTextView.backgroundColor = .clear
         composeTextView.textColor = .textColor
         composeTextView.delegate = self
-        composeTextView.setAccessibilityIdentifier("hush.editor.compose.text")
+        composeTextView.setAccessibilityIdentifier("clemii.editor.compose.text")
         editorScroll.documentView = composeTextView
 
         let cardFooter = NSView()
@@ -548,7 +548,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         openAIButton.toolTip = provider == .off
             ? "Enable a local AI engine in Personas to edit conversationally."
             : "Open the private AI editor"
-        openAIButton.setAccessibilityIdentifier("hush.editor.open-ai")
+        openAIButton.setAccessibilityIdentifier("clemii.editor.open-ai")
         openAIButton.translatesAutoresizingMaskIntoConstraints = false
         composeContainer.addSubview(openAIButton)
 
@@ -618,7 +618,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         instructionTextView.isRichText = false
         instructionTextView.delegate = self
         instructionTextView.onSubmit = { [weak self] in self?.sendInstruction() }
-        instructionTextView.setAccessibilityIdentifier("hush.editor.ai.prompt")
+        instructionTextView.setAccessibilityIdentifier("clemii.editor.ai.prompt")
         instructionScroll.documentView = instructionTextView
         instructionPlaceholder.stringValue = "Message clemii…"
         instructionPlaceholder.font = .systemFont(ofSize: 14)
@@ -634,7 +634,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         microphoneButton.target = self
         microphoneButton.action = #selector(toggleVoiceInput)
         microphoneButton.toolTip = "Dictate into this conversation"
-        microphoneButton.setAccessibilityIdentifier("hush.editor.ai.microphone")
+        microphoneButton.setAccessibilityIdentifier("clemii.editor.ai.microphone")
 
         voiceMeter.isHidden = true
         voiceMeter.translatesAutoresizingMaskIntoConstraints = false
@@ -642,7 +642,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         voiceStatus.font = .systemFont(ofSize: 13, weight: .medium)
         voiceStatus.textColor = .secondaryLabelColor
         voiceStatus.isHidden = true
-        voiceStatus.setAccessibilityIdentifier("hush.editor.ai.voice.status")
+        voiceStatus.setAccessibilityIdentifier("clemii.editor.ai.voice.status")
         voiceStatus.translatesAutoresizingMaskIntoConstraints = false
         promptCard.addSubview(voiceStatus)
 
@@ -727,7 +727,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
                 duration: turn.generationDuration,
                 createdArtifact: turn.revisionID != nil,
                 instruction: turn.instruction,
-                accessibilityID: "hush.editor.ai.thinking.\(turn.id.uuidString)"
+                accessibilityID: "clemii.editor.ai.thinking.\(turn.id.uuidString)"
             ))
             chatStack.addArrangedSubview(makeAssistantStatus(
                 turn.assistantMessage,
@@ -753,7 +753,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
                 duration: nil,
                 createdArtifact: false,
                 instruction: pendingInstruction,
-                accessibilityID: "hush.editor.ai.thinking.active",
+                accessibilityID: "clemii.editor.ai.thinking.active",
                 isActive: true
             ))
             chatStack.addArrangedSubview(makeStreamingAssistantMessage())
@@ -831,7 +831,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
                 createdArtifact: createdArtifact
             )
         let detail = NSTextField(wrappingLabelWithString: detailText)
-        detail.identifier = NSUserInterfaceItemIdentifier("hush.editor.ai.thinking.detail")
+        detail.identifier = NSUserInterfaceItemIdentifier("clemii.editor.ai.thinking.detail")
         detail.font = .systemFont(ofSize: 11.5)
         detail.textColor = .tertiaryLabelColor
         detail.maximumNumberOfLines = 0
@@ -856,7 +856,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
     @objc private func toggleThinkingDetails(_ sender: NSButton) {
         guard let stack = sender.superview as? NSStackView,
               let detail = stack.arrangedSubviews.first(where: {
-                  $0.identifier?.rawValue == "hush.editor.ai.thinking.detail"
+                  $0.identifier?.rawValue == "clemii.editor.ai.thinking.detail"
               }) else { return }
         detail.isHidden.toggle()
         sender.image = NSImage(
@@ -868,7 +868,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
 
     private func makeInitialConversationPrompt() -> NSView {
         let wrapper = NSView()
-        wrapper.setAccessibilityIdentifier("hush.editor.ai.persona-setup")
+        wrapper.setAccessibilityIdentifier("clemii.editor.ai.persona-setup")
 
         let title = NSTextField(labelWithString: "What would you like to do with this text?")
         title.font = .systemFont(ofSize: 15.5, weight: .regular)
@@ -894,7 +894,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         let detail = NSTextField(labelWithString: contextualDetail)
         detail.font = .systemFont(ofSize: 11.5)
         detail.textColor = .tertiaryLabelColor
-        detail.setAccessibilityIdentifier("hush.editor.ai.context")
+        detail.setAccessibilityIdentifier("clemii.editor.ai.context")
         let heading = NSStackView(views: [title, detail])
         heading.orientation = .vertical
         heading.alignment = .leading
@@ -944,7 +944,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
             more.controlSize = .small
             more.target = self
             more.action = #selector(selectOverflowPersona(_:))
-            more.setAccessibilityIdentifier("hush.editor.ai.persona-more")
+            more.setAccessibilityIdentifier("clemii.editor.ai.persona-more")
             choices.addArrangedSubview(more)
         }
 
@@ -997,7 +997,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         conversationModelPicker.target = self
         conversationModelPicker.action = #selector(showConversationModelMenu(_:))
         conversationModelPicker.toolTip = "Choose the on-device model for this conversation"
-        conversationModelPicker.setAccessibilityIdentifier("hush.editor.ai.model")
+        conversationModelPicker.setAccessibilityIdentifier("clemii.editor.ai.model")
         conversationModelPicker.setAccessibilityLabel("AI model, \(provider.displayName)")
     }
 
@@ -1043,8 +1043,8 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         button.state = isSelected ? .on : .off
         button.contentTintColor = isSelected ? DesignTokens.brand500 : .secondaryLabelColor
         button.setAccessibilityIdentifier(
-            profileIndex.map { "hush.editor.ai.persona.\(profiles[$0].id.uuidString)" }
-                ?? "hush.editor.ai.persona.none"
+            profileIndex.map { "clemii.editor.ai.persona.\(profiles[$0].id.uuidString)" }
+                ?? "clemii.editor.ai.persona.none"
         )
         return button
     }
@@ -1131,7 +1131,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         body.textColor = text.isEmpty ? .tertiaryLabelColor : .labelColor
         body.isSelectable = !text.isEmpty
         body.maximumNumberOfLines = 14
-        body.setAccessibilityIdentifier(version.map { "hush.editor.ai.artifact.\($0)" } ?? "hush.editor.ai.artifact.source")
+        body.setAccessibilityIdentifier(version.map { "clemii.editor.ai.artifact.\($0)" } ?? "clemii.editor.ai.artifact.source")
         body.translatesAutoresizingMaskIntoConstraints = false
         card.addSubview(body)
 
@@ -1151,7 +1151,7 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         footer.textColor = .tertiaryLabelColor
         footer.alignment = .right
         if let version {
-            footer.setAccessibilityIdentifier("hush.editor.ai.artifact.\(version).metadata")
+            footer.setAccessibilityIdentifier("clemii.editor.ai.artifact.\(version).metadata")
             footer.setAccessibilityLabel(footerText)
         }
         footer.translatesAutoresizingMaskIntoConstraints = false
@@ -1197,14 +1197,14 @@ final class ClemiiSelectionEditorViewController: NSViewController, NSWindowDeleg
         body.textColor = pendingPartialText.isEmpty ? .tertiaryLabelColor : .labelColor
         body.isSelectable = true
         body.maximumNumberOfLines = 14
-        body.setAccessibilityIdentifier("hush.editor.ai.streaming-artifact")
+        body.setAccessibilityIdentifier("clemii.editor.ai.streaming-artifact")
         body.translatesAutoresizingMaskIntoConstraints = false
         card.addSubview(body)
 
         let status = NSTextField(labelWithString: "Streaming locally · 0.0s")
         status.font = .systemFont(ofSize: 10.5, weight: .medium)
         status.textColor = DesignTokens.brand500
-        status.setAccessibilityIdentifier("hush.editor.ai.streaming-status")
+        status.setAccessibilityIdentifier("clemii.editor.ai.streaming-status")
         status.translatesAutoresizingMaskIntoConstraints = false
         card.addSubview(status)
 

@@ -44,7 +44,7 @@ final class Settings {
             FormerIdentity.adoptPreferences(into: .standard)
             return .standard
         }
-        let suite = "hush.tests.shared"
+        let suite = "clemii.tests.shared"
         let defaults = UserDefaults(suiteName: suite) ?? .standard
         defaults.removePersistentDomain(forName: suite)
         return defaults

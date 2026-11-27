@@ -11,7 +11,7 @@ references, not a list of marketing claims.
 | Install, grant permissions and try dictation | [Onboarding](../../macos/docs/user-journeys/onboarding.md) |
 | Choose, download, cancel or remove a speech model | [Transcription models](../../macos/docs/user-journeys/transcription-models.md) |
 | Choose a writing style | [Persona wheel](../../macos/docs/user-journeys/persona-wheel.md) |
-| Set up the assistant, act and interrupt | [Assistant](../../macos/docs/user-journeys/hey-hush.md) |
+| Set up the assistant, act and interrupt | [Assistant](../../macos/docs/user-journeys/hey-clemii.md) |
 | Control the listening interface | [HUD settings](../../macos/docs/user-journeys/hud-settings.md) |
 | Measure typing with consent | [Typing benchmark](../../macos/docs/user-journeys/typing-benchmark.md) |
 | Create, edit and share a signed record | [Verified Messages author](../../macos/docs/user-journeys/verified-messages.md) |

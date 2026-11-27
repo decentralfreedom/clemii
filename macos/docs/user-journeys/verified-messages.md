@@ -25,7 +25,7 @@ If publication fails, clemii inserts the message without a proof link and shows 
 
 ## Trust and privacy invariants
 
-- Hey Hush assistant requests are a separate local workflow. Voice captured through Control + Fn is bound to that assistant turn UUID and bypasses persona rewriting, message insertion, activity history, and proof publication. Draft insertion from the assistant does not imply a Verified Message. See [Hey Hush](hey-hush.md), HH-001 and HH-003, with `AssistantFoundationTests.voiceContextBinding` and the assistant UI journeys.
+- Hey clemii assistant requests are a separate local workflow. Voice captured through Control + Fn is bound to that assistant turn UUID and bypasses persona rewriting, message insertion, activity history, and proof publication. Draft insertion from the assistant does not imply a Verified Message. See [Hey clemii](hey-hush.md), HH-001 and HH-003, with `AssistantFoundationTests.voiceContextBinding` and the assistant UI journeys.
 
 - Verified Messages is opt in.
 - The installation private key never leaves the Mac.

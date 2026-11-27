@@ -26,7 +26,7 @@ struct PersonaEditorSheetTests {
 
     private func instructions(in view: NSView) throws -> NSTextView {
         func find(_ view: NSView) -> NSTextView? {
-            if let text = view as? NSTextView, text.accessibilityIdentifier() == "hush.personaEditor.instructions" { return text }
+            if let text = view as? NSTextView, text.accessibilityIdentifier() == "clemii.personaEditor.instructions" { return text }
             for child in view.subviews { if let found = find(child) { return found } }
             return nil
         }

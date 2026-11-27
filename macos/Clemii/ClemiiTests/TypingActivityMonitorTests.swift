@@ -15,7 +15,7 @@ struct TypingActivityMonitorTests {
 
     @Test("Stopping tracking does not repeatedly save the same aggregate", arguments: [true, false])
     func permissionLossSettles(disableMeasurement: Bool) async throws {
-        let suite = "hush.tests.typing.\(UUID().uuidString)"
+        let suite = "clemii.tests.typing.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
         let settings = Settings(defaults: defaults)
@@ -52,7 +52,7 @@ struct TypingActivityMonitorTests {
 
     @Test("Unchanged aggregate does not notify but new typing does")
     func onlyChangedAggregatesPublish() throws {
-        let suite = "hush.tests.typing.\(UUID().uuidString)"
+        let suite = "clemii.tests.typing.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
         let settings = Settings(defaults: defaults)

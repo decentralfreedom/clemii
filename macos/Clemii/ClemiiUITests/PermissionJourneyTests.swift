@@ -2,7 +2,7 @@ import XCTest
 
 final class PermissionJourneyTests: XCTestCase {
     func testLandingShowsWorkflowsAndModelsStayInContext() {
-        let app = launch("--preview-hush-ai", "--preview-light-appearance")
+        let app = launch("--preview-clemii-ai", "--preview-light-appearance")
         defer { app.terminate() }
         XCTAssertTrue(app.buttons["Open Live Write"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Open Assistant"].exists)
@@ -15,16 +15,16 @@ final class PermissionJourneyTests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Screen Recording"].exists)
         app.buttons["clemii AI"].click()
         app.buttons["Open Assistant"].click()
-        XCTAssertTrue(app.switches["hush.assistant.enabled"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.switches["clemii.assistant.enabled"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.staticTexts["Screen Recording"].exists)
-        XCTAssertTrue(app.staticTexts["hush.assistant.screen.status"].exists)
+        XCTAssertTrue(app.staticTexts["clemii.assistant.screen.status"].exists)
         // The AI model comes first as its own list, ChatGPT last; listening and voice follow.
         XCTAssertTrue(app.staticTexts["AI model"].exists)
         XCTAssertTrue(app.staticTexts["Required models"].exists)
         XCTAssertTrue(app.staticTexts["ChatGPT"].exists)
         XCTAssertTrue(app.staticTexts["Kokoro"].exists)
-        XCTAssertTrue(app.staticTexts["hush.assistant.privacy"].exists)
-        XCTAssertTrue(app.staticTexts["hush.assistant.local-processing"].exists)
+        XCTAssertTrue(app.staticTexts["clemii.assistant.privacy"].exists)
+        XCTAssertTrue(app.staticTexts["clemii.assistant.local-processing"].exists)
         XCTAssertFalse(app.buttons["Test voice"].exists)
         attach(app, "Assistant - light")
         app.buttons["control-center-back"].click()
@@ -32,7 +32,7 @@ final class PermissionJourneyTests: XCTestCase {
     }
 
     func testLiveWriteUsesSharedModelsAndKeepsOptionalPersonas() {
-        let app = launch("--preview-hush-ai", "--preview-light-appearance")
+        let app = launch("--preview-clemii-ai", "--preview-light-appearance")
         defer { app.terminate() }
         XCTAssertTrue(app.buttons["Open Live Write"].waitForExistence(timeout: 5))
         app.buttons["Open Live Write"].click()
@@ -63,7 +63,7 @@ final class PermissionJourneyTests: XCTestCase {
     }
 
     func testAISettingsInDarkAppearance() {
-        let app = launch("--preview-hush-ai", "--preview-dark-appearance")
+        let app = launch("--preview-clemii-ai", "--preview-dark-appearance")
         defer { app.terminate() }
         XCTAssertTrue(app.buttons["Open Live Write"].waitForExistence(timeout: 5))
         attach(app, "clemii AI - dark")
@@ -74,17 +74,17 @@ final class PermissionJourneyTests: XCTestCase {
         attach(app, "Live Write - engines dark")
         app.buttons["control-center-back"].click()
         app.buttons["Open Assistant"].click()
-        XCTAssertTrue(app.switches["hush.assistant.enabled"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.switches["clemii.assistant.enabled"].waitForExistence(timeout: 3))
         attach(app, "Assistant - dark")
     }
 
     func testCompactWindowKeepsNavigationAndModelsReachable() {
-        let app = launch("--preview-hush-ai", "--preview-light-appearance", "--preview-compact-window")
+        let app = launch("--preview-clemii-ai", "--preview-light-appearance", "--preview-compact-window")
         defer { app.terminate() }
         XCTAssertTrue(app.buttons["Open Assistant"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Open Live Write"].isHittable)
         attach(app, "clemii AI - compact")
-        XCTAssertTrue(app.staticTexts["hush.ai.assistant.status"].exists)
+        XCTAssertTrue(app.staticTexts["clemii.ai.assistant.status"].exists)
         app.buttons["Open Assistant"].click()
         let voice = modelControl("kokoro", in: app)
         reveal(voice, in: app)
@@ -95,7 +95,7 @@ final class PermissionJourneyTests: XCTestCase {
     func testOneSetupButtonCanCancelAndResume() {
         let app = launch("--preview-assistant-settings", "--preview-light-appearance", "--preview-assistant-setup-flow", "-assistant.enabled.v1", "YES")
         defer { app.terminate() }
-        let setup = app.buttons["hush.assistant.action"]
+        let setup = app.buttons["clemii.assistant.action"]
         XCTAssertTrue(setup.waitForExistence(timeout: 5))
         setup.click()
         XCTAssertTrue(app.buttons["Cancel"].waitForExistence(timeout: 2))
@@ -140,7 +140,7 @@ final class PermissionJourneyTests: XCTestCase {
     }
 
     private func modelControl(_ id: String, in app: XCUIApplication) -> XCUIElement {
-        app.descendants(matching: .any).matching(identifier: "hush.ai.model.\(id)").firstMatch
+        app.descendants(matching: .any).matching(identifier: "clemii.ai.model.\(id)").firstMatch
     }
 
     private func launch(_ arguments: String...) -> XCUIApplication {

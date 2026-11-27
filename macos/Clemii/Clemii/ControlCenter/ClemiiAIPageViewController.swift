@@ -13,7 +13,7 @@ final class ClemiiAIPageViewController: ControlCenterPageViewController {
         description: "Talk naturally. Ask for a text and clemii writes it; anything else is cleaned up in your words.",
         symbol: "text.bubble.fill",
         colors: AIFeatureIcon.liveWrite,
-        identifier: "hush.ai.livewrite"
+        identifier: "clemii.ai.livewrite"
     )
     private let assistant = AIFeatureSwitchCard(
         title: "Assistant",
@@ -21,7 +21,7 @@ final class ClemiiAIPageViewController: ControlCenterPageViewController {
         symbol: "cursorarrow.rays",
         colors: AIFeatureIcon.assistant,
         badge: "BETA",
-        identifier: "hush.ai.assistant"
+        identifier: "clemii.ai.assistant"
     )
 
     init(coordinator: DictationCoordinator?, onNavigate: @escaping (ClemiiDestination) -> Void) {

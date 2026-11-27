@@ -713,7 +713,7 @@ final class AssistantCompanionController: NSObject, ObservableObject {
         if panel == nil {
             let panel = CompanionPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
             configure(panel)
-            panel.setAccessibilityIdentifier("hush.companion.window")
+            panel.setAccessibilityIdentifier("clemii.companion.window")
             panel.contentView = CompanionHostingView(rootView: AnyView(CompanionDetailView(controller: self)))
             panel.onEscape = { [weak self] in self?.stop() }
             self.panel = panel
@@ -721,7 +721,7 @@ final class AssistantCompanionController: NSObject, ObservableObject {
         if pointer == nil {
             let pointer = CompanionPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
             configure(pointer)
-            pointer.setAccessibilityIdentifier("hush.companion.cursor.window")
+            pointer.setAccessibilityIdentifier("clemii.companion.cursor.window")
             pointer.contentView = CompanionHostingView(rootView: AnyView(CompanionCursorView(controller: self)))
             self.pointer = pointer
         }
@@ -856,7 +856,7 @@ private struct CompanionEscapeButton: NSViewRepresentable {
         button.focusRingType = .none
         button.refusesFirstResponder = true
         button.sendAction(on: .leftMouseDown)
-        button.setAccessibilityIdentifier("hush.companion.stop")
+        button.setAccessibilityIdentifier("clemii.companion.stop")
         button.setAccessibilityLabel("Stop clemii")
         return button
     }
@@ -888,7 +888,7 @@ private struct CompanionCursorView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain).help("Talk to clemii\u{2019}s AI assistant · Control + Fn")
-            .accessibilityLabel("Talk to clemii\u{2019}s AI assistant").accessibilityIdentifier("hush.companion.microphone")
+            .accessibilityLabel("Talk to clemii\u{2019}s AI assistant").accessibilityIdentifier("clemii.companion.microphone")
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
@@ -904,7 +904,7 @@ private struct CompanionCursorView: View {
                                     .frame(width: 5, height: 5).accessibilityHidden(true)
                             }
                             Text(controller.status).font(.system(size: 12, weight: .medium))
-                                .lineLimit(1).accessibilityIdentifier("hush.companion.status")
+                                .lineLimit(1).accessibilityIdentifier("clemii.companion.status")
                             // A persistent AI label (EU AI Act Art. 50(1); the guidelines recommend
                             // recognisable "AI" symbols beside the interaction).
                             Text("AI")
@@ -914,7 +914,7 @@ private struct CompanionCursorView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 3).stroke(.secondary.opacity(0.6), lineWidth: 0.75))
                                 .help("clemii\u{2019}s assistant is AI and can make mistakes.")
                                 .accessibilityLabel("AI assistant")
-                                .accessibilityIdentifier("hush.companion.ai-label")
+                                .accessibilityIdentifier("clemii.companion.ai-label")
                     }
                     Rectangle().fill(.primary.opacity(0.10)).frame(width: 1, height: 13)
                     CompanionEscapeButton { controller.stop() }
@@ -933,13 +933,13 @@ private struct CompanionCursorView: View {
                     .padding(.horizontal, 10).padding(.vertical, 2)
                     .background(.regularMaterial, in: Capsule())
                     .lineLimit(1)
-                    .accessibilityIdentifier("hush.companion.progress")
+                    .accessibilityIdentifier("clemii.companion.progress")
                 }
             }
             Spacer(minLength: 0)
         }
         .padding(5).frame(width: 300, height: 64, alignment: .topLeading)
-        .accessibilityElement(children: .contain).accessibilityIdentifier("hush.companion.cursor")
+        .accessibilityElement(children: .contain).accessibilityIdentifier("clemii.companion.cursor")
         .contextMenu {
             if !controller.response.isEmpty {
                 Button("Read last reply") { controller.expanded.toggle() }
@@ -962,11 +962,11 @@ private struct CompanionDetailView: View {
             if !controller.spokenText.isEmpty {
                 Text(controller.spokenText).font(.system(size: 13)).lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityIdentifier("hush.companion.speech")
+                    .accessibilityIdentifier("clemii.companion.speech")
             } else if !controller.response.isEmpty && (controller.waitingForInput || controller.expanded) {
                 Text(controller.response).font(.system(size: 13)).lineSpacing(3)
                     .textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
-                    .accessibilityIdentifier("hush.companion.response")
+                    .accessibilityIdentifier("clemii.companion.response")
             }
             if controller.expanded, let pending = controller.pending, pending.action == .diagram {
                 VStack(alignment: .leading, spacing: 6) {
@@ -982,7 +982,7 @@ private struct CompanionDetailView: View {
                 Label(notice, systemImage: "exclamationmark.circle")
                     .font(.system(size: 11)).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityIdentifier("hush.companion.notice")
+                    .accessibilityIdentifier("clemii.companion.notice")
             }
             if controller.spokenText.isEmpty {
                 Text("Hold ⌃ Fn to answer · Esc to stop")
@@ -994,7 +994,7 @@ private struct CompanionDetailView: View {
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(.primary.opacity(0.10), lineWidth: 0.5))
         .padding(6)
-        .accessibilityElement(children: .contain).accessibilityIdentifier("hush.companion.surface")
+        .accessibilityElement(children: .contain).accessibilityIdentifier("clemii.companion.surface")
     }
 }
 

@@ -363,7 +363,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let destination: ClemiiDestination
         if arguments.contains("--preview-dashboard") {
             destination = .dashboard
-        } else if arguments.contains("--preview-hush-ai") {
+        } else if arguments.contains("--preview-clemii-ai") {
             destination = .ai
         } else if arguments.contains("--preview-assistant-settings") {
             destination = .assistant

@@ -33,7 +33,7 @@ or revised text; it does not always originate from a microphone recording.
 | --- | --- | --- |
 | Audio capture | [AudioRecorder.swift](../../macos/Clemii/Clemii/Audio/AudioRecorder.swift) | [Onboarding](../../macos/docs/user-journeys/onboarding.md) |
 | Local language models | [LLMRuntime.swift](../../macos/Clemii/Clemii/PostProcessing/LLMRuntime.swift) | [Personas](../../macos/docs/user-journeys/persona-wheel.md) |
-| Assistant and desktop actions | [Assistant/](../../macos/Clemii/Clemii/Assistant) | [Assistant journeys](../../macos/docs/user-journeys/hey-hush.md) |
+| Assistant and desktop actions | [Assistant/](../../macos/Clemii/Clemii/Assistant) | [Assistant journeys](../../macos/docs/user-journeys/hey-clemii.md) |
 | Native signed-message logic | [ClemiiProvenance](../../macos/Packages/ClemiiProvenance) | [Author journey](../../macos/docs/user-journeys/verified-messages.md) |
 | API and service | [server/app.ts](../../webapp/apps/web/server/app.ts) | [OpenAPI](../../webapp/apps/web/openapi/hush-provenance.json) |
 | Browser verification | [useProofVerification.ts](../../webapp/apps/web/src/provenance/useProofVerification.ts) | [Recipient journey](../../webapp/apps/web/docs/user-journeys/proof-recipient.md) |

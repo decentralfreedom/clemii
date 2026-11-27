@@ -72,7 +72,9 @@ public struct ProofManifest: Codable, Equatable, Sendable {
         public enum Source: String, Codable, Sendable {
             case microphone
             case keyboard
-            case hushHistory = "hush_history"
+            // Signed into every published proof and read by the website's verifier: the value
+            // keeps its first name for good, whatever the case is called.
+            case clemiiHistory = "hush_history"
         }
 
         public let source: Source

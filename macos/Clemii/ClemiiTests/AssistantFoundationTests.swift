@@ -2,7 +2,7 @@ import AppKit
 import Testing
 @testable import Clemii
 
-@Suite("Hey Hush foundation", .serialized)
+@Suite("Hey clemii foundation", .serialized)
 @MainActor
 struct AssistantFoundationTests {
     private func brief(_ request: String = "Write a friendly reply") -> AssistantBrief {

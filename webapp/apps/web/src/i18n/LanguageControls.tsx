@@ -9,18 +9,20 @@ import { getLocale } from "../paraglide/runtime";
 import "./language.css";
 
 // Read by the head script in shared/site-head.ts: a stored choice always wins.
-const storageKey = "hush.language";
+const storageKey = "clemii.language";
+/** Where a choice made before the rename is kept; read until it is replaced, never written. */
+const formerStorageKey = "hush.language";
 const languageNames: Record<SiteLanguage, string> = { en: "English", de: "Deutsch" };
 
 function storedLanguage(): SiteLanguage | undefined {
   try {
-    const value = localStorage.getItem(storageKey);
+    const value = localStorage.getItem(storageKey) ?? localStorage.getItem(formerStorageKey);
     return value === "en" || value === "de" ? value : undefined;
   } catch { return undefined; }
 }
 
 function rememberLanguage(language: SiteLanguage) {
-  try { localStorage.setItem(storageKey, language); } catch { /* private mode: the choice lasts for this page only */ }
+  try { localStorage.setItem(storageKey, language); localStorage.removeItem(formerStorageKey); } catch { /* private mode: the choice lasts for this page only */ }
 }
 
 /** The same page in the other language when it exists (landing, legal pages), otherwise that language's home. */

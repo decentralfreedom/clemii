@@ -337,7 +337,7 @@ final class ControlCenterSeparatorView: NSView {
 }
 
 extension TimeInterval {
-    var hushCompactDuration: String {
+    var clemiiCompactDuration: String {
         if self < 60 { return "\(Int(self.rounded())) sec" }
         if self < 3600 { return "\(Int((self / 60).rounded())) min" }
         let hours = self / 3600

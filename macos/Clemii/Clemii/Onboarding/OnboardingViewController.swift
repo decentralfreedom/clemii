@@ -20,7 +20,7 @@ final class OnboardingViewController: NSViewController {
         let host = NSHostingView(rootView: root)
         host.frame = NSRect(x: 0, y: 0, width: 1280, height: 860)
         host.setAccessibilityElement(true)
-        host.setAccessibilityIdentifier("hush.onboarding")
+        host.setAccessibilityIdentifier("clemii.onboarding")
         view = host
     }
 
@@ -612,7 +612,7 @@ private struct ImmersiveOnboardingView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.extraLarge)
                 .disabled(!flow.primaryEnabled)
-                .accessibilityIdentifier("hush.onboarding.primary")
+                .accessibilityIdentifier("clemii.onboarding.primary")
         }
         .padding(.horizontal, 40)
         .frame(maxWidth: .infinity)
@@ -687,7 +687,7 @@ private struct OnboardingCompletionOverlay: View {
             .padding(.bottom, 8)
         }
         .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("hush.onboarding.completion")
+        .accessibilityIdentifier("clemii.onboarding.completion")
         .task { await runAnimation() }
     }
 
@@ -1005,7 +1005,7 @@ private struct VoiceOnboardingStep: View {
             .font(.system(size: 54, weight: .bold))
             .tracking(-2.4)
             .accessibilityElement(children: .combine)
-            .accessibilityIdentifier("hush.onboarding.voice.title")
+            .accessibilityIdentifier("clemii.onboarding.voice.title")
 
             Text("Say “Hello clemii, this is my voice.”")
                 .font(.system(size: 19, weight: .medium))
@@ -1017,7 +1017,7 @@ private struct VoiceOnboardingStep: View {
             }
             .buttonStyle(.plain)
             .padding(.top, 28)
-            .accessibilityIdentifier("hush.onboarding.voice")
+            .accessibilityIdentifier("clemii.onboarding.voice")
             .accessibilityLabel(flow.voiceState == .listening ? "Finish voice test" : "Start voice test")
 
             Text(flow.voiceLabel)
@@ -1100,7 +1100,7 @@ private struct LocalTranscriptionMark: View {
         .shadow(color: OnboardingPalette.purple.opacity(0.3), radius: 4, y: 2)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Local transcription activity")
-        .accessibilityIdentifier("hush.onboarding.processingMark")
+        .accessibilityIdentifier("clemii.onboarding.processingMark")
     }
 }
 
@@ -1121,7 +1121,7 @@ private struct VoiceResult: View {
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(OnboardingPalette.ink)
                     .lineLimit(1)
-                    .accessibilityIdentifier("hush.onboarding.transcript")
+                    .accessibilityIdentifier("clemii.onboarding.transcript")
             } else if case .failed(let message) = flow.voiceState {
                 Image(systemName: "exclamationmark.circle.fill").foregroundStyle(.red)
                 Text(message).font(.system(size: 14, weight: .medium)).foregroundStyle(OnboardingPalette.muted)
@@ -1176,7 +1176,7 @@ private struct PermissionSetupOverlay: View {
                         detail: "So clemii can hear your voice.",
                         action: flow.microphoneReady ? "Allowed" : "Allow",
                         ready: flow.microphoneReady,
-                        identifier: "hush.onboarding.microphone",
+                        identifier: "clemii.onboarding.microphone",
                         onTap: flow.requestMicrophone
                     )
                     PermissionRow(
@@ -1185,7 +1185,7 @@ private struct PermissionSetupOverlay: View {
                         detail: "So clemii can type into any app. Opens System Settings.",
                         action: flow.accessibilityReady ? "Enabled" : "Open Settings",
                         ready: flow.accessibilityReady,
-                        identifier: "hush.onboarding.accessibility",
+                        identifier: "clemii.onboarding.accessibility",
                         onTap: flow.requestAccessibility
                     )
                 }
@@ -1200,7 +1200,7 @@ private struct PermissionSetupOverlay: View {
                         .buttonStyle(.borderedProminent)
                         .controlSize(.extraLarge)
                         .disabled(!flow.permissionsReady)
-                        .accessibilityIdentifier("hush.onboarding.permissions.continue")
+                        .accessibilityIdentifier("clemii.onboarding.permissions.continue")
                 }
                 .padding(.top, 16)
                 .overlay(alignment: .top) { Rectangle().fill(OnboardingPalette.ink.opacity(0.07)).frame(height: 1) }
@@ -1276,7 +1276,7 @@ private struct PersonasOnboardingStep: View {
                     title: "Apple Intelligence",
                     detail: "On-device model · No download needed",
                     enabled: flow.personasEnabled,
-                    identifier: "hush.onboarding.personas",
+                    identifier: "clemii.onboarding.personas",
                     onToggle: flow.togglePersonas
                 )
                 .padding(.top, 28)
@@ -1397,7 +1397,7 @@ private struct ProofOnboardingStep: View {
                     title: "Attach proof",
                     detail: "Signed on-device · Audio never shared",
                     enabled: flow.proofEnabled,
-                    identifier: "hush.onboarding.verified",
+                    identifier: "clemii.onboarding.verified",
                     onToggle: flow.toggleProof
                 )
                 .padding(.top, 28)

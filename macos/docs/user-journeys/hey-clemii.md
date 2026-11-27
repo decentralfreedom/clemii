@@ -1,4 +1,4 @@
-# Hey Hush user journey
+# Hey clemii user journey
 
 **Status, 2026-11-01:** local coworker prototype, not release-qualified. The normal entry is now a voice-controlled clemii cursor with a short state label and an Esc control. The old Mail form is retained only as a legacy fixture. No typed conversation field, Preview, Copy, Apply, or Insert button belongs in the coworker experience. See the [PRD](../PRD-hey-hush.md) and [vision audit](../research/2026-11-01-mac-vision-selection.md) for capabilities that still need implementation and qualification.
 
@@ -120,7 +120,7 @@ The checked-sequence implementation and its paired model evaluation are recorded
 
 ## HH-012 - Set up local Assistant models
 
-Workflow > clemii AI contains two native feature cards, Live Write and Assistant (Beta), each with a switch, its real status and one next step (see `clemii-ai.md`). Assistant shows Ready only when its setup prerequisites are ready, and its card offers guided setup directly. Assistant can be turned off; its shortcut then does not open it. There is no global model catalogue and no Hey Hush row in the menu-bar panel. Control + Fn remains the voice entry point.
+Workflow > clemii AI contains two native feature cards, Live Write and Assistant (Beta), each with a switch, its real status and one next step (see `clemii-ai.md`). Assistant shows Ready only when its setup prerequisites are ready, and its card offers guided setup directly. Assistant can be turned off; its shortcut then does not open it. There is no global model catalogue and no Hey clemii row in the menu-bar panel. Control + Fn remains the voice entry point.
 
 Model management belongs to the workflow that uses it. Personas has an expandable **Writing engine** section for Apple Intelligence and the two Qwen options. Each downloadable engine supports Download, Use and Remove. Assistant has **On this Mac** controls for its selected Qwen engine, current transcription model and Kokoro voice. Each row explains the model's role, storage and state. Downloads remain shared, so the same Qwen files serve both workflows without duplication. Bundled transcription files cannot be removed separately; Apple Intelligence remains managed by macOS.
 

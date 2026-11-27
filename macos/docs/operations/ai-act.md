@@ -42,7 +42,7 @@ with its deadline.
 |---|---|---|
 | Live Write clean-up (fillers, grammar, punctuation) | none | Standard editing, exempt: "Grammar correction and spellchecking, linguistic and minor stylistic polishing that do not change the substance, meaning, style or messaging" (guidelines, para. 90) |
 | Live Write writing a requested text, personas changing tone | Art. 50(2) marking | In scope: new text, or "rewriting text that changes style, structure and meaning" |
-| Assistant conversation | Art. 50(1) disclosure | In scope: voice assistants are the guidelines' first example. "Hey Hush" and "Talk to clemii" are the "generic references to 'assistant'" the guidelines call unclear |
+| Assistant conversation | Art. 50(1) disclosure | In scope: voice assistants are the guidelines' first example. "Hey clemii" and "Talk to clemii" are the "generic references to 'assistant'" the guidelines call unclear |
 | Assistant text written into apps | Art. 50(2) marking | In scope |
 | Assistant spoken voice (Kokoro) | Art. 50(2) marking | Residual risk. Point 88 exempts ephemeral real-time output only "when marking is not technically feasible", and audio watermarking exists. The voice is generic, played locally and never stored, and the user is told it is AI |
 
