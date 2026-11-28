@@ -206,7 +206,13 @@ export function createApp(input: {
     },
     referrerPolicy: "no-referrer",
     xFrameOptions: "DENY",
+    crossOriginResourcePolicy: false,
   }));
+  // Resources stay on this origin, except blog covers: the CMS (a clemii.com subdomain) shows them as thumbnails.
+  app.use("*", async (context, next) => {
+    await next();
+    context.header("cross-origin-resource-policy", context.req.path.startsWith("/blog/covers/") ? "same-site" : "same-origin");
+  });
   app.use(
     "/v1/*",
     cors({

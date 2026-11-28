@@ -251,7 +251,11 @@ test("BLOG-015 lists articles as cards with artwork and filters them by topic", 
   const image = cards.first().locator("img.blog-card-image");
   await expect(image).toBeVisible();
   expect(await image.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(800);
-  expect((await request.get((await image.getAttribute("src"))!)).headers()["content-type"]).toBe("image/webp");
+  const cover = (await request.get((await image.getAttribute("src"))!)).headers();
+  expect(cover["content-type"]).toBe("image/webp");
+  // The CMS, on a clemii.com subdomain, shows covers as thumbnails; the pages themselves stay on this origin.
+  expect(cover["cross-origin-resource-policy"]).toBe("same-site");
+  expect((await request.get("/blog")).headers()["cross-origin-resource-policy"]).toBe("same-origin");
   await expect(cards.first().locator(".blog-card-topic")).toHaveText("Dictation without the cloud");
   const topics = page.getByRole("group", { name: "Topics" });
   await expect(topics.getByRole("button", { name: "All" })).toHaveAttribute("aria-pressed", "true");
