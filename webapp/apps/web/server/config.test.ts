@@ -15,6 +15,12 @@ describe("settings named before the rename", () => {
     const config = loadConfig({ NODE_ENV: "test", HUSH_PUBLIC_BASE_URL: "https://old.example", CLEMII_PUBLIC_BASE_URL: "https://clemii.com" });
     expect(config.publicBaseUrl).toBe("https://clemii.com");
   });
+
+  test("an empty CLEMII_ setting counts as missing", () => {
+    // BuildKit sets an optional build secret that was not passed to an empty string.
+    const config = loadConfig({ NODE_ENV: "test", HUSH_PUBLIC_BASE_URL: "https://old.example", CLEMII_PUBLIC_BASE_URL: "" });
+    expect(config.publicBaseUrl).toBe("https://old.example");
+  });
 });
 
 describe("proof short-link configuration", () => {
