@@ -9,10 +9,11 @@
 import { blogAuthors, type BlogAuthorId } from "@clemii/article/authors";
 import { blogClusters, type BlogClusterId } from "@clemii/article/taxonomy";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowUpDown, ChartNoAxesColumn, ImageIcon, Pen, PenLine, Plus, SearchX } from "lucide-react";
+import { ArrowUpDown, ChartNoAxesColumn, Pen, PenLine, Plus, SearchX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useGetPost, useListPosts, type ListPostsStatus, type Post } from "@/api/cms.generated";
 import { PostCelebrationModal } from "@/components/post-celebration-modal";
+import { PostCover } from "@/components/post-cover";
 import { readPublishCelebration, type PublishCelebration } from "@/components/publish-celebration";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -63,22 +64,6 @@ function Status({ post }: { post: Post }) {
   return <span className="text-muted-foreground">Published</span>;
 }
 
-/**
- * A published post's thumbnail, as the blog shows it. The website renders it once the post is published, so a
- * post has none before, and none for the minutes until the website has built it: those show the placeholder.
- * Anchored left, where the cover sets its title.
- */
-function Thumbnail({ src }: { src: string | null }) {
-  const [failed, setFailed] = useState<string | null>(null);
-  return (
-    <span aria-hidden className="flex aspect-[16/10] w-[80px] shrink-0 items-center justify-center overflow-hidden rounded-sm bg-muted lg:w-[100px]">
-      {src && failed !== src
-        ? <img src={src} alt="" width={800} height={420} loading="lazy" decoding="async" onError={() => setFailed(src)} className="size-full object-cover object-left" />
-        : <ImageIcon size={18} className="text-muted-foreground/50" />}
-    </span>
-  );
-}
-
 function PostRow({ post }: { post: Post }) {
   const author = blogAuthors[post.author as BlogAuthorId]?.name ?? post.author;
   const topic = blogClusters[post.cluster as BlogClusterId]?.[post.lang as "en" | "de"] ?? post.cluster;
@@ -87,7 +72,7 @@ function PostRow({ post }: { post: Post }) {
     <li className="group border-b border-border-default hover:bg-table-row-hover">
       <div className="flex items-center gap-3 pr-4">
         <Link to="/posts/$id" params={{ id: post.id }} className="flex min-w-0 flex-1 items-start gap-4 py-4 pl-4 no-underline focus-visible:ring-1 focus-visible:ring-focus-ring focus-visible:ring-inset">
-          <Thumbnail src={post.cover} />
+          <PostCover src={post.cover} className="aspect-[16/10] w-[80px] shrink-0 rounded-sm lg:w-[100px]" />
           <span className="flex min-w-0 flex-1 flex-col gap-1">
             <h3 className="truncate text-md font-semibold tracking-normal text-foreground">{post.rendition?.heading ?? post.title}</h3>
             <span className="truncate text-sm text-text-secondary">

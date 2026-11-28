@@ -3,13 +3,14 @@
 // MIT License, Copyright (c) 2013-2026 Ghost Foundation (see packages/theme/LICENSE.ghost).
 // Changes for clemii (2026-11-15, Clemens Kressmann, AGPL-3.0-only): no email-only
 // or gift variants, the clemii mark and name in place of the site icon and title,
-// and the post read from the CMS.
+// the post read from the CMS, and its cover in place of the feature image.
 //
 // The post-publish celebration on the posts list: the headline, the post as a
 // card linking to it on clemii.com, and the ways to share it.
 import { blogAuthors, type BlogAuthorId } from "@clemii/article/authors";
 import type { Post } from "@/api/cms.generated";
 import { ClemiiLogo } from "@/components/clemii-logo";
+import { PostCover } from "@/components/post-cover";
 import { celebrationCopy } from "@/components/publish-celebration";
 import ShareModal, { type ShareModalSocialLink } from "@/components/ui/share-modal";
 import { articleUrl } from "@/lib/article-url";
@@ -56,6 +57,7 @@ export function PostCelebrationModal({ post, wasPublished, postCount, onClose }:
           </ShareModal.Title>
         </ShareModal.Header>
         <ShareModal.Preview href={url}>
+          {post.cover && <PostCover src={post.cover} className="aspect-video" />}
           <div className="p-6 pt-5">
             <h3 className="scroll-m-20 text-lg font-semibold tracking-tight text-text-primary">{title}</h3>
             {post.description && <p className="line-clamp-2">{post.description}</p>}
