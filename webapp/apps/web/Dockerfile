@@ -46,15 +46,21 @@ WORKDIR /app/apps/web
 # The CMS's public address, so the build works on any builder (the CMS runs as
 # its own service and publishes no host port). ADD re-fetches this URL on every
 # build and keeps the next step's cache only while the site revision is unchanged.
+# Until Coolify passes the CLEMII_ names, the HUSH_ ones stand in (docs/reference/former-name.md).
 ARG HUSH_CMS_URL=https://cms.clemii.com
-ADD ${HUSH_CMS_URL}/v1/site/revision /tmp/cms-revision
+ARG CLEMII_CMS_URL=${HUSH_CMS_URL}
+ADD ${CLEMII_CMS_URL}/v1/site/revision /tmp/cms-revision
 # The read-only token arrives as a build secret and never enters a layer.
-RUN --mount=type=secret,id=HUSH_CMS_TOKEN,env=HUSH_CMS_TOKEN,required=true \
-    HUSH_CMS_URL="$HUSH_CMS_URL" bun scripts/blog/pull-cms.ts /tmp/cms-content \
-    && HUSH_BLOG_CONTENT_DIR=/tmp/cms-content bun run build
+# The script requires one of the two (scripts/blog/pull-cms.ts).
+RUN --mount=type=secret,id=CLEMII_CMS_TOKEN,env=CLEMII_CMS_TOKEN,required=false \
+    --mount=type=secret,id=HUSH_CMS_TOKEN,env=HUSH_CMS_TOKEN,required=false \
+    CLEMII_CMS_URL="$CLEMII_CMS_URL" bun scripts/blog/pull-cms.ts /tmp/cms-content \
+    && CLEMII_BLOG_CONTENT_DIR=/tmp/cms-content bun run build
 
 FROM oven/bun:1.3.9-alpine AS runtime-base
 
+# The data directory keeps its HUSH_ name until Coolify sets the CLEMII_ names: an image default under
+# the new name would win over an old-name setting there (docs/reference/former-name.md).
 WORKDIR /app
 ENV NODE_ENV=production \
     PORT=3000 \

@@ -3,7 +3,7 @@
 //
 // Blog journeys (docs/user-journeys/blog.md). They run against the fixture
 // articles: CI generates them with
-//   HUSH_BLOG_CONTENT_DIR=scripts/blog/fixtures/content bun run blog:generate
+//   CLEMII_BLOG_CONTENT_DIR=scripts/blog/fixtures/content bun run blog:generate
 // before building. With the committed content they skip.
 import { expect, test } from "@playwright/test";
 import { blogPosts } from "../shared/blog-posts.generated";

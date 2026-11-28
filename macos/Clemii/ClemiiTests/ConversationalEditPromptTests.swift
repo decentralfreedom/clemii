@@ -3,7 +3,7 @@ import Testing
 @testable import Clemii
 
 nonisolated private let runQwenConversationE2E =
-    ProcessInfo.processInfo.environment["HUSH_QWEN_CONVERSATION_E2E"] == "1"
+    ProcessInfo.processInfo.environment["CLEMII_QWEN_CONVERSATION_E2E"] == "1"
 
 @Suite("Conversational editing prompts")
 struct ConversationalEditPromptTests {

@@ -208,14 +208,14 @@ describe("only this server counts", () => {
 describe("analytics configuration", () => {
   test("is off unless both settings are given, and refuses half of it", () => {
     expect(loadConfig({ NODE_ENV: "test" }).analytics).toBeUndefined();
-    expect(() => loadConfig({ NODE_ENV: "test", HUSH_UMAMI_URL: "https://umami.example" })).toThrow(/both/);
-    expect(loadConfig({ NODE_ENV: "test", HUSH_UMAMI_URL: "https://umami.example/", HUSH_UMAMI_WEBSITE_ID: analytics.websiteId }).analytics)
+    expect(() => loadConfig({ NODE_ENV: "test", CLEMII_UMAMI_URL: "https://umami.example" })).toThrow(/both/);
+    expect(loadConfig({ NODE_ENV: "test", CLEMII_UMAMI_URL: "https://umami.example/", CLEMII_UMAMI_WEBSITE_ID: analytics.websiteId }).analytics)
       .toEqual(analytics);
   });
 
   test("needs HTTPS in production and the website's UUID", () => {
-    const base = { NODE_ENV: "production", HUSH_PUBLIC_BASE_URL: "https://behu.sh" };
-    expect(() => loadConfig({ ...base, HUSH_UMAMI_URL: "http://umami.example", HUSH_UMAMI_WEBSITE_ID: analytics.websiteId })).toThrow(/HTTPS/);
-    expect(() => loadConfig({ ...base, HUSH_UMAMI_URL: "https://umami.example", HUSH_UMAMI_WEBSITE_ID: "behu.sh" })).toThrow(/UUID/);
+    const base = { NODE_ENV: "production", CLEMII_PUBLIC_BASE_URL: "https://behu.sh" };
+    expect(() => loadConfig({ ...base, CLEMII_UMAMI_URL: "http://umami.example", CLEMII_UMAMI_WEBSITE_ID: analytics.websiteId })).toThrow(/HTTPS/);
+    expect(() => loadConfig({ ...base, CLEMII_UMAMI_URL: "https://umami.example", CLEMII_UMAMI_WEBSITE_ID: "behu.sh" })).toThrow(/UUID/);
   });
 });

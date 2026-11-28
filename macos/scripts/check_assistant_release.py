@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 
 
-MARKERS = (b"Hush/Development/AssistantTraces", b"--assistant-diagnostics", b"CoworkerTrace", b"CoworkerDiagnostics", b"--inspect-mail-editor", b"--test-mail-editor", b"--preview-assistant-sequence", b"--preview-assistant-progress", b"HUSH_COWORKER_LIVE", b"--inspect-browser", b"--test-browser-controls", b"--test-browser-agent", b"HUSH_OPERATION_AB", b"HUSH_BUNDLED_BROWSER_ACTIONS", b"HUSH_TEST_HOST", b"--hud-spaces")
+MARKERS = (b"Clemii/Development/AssistantTraces", b"--assistant-diagnostics", b"CoworkerTrace", b"CoworkerDiagnostics", b"--inspect-mail-editor", b"--test-mail-editor", b"--preview-assistant-sequence", b"--preview-assistant-progress", b"CLEMII_COWORKER_LIVE", b"--inspect-browser", b"--test-browser-controls", b"--test-browser-agent", b"CLEMII_OPERATION_AB", b"CLEMII_BUNDLED_BROWSER_ACTIONS", b"CLEMII_TEST_HOST", b"--hud-spaces")
 
 
 def main():

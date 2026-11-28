@@ -7,7 +7,7 @@ import Testing
 /// transcription of recorded speech, compared against the bundled Whisper model.
 ///
 /// Opt-in because the first run downloads ~800 MB:
-///   TEST_RUNNER_HUSH_PARAKEET_E2E=1 xcodebuild test -project Clemii/Clemii.xcodeproj -scheme Clemii \
+///   TEST_RUNNER_CLEMII_PARAKEET_E2E=1 xcodebuild test -project Clemii/Clemii.xcodeproj -scheme Clemii \
 ///     -only-testing:ClemiiTests/FluidAudioTranscriberIntegrationTests
 ///
 /// The fixtures are synthetic `say` voices (en_US, en_GB, de_DE). They prove the
@@ -16,7 +16,7 @@ import Testing
 @Suite(
     "FluidAudio transcriber integration",
     .serialized,
-    .enabled(if: ProcessInfo.processInfo.environment["HUSH_PARAKEET_E2E"] == "1")
+    .enabled(if: ProcessInfo.processInfo.environment["CLEMII_PARAKEET_E2E"] == "1")
 )
 struct FluidAudioTranscriberIntegrationTests {
     struct Clip: Sendable, CustomTestStringConvertible {

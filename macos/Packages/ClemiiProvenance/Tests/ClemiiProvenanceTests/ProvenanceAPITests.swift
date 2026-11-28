@@ -4,7 +4,7 @@ import Testing
 import CryptoKit
 import OpenAPIRuntime
 
-private let integrationServiceURL = ProcessInfo.processInfo.environment["HUSH_PROVENANCE_E2E_BASE_URL"]
+private let integrationServiceURL = ProcessInfo.processInfo.environment["CLEMII_PROVENANCE_E2E_BASE_URL"]
     .flatMap(URL.init(string:))
 
 @Suite("clemii provenance API")

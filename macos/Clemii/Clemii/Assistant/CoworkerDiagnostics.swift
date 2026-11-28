@@ -12,11 +12,11 @@ final class CoworkerDiagnostics {
     }
     private var stopRecordings: [() -> Void] = []
     static var directory: URL {
-        if let path = ProcessInfo.processInfo.environment["HUSH_ASSISTANT_TRACE_ROOT"] {
+        if let path = ProcessInfo.processInfo.environment["CLEMII_ASSISTANT_TRACE_ROOT"] {
             return URL(fileURLWithPath: path, isDirectory: true)
         }
         return FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Hush/Development/AssistantTraces", isDirectory: true)
+            .appendingPathComponent("Clemii/Development/AssistantTraces", isDirectory: true)
     }
 
     func begin(id: UUID, application: NSRunningApplication?) -> CoworkerTrace? {

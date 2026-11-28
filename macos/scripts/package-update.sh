@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+# shellcheck source=former-names.sh
+source "$(dirname "${BASH_SOURCE[0]}")/former-names.sh"
 
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP_PATH="${1:-${HUSH_RELEASE_DIRECTORY:-${SCRIPT_DIRECTORY}/../artifacts/release}/export/clemii.app}"
+APP_PATH="${1:-${CLEMII_RELEASE_DIRECTORY:-${SCRIPT_DIRECTORY}/../artifacts/release}/export/clemii.app}"
 OUTPUT_DIRECTORY="${2:-${SCRIPT_DIRECTORY}/../artifacts/updates/alpha}"
-UPDATE_ORIGIN="${HUSH_UPDATE_ORIGIN:-https://updates.clemii.com}"
-UPDATE_CHANNEL="${HUSH_UPDATE_CHANNEL:-alpha}"
+UPDATE_ORIGIN="${CLEMII_UPDATE_ORIGIN:-https://updates.clemii.com}"
+UPDATE_CHANNEL="${CLEMII_UPDATE_CHANNEL:-alpha}"
 # The Keychain account holding the Sparkle EdDSA key: a stored name, not an address. Keep it.
-SPARKLE_ACCOUNT="${HUSH_SPARKLE_ACCOUNT:-behu.sh}"
-SPARKLE_BIN_DIRECTORY="${HUSH_SPARKLE_BIN_DIRECTORY:-}"
+SPARKLE_ACCOUNT="${CLEMII_SPARKLE_ACCOUNT:-behu.sh}"
+SPARKLE_BIN_DIRECTORY="${CLEMII_SPARKLE_BIN_DIRECTORY:-}"
 
 if [[ ! -d "${APP_PATH}" ]]; then
   echo "App bundle not found: ${APP_PATH}" >&2
@@ -38,14 +40,14 @@ if [[ -n "${RELEASE_SLUG}" ]] && ! [[ "${RELEASE_SLUG}" =~ ^(alpha|beta|rc)\.[1-
 fi
 
 if [[ -z "${SPARKLE_BIN_DIRECTORY}" ]]; then
-  DERIVED_DATA_DIRECTORY="${HUSH_DERIVED_DATA_PATH:-/tmp/hush-release}"
+  DERIVED_DATA_DIRECTORY="${CLEMII_DERIVED_DATA_PATH:-/tmp/hush-release}"
   CANDIDATE="${DERIVED_DATA_DIRECTORY}/SourcePackages/artifacts/sparkle/Sparkle/bin"
   if [[ -x "${CANDIDATE}/generate_appcast" ]]; then
     SPARKLE_BIN_DIRECTORY="${CANDIDATE}"
   fi
 fi
 if [[ ! -x "${SPARKLE_BIN_DIRECTORY}/generate_appcast" ]]; then
-  echo "Sparkle tools not found. Build clemii once or set HUSH_SPARKLE_BIN_DIRECTORY." >&2
+  echo "Sparkle tools not found. Build clemii once or set CLEMII_SPARKLE_BIN_DIRECTORY." >&2
   exit 1
 fi
 
@@ -56,12 +58,12 @@ ARCHIVE_PATH="${OUTPUT_DIRECTORY}/${ARCHIVE_NAME}"
 rm -f "${ARCHIVE_PATH}"
 ditto -c -k --sequesterRsrc --keepParent "${APP_PATH}" "${ARCHIVE_PATH}"
 
-if [[ -n "${HUSH_RELEASE_NOTES_FILE:-}" ]]; then
-  if [[ ! -f "${HUSH_RELEASE_NOTES_FILE}" ]]; then
-    echo "Release notes file not found: ${HUSH_RELEASE_NOTES_FILE}" >&2
+if [[ -n "${CLEMII_RELEASE_NOTES_FILE:-}" ]]; then
+  if [[ ! -f "${CLEMII_RELEASE_NOTES_FILE}" ]]; then
+    echo "Release notes file not found: ${CLEMII_RELEASE_NOTES_FILE}" >&2
     exit 1
   fi
-  cp "${HUSH_RELEASE_NOTES_FILE}" "${ARCHIVE_PATH%.*}.md"
+  cp "${CLEMII_RELEASE_NOTES_FILE}" "${ARCHIVE_PATH%.*}.md"
 fi
 
 # hush (builds 18 and older) reads this channel too and shares the EdDSA key, so Sparkle

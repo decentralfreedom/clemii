@@ -36,7 +36,7 @@ final class RecordingJournal {
     /// Tests and previews never touch the user's recordings.
     nonisolated static var defaultDirectory: URL {
         let environment = ProcessInfo.processInfo.environment
-        if environment["HUSH_TEST_HOST"] == "1" || environment["XCTestConfigurationFilePath"] != nil {
+        if environment["CLEMII_TEST_HOST"] == "1" || environment["XCTestConfigurationFilePath"] != nil {
             return FileManager.default.temporaryDirectory.appendingPathComponent("hush-recordings-\(ProcessInfo.processInfo.processIdentifier)")
         }
         return AIModelStorage.root.deletingLastPathComponent().appendingPathComponent("Recordings", isDirectory: true)

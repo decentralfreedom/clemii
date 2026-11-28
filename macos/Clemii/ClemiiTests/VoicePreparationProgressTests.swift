@@ -34,7 +34,7 @@ struct VoicePreparationProgressTests {
         #expect(panel.subviews.allSatisfy { $0.frame.maxY <= panel.bounds.height })
     }
 
-    @Test(.enabled(if: ProcessInfo.processInfo.environment["HUSH_PROGRESS_FIXTURE"] != nil))
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["CLEMII_PROGRESS_FIXTURE"] != nil))
     func actualURLSessionTransferReportsIntermediatePercentage() async throws {
         let url = URL(string: "http://127.0.0.1:3017/voice.bin")!
         let session = URLSession(configuration: .ephemeral)

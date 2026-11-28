@@ -4,7 +4,7 @@ import XCTest
 
 final class BrowserInspectionTests: XCTestCase {
     func testSafariTabStructure() throws {
-        try XCTSkipUnless(ProcessInfo.processInfo.environment["HUSH_BROWSER_INSPECT"] == "1")
+        try XCTSkipUnless(ProcessInfo.processInfo.environment["CLEMII_BROWSER_INSPECT"] == "1")
         let safari = XCUIApplication(bundleIdentifier: "com.apple.Safari")
         XCTAssertTrue(safari.windows.firstMatch.exists)
         print("[browser-inspect] AX trusted: \(AXIsProcessTrusted())")

@@ -66,7 +66,7 @@ class InstallerLayoutChecks(unittest.TestCase):
         script = Path(__file__).resolve().parents[1] / "release-dmg.sh"
         result = subprocess.run(["/bin/bash", str(script), "--app", "missing.app"],
                                 capture_output=True, text=True,
-                                env=dict(os.environ, HUSH_DMG_HEADLESS="1", HUSH_NOTARIZE="1"))
+                                env=dict(os.environ, CLEMII_DMG_HEADLESS="1", CLEMII_NOTARIZE="1"))
         self.assertEqual(result.returncode, 1)
         self.assertIn("only allowed with --local", result.stderr)
 
@@ -137,7 +137,7 @@ class NotaryChecks(unittest.TestCase):
                 tool_source = f"#!{sys.executable}\n" + '''import json, os, pathlib, sys
 tool = pathlib.Path(sys.argv[0]).name
 args = sys.argv[1:]
-with open(os.environ["HUSH_TEST_COMMANDS"], "a") as log:
+with open(os.environ["CLEMII_TEST_COMMANDS"], "a") as log:
     log.write(json.dumps([tool, *args]) + "\\n")
 if tool == "create-dmg":
     pathlib.Path(args[-2]).write_bytes(b"packaging fixture")
@@ -146,16 +146,16 @@ if tool == "codesign":
         if arg.startswith("--extract-certificates="):
             pathlib.Path(arg.split("=", 1)[1] + "0").write_bytes(b"certificate fixture")
 if tool == "python3" and pathlib.Path(args[0]).name == "notarize_artifact.py":
-    sys.exit(int(os.environ["HUSH_TEST_NOTARY_EXIT"]))
+    sys.exit(int(os.environ["CLEMII_TEST_NOTARY_EXIT"]))
 '''
                 for name in ("python3", "create-dmg", "codesign", "xcrun"):
                     tool = binaries / name
                     tool.write_text(tool_source)
                     tool.chmod(0o755)
-                environment = {key: value for key, value in os.environ.items() if not key.startswith("HUSH_")}
+                environment = {key: value for key, value in os.environ.items() if not key.startswith(("HUSH_", "CLEMII_"))}
                 environment.update(PATH=f"{binaries}:{os.environ['PATH']}",
-                                   HUSH_NOTARIZE="1", HUSH_TEST_NOTARY_EXIT=str(notary_exit),
-                                   HUSH_TEST_COMMANDS=str(commands_path))
+                                   CLEMII_NOTARIZE="1", CLEMII_TEST_NOTARY_EXIT=str(notary_exit),
+                                   CLEMII_TEST_COMMANDS=str(commands_path))
                 output = root / "clemii.dmg"
                 script = Path(__file__).resolve().parents[1] / "release-dmg.sh"
                 result = subprocess.run(["/bin/bash", str(script), "--app", str(app),
@@ -182,8 +182,8 @@ if tool == "python3" and pathlib.Path(args[0]).name == "notarize_artifact.py":
             fake_xcode = root / "xcodebuild"
             fake_xcode.write_text('#!/bin/sh\n[ "$1" != "-version" ] || exit 0\nprintf "%s\\n" "$@"\nexit 42\n')
             fake_xcode.chmod(0o755)
-            environment = {key: value for key, value in os.environ.items() if not key.startswith("HUSH_")}
-            environment.update(PATH=f"{root}:{os.environ['PATH']}", HUSH_RELEASE_DIRECTORY=str(root / "release"))
+            environment = {key: value for key, value in os.environ.items() if not key.startswith(("HUSH_", "CLEMII_"))}
+            environment.update(PATH=f"{root}:{os.environ['PATH']}", CLEMII_RELEASE_DIRECTORY=str(root / "release"))
             script = Path(__file__).resolve().parents[1] / "build-dmg.sh"
             result = subprocess.run(["/bin/bash", str(script)], capture_output=True, text=True, env=environment)
             self.assertEqual(result.returncode, 42, result.stderr)
@@ -193,7 +193,7 @@ if tool == "python3" and pathlib.Path(args[0]).name == "notarize_artifact.py":
             self.assertNotIn("-skipMacroValidation", result.stdout)
 
     def test_submission_requires_explicit_opt_in(self):
-        environment = dict(os.environ, HUSH_NOTARIZE="0")
+        environment = dict(os.environ, CLEMII_NOTARIZE="0")
         script = Path(__file__).resolve().parents[1] / "notarize_artifact.py"
         result = subprocess.run([sys.executable, str(script), "missing.app"],
                                 capture_output=True, text=True, env=environment)
@@ -239,10 +239,10 @@ if tool == "python3" and pathlib.Path(args[0]).name == "notarize_artifact.py":
                 self.assertEqual(any("staple" in command for command in commands), status == "Accepted")
 
 
-@unittest.skipUnless(os.environ.get("HUSH_DISTRIBUTION_TEST_APP"), "requires an exported app")
+@unittest.skipUnless(os.environ.get("CLEMII_DISTRIBUTION_TEST_APP"), "requires an exported app")
 class ExportedBundleChecks(unittest.TestCase):
     def test_modified_resource_invalidates_actual_export(self):
-        original = Path(os.environ["HUSH_DISTRIBUTION_TEST_APP"])
+        original = Path(os.environ["CLEMII_DISTRIBUTION_TEST_APP"])
         script = Path(__file__).resolve().parents[1] / "check_distribution.py"
         with tempfile.TemporaryDirectory(prefix="hush-seal-test-") as temporary:
             candidate = Path(temporary) / "clemii.app"

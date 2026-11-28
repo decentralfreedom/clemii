@@ -1,33 +1,38 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+# shellcheck source=former-names.sh
+source "$(dirname "${BASH_SOURCE[0]}")/former-names.sh"
 
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPOSITORY_DIRECTORY="$(cd "${SCRIPT_DIRECTORY}/.." && pwd)"
-UPDATE_ENV_FILE="${HUSH_UPDATE_ENV_FILE:-${REPOSITORY_DIRECTORY}/.env.update.local}"
+UPDATE_ENV_FILE="${CLEMII_UPDATE_ENV_FILE:-${REPOSITORY_DIRECTORY}/.env.update.local}"
 
 if [[ -f "${UPDATE_ENV_FILE}" ]]; then
   set -a
   # shellcheck disable=SC1090
   source "${UPDATE_ENV_FILE}"
   set +a
+  # The settings file may still use the HUSH_ names.
+  # shellcheck source=former-names.sh
+  source "${SCRIPT_DIRECTORY}/former-names.sh"
 fi
 
-APP_PATH="${HUSH_APP_PATH:-${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}/export/clemii.app}"
-UPDATE_CHANNEL="${HUSH_UPDATE_CHANNEL:-alpha}"
-RELEASE_DIRECTORY="${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}"
+APP_PATH="${CLEMII_APP_PATH:-${CLEMII_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}/export/clemii.app}"
+UPDATE_CHANNEL="${CLEMII_UPDATE_CHANNEL:-alpha}"
+RELEASE_DIRECTORY="${CLEMII_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}"
 # Each publish stages a fresh mirror of the published channel inside its release
 # directory. generate_appcast moves superseded files into old_updates/, so a folder
 # reused across releases carries stale files that collide with the next run.
-if [[ -n "${HUSH_UPDATE_DIRECTORY:-}" ]]; then
-  UPDATE_DIRECTORY="${HUSH_UPDATE_DIRECTORY}"
+if [[ -n "${CLEMII_UPDATE_DIRECTORY:-}" ]]; then
+  UPDATE_DIRECTORY="${CLEMII_UPDATE_DIRECTORY}"
 else
   mkdir -p "${RELEASE_DIRECTORY}"
   UPDATE_DIRECTORY="$(mktemp -d "${RELEASE_DIRECTORY}/updates.XXXXXX")/${UPDATE_CHANNEL}"
 fi
-R2_BUCKET="${HUSH_R2_BUCKET:-hush}"
-R2_ENDPOINT="${HUSH_R2_ENDPOINT:-}"
-DMG_PATH="${HUSH_DMG_PATH:-}"
+R2_BUCKET="${CLEMII_R2_BUCKET:-hush}"
+R2_ENDPOINT="${CLEMII_R2_ENDPOINT:-}"
+DMG_PATH="${CLEMII_DMG_PATH:-}"
 
 # Never publish a local, unnotarized or damaged candidate, even if credentials exist.
 python3 "${SCRIPT_DIRECTORY}/check_distribution.py" "${APP_PATH}" --phase postflight
@@ -41,7 +46,7 @@ if ! command -v aws >/dev/null 2>&1; then
   exit 1
 fi
 if [[ -z "${R2_ENDPOINT}" ]]; then
-  echo "HUSH_R2_ENDPOINT is required, for example https://ACCOUNT_ID.r2.cloudflarestorage.com" >&2
+  echo "CLEMII_R2_ENDPOINT is required, for example https://ACCOUNT_ID.r2.cloudflarestorage.com" >&2
   exit 1
 fi
 if [[ -z "${AWS_ACCESS_KEY_ID:-}" || -z "${AWS_SECRET_ACCESS_KEY:-}" ]]; then

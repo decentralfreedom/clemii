@@ -40,7 +40,7 @@ artifacts.
 If port 3000 is already used by the native development server, choose another host port without changing the container contract:
 
 ```sh
-HUSH_COMPOSE_PORT=4300 docker compose up --build
+CLEMII_COMPOSE_PORT=4300 docker compose up --build
 ```
 
 ## 1. Create the service
@@ -134,7 +134,7 @@ For external key management, generate a key locally and provide the two output v
 bun run key:generate hush-production-1
 ```
 
-Set `HUSH_SERVICE_KEY_ID` and `HUSH_SERVICE_PRIVATE_JWK`, mark the private JWK as a secret, and disable Build Variable. An environment key takes precedence over the volume-managed key; its public key is added to the key set like any other. The generated key does not need this: `HUSH_SERVICE_KEY_ID` only names a key supplied this way.
+Set `CLEMII_SERVICE_KEY_ID` and `CLEMII_SERVICE_PRIVATE_JWK`, mark the private JWK as a secret, and disable Build Variable. An environment key takes precedence over the volume-managed key; its public key is added to the key set like any other. The generated key does not need this: `CLEMII_SERVICE_KEY_ID` only names a key supplied this way.
 
 ## 4. Deploy
 
@@ -217,7 +217,7 @@ ever appears in a terminal log, chat or ticket, rotate.
 
 ## Optional external storage
 
-For multiple web replicas, replace the local encrypted-object volume with S3-compatible storage and configure `HUSH_S3_BUCKET`, `HUSH_S3_REGION`, `HUSH_S3_ENDPOINT`, `HUSH_S3_ACCESS_KEY_ID`, and `HUSH_S3_SECRET_ACCESS_KEY`. PostgreSQL remains the source of truth. The included single-web-service stack does not require S3.
+For multiple web replicas, replace the local encrypted-object volume with S3-compatible storage and configure `CLEMII_S3_BUCKET`, `CLEMII_S3_REGION`, `CLEMII_S3_ENDPOINT`, `CLEMII_S3_ACCESS_KEY_ID`, and `CLEMII_S3_SECRET_ACCESS_KEY`. PostgreSQL remains the source of truth. The included single-web-service stack does not require S3.
 
 ## Zero-downtime deployments
 
@@ -245,13 +245,13 @@ Docker Swarm, Kubernetes, Fly.io) works without code changes:
 | --- | --- |
 | `GET /health/live` | 200 while the process runs, including while draining. Use for liveness only. |
 | `GET /health/ready` | 200 only when the instance is not draining and PostgreSQL answers within 2 seconds; otherwise 503. Never cached. Use for readiness and routing. During a deploy the proxy may still send a few requests to the draining instance, so `https://behu.sh/health/ready` can briefly answer 503 while every page succeeds. Point external uptime monitors at `/health/live` or a page, not at `/health/ready`. |
-| `SIGTERM` | Report not-ready and keep serving for `HUSH_SHUTDOWN_DRAIN_MS` (default 10000), answering with `Connection: close` so the proxy stops reusing keep-alive connections to this instance. Then wait (at most 10 seconds) for in-flight requests, close every remaining connection at once, close the database and exit 0. Leaving idle keep-alive connections open made requests sent on them hang until they timed out. |
+| `SIGTERM` | Report not-ready and keep serving for `CLEMII_SHUTDOWN_DRAIN_MS` (default 10000), answering with `Connection: close` so the proxy stops reusing keep-alive connections to this instance. Then wait (at most 10 seconds) for in-flight requests, close every remaining connection at once, close the database and exit 0. Leaving idle keep-alive connections open made requests sent on them hang until they timed out. |
 | Configuration | Environment variables only. No host port, container name or IP is required. |
 | Migrations | Applied at start under a PostgreSQL advisory lock, so concurrent starts never race. |
 | Background cleanup | Idempotent; two instances may run it during an overlap. |
 | Shared volume | Object writes are atomic (temporary file, then rename). |
-| `HUSH_READ_ONLY=1` | Proof writes return 503 with `Retry-After: 300`; pages and proof reads keep working. Used during data moves. |
-| `HUSH_UMAMI_URL`, `HUSH_UMAMI_WEBSITE_ID` | Optional, set together (PRD R10). The server then counts page views and downloads and sends them to that Umami (`/api/send`). Without them nothing is counted. There is no browser tracker. |
+| `CLEMII_READ_ONLY=1` | Proof writes return 503 with `Retry-After: 300`; pages and proof reads keep working. Used during data moves. |
+| `CLEMII_UMAMI_URL`, `CLEMII_UMAMI_WEBSITE_ID` | Optional, set together (PRD R10). The server then counts page views and downloads and sends them to that Umami (`/api/send`). Without them nothing is counted. There is no browser tracker. |
 
 **Migrations must stay additive.** The previous release keeps serving from the
 new schema until its replacement is healthy. Add tables, nullable columns and
@@ -265,19 +265,19 @@ running version uses it.
 3. **Health Check**: enable it with path `/health/ready`, port `3000`, interval 5 seconds, timeout 2 seconds, retries 3, start period 10 seconds. The dashboard check replaces the image's slower `HEALTHCHECK`.
 4. **Advanced > Operations > Stop Grace Period**: 30 seconds (Coolify's default). The drain (10 seconds) plus in-flight requests must finish well inside it.
 5. **Container Labels**: keep **Managed by Coolify**. No retry middleware is needed: the end-to-end check below runs with Coolify's generated labels and no retry, and drops no requests. Hand-edited labels would stop following domain changes.
-6. **Environment Variables** (runtime only): `NODE_ENV=production`, `PORT=3000`, `HUSH_PUBLIC_BASE_URL=https://behu.sh`, `HUSH_DATA_DIR=/app/data`, `HUSH_SERVICE_KEY_ID`, and `DATABASE_URL` from the `hush-postgres` resource's internal connection URL.
+6. **Environment Variables** (runtime only): `NODE_ENV=production`, `PORT=3000`, `CLEMII_PUBLIC_BASE_URL=https://behu.sh`, `CLEMII_DATA_DIR=/app/data`, `CLEMII_SERVICE_KEY_ID`, and `DATABASE_URL` from the `hush-postgres` resource's internal connection URL.
    - Visit counting:
-     - `HUSH_UMAMI_URL=https://umami.decentralfreedom.com`, the operator's Umami.
-     - `HUSH_UMAMI_WEBSITE_ID`, the UUID of the Umami website `hush` / `behu.sh`.
+     - `CLEMII_UMAMI_URL=https://umami.decentralfreedom.com`, the operator's Umami.
+     - `CLEMII_UMAMI_WEBSITE_ID`, the UUID of the Umami website `hush` / `behu.sh`.
    - Cloudflare Access protects Umami except `/script.js` and `/api/send`, so this server needs no Access credentials to send.
 7. **Persistent Storage**: one volume mounted at `/app/data`.
 8. Automatic deployment settings stay as in "Automatic website deployments" above.
 9. **Blog from the CMS**: under **Build**, set **Docker Build Stage Target** to
-   `runtime-cms` and enable **Use Docker Build Secrets**. Add `HUSH_CMS_TOKEN`
+   `runtime-cms` and enable **Use Docker Build Secrets**. Add `CLEMII_CMS_TOKEN`
    (a read-only token from `bun run cms:token --name website-build --scopes
    posts:read` in the `cms` container) as a locked variable that is available
    at build time and not at runtime. The build reads the CMS at its public
-   address (`HUSH_CMS_URL`, default `https://cms.clemii.com`), so it works on any
+   address (`CLEMII_CMS_URL`, default `https://cms.clemii.com`), so it works on any
    builder; the token is the only credential it needs. Without these settings the image
    builds the default target `runtime`, with the blog from `content/blog`.
 
@@ -334,7 +334,7 @@ production for at least a week.
 5. **Rehearse rolling updates** on the temporary domain: redeploy three times
    while polling it every 200 milliseconds. Require zero non-2xx responses.
 6. **Cut over.**
-   1. Set `HUSH_READ_ONLY=1` on the Compose resource and redeploy it. Proof
+   1. Set `CLEMII_READ_ONLY=1` on the Compose resource and redeploy it. Proof
       publishing pauses; every page stays up.
    2. Take a final `pg_dump` and restore it into `hush-postgres`; copy any
       objects created since step 3.
@@ -343,5 +343,5 @@ production for at least a week.
    4. Verify `/health/ready`, a proof, and the pages on `https://behu.sh`.
    5. Stop (do not delete) the Compose resource.
 7. **Rollback**: move the domain back to the Compose resource, remove
-   `HUSH_READ_ONLY`, and redeploy it. Its database and volume are untouched
+   `CLEMII_READ_ONLY`, and redeploy it. Its database and volume are untouched
    until the final cleanup.

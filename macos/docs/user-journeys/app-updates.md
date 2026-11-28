@@ -40,7 +40,7 @@ Sparkle's EdDSA verification before it can replace the installed app.
 - All archives and appcasts are served over HTTPS.
 - Public packaging requires Developer ID signing, a validated staple and a
   successful Gatekeeper assessment. Local candidate preparation never submits
-  to Apple unless `HUSH_NOTARIZE=1` is explicitly set.
+  to Apple unless `CLEMII_NOTARIZE=1` is explicitly set.
 - Developer ID signing and Apple notarization are additive release stages. They
   must not change the app ID, appcast URL, or Sparkle public key.
 - Automatic checks and downloads may run in the background, but clemii never

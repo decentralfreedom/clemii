@@ -533,11 +533,11 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = NO;
-				HUSH_RELEASE_CHANNEL = "Alpha 10";
-				HUSH_RELEASE_SLUG = alpha.10;
-				HUSH_UPDATE_FEED_URL = "https://updates.clemii.com/alpha/appcast.xml";
-				HUSH_PROOF_SERVICE_URL = "http://127.0.0.1:3000";
-				HUSH_PROOF_SHORT_URL = "http://127.0.0.1:3000/s/";
+				CLEMII_RELEASE_CHANNEL = "Alpha 10";
+				CLEMII_RELEASE_SLUG = alpha.10;
+				CLEMII_UPDATE_FEED_URL = "https://updates.clemii.com/alpha/appcast.xml";
+				CLEMII_PROOF_SERVICE_URL = "http://127.0.0.1:3000";
+				CLEMII_PROOF_SHORT_URL = "http://127.0.0.1:3000/s/";
 				INFOPLIST_FILE = Clemii/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -571,11 +571,11 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = NO;
-				HUSH_RELEASE_CHANNEL = "Alpha 10";
-				HUSH_RELEASE_SLUG = alpha.10;
-				HUSH_UPDATE_FEED_URL = "https://updates.clemii.com/alpha/appcast.xml";
-				HUSH_PROOF_SERVICE_URL = "https://clemii.com";
-				HUSH_PROOF_SHORT_URL = "https://clemii.com/s/";
+				CLEMII_RELEASE_CHANNEL = "Alpha 10";
+				CLEMII_RELEASE_SLUG = alpha.10;
+				CLEMII_UPDATE_FEED_URL = "https://updates.clemii.com/alpha/appcast.xml";
+				CLEMII_PROOF_SERVICE_URL = "https://clemii.com";
+				CLEMII_PROOF_SHORT_URL = "https://clemii.com/s/";
 				INFOPLIST_FILE = Clemii/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

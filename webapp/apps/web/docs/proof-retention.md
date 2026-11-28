@@ -53,7 +53,7 @@ Use an isolated disposable PostgreSQL database, never a production URL:
 
 ```sh
 DATABASE_URL=postgresql://postgres@127.0.0.1:55439/hush_test bun run db:migrate
-HUSH_TEST_DATABASE_URL=postgresql://postgres@127.0.0.1:55439/hush_test bun test server/services/proof-cleanup.test.ts
+CLEMII_TEST_DATABASE_URL=postgresql://postgres@127.0.0.1:55439/hush_test bun test server/services/proof-cleanup.test.ts
 ```
 
 Normal `bun test server` runs the SQLite/filesystem contract. Both use synthetic

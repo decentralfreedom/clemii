@@ -73,7 +73,7 @@ def notarize(artifact, profile, team, reports, resume=None):
     submission_id = state["id"]
     print(f"Submission saved: {submission_id}\nReport: {state_path}", flush=True)
     result = run("/usr/bin/xcrun", "notarytool", "wait", submission_id, *auth,
-                 "--timeout", os.environ.get("HUSH_NOTARY_TIMEOUT", "15m"),
+                 "--timeout", os.environ.get("CLEMII_NOTARY_TIMEOUT", "15m"),
                  "--output-format", "json", required=False)
     # Query explicitly: command completion alone is not evidence of acceptance.
     status = run("/usr/bin/xcrun", "notarytool", "info", submission_id, *auth,
@@ -102,13 +102,13 @@ def main():
     parser.add_argument("artifact", type=Path)
     parser.add_argument("--resume")
     args = parser.parse_args()
-    if os.environ.get("HUSH_NOTARIZE") != "1":
-        parser.error("Submission is opt-in. Review the candidate before setting HUSH_NOTARIZE=1.")
+    if os.environ.get("CLEMII_NOTARIZE") != "1":
+        parser.error("Submission is opt-in. Review the candidate before setting CLEMII_NOTARIZE=1.")
     root = Path(__file__).resolve().parent.parent
     try:
-        notarize(args.artifact, os.environ.get("HUSH_NOTARY_KEYCHAIN_PROFILE", "HushNotary"),
-                 os.environ.get("HUSH_DEVELOPMENT_TEAM", "3A22UK7C9L"),
-                 Path(os.environ.get("HUSH_NOTARY_REPORTS", str(root / "artifacts/notarization"))),
+        notarize(args.artifact, os.environ.get("CLEMII_NOTARY_KEYCHAIN_PROFILE", "HushNotary"),
+                 os.environ.get("CLEMII_DEVELOPMENT_TEAM", "3A22UK7C9L"),
+                 Path(os.environ.get("CLEMII_NOTARY_REPORTS", str(root / "artifacts/notarization"))),
                  args.resume)
     except (RuntimeError, ValueError, OSError, KeyError, subprocess.SubprocessError) as error:
         print(error, file=sys.stderr)

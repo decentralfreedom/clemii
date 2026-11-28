@@ -31,14 +31,14 @@ is writing that platform's configuration from it, and copying the data.
 
 | Service | Image | Port | Health | Runs | State |
 | --- | --- | --- | --- | --- | --- |
-| Website and proof service (`web`) | `apps/web/Dockerfile`, target `runtime-cms` in production | 3000 | `/health/live`, `/health/ready` | Any number of copies once proof objects are in S3; one while they are on disk | PostgreSQL (`DATABASE_URL`); proof objects in S3 or on disk (`HUSH_DATA_DIR`); the proof-signing key in `HUSH_DATA_DIR` (a persistent volume) |
+| Website and proof service (`web`) | `apps/web/Dockerfile`, target `runtime-cms` in production | 3000 | `/health/live`, `/health/ready` | Any number of copies once proof objects are in S3; one while they are on disk | PostgreSQL (`DATABASE_URL`); proof objects in S3 or on disk (`CLEMII_DATA_DIR`); the proof-signing key in `CLEMII_DATA_DIR` (a persistent volume) |
 | CMS API and admin (`cms`) | `apps/cms/Dockerfile` | 3100 | `/health/live`, `/health/ready` | Any number of copies | PostgreSQL (`CMS_DATABASE_URL`); images and backups in S3-compatible buckets |
 | CMS scheduler (`cms-scheduler`) | `apps/cms/Dockerfile`, target `scheduler` (or the default image with the command `bun run cms:scheduler`) | 3100, health only | `/health/live`, `/health/ready` (a tick succeeded in the last five minutes) | **One copy** (two for a moment during a rolling update are safe); on Kubernetes one replica | as the API |
 | Databases | `postgres:17-alpine`, or the platform's managed PostgreSQL 17 | 5432 | `pg_isready` | one each for web and CMS | a persistent volume, or managed |
 
 Building the production website reads the CMS: it needs the build argument
-`HUSH_CMS_URL` (default `https://cms.clemii.com`) and the build secret
-`HUSH_CMS_TOKEN` (a read-only CMS token). Publishing a post rebuilds the site;
+`CLEMII_CMS_URL` (default `https://cms.clemii.com`) and the build secret
+`CLEMII_CMS_TOKEN` (a read-only CMS token). Publishing a post rebuilds the site;
 today the scheduler asks Coolify for that build (`CMS_COOLIFY_*`), so on another
 platform this trigger is the one setting to point at its deploy hook.
 
@@ -76,7 +76,7 @@ traffic during a rolling update.
   bucket; `bun run cms:restore --target-url <new database>` restores the newest
   into the new database ([CMS operations](../../webapp/apps/cms/README.md)).
 - **Website database**: `pg_dump` and `pg_restore` between the two PostgreSQL servers.
-- **Website proof objects and signing key**: copy `HUSH_DATA_DIR` to the new
+- **Website proof objects and signing key**: copy `CLEMII_DATA_DIR` to the new
   volume. A new signing key is also fine: earlier proofs stay valid through the
   published key set ([signing key rotation](../../webapp/apps/web/docs/operations/coolify-deployment.md#signing-key-rotation)).
 - **Images and backups** stay in their buckets; only the credentials move.

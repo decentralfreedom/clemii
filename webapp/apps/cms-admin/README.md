@@ -18,7 +18,7 @@ Needs a PostgreSQL server for a throwaway database, the same one the CMS tests u
 cd webapp
 bun install --frozen-lockfile
 cd apps/cms-admin
-HUSH_TEST_DATABASE_URL=postgresql://hush:hush-test@127.0.0.1:5432/hush_test bun run dev
+CLEMII_TEST_DATABASE_URL=postgresql://hush:hush-test@127.0.0.1:5432/hush_test bun run dev
 ```
 
 Open http://localhost:5174/__e2e/sign-in in Chrome or Firefox. `bun run dev`

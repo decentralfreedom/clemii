@@ -79,7 +79,7 @@ jobs:
       - name: Test Swift against the local service
         run: |
           cd webapp/apps/web
-          NODE_ENV=test PORT=4300 HUSH_PUBLIC_BASE_URL=http://127.0.0.1:4300 bun server/index.ts > "$RUNNER_TEMP/hush-service.log" 2>&1 &
+          NODE_ENV=test PORT=4300 CLEMII_PUBLIC_BASE_URL=http://127.0.0.1:4300 bun server/index.ts > "$RUNNER_TEMP/hush-service.log" 2>&1 &
           service_pid=$!
           trap 'kill "$service_pid" 2>/dev/null || true' EXIT
           ready=0
@@ -90,7 +90,7 @@ jobs:
           done
           if [ "$ready" != 1 ]; then cat "$RUNNER_TEMP/hush-service.log"; exit 1; fi
           cd ../../..
-          HUSH_PROVENANCE_E2E_BASE_URL=http://127.0.0.1:4300 swift test --package-path macos/Packages/ClemiiProvenance --force-resolved-versions --filter enrollsAndPublishesWithHonoService
+          CLEMII_PROVENANCE_E2E_BASE_URL=http://127.0.0.1:4300 swift test --package-path macos/Packages/ClemiiProvenance --force-resolved-versions --filter enrollsAndPublishesWithHonoService
       # Swift packages (MLX, WhisperKit, FluidAudio) and their build products dominate the
       # build; the newest cache for these resolved versions is restored and the build updates it.
       - name: Restore the Swift packages and the native build

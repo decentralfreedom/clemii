@@ -14,14 +14,14 @@ struct ProofServiceConfiguration: Equatable {
         environment: [String: String] = ProcessInfo.processInfo.environment,
         infoDictionary: [String: Any] = Bundle.main.infoDictionary ?? [:]
     ) -> ProofServiceConfiguration {
-        let environmentServiceURL = validURL(environment["HUSH_PROOF_SERVICE_URL"])
+        let environmentServiceURL = validURL(environment["CLEMII_PROOF_SERVICE_URL"])
         let bundledServiceURL = validURL(infoDictionary["ClemiiProofServiceURL"] as? String)
         let serviceURL = environmentServiceURL
             ?? bundledServiceURL
             ?? productionServiceURL
 
         let bundledShortURL = validURL(infoDictionary["ClemiiProofShortURL"] as? String)
-        let proofURLBaseURL = validURL(environment["HUSH_PROOF_SHORT_URL"])
+        let proofURLBaseURL = validURL(environment["CLEMII_PROOF_SHORT_URL"])
             ?? environmentServiceURL?.appending(path: "s")
             ?? bundledShortURL
             ?? serviceURL.appending(path: "s")

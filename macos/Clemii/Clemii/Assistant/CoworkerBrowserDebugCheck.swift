@@ -29,7 +29,7 @@ enum CoworkerBrowserDebugCheck {
                 if !args.contains("--inspect-browser") {
                     safari.activate()
                     try await Task.sleep(for: .milliseconds(400))
-                    let goal = ProcessInfo.processInfo.environment["HUSH_BROWSER_GOAL"] ?? "Open a new tab, go to https://www.youtube.com/, search for David Guetta and open the first music video."
+                    let goal = ProcessInfo.processInfo.environment["CLEMII_BROWSER_GOAL"] ?? "Open a new tab, go to https://www.youtube.com/, search for David Guetta and open the first music video."
                     if args.contains("--test-browser-agent") {
                         CoworkerDiagnostics.shared.enabled = true
                         let controller = AssistantCompanionController(voiceEnabled: false)
@@ -102,7 +102,7 @@ enum CoworkerBrowserDebugCheck {
                 }
             } catch { report["error"] = String(describing: error); report["description"] = error.localizedDescription }
             report["duration"] = String(describing: started.duration(to: .now))
-            let path = ProcessInfo.processInfo.environment["HUSH_BROWSER_PROBE_PATH"] ?? "/private/tmp/hush-browser-check.json"
+            let path = ProcessInfo.processInfo.environment["CLEMII_BROWSER_PROBE_PATH"] ?? "/private/tmp/hush-browser-check.json"
             if let data = try? JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys]) {
                 try? data.write(to: URL(fileURLWithPath: path), options: .atomic)
                 try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)

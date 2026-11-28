@@ -19,8 +19,8 @@ struct ProofServiceConfigurationTests {
     @Test func environmentCanSelectLocalDevelopmentServer() throws {
         let configuration = ProofServiceConfiguration.resolve(
             environment: [
-                "HUSH_PROOF_SERVICE_URL": "http://127.0.0.1:3000",
-                "HUSH_PROOF_SHORT_URL": "http://127.0.0.1:3000/s/",
+                "CLEMII_PROOF_SERVICE_URL": "http://127.0.0.1:3000",
+                "CLEMII_PROOF_SHORT_URL": "http://127.0.0.1:3000/s/",
             ],
             infoDictionary: [
                 "ClemiiProofServiceURL": "https://clemii.com",
@@ -34,7 +34,7 @@ struct ProofServiceConfigurationTests {
 
     @Test func serviceOverrideDerivesMatchingShortURL() throws {
         let configuration = ProofServiceConfiguration.resolve(
-            environment: ["HUSH_PROOF_SERVICE_URL": "http://localhost:4000"],
+            environment: ["CLEMII_PROOF_SERVICE_URL": "http://localhost:4000"],
             infoDictionary: [
                 "ClemiiProofServiceURL": "https://clemii.com",
                 "ClemiiProofShortURL": "https://clemii.com/s/",
@@ -48,8 +48,8 @@ struct ProofServiceConfigurationTests {
     @Test func unsafeRemoteHTTPOverrideFailsClosed() throws {
         let configuration = ProofServiceConfiguration.resolve(
             environment: [
-                "HUSH_PROOF_SERVICE_URL": "http://example.com",
-                "HUSH_PROOF_SHORT_URL": "https://clemii.com/s/?redirect=other",
+                "CLEMII_PROOF_SERVICE_URL": "http://example.com",
+                "CLEMII_PROOF_SHORT_URL": "https://clemii.com/s/?redirect=other",
             ],
             infoDictionary: [:]
         )

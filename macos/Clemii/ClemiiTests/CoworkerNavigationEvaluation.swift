@@ -5,7 +5,7 @@ import Testing
 
 /// Small, synthetic navigation regression set. No UI actions or microphone input.
 @Suite("Native navigation decisions", .serialized,
-       .enabled(if: ProcessInfo.processInfo.environment["HUSH_NAVIGATION_EVAL"] == "1"))
+       .enabled(if: ProcessInfo.processInfo.environment["CLEMII_NAVIGATION_EVAL"] == "1"))
 @MainActor
 struct CoworkerNavigationEvaluation {
     @Test("Named sites, supplied URLs, unknown destinations and observed results")

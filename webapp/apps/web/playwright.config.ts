@@ -1,8 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const baseURL = process.env.HUSH_E2E_BASE_URL ?? "http://127.0.0.1:4173";
+const baseURL = process.env.CLEMII_E2E_BASE_URL ?? "http://127.0.0.1:4173";
 if (!/^http:\/\/127\.0\.0\.1:\d+$/.test(baseURL)) {
-  throw new Error("HUSH_E2E_BASE_URL must be an HTTP 127.0.0.1 URL with a port");
+  throw new Error("CLEMII_E2E_BASE_URL must be an HTTP 127.0.0.1 URL with a port");
 }
 const port = new URL(baseURL).port;
 
@@ -34,7 +34,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `NODE_ENV=test PORT=${port} HUSH_PUBLIC_BASE_URL=${baseURL} bun server/index.ts`,
+    command: `NODE_ENV=test PORT=${port} CLEMII_PUBLIC_BASE_URL=${baseURL} bun server/index.ts`,
     url: `${baseURL}/health/ready`,
     reuseExistingServer: false,
   },

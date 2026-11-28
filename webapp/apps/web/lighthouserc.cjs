@@ -5,7 +5,7 @@ module.exports = {
     collect: {
       url: ["http://127.0.0.1:4315/", "http://127.0.0.1:4315/verified-messages"],
       numberOfRuns: 1,
-      startServerCommand: "NODE_ENV=test PORT=4315 HUSH_PUBLIC_BASE_URL=http://127.0.0.1:4315 bun server/index.ts",
+      startServerCommand: "NODE_ENV=test PORT=4315 CLEMII_PUBLIC_BASE_URL=http://127.0.0.1:4315 bun server/index.ts",
       startServerReadyPattern: "proof service listening",
       chromePath: process.env.CHROME_PATH || require("@playwright/test").chromium.executablePath(),
       settings: { onlyCategories: ["seo"], chromeFlags: "--headless" },

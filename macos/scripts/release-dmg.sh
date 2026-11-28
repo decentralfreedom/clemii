@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # Package an exported app. Signing is local; Apple submission is explicit opt-in.
 set -euo pipefail
+# shellcheck source=former-names.sh
+source "$(dirname "${BASH_SOURCE[0]}")/former-names.sh"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPOSITORY_DIRECTORY="$(cd "${SCRIPT_DIR}/.." && pwd)"
-RELEASE_DIRECTORY="${HUSH_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}"
+RELEASE_DIRECTORY="${CLEMII_RELEASE_DIRECTORY:-${REPOSITORY_DIRECTORY}/artifacts/release}"
 APP="${RELEASE_DIRECTORY}/export/clemii.app"
 OUTPUT=""
 LOCAL=0
@@ -14,13 +16,13 @@ while [[ $# -gt 0 ]]; do
     --local) LOCAL=1; shift ;;
     -h|--help)
       echo "Usage: $0 [--app exported/clemii.app] [--output file.dmg] [--local]"
-      echo "Default: signed local candidate. HUSH_NOTARIZE=1 submits to Apple."
+      echo "Default: signed local candidate. CLEMII_NOTARIZE=1 submits to Apple."
       exit 0 ;;
     *) echo "Unknown argument: $1" >&2; exit 1 ;;
   esac
 done
-if [[ "${LOCAL}" == "0" && "${HUSH_DMG_HEADLESS:-0}" == "1" ]]; then
-  echo "Release DMGs require Finder layout. HUSH_DMG_HEADLESS=1 is only allowed with --local." >&2
+if [[ "${LOCAL}" == "0" && "${CLEMII_DMG_HEADLESS:-0}" == "1" ]]; then
+  echo "Release DMGs require Finder layout. CLEMII_DMG_HEADLESS=1 is only allowed with --local." >&2
   exit 1
 fi
 if ! command -v create-dmg >/dev/null 2>&1; then
@@ -29,7 +31,7 @@ if ! command -v create-dmg >/dev/null 2>&1; then
 fi
 INFO_PLIST="${APP}/Contents/Info.plist"
 [[ -f "${INFO_PLIST}" ]] || { echo "App not found: ${APP}" >&2; exit 1; }
-if [[ "${LOCAL}" == "1" && "${HUSH_NOTARIZE:-0}" == "1" ]]; then
+if [[ "${LOCAL}" == "1" && "${CLEMII_NOTARIZE:-0}" == "1" ]]; then
   echo "Local development builds cannot be submitted by this script." >&2
   exit 1
 fi
@@ -51,7 +53,7 @@ ASSET_ARGS=()
 [[ -f "${SCRIPT_DIR}/dmg-background.png" ]] || { echo "Installer background is missing." >&2; exit 1; }
 ASSET_ARGS+=(--background "${SCRIPT_DIR}/dmg-background.png")
 # Headless images are only useful for local development, never distribution.
-[[ "${HUSH_DMG_HEADLESS:-0}" != "1" ]] || ASSET_ARGS+=(--skip-jenkins)
+[[ "${CLEMII_DMG_HEADLESS:-0}" != "1" ]] || ASSET_ARGS+=(--skip-jenkins)
 create-dmg --volname clemii --window-pos 200 120 --window-size 540 380 \
   --icon-size 110 --text-size 13 --icon clemii.app 140 180 --app-drop-link 400 180 \
   --hide-extension clemii.app ${ASSET_ARGS[@]+"${ASSET_ARGS[@]}"} --no-internet-enable --format UDZO \
@@ -66,7 +68,7 @@ if [[ "${LOCAL}" == "0" ]]; then
   CERTIFICATE_HASH="$(shasum -a 1 "${CERTIFICATES}/cert0")"
   codesign --sign "${CERTIFICATE_HASH%% *}" --timestamp "${OUTPUT}"
   python3 "${SCRIPT_DIR}/check_distribution.py" "${OUTPUT}" --report "${OUTPUT}.preflight.json"
-  if [[ "${HUSH_NOTARIZE:-0}" == "1" ]]; then
+  if [[ "${CLEMII_NOTARIZE:-0}" == "1" ]]; then
     "${SCRIPT_DIR}/notarize-artifact.sh" "${OUTPUT}"
     # The accepted DMG submission also provides a ticket for its nested app.
     # Staple the exported copy for the separate Sparkle ZIP without resubmitting.

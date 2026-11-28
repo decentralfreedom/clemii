@@ -21,13 +21,13 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ClemiiReleaseChannel</key>
-	<string>$(HUSH_RELEASE_CHANNEL)</string>
+	<string>$(CLEMII_RELEASE_CHANNEL)</string>
 	<key>ClemiiReleaseSlug</key>
-	<string>$(HUSH_RELEASE_SLUG)</string>
+	<string>$(CLEMII_RELEASE_SLUG)</string>
 	<key>ClemiiProofServiceURL</key>
-	<string>$(HUSH_PROOF_SERVICE_URL)</string>
+	<string>$(CLEMII_PROOF_SERVICE_URL)</string>
 	<key>ClemiiProofShortURL</key>
-	<string>$(HUSH_PROOF_SHORT_URL)</string>
+	<string>$(CLEMII_PROOF_SHORT_URL)</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
@@ -72,7 +72,7 @@
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>$(HUSH_UPDATE_FEED_URL)</string>
+	<string>$(CLEMII_UPDATE_FEED_URL)</string>
 	<key>SUPublicEDKey</key>
 	<string>F9No+lZW3Cmky1+kAuV8FHjC2veYwwD9dtSqQaHYM28=</string>
 </dict>

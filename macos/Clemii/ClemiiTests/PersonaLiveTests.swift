@@ -7,15 +7,15 @@ import Testing
 @testable import Clemii
 
 /// Opt-in evaluation with the installed models: a persona decides what clemii does
-/// with a dictation. Run with HUSH_PERSONA_LIVE=1 (and TEST_RUNNER_HUSH_PERSONA_LIVE=1).
+/// with a dictation. Run with CLEMII_PERSONA_LIVE=1 (and TEST_RUNNER_CLEMII_PERSONA_LIVE=1).
 /// Sampling varies, so each case runs several times and reports how many runs pass.
 @Suite("Personas on the installed models", .serialized,
-       .enabled(if: ProcessInfo.processInfo.environment["HUSH_PERSONA_LIVE"] == "1"))
+       .enabled(if: ProcessInfo.processInfo.environment["CLEMII_PERSONA_LIVE"] == "1"))
 @MainActor
 struct PersonaLiveTests {
     nonisolated static let providers: [LLMProvider] = [.qwen35_4b, .qwen35_2b, .appleIntelligence]
-    /// Runs per case: HUSH_PERSONA_RUNS, 3 by default; more to tell close variants apart.
-    static let runs = Int(ProcessInfo.processInfo.environment["HUSH_PERSONA_RUNS"] ?? "") ?? 3
+    /// Runs per case: CLEMII_PERSONA_RUNS, 3 by default; more to tell close variants apart.
+    static let runs = Int(ProcessInfo.processInfo.environment["CLEMII_PERSONA_RUNS"] ?? "") ?? 3
 
     /// A tester's persona that writes what is dictated, in German.
     static let assistant = Profile(

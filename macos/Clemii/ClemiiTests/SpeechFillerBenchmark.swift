@@ -13,16 +13,16 @@ import FluidAudio
 ///
 /// Opt-in, because it needs clips and downloaded models:
 ///   scripts/speech-benchmark-clips.sh /tmp/clips
-///   TEST_RUNNER_HUSH_SPEECH_BENCH_CLIPS=/tmp/clips \
-///   TEST_RUNNER_HUSH_SPEECH_BENCH_ENGINES=parakeet-ultra,base,large-v3-v20240930_turbo_632MB,bark-clean \
-///   TEST_RUNNER_HUSH_SPEECH_BENCH_MODELS=/tmp/bench-models \
+///   TEST_RUNNER_CLEMII_SPEECH_BENCH_CLIPS=/tmp/clips \
+///   TEST_RUNNER_CLEMII_SPEECH_BENCH_ENGINES=parakeet-ultra,base,large-v3-v20240930_turbo_632MB,bark-clean \
+///   TEST_RUNNER_CLEMII_SPEECH_BENCH_MODELS=/tmp/bench-models \
 ///   xcodebuild test ... -only-testing:ClemiiTests/SpeechFillerBenchmark
 /// Engines that are not on this Mac are skipped, never downloaded, except Bark, which
-/// downloads into HUSH_SPEECH_BENCH_MODELS. HUSH_SPEECH_BENCH_OUT writes the results as JSON.
+/// downloads into CLEMII_SPEECH_BENCH_MODELS. CLEMII_SPEECH_BENCH_OUT writes the results as JSON.
 @Suite(
     "Speech filler benchmark",
     .serialized,
-    .enabled(if: ProcessInfo.processInfo.environment["HUSH_SPEECH_BENCH_CLIPS"] != nil)
+    .enabled(if: ProcessInfo.processInfo.environment["CLEMII_SPEECH_BENCH_CLIPS"] != nil)
 )
 struct SpeechFillerBenchmark {
 
@@ -58,11 +58,11 @@ struct SpeechFillerBenchmark {
         let corpusURL = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
             .appendingPathComponent("Fixtures/Speech/filler-clips.json")
         let corpus = try JSONDecoder().decode(Corpus.self, from: Data(contentsOf: corpusURL))
-        let clipsFolder = URL(fileURLWithPath: try #require(Self.environment["HUSH_SPEECH_BENCH_CLIPS"]))
+        let clipsFolder = URL(fileURLWithPath: try #require(Self.environment["CLEMII_SPEECH_BENCH_CLIPS"]))
         let clips = corpus.clips.filter { FileManager.default.fileExists(atPath: clipsFolder.appendingPathComponent("\($0.id).wav").path) }
         #expect(!clips.isEmpty, "No clips in \(clipsFolder.path); run scripts/speech-benchmark-clips.sh")
 
-        let engines = (Self.environment["HUSH_SPEECH_BENCH_ENGINES"] ?? "parakeet-ultra,base")
+        let engines = (Self.environment["CLEMII_SPEECH_BENCH_ENGINES"] ?? "parakeet-ultra,base")
             .split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
         var measurements: [Measurement] = []
         for engine in engines {
@@ -84,7 +84,7 @@ struct SpeechFillerBenchmark {
         }
 
         print(Self.report(measurements))
-        if let path = Self.environment["HUSH_SPEECH_BENCH_OUT"] {
+        if let path = Self.environment["CLEMII_SPEECH_BENCH_OUT"] {
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             try encoder.encode(["corpusVersion": corpus.version]).write(to: URL(fileURLWithPath: path + ".meta.json"))
@@ -99,7 +99,7 @@ struct SpeechFillerBenchmark {
     static func engine(_ name: String) async throws -> Transcribe? {
         #if canImport(FluidAudio)
         if name == "bark-clean" {
-            let folder = URL(fileURLWithPath: environment["HUSH_SPEECH_BENCH_MODELS"] ?? NSTemporaryDirectory())
+            let folder = URL(fileURLWithPath: environment["CLEMII_SPEECH_BENCH_MODELS"] ?? NSTemporaryDirectory())
             let models = try await AsrModels.downloadAndLoad(to: folder, version: .bark3Clean, progressHandler: { _ in })
             let asr = AsrManager(config: .default)
             try await asr.loadModels(models)

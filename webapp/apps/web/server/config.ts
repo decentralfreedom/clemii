@@ -1,3 +1,4 @@
+import { withFormerNames } from "../shared/former-names";
 import { link, mkdir, rename, unlink, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import {
@@ -15,7 +16,7 @@ export type ServerConfig = {
   dataDirectory: string;
   databaseUrl?: string;
   allowedOrigin: string;
-  /** Id of a key supplied through HUSH_SERVICE_PRIVATE_JWK; generated keys name themselves. */
+  /** Id of a key supplied through CLEMII_SERVICE_PRIVATE_JWK; generated keys name themselves. */
   serviceKeyId?: string;
   servicePrivateJwk?: JsonWebKey;
   /** Rejects proof writes with 503 while every read keeps working (data migrations). */
@@ -23,8 +24,8 @@ export type ServerConfig = {
   /** How long a stopping instance keeps serving before it closes its listener. */
   shutdownDrainMs: number;
   /**
-   * Umami (blog funnel, PRD R10), off unless both HUSH_UMAMI_URL and
-   * HUSH_UMAMI_WEBSITE_ID are set; then this server counts page views and
+   * Umami (blog funnel, PRD R10), off unless both CLEMII_UMAMI_URL and
+   * CLEMII_UMAMI_WEBSITE_ID are set; then this server counts page views and
    * downloads, on the server only: there is no browser tracker.
    */
   analytics?: { umamiUrl: string; websiteId: string };
@@ -37,24 +38,25 @@ export type ServerConfig = {
   };
 };
 
-export function loadConfig(env = process.env): ServerConfig {
+export function loadConfig(settings: Record<string, string | undefined> = process.env): ServerConfig {
+  const env = withFormerNames(settings);
   const environment = (env.NODE_ENV ?? "development") as ServerConfig["environment"];
-  const publicBaseUrl = env.HUSH_PUBLIC_BASE_URL ?? "http://127.0.0.1:3000";
+  const publicBaseUrl = env.CLEMII_PUBLIC_BASE_URL ?? "http://127.0.0.1:3000";
   const shortBaseUrl = normalizeBaseUrl(
-    env.HUSH_SHORT_BASE_URL ?? new URL("/s/", publicBaseUrl).toString(),
+    env.CLEMII_SHORT_BASE_URL ?? new URL("/s/", publicBaseUrl).toString(),
     environment,
   );
-  const dataDirectory = resolve(env.HUSH_DATA_DIR ?? ".data");
-  const privateJwk = env.HUSH_SERVICE_PRIVATE_JWK
-    ? (JSON.parse(env.HUSH_SERVICE_PRIVATE_JWK) as JsonWebKey)
+  const dataDirectory = resolve(env.CLEMII_DATA_DIR ?? ".data");
+  const privateJwk = env.CLEMII_SERVICE_PRIVATE_JWK
+    ? (JSON.parse(env.CLEMII_SERVICE_PRIVATE_JWK) as JsonWebKey)
     : undefined;
-  const s3 = env.HUSH_S3_BUCKET
+  const s3 = env.CLEMII_S3_BUCKET
     ? {
-        bucket: env.HUSH_S3_BUCKET,
-        region: env.HUSH_S3_REGION ?? "auto",
-        endpoint: env.HUSH_S3_ENDPOINT,
-        accessKeyId: env.HUSH_S3_ACCESS_KEY_ID,
-        secretAccessKey: env.HUSH_S3_SECRET_ACCESS_KEY,
+        bucket: env.CLEMII_S3_BUCKET,
+        region: env.CLEMII_S3_REGION ?? "auto",
+        endpoint: env.CLEMII_S3_ENDPOINT,
+        accessKeyId: env.CLEMII_S3_ACCESS_KEY_ID,
+        secretAccessKey: env.CLEMII_S3_SECRET_ACCESS_KEY,
       }
     : undefined;
   return {
@@ -64,25 +66,25 @@ export function loadConfig(env = process.env): ServerConfig {
     shortBaseUrl,
     dataDirectory,
     databaseUrl: env.DATABASE_URL,
-    allowedOrigin: env.HUSH_ALLOWED_ORIGIN ?? new URL(publicBaseUrl).origin,
-    serviceKeyId: env.HUSH_SERVICE_KEY_ID,
+    allowedOrigin: env.CLEMII_ALLOWED_ORIGIN ?? new URL(publicBaseUrl).origin,
+    serviceKeyId: env.CLEMII_SERVICE_KEY_ID,
     servicePrivateJwk: privateJwk,
-    readOnly: env.HUSH_READ_ONLY === "1",
-    shutdownDrainMs: boundedInteger(env.HUSH_SHUTDOWN_DRAIN_MS, 10_000, 0, 60_000, "HUSH_SHUTDOWN_DRAIN_MS"),
+    readOnly: env.CLEMII_READ_ONLY === "1",
+    shutdownDrainMs: boundedInteger(env.CLEMII_SHUTDOWN_DRAIN_MS, 10_000, 0, 60_000, "CLEMII_SHUTDOWN_DRAIN_MS"),
     analytics: loadAnalytics(env, environment),
     s3,
   };
 }
 
 function loadAnalytics(env: Record<string, string | undefined>, environment: ServerConfig["environment"]): ServerConfig["analytics"] {
-  const umamiUrl = env.HUSH_UMAMI_URL;
-  const websiteId = env.HUSH_UMAMI_WEBSITE_ID;
+  const umamiUrl = env.CLEMII_UMAMI_URL;
+  const websiteId = env.CLEMII_UMAMI_WEBSITE_ID;
   if (!umamiUrl && !websiteId) return undefined;
-  if (!umamiUrl || !websiteId) throw new Error("Set both HUSH_UMAMI_URL and HUSH_UMAMI_WEBSITE_ID, or neither");
+  if (!umamiUrl || !websiteId) throw new Error("Set both CLEMII_UMAMI_URL and CLEMII_UMAMI_WEBSITE_ID, or neither");
   const url = new URL(umamiUrl);
-  if (environment === "production" && url.protocol !== "https:") throw new Error("HUSH_UMAMI_URL must use HTTPS in production");
-  if (url.username || url.password || url.search || url.hash) throw new Error("HUSH_UMAMI_URL must be a plain origin or path");
-  if (!/^[0-9a-f-]{36}$/i.test(websiteId)) throw new Error("HUSH_UMAMI_WEBSITE_ID must be the website's UUID from Umami");
+  if (environment === "production" && url.protocol !== "https:") throw new Error("CLEMII_UMAMI_URL must use HTTPS in production");
+  if (url.username || url.password || url.search || url.hash) throw new Error("CLEMII_UMAMI_URL must be a plain origin or path");
+  if (!/^[0-9a-f-]{36}$/i.test(websiteId)) throw new Error("CLEMII_UMAMI_WEBSITE_ID must be the website's UUID from Umami");
   return { umamiUrl: url.toString().replace(/\/$/, ""), websiteId };
 }
 
@@ -107,14 +109,14 @@ function normalizeBaseUrl(
 ): string {
   const url = new URL(value);
   if (!["http:", "https:"].includes(url.protocol)) {
-    throw new Error("HUSH_SHORT_BASE_URL must use HTTP or HTTPS");
+    throw new Error("CLEMII_SHORT_BASE_URL must use HTTP or HTTPS");
   }
   if (environment === "production" && url.protocol !== "https:") {
-    throw new Error("HUSH_SHORT_BASE_URL must use HTTPS in production");
+    throw new Error("CLEMII_SHORT_BASE_URL must use HTTPS in production");
   }
   if (url.username || url.password || url.search || url.hash) {
     throw new Error(
-      "HUSH_SHORT_BASE_URL must not contain credentials, a query, or a fragment",
+      "CLEMII_SHORT_BASE_URL must not contain credentials, a query, or a fragment",
     );
   }
   if (!url.pathname.endsWith("/")) url.pathname += "/";

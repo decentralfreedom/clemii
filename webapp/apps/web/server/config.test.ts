@@ -5,11 +5,23 @@ import { join } from "node:path";
 import { loadConfig, loadServiceKey } from "./config";
 import { createEphemeralServiceKey } from "./crypto/p256";
 
+describe("settings named before the rename", () => {
+  test("a HUSH_ setting stands in for its missing CLEMII_ twin", () => {
+    const config = loadConfig({ NODE_ENV: "test", HUSH_PUBLIC_BASE_URL: "https://old.example", HUSH_READ_ONLY: "1" });
+    expect([config.publicBaseUrl, config.readOnly]).toEqual(["https://old.example", true]);
+  });
+
+  test("the CLEMII_ setting wins when both are set", () => {
+    const config = loadConfig({ NODE_ENV: "test", HUSH_PUBLIC_BASE_URL: "https://old.example", CLEMII_PUBLIC_BASE_URL: "https://clemii.com" });
+    expect(config.publicBaseUrl).toBe("https://clemii.com");
+  });
+});
+
 describe("proof short-link configuration", () => {
   test("uses the local resolver path by default", () => {
     const config = loadConfig({
       NODE_ENV: "test",
-      HUSH_PUBLIC_BASE_URL: "http://127.0.0.1:4173",
+      CLEMII_PUBLIC_BASE_URL: "http://127.0.0.1:4173",
     });
 
     expect(config.shortBaseUrl).toBe("http://127.0.0.1:4173/s/");
@@ -18,7 +30,7 @@ describe("proof short-link configuration", () => {
   test("derives the production resolver path from the canonical origin", () => {
     const config = loadConfig({
       NODE_ENV: "production",
-      HUSH_PUBLIC_BASE_URL: "https://behu.sh",
+      CLEMII_PUBLIC_BASE_URL: "https://behu.sh",
     });
 
     expect(config.shortBaseUrl).toBe("https://behu.sh/s/");
@@ -28,8 +40,8 @@ describe("proof short-link configuration", () => {
   test("normalizes a first-party short domain", () => {
     const config = loadConfig({
       NODE_ENV: "production",
-      HUSH_PUBLIC_BASE_URL: "https://verify.hush.app",
-      HUSH_SHORT_BASE_URL: "https://behu.sh",
+      CLEMII_PUBLIC_BASE_URL: "https://verify.hush.app",
+      CLEMII_SHORT_BASE_URL: "https://behu.sh",
     });
 
     expect(config.shortBaseUrl).toBe("https://behu.sh/");
@@ -39,13 +51,13 @@ describe("proof short-link configuration", () => {
     expect(() =>
       loadConfig({
         NODE_ENV: "production",
-        HUSH_SHORT_BASE_URL: "http://behu.sh",
+        CLEMII_SHORT_BASE_URL: "http://behu.sh",
       }),
     ).toThrow("must use HTTPS in production");
     expect(() =>
       loadConfig({
         NODE_ENV: "test",
-        HUSH_SHORT_BASE_URL: "https://user:secret@behu.sh/",
+        CLEMII_SHORT_BASE_URL: "https://user:secret@behu.sh/",
       }),
     ).toThrow("must not contain credentials");
   });
@@ -55,10 +67,10 @@ describe("proof short-link configuration", () => {
     try {
       const production = loadConfig({
         NODE_ENV: "production",
-        HUSH_PUBLIC_BASE_URL: "https://behu.sh",
-        HUSH_SHORT_BASE_URL: "https://behu.sh",
-        HUSH_DATA_DIR: dataDirectory,
-        HUSH_SERVICE_KEY_ID: "hush-production-1",
+        CLEMII_PUBLIC_BASE_URL: "https://behu.sh",
+        CLEMII_SHORT_BASE_URL: "https://behu.sh",
+        CLEMII_DATA_DIR: dataDirectory,
+        CLEMII_SERVICE_KEY_ID: "hush-production-1",
       });
       const first = await loadServiceKey(production);
       const second = await loadServiceKey(production);
@@ -89,9 +101,9 @@ describe("proof short-link configuration", () => {
       await Bun.write(join(dataDirectory, "service-key.json"), JSON.stringify({ id: "hush-production-1", privateJwk }));
       const loaded = await loadServiceKey(loadConfig({
         NODE_ENV: "production",
-        HUSH_PUBLIC_BASE_URL: "https://behu.sh",
-        HUSH_SHORT_BASE_URL: "https://behu.sh",
-        HUSH_DATA_DIR: dataDirectory,
+        CLEMII_PUBLIC_BASE_URL: "https://behu.sh",
+        CLEMII_SHORT_BASE_URL: "https://behu.sh",
+        CLEMII_DATA_DIR: dataDirectory,
       }));
       expect(loaded.id).toBe("hush-production-1");
       expect(loaded.publicJwk).toEqual(legacy.publicJwk);
@@ -103,9 +115,9 @@ describe("proof short-link configuration", () => {
 
   test("reads read-only mode and a bounded shutdown drain", () => {
     expect(loadConfig({ NODE_ENV: "test" })).toMatchObject({ readOnly: false, shutdownDrainMs: 10_000 });
-    expect(loadConfig({ NODE_ENV: "test", HUSH_READ_ONLY: "1", HUSH_SHUTDOWN_DRAIN_MS: "2500" }))
+    expect(loadConfig({ NODE_ENV: "test", CLEMII_READ_ONLY: "1", CLEMII_SHUTDOWN_DRAIN_MS: "2500" }))
       .toMatchObject({ readOnly: true, shutdownDrainMs: 2_500 });
-    expect(() => loadConfig({ NODE_ENV: "test", HUSH_SHUTDOWN_DRAIN_MS: "-1" })).toThrow("HUSH_SHUTDOWN_DRAIN_MS");
-    expect(() => loadConfig({ NODE_ENV: "test", HUSH_SHUTDOWN_DRAIN_MS: "90000" })).toThrow("HUSH_SHUTDOWN_DRAIN_MS");
+    expect(() => loadConfig({ NODE_ENV: "test", CLEMII_SHUTDOWN_DRAIN_MS: "-1" })).toThrow("CLEMII_SHUTDOWN_DRAIN_MS");
+    expect(() => loadConfig({ NODE_ENV: "test", CLEMII_SHUTDOWN_DRAIN_MS: "90000" })).toThrow("CLEMII_SHUTDOWN_DRAIN_MS");
   });
 });

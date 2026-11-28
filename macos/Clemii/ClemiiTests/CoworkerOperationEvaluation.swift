@@ -4,7 +4,7 @@ import Testing
 @testable import Clemii
 
 @Suite("Browser operation A/B", .serialized,
-       .enabled(if: ProcessInfo.processInfo.environment["HUSH_OPERATION_AB"] == "1"))
+       .enabled(if: ProcessInfo.processInfo.environment["CLEMII_OPERATION_AB"] == "1"))
 @MainActor
 struct CoworkerOperationEvaluation {
     struct Result: Codable {
@@ -34,7 +34,7 @@ struct CoworkerOperationEvaluation {
         var rows: [Result] = []
         var packets: [[String: Any]] = []
         for (index, test) in cases.enumerated() {
-            let variants = ProcessInfo.processInfo.environment["HUSH_OPERATION_VARIANTS"]?.components(separatedBy: ",") ?? ["primitive", "bundled"]
+            let variants = ProcessInfo.processInfo.environment["CLEMII_OPERATION_VARIANTS"]?.components(separatedBy: ",") ?? ["primitive", "bundled"]
             for offset in 0..<variants.count {
                 let variant = variants[(index + offset) % variants.count]
                 var observation = test.request.observation

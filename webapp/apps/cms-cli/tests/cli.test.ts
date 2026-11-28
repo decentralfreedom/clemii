@@ -10,9 +10,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import postgres from "postgres";
 
-const serverUrl = process.env.HUSH_TEST_DATABASE_URL;
+const serverUrl = process.env.CLEMII_TEST_DATABASE_URL;
 // CI provides PostgreSQL; never let the CLI journeys skip there.
-if (process.env.CI && !serverUrl) throw new Error("HUSH_TEST_DATABASE_URL is required in CI");
+if (process.env.CI && !serverUrl) throw new Error("CLEMII_TEST_DATABASE_URL is required in CI");
 
 const cmsDir = join(import.meta.dir, "../../cms");
 const fixtures = join(import.meta.dir, "fixtures");
@@ -78,8 +78,8 @@ describe.skipIf(!serverUrl)("hush-cms CLI", () => {
   /** Runs hush-cms in the work directory as the given token. */
   async function cli(args: string[], options: { token?: string | null; stdin?: string } = {}) {
     const token = options.token === undefined ? tokens.agent : options.token;
-    const environment: Record<string, string | undefined> = { ...process.env, HUSH_CMS_URL: url, HUSH_CMS_TOKEN: token ?? undefined };
-    if (token === null) delete environment.HUSH_CMS_TOKEN;
+    const environment: Record<string, string | undefined> = { ...process.env, CLEMII_CMS_URL: url, CLEMII_CMS_TOKEN: token ?? undefined };
+    if (token === null) delete environment.CLEMII_CMS_TOKEN;
     const child = Bun.spawn(["bun", join(import.meta.dir, "../src/main.ts"), ...args], {
       cwd: work, env: environment, stdin: options.stdin === undefined ? "ignore" : new TextEncoder().encode(options.stdin), stdout: "pipe", stderr: "pipe",
     });
@@ -208,12 +208,12 @@ describe.skipIf(!serverUrl)("hush-cms CLI", () => {
 
     if (process.platform !== "darwin") {
       const login = await cli(["auth", "login", "--no-browser"], { token: null });
-      expect([login.exitCode, login.stderr]).toEqual([1, "hush-cms: Only macOS has a Keychain here; set HUSH_CMS_TOKEN instead.\n"]);
+      expect([login.exitCode, login.stderr]).toEqual([1, "hush-cms: Only macOS has a Keychain here; set CLEMII_CMS_TOKEN instead.\n"]);
       return;
     }
     // A Keychain item for this test's own origin, removed again below.
-    const environment: Record<string, string | undefined> = { ...process.env, HUSH_CMS_URL: url };
-    delete environment.HUSH_CMS_TOKEN;
+    const environment: Record<string, string | undefined> = { ...process.env, CLEMII_CMS_URL: url };
+    delete environment.CLEMII_CMS_TOKEN;
     const login = Bun.spawn(["bun", join(import.meta.dir, "../src/main.ts"), "auth", "login", "--no-browser"], { cwd: work, env: environment, stdout: "pipe", stderr: "pipe" });
     try {
       // The CLI shows a one-time code and the page to approve it, then waits.

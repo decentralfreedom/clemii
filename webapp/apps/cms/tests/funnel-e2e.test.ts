@@ -21,9 +21,9 @@ import { umamiClient } from "../src/traffic/umami";
 import { createTestDatabase, serverUrl } from "./database";
 import { credentials, validPost } from "./fixtures";
 
-const url = process.env.HUSH_FUNNEL_UMAMI_URL;
-const websiteId = process.env.HUSH_FUNNEL_UMAMI_WEBSITE_ID;
-const apiKey = process.env.HUSH_FUNNEL_UMAMI_API_KEY;
+const url = process.env.CLEMII_FUNNEL_UMAMI_URL;
+const websiteId = process.env.CLEMII_FUNNEL_UMAMI_WEBSITE_ID;
+const apiKey = process.env.CLEMII_FUNNEL_UMAMI_API_KEY;
 
 test.skipIf(!url || !websiteId || !apiKey || !serverUrl)("FUNNEL-001 the CMS imports exactly the visits and downloads the website counted", async () => {
   const database = await createTestDatabase();

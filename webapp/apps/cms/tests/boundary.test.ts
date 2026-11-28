@@ -13,6 +13,6 @@ test("the CMS stays out of the website and the proof service", async () => {
     const source = await Bun.file(join(root, file)).text();
     expect(source, file).not.toMatch(/from ["'][^"']*apps\/web/);
     expect(source, file).not.toMatch(/from ["']\.\.\/\.\.\/\.\.\//);
-    expect(source, file).not.toMatch(/\b(DATABASE_URL|HUSH_SERVICE_PRIVATE_JWK)\b/);
+    expect(source, file).not.toMatch(/\b(DATABASE_URL|CLEMII_SERVICE_PRIVATE_JWK)\b/);
   }
 });

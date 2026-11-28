@@ -9,9 +9,9 @@
 import { expect, test, type Browser } from "@playwright/test";
 import { blogPosts } from "../shared/blog-posts.generated";
 
-const umamiUrl = process.env.HUSH_UMAMI_URL;
-const websiteId = process.env.HUSH_UMAMI_WEBSITE_ID;
-const apiKey = process.env.HUSH_FUNNEL_UMAMI_API_KEY;
+const umamiUrl = process.env.CLEMII_UMAMI_URL;
+const websiteId = process.env.CLEMII_UMAMI_WEBSITE_ID;
+const apiKey = process.env.CLEMII_FUNNEL_UMAMI_API_KEY;
 const article = "/blog/fixture-dictation-without-cloud";
 // A browser as visitors have it: Umami drops "HeadlessChrome" as a bot (checked below).
 const userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36";

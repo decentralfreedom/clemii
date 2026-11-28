@@ -4,13 +4,13 @@ clemii short links are first-party aliases for completed encrypted proofs. They 
 
 ## Production shape
 
-Set `HUSH_SHORT_BASE_URL` to the public short domain with a trailing slash:
+Set `CLEMII_SHORT_BASE_URL` to the public short domain with a trailing slash:
 
 ```text
-HUSH_SHORT_BASE_URL=https://behu.sh/
+CLEMII_SHORT_BASE_URL=https://behu.sh/
 ```
 
-The Hono service resolves `/<code>` directly and returns a `302` to the canonical verifier URL configured by `HUSH_PUBLIC_BASE_URL`. `/s/<code>` remains available as a compatibility route. A same-domain Coolify deployment does not require a separate edge rewrite.
+The Hono service resolves `/<code>` directly and returns a `302` to the canonical verifier URL configured by `CLEMII_PUBLIC_BASE_URL`. `/s/<code>` remains available as a compatibility route. A same-domain Coolify deployment does not require a separate edge rewrite.
 
 If a dedicated short-link edge is introduced later, it may internally rewrite `/<code>` to `/s/<code>` without redirecting.
 
@@ -33,4 +33,4 @@ The alias row is created idempotently after proof completion. A unique code inde
 
 Six Base64URL characters provide a 36-bit public locator space. The code is not an authorization secret: proof contents remain encrypted and require the independent fragment key. Rate limits reduce enumeration, while the database uniqueness constraint and allocation retries resolve collisions without overwriting an existing alias.
 
-Local development defaults to `<HUSH_PUBLIC_BASE_URL>/s/`. Production may use a root short base such as `https://behu.sh/` without a separate edge.
+Local development defaults to `<CLEMII_PUBLIC_BASE_URL>/s/`. Production may use a root short base such as `https://behu.sh/` without a separate edge.
