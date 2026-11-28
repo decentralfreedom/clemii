@@ -383,8 +383,9 @@ test("CMS-009 the post settings dock beside the editor, and Cmd/Ctrl+. toggles t
 
 test("CMS-010 publishing celebrates the post on the posts list, with its link to share", async ({ signedIn, draft }) => {
   const post = await draft();
-  // The website has not built the new post's thumbnail yet.
-  await signedIn.route(`https://clemii.com/blog/covers/${post.slug}-*`, (route) => route.fulfill({ status: 404 }));
+  // The website has not built the new post's cover yet; once it has, the fixture serves it.
+  let built = false;
+  await signedIn.route(`https://clemii.com/blog/covers/${post.slug}-*`, (route) => built ? route.fallback() : route.fulfill({ status: 404 }));
   await signedIn.goto(`/posts/${post.id}`);
   await expect(status(signedIn)).toHaveText("Draft - Saved");
   await signedIn.keyboard.press("ControlOrMeta+Shift+p");
@@ -405,6 +406,15 @@ test("CMS-010 publishing celebrates the post on the posts list, with its link to
   await expect(card).toContainText("A practical guide to dictating on a Mac");
   await expect(card).toContainText("clemii");
   await expect(card).toContainText("Clemens Kressmann");
+  // Its cover, as Ghost shows the feature image: the placeholder until the website has built it, then the
+  // cover itself, without a reload.
+  const cover = (scope: typeof card) => scope.locator(`img[src*="/blog/covers/"]`);
+  const loaded = (scope: typeof card) => cover(scope).evaluateAll((images: HTMLImageElement[]) => images.some((image) => image.complete && image.naturalWidth > 0));
+  await expect(card.locator("svg.lucide-image")).toBeVisible();
+  expect(await loaded(card)).toBe(false);
+  built = true;
+  await expect.poll(() => loaded(card), { timeout: 25_000 }).toBe(true);
+  await expect(cover(card)).toHaveCSS("opacity", "1");
   // Sharing names the post's address.
   await expect(celebration.getByRole("link", { name: "Share on X" })).toHaveAttribute("href", `https://twitter.com/intent/tweet?text=${encodeURIComponent("How to dictate on a Mac without the cloud")}%0A${encodeURIComponent(url)}`);
   await expect(celebration.getByRole("link", { name: "Share on LinkedIn" })).toHaveAttribute("href", new RegExp(encodeURIComponent(url).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
@@ -417,12 +427,11 @@ test("CMS-010 publishing celebrates the post on the posts list, with its link to
   await signedIn.reload();
   await expect(signedIn.getByRole("heading", { name: "Posts", exact: true })).toBeVisible();
   await expect(signedIn.getByRole("dialog")).toHaveCount(0);
-  // Its row shows the placeholder until the website has built the thumbnail, not a broken image.
+  // Its row shows the cover the website has built.
   const row = signedIn.getByRole("main").getByRole("listitem").filter({ has: signedIn.locator(`a[href="/posts/${post.id}"]`) });
   await row.scrollIntoViewIfNeeded();
   await expect(row).toContainText("Published");
-  await expect(row.locator("img")).toHaveCount(0);
-  await expect(row.locator("svg.lucide-image")).toBeVisible();
+  await expect.poll(() => loaded(row)).toBe(true);
 });
 
 test("CMS-011 the owner approves a draft in its preview, for an agent to schedule or publish it as it is", async ({ signedIn, draft }) => {
